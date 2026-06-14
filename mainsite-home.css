@@ -19,7 +19,7 @@ body { font-family:'Poppins','Helvetica Neue',Arial,sans-serif; background:#fff;
 .hero-badge .dot { width:7px; height:7px; border-radius:50%; background:#4cb826; flex-shrink:0; }
 .hero-badge span { font-size:12px; font-weight:500; color:#5a5a5a; letter-spacing:1.5px; text-transform:uppercase; }
 .hero h1 { font-size:41px; font-weight:700; line-height:1.18; letter-spacing:-0.5px; margin:0 0 20px; max-width:700px; margin-left:auto; margin-right:auto; }
-.hero h1 .grn { color:#4cb826; }
+.hero h1 .grn { color:#ff3d9a; }
 .hero-sub { font-size:15px; color:#5a5a5a; line-height:1.7; max-width:600px; margin:0 auto 32px; }
 .hero-ctas { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
 .btn { display:inline-block; font-family:inherit; font-size:14px; font-weight:600; border-radius:8px; padding:14px 30px; cursor:pointer; text-decoration:none; text-align:center; transition:all 0.2s; }

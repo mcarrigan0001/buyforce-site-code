@@ -30,9 +30,19 @@ The loader fetches a cache-busted copy each load (`?v=timestamp`), so updates ap
 
 Paste the full contents of `mainsite-home.loader.html` into the home page's HighLevel Custom Code element (replacing the old code), then Save + Publish. That's the last time you touch HighLevel for this page.
 
-### Tradeoff (accepted)
+### Tradeoff (accepted, for now)
 
-Page content is loaded by script, so it's not in the initial HTML — weaker for Google SEO and social link previews. Chosen because traffic to this page is driven directly, not via search.
+Page content is loaded by script, so it's not in the initial HTML — weaker for Google SEO and social link previews. Chosen deliberately for the **build phase**: while the page changes often, fully hands-off speed matters more than SEO.
+
+### Planned SEO switch (do this once the page is finalized)
+
+When the design/content is locked and the page should rank in Google:
+1. Take the current `mainsite-home.body.html` content.
+2. Paste it inline into the HighLevel Custom Code element (replacing the loader's `<div id="bf-home">`).
+3. Keep (or inline) the `<link>` to `mainsite-home.css` and `<script src>` to `mainsite-home.js`.
+4. Save + Publish. Now the content is in the initial HTML = SEO-friendly.
+
+GitHub stays the source of truth throughout — this is only a change in *where the HTML is served from*, not a rebuild.
 
 ## Conventions
 
