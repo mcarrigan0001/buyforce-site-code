@@ -11,6 +11,7 @@
 (function () {
   function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function money(s){ return (s||'').replace(/\.00(?=$|[^0-9])/,''); }
 
   function fixLinks(){
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
@@ -132,7 +133,7 @@
   }
 
   function tile(lbl,val){
-    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(val):'—')+'</div></div>';
+    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(money(val)):'—')+'</div></div>';
   }
 
   function buildCard(F, card){
@@ -146,16 +147,16 @@
     var akNum=parseFloat((asking||'').replace(/[^0-9.]/g,''));
     if(!isNaN(wtNum) && wtNum>0 && wtNum!==akNum){
       askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div>'+
-        '<div style="font-size:14px;font-weight:500;color:#161616;display:flex;align-items:center;gap:3px;">'+esc(willTake)+'<i class="ti ti-arrow-down-right" style="font-size:13px;color:#2b6012;" aria-hidden="true"></i></div>'+
-        (asking?'<div style="font-size:10px;color:#b4b2a9;text-decoration:line-through;">was '+esc(asking)+'</div>':'');
+        '<div style="font-size:14px;font-weight:500;color:#161616;display:flex;align-items:center;gap:3px;">'+esc(money(willTake))+'<i class="ti ti-arrow-down-right" style="font-size:13px;color:#2b6012;" aria-hidden="true"></i></div>'+
+        (asking?'<div style="font-size:10px;color:#b4b2a9;text-decoration:line-through;">was '+esc(money(asking))+'</div>':'');
     } else {
-      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(asking?esc(asking):'—')+'</div>';
+      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(asking?esc(money(asking)):'—')+'</div>';
     }
 
     var oc = comp ? COMPC[comp.color] : null;
     var offerTile = '<div'+(oc?' style="background:'+oc.bg+';border-radius:6px;padding:2px 6px;margin:-2px -4px;"':'')+'>'+
       '<div style="font-size:11px;color:'+(oc?oc.fg:'#7c7c7c')+';">Offer</div>'+
-      '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(F['Offer Amount']):'—')+'</div></div>';
+      '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
     var equityTile = '<div><div style="font-size:11px;color:#7c7c7c;">Equity</div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
 
