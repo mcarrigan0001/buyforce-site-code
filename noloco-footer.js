@@ -4,7 +4,7 @@
 /* 2) Adds a Tabler icon above each pipeline column's caret, matched by  */
 /*    stage NAME (survives reordering). Gray normally, green on active.   */
 /* 3) Renders a live "time in stage" badge on each card from             */
-/*    Stage Entered At, colored per-stage (green/amber/red).             */
+/*    Stage Entered At, colored per-stage (green/orange/red).            */
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
@@ -56,6 +56,7 @@
     });
   }
 
+  /* per-stage [orange, red] thresholds in MINUTES; null = no aging (terminal) */
   var THRESH = {
     'Fresh Leads': [240, 720],
     'Engaged - Awaiting VIN': [720, 1440],
@@ -77,9 +78,11 @@
     if (mins < 1) return 'just now';
     if (mins < 60) return mins + 'm';
     var h = Math.floor(mins / 60);
-    if (h < 24) return h + 'h';
+    var m = mins % 60;
+    if (h < 24) return h + 'h ' + m + 'm';
     var d = Math.floor(h / 24);
-    return d + 'd';
+    var hh = h % 24;
+    return d + 'd ' + hh + 'h';
   }
 
   function stageOf(card){
@@ -110,7 +113,7 @@
       var stage = stageOf(card);
       var t = THRESH.hasOwnProperty(stage) ? THRESH[stage] : null;
       var color = '#5f5e5a';
-      if (t) { color = mins >= t[1] ? '#c93535' : (mins >= t[0] ? '#bd7a12' : '#3b6d11'); }
+      if (t) { color = mins >= t[1] ? '#c93535' : (mins >= t[0] ? '#e8730c' : '#3b6d11'); }
       var key = label + '|' + color;
       if (card.getAttribute('data-bfaging') === key) return;
       card.setAttribute('data-bfaging', key);
