@@ -10,7 +10,6 @@
 (function () {
   function norm(s){ return (s||'').replace(/[‒-―]/g,'-').replace(/\s+/g,' ').trim(); }
 
-  /* ---- 1) external links open in a new tab ---- */
   function fixLinks(){
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
       if (a.hostname !== location.hostname && !a.target) {
@@ -20,7 +19,6 @@
     });
   }
 
-  /* ---- 2) pipeline stage icons ---- */
   var ICONS = {
     'Fresh Leads': 'ti-user-plus',
     'Engaged - Awaiting VIN': 'ti-message-2',
@@ -53,4 +51,77 @@
       icon.className = 'ti ' + cls + ' bf-stage-icon';
       icon.setAttribute('aria-hidden','true');
       if (btn && btn.parentNode) { btn.parentNode.insertBefore(icon, btn); }
-     
+      else { header.insertBefore(icon, header.firstChild); }
+      group.setAttribute('data-bficon','1');
+    });
+  }
+
+  var THRESH = {
+    'Fresh Leads': [240, 720],
+    'Engaged - Awaiting VIN': [720, 1440],
+    'VIN Received - Appraisal Needed': [120, 360],
+    'Appraisal Complete - Enter Offer Sheet Values': [120, 360],
+    'Offer Sheet Generated': [120, 480],
+    'Offer Sent (0-2 Days)': [1440, 2880],
+    'Nurturing (Follow Up and Re-engage)': [10080, 20160],
+    'Appraisal Review Needed': [240, 720],
+    'Appraisal Review Complete': [240, 720],
+    'Verbal Yes - Schedule Appt': [720, 1440],
+    'Scheduled': [1440, 4320],
+    'Appt Shown - Follow Up': [720, 1440],
+    'Acquired': null,
+    'No Deal': null
+  };
+
+  function fmtDuration(mins){
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm';
+    var h = Math.floor(mins / 60);
+    if (h < 24) return h + 'h';
+    var d = Math.floor(h / 24);
+    return d + 'd';
+  }
+
+  function stageOf(card){
+    var g = card.closest ? card.closest('[data-testid="collection-group"]') : null;
+    if (!g) return '';
+    var l = g.querySelector('[data-testid="collection-group-header-label"]');
+    return l ? norm(l.textContent) : '';
+  }
+
+  function addAging(){
+    document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
+      var cells = card.querySelectorAll('[data-testid="field-cell"]');
+      var lblSpan = null;
+      for (var i = 0; i < cells.length; i++) {
+        var l = cells[i].querySelector('[data-testid="field-cell-label"]');
+        if (l && norm(l.textContent) === 'Stage Entered At') { lblSpan = l; break; }
+      }
+      if (!lblSpan) return;
+      var valNode = lblSpan.nextElementSibling;
+      if (!valNode) return;
+      var raw = (valNode.getAttribute('data-bfraw') || valNode.textContent || '').trim();
+      if (!raw) return;
+      var dt = new Date(raw);
+      if (isNaN(dt.getTime())) return;
+      var mins = Math.floor((Date.now() - dt.getTime()) / 60000);
+      if (mins < 0) mins = 0;
+      var label = fmtDuration(mins);
+      var stage = stageOf(card);
+      var t = THRESH.hasOwnProperty(stage) ? THRESH[stage] : null;
+      var color = '#5f5e5a';
+      if (t) { color = mins >= t[1] ? '#c93535' : (mins >= t[0] ? '#bd7a12' : '#3b6d11'); }
+      var key = label + '|' + color;
+      if (card.getAttribute('data-bfaging') === key) return;
+      card.setAttribute('data-bfaging', key);
+      if (!valNode.getAttribute('data-bfraw')) valNode.setAttribute('data-bfraw', raw);
+      lblSpan.style.display = 'none';
+      valNode.innerHTML = '<span class="bf-aging" title="In stage: ' + label + '" style="display:inline-flex;align-items:center;gap:4px;font-weight:500;color:' + color + ';"><i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i>' + label + ' in stage</span>';
+    });
+  }
+
+  function run(){ fixLinks(); addIcons(); addAging(); }
+  run();
+  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
+  setInterval(addAging, 60000);
+})();
