@@ -235,4 +235,4 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { flex-basis: 100%; font-size: 20px; margin: 0 0 3px; text-align: left; }
 
 /* Board collection title ("Opportunities") — match record breadcrumb size */
-[data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 12px !important; }
+[data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 10px !important; }
