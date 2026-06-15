@@ -1,0 +1,208 @@
+/* ===================================================================== */
+/* BuyForce — Noloco workspace theme                                      */
+/* Hosted in GitHub. Loaded by a <link> in Noloco's custom header code.   */
+/* Edit here + push → Noloco restyles automatically in ~1 min.           */
+/* ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ---- Font, selection, scrollbar, focus ---- */
+*, body, button, input, textarea, select {
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif !important;
+}
+::selection { background: #57C822; color: #fff; }
+html { scroll-behavior: smooth; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #57C822; }
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 2px solid #57C822 !important;
+  outline-offset: 2px;
+}
+
+/* ---- Green scale → BuyForce green ---- */
+:root, .project-theme, .light {
+  --color-green-50:  #f2fbe9 !important;
+  --color-green-100: #e3f5cf !important;
+  --color-green-200: #c7ec9f !important;
+  --color-green-300: #a6df6c !important;
+  --color-green-400: #83d13f !important;
+  --color-green-500: #57c822 !important;
+  --color-green-600: #47a31b !important;
+  --color-green-700: #377d15 !important;
+  --color-green-800: #2b6012 !important;
+  --color-green-900: #244e10 !important;
+}
+.bg-green-100 { background-color: #e3f5cf !important; }
+
+/* ---- Red + amber/caution scales ---- */
+:root, .project-theme, .light {
+  --color-red-50:  #fdf2f2 !important;
+  --color-red-100: #fbe3e3 !important;
+  --color-red-200: #f6c9c9 !important;
+  --color-red-300: #efa3a3 !important;
+  --color-red-400: #e57373 !important;
+  --color-red-500: #dc4a4a !important;
+  --color-red-600: #c93535 !important;
+  --color-red-700: #a72828 !important;
+  --color-red-800: #862020 !important;
+  --color-red-900: #6e1c1c !important;
+  --color-yellow-50:  #fdf8ec !important; --color-amber-50:  #fdf8ec !important; --color-orange-50:  #fdf8ec !important;
+  --color-yellow-100: #fbeecd !important; --color-amber-100: #fbeecd !important; --color-orange-100: #fbeecd !important;
+  --color-yellow-200: #f6dd9b !important; --color-amber-200: #f6dd9b !important; --color-orange-200: #f6dd9b !important;
+  --color-yellow-300: #efc662 !important; --color-amber-300: #efc662 !important; --color-orange-300: #efc662 !important;
+  --color-yellow-400: #e8ad36 !important; --color-amber-400: #e8ad36 !important; --color-orange-400: #e8ad36 !important;
+  --color-yellow-500: #d99419 !important; --color-amber-500: #d99419 !important; --color-orange-500: #d99419 !important;
+  --color-yellow-600: #bd7a12 !important; --color-amber-600: #bd7a12 !important; --color-orange-600: #bd7a12 !important;
+  --color-yellow-700: #985f10 !important; --color-amber-700: #985f10 !important; --color-orange-700: #985f10 !important;
+  --color-yellow-800: #7a4d13 !important; --color-amber-800: #7a4d13 !important; --color-orange-800: #7a4d13 !important;
+  --color-yellow-900: #653f13 !important; --color-amber-900: #653f13 !important; --color-orange-900: #653f13 !important;
+}
+.bg-red-100 { background-color: #fbe3e3 !important; }
+.bg-yellow-100, .bg-amber-100, .bg-orange-100 { background-color: #fbeecd !important; }
+
+/* ---- Typography & box polish ---- */
+
+/* A — gray stat boxes */
+.highlight.bg-white {
+  background-color: #f6f7f3 !important;
+  box-shadow: none !important;
+}
+
+/* B — highlight labels (small, muted gray) */
+[data-testid="highlight-item"] .text-xs,
+[data-testid="highlight-item"] .text-sm {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #7c7c7c !important;
+  letter-spacing: 0.2px !important;
+}
+
+/* C — highlight values (large, bold; color left intact for conditional green/red) */
+[data-testid="highlight-item"] .text-base,
+[data-testid="highlight-item"] .text-lg,
+[data-testid="highlight-item"] .text-xl,
+[data-testid="highlight-item"] .text-2xl,
+[data-testid="highlight-item"] .text-3xl {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+/* D — header title (heavier) */
+.sticky h1 {
+  font-size: 1.25rem !important;
+  line-height: 1.45 !important;
+  color: #161616 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.3px !important;
+}
+
+/* E — section titles (dark + bold to match the record title) */
+[data-testid="record-view-body"] h1 {
+  color: #161616 !important;
+  font-weight: 700 !important;
+}
+
+/* F — header subtitle (locked to header region only; cannot touch the record body) */
+.sticky.z-30 .flex.flex-col.overflow-hidden:has(> h1) {
+  font-size: 12px !important;
+  color: #9aa0a6 !important;
+}
+
+/* G — breadcrumb (Opportunities > vehicle) — smaller */
+.sticky.z-30 .text-stone-600.min-h-4,
+.sticky.z-30 .text-stone-600.min-h-4 a,
+.sticky.z-30 .text-stone-600.min-h-4 span,
+.sticky.z-30 .text-stone-600.min-h-4 div {
+  font-size: 10px !important;
+}
+
+/* Top bar — white */
+[data-testid="navigation-sidebar"] {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* ---- Equity / Beats notice layout (label left, value right) ---- */
+.section-notice .grow {
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+.section-notice .grow > h5 { margin-bottom: 0 !important; }
+.section-notice .grow > div {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+}
+
+/* ---- Beats CarMax / Carvana notices → amber ---- */
+.section-notice:has(h5[aria-label*="Beats CarMax"]) > div,
+.section-notice:has(h5[aria-label*="Beats Carvana"]) > div {
+  background-color: #fbeecd !important;
+  border-color: #e8ad36 !important;
+  color: #7a4d13 !important;
+}
+
+/* ===== BuyForce — Details panel polish (applies to ALL Details panels) ===== */
+
+/* Header band: trim the default 24px padding */
+[data-testid="details-section"] .bg-stone-50 {
+  padding: 16px 20px !important;
+}
+
+/* Title: dark + bold, matching your record title and metric values */
+[data-testid="details-section"] h2 {
+  color: #161616 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+/* Subtitle: muted and tight under the title */
+[data-testid="details-section"] .w-full.mt-2 {
+  color: #6b7280 !important;
+  font-size: 0.8125rem !important;
+  margin-top: 4px !important;
+}
+
+/* Fields area: tighter padding only — let the grid fill the full width */
+[data-testid="details-section"] form {
+  padding: 12px 20px 18px !important;
+}
+
+/* Section alignment (Option B): keep Details panels narrow but center them.
+   To center ONLY the Decode panel instead, replace the selector below
+   with:  #elmZXmn9MpGWxtX7UcuCA8VG  */
+[data-testid="record-view-section"].section-details {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Empty text fields — cream ring + very faint fill (clears when a value is typed).
+   box-shadow is used because the field's outline is a ring, not a CSS border.
+   Works on editable inputs/textareas only; read-only display fields can't be detected this way. */
+[data-testid="details-section"] input:placeholder-shown,
+[data-testid="details-section"] textarea:placeholder-shown {
+  background-color: #fefdf8 !important;
+  border-color: #fbeecd !important;
+  box-shadow: 0 0 0 1px #fbeecd !important;
+}
+
+/* OPTIONAL: extra gap before the Decode button (the last button in the header group) */
+/*
+[data-testid="details-section"] .ml-auto.justify-end > div:last-child {
+  margin-left: 12px !important;
+}
+*/
+
+/* Mobile only (≤640px) — header action buttons go full-width and drop clear of the subtitle */
+@media (max-width: 640px) {
+  .sticky.z-30 [data-testid="action-button"] {
+    width: 100% !important;
+    margin-top: 6px !important;
+  }
+}
