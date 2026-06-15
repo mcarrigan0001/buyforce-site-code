@@ -206,3 +206,21 @@ a:focus-visible, button:focus-visible, input:focus-visible {
     margin-top: 6px !important;
   }
 }
+/* ---- Pipeline board — neutral columns, green active column ---- */
+[data-testid="collection-group"] {
+  border-top: 3px solid #c4c4c4;
+  border-radius: 6px 6px 0 0;
+}
+[data-testid="collection-group"] [data-testid="collection-group-header"] {
+  color: #7c7c7c !important;
+}
+[data-testid="collection-group"]:not(.w-12) {
+  border-top-color: #57c822;
+}
+[data-testid="collection-group"]:not(.w-12) .bg-stone-50 {
+  outline-color: #57c822 !important;
+  background-color: #ffffff !important;
+}
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] {
+  color: #2b6012 !important;
+}
