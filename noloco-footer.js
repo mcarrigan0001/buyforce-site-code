@@ -1,14 +1,16 @@
 /* ===================================================================== */
 /* BuyForce — Noloco footer script                                       */
-/* 1) Opens external links in a new tab.                                 */
-/* 2) Adds a Tabler icon above each pipeline column's caret, matched by  */
-/*    stage NAME (survives reordering). Gray normally, green on active.   */
-/* 3) Renders a live "time in stage" badge on each card from             */
-/*    Stage Entered At, colored per-stage (green/orange/red).            */
+/* 1) External links open in a new tab.                                  */
+/* 2) Tabler icon above each pipeline column caret (matched by name).    */
+/* 3) Opportunity cards rebuilt from their native field cells:           */
+/*    header (title/subtitle), meta line (listed-ago + location),        */
+/*    2x3 metric tiles, competitive green/yellow/red on Offer + pill,    */
+/*    colored equity, and a live in-stage clock. Native cells hidden.    */
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
-  function norm(s){ return (s||'').replace(/[‒-―]/g,'-').replace(/\s+/g,' ').trim(); }
+  function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function fixLinks(){
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
@@ -92,39 +94,122 @@
     return l ? norm(l.textContent) : '';
   }
 
-  function addAging(){
+  /* ---- card helpers ---- */
+  var COMPC = { g:{bg:'#e3f5cf',fg:'#2b6012'}, y:{bg:'#fbeecd',fg:'#7a4d13'}, r:{bg:'#fbe3e3',fg:'#c93535'} };
+
+  function compInfo(raw){
+    var t = norm(raw).toLowerCase();
+    if(!t) return null;
+    if(t.indexOf('both')>=0) return {label:'Beats Both', color:'g', icon:'ti-check'};
+    if(t.indexOf('neither')>=0) return {label:'Beats Neither', color:'r', icon:'ti-x'};
+    if(t.indexOf('carmax')>=0) return {label:'Beats CarMax', color:'y', icon:'ti-check'};
+    if(t.indexOf('carvana')>=0) return {label:'Beats Carvana', color:'y', icon:'ti-check'};
+    return null;
+  }
+
+  function equityInfo(raw){
+    var t = (raw||'').trim();
+    if(!t || /unknown/i.test(t)) return {text:'—', color:'#9aa0a6'};
+    var m = t.match(/\$[\d,]+(\.\d+)?/);
+    var amt = m ? m[0] : t;
+    if(/negative/i.test(t)) return {text:'−'+amt, color:'#c93535'};
+    return {text:'+'+amt, color:'#2b6012'};
+  }
+
+  function listedAgo(raw){
+    if(!raw) return '';
+    var d = new Date(raw);
+    if(isNaN(d.getTime())) return '';
+    var days = Math.floor((Date.now()-d.getTime())/86400000);
+    if(days<0) days=0;
+    if(days===0) return 'Listed today';
+    if(days===1) return 'Listed 1 day ago';
+    if(days<7) return 'Listed '+days+' days ago';
+    if(days<14) return 'Listed 1 week ago';
+    if(days<60) return 'Listed '+Math.round(days/7)+' weeks ago';
+    var mo = Math.round(days/30);
+    return 'Listed '+mo+' month'+(mo>1?'s':'')+' ago';
+  }
+
+  function tile(lbl,val){
+    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(val):'—')+'</div></div>';
+  }
+
+  function buildCard(F, card){
+    var comp = compInfo(F['Competition']);
+    var eq = equityInfo(F['Equity Display']);
+    var asking = F['Asking Price'];
+    var willTake = F['Seller Will Take'];
+
+    var askInner;
+    if(willTake && willTake !== asking){
+      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div>'+
+        '<div style="font-size:14px;font-weight:500;color:#161616;display:flex;align-items:center;gap:3px;">'+esc(willTake)+'<i class="ti ti-arrow-down-right" style="font-size:13px;color:#2b6012;" aria-hidden="true"></i></div>'+
+        (asking?'<div style="font-size:10px;color:#b4b2a9;text-decoration:line-through;">was '+esc(asking)+'</div>':'');
+    } else {
+      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(asking?esc(asking):'—')+'</div>';
+    }
+
+    var oc = comp ? COMPC[comp.color] : null;
+    var offerTile = '<div'+(oc?' style="background:'+oc.bg+';border-radius:6px;padding:2px 6px;margin:-2px -4px;"':'')+'>'+
+      '<div style="font-size:11px;color:'+(oc?oc.fg:'#7c7c7c')+';">Offer</div>'+
+      '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(F['Offer Amount']):'—')+'</div></div>';
+
+    var equityTile = '<div><div style="font-size:11px;color:#7c7c7c;">Equity</div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
+
+    var grid = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start;border-top:0.5px solid #ece9e0;padding-top:10px;">'+
+      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + '</div>';
+
+    var pill='';
+    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:inline-flex;align-items:center;gap:3px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:3px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+
+    var metaParts=[];
+    var la=listedAgo(F['Date Listed']);
+    if(la) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-calendar" style="font-size:12px;" aria-hidden="true"></i>'+la+'</span>');
+    if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-map-pin" style="font-size:12px;" aria-hidden="true"></i>'+esc(F['Listing Location'])+'</span>');
+    var meta = metaParts.length ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:11px;color:#888780;">'+metaParts.join('')+'</div>' : '';
+
+    var header='<div style="margin-bottom:9px;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
+      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>';
+
+    var clock='';
+    var se=F['Stage Entered At'];
+    if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var col='#5f5e5a'; if(th){col=mins>=th[1]?'#c93535':(mins>=th[0]?'#e8730c':'#3b6d11');} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:'+col+';"><i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
+
+    return header + grid + pill + clock;
+  }
+
+  function addCards(force){
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
-      var cells = card.querySelectorAll('[data-testid="field-cell"]');
-      var lblSpan = null;
-      for (var i = 0; i < cells.length; i++) {
-        var l = cells[i].querySelector('[data-testid="field-cell-label"]');
-        if (l && norm(l.textContent) === 'Stage Entered At') { lblSpan = l; break; }
+      var firstCell = card.querySelector('[data-testid="field-cell"]');
+      if(!firstCell) return;
+      var container = firstCell.parentNode;
+      if(!container) return;
+
+      var F = {};
+      container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
+        var lab = cell.querySelector('[data-testid="field-cell-label"]');
+        if(!lab) return;
+        var vNode = lab.nextElementSibling;
+        F[norm(lab.textContent)] = vNode ? vNode.textContent.trim() : '';
+      });
+
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Stage Entered At'],stageOf(card)].join('|');
+
+      var body = container.querySelector(':scope > .bf-body');
+      if(body && !force && body.getAttribute('data-raw')===raw){
+        container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ if(cell.style.display!=='none') cell.style.display='none'; });
+        return;
       }
-      if (!lblSpan) return;
-      var valNode = lblSpan.nextElementSibling;
-      if (!valNode) return;
-      var raw = (valNode.getAttribute('data-bfraw') || valNode.textContent || '').trim();
-      if (!raw) return;
-      var dt = new Date(raw);
-      if (isNaN(dt.getTime())) return;
-      var mins = Math.floor((Date.now() - dt.getTime()) / 60000);
-      if (mins < 0) mins = 0;
-      var label = fmtDuration(mins);
-      var stage = stageOf(card);
-      var t = THRESH.hasOwnProperty(stage) ? THRESH[stage] : null;
-      var color = '#5f5e5a';
-      if (t) { color = mins >= t[1] ? '#c93535' : (mins >= t[0] ? '#e8730c' : '#3b6d11'); }
-      var key = label + '|' + color;
-      if (card.getAttribute('data-bfaging') === key) return;
-      card.setAttribute('data-bfaging', key);
-      if (!valNode.getAttribute('data-bfraw')) valNode.setAttribute('data-bfraw', raw);
-      lblSpan.style.display = 'none';
-      valNode.innerHTML = '<span class="bf-aging" title="In stage: ' + label + '" style="display:inline-flex;align-items:center;gap:4px;font-weight:500;color:' + color + ';"><i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i>' + label + ' in stage</span>';
+      if(!body){ body=document.createElement('div'); body.className='bf-body'; container.appendChild(body); }
+      body.innerHTML = buildCard(F, card);
+      body.setAttribute('data-raw', raw);
+      container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ cell.style.display='none'; });
     });
   }
 
-  function run(){ fixLinks(); addIcons(); addAging(); }
+  function run(){ fixLinks(); addIcons(); addCards(false); }
   run();
-  new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
-  setInterval(addAging, 60000);
+  new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
+  setInterval(function(){ addCards(true); }, 60000);
 })();
