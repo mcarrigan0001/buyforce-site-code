@@ -142,7 +142,9 @@
     var willTake = F['Seller Will Take'];
 
     var askInner;
-    if(willTake && willTake !== asking){
+    var wtNum=parseFloat((willTake||'').replace(/[^0-9.]/g,''));
+    var akNum=parseFloat((asking||'').replace(/[^0-9.]/g,''));
+    if(!isNaN(wtNum) && wtNum>0 && wtNum!==akNum){
       askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div>'+
         '<div style="font-size:14px;font-weight:500;color:#161616;display:flex;align-items:center;gap:3px;">'+esc(willTake)+'<i class="ti ti-arrow-down-right" style="font-size:13px;color:#2b6012;" aria-hidden="true"></i></div>'+
         (asking?'<div style="font-size:10px;color:#b4b2a9;text-decoration:line-through;">was '+esc(asking)+'</div>':'');
