@@ -234,8 +234,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { position: relative !important; flex-direction: column !important; flex-wrap: nowrap !important; justify-content: flex-start !important; align-items: center !important; text-align: center !important; }
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { font-size: 20px; margin: 0 0 4px; }
 [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) > button { position: absolute !important; top: 0; right: 0; }
-[data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) { flex-direction: column !important; align-items: center !important; text-align: center !important; }
-[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { width: 100% !important; text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) { justify-content: center !important; text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] + * { display: none !important; }
 
 /* Board collection title ("Opportunities") — match record breadcrumb size */
 [data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 10px !important; }
