@@ -58,15 +58,15 @@
 
   /* per-stage [orange, red] thresholds in MINUTES; null = no aging (terminal) */
   var THRESH = {
-    'Fresh Leads': [240, 720],
-    'Engaged - Awaiting VIN': [720, 1440],
-    'VIN Received - Appraisal Needed': [120, 360],
-    'Appraisal Complete - Enter Offer Sheet Values': [120, 360],
-    'Offer Sheet Generated': [120, 480],
+    'Fresh Leads': [120, 360],
+    'Engaged - Awaiting VIN': [360, 720],
+    'VIN Received - Appraisal Needed': [60, 180],
+    'Appraisal Complete - Enter Offer Sheet Values': [60, 180],
+    'Offer Sheet Generated': [60, 180],
     'Offer Sent (0-2 Days)': [1440, 2880],
-    'Nurturing (Follow Up and Re-engage)': [10080, 20160],
-    'Appraisal Review Needed': [240, 720],
-    'Appraisal Review Complete': [240, 720],
+    'Nurturing (Follow Up and Re-engage)': [1440, 2880],
+    'Appraisal Review Needed': [60, 180],
+    'Appraisal Review Complete': [60, 180],
     'Verbal Yes - Schedule Appt': [720, 1440],
     'Scheduled': [1440, 4320],
     'Appt Shown - Follow Up': [720, 1440],
