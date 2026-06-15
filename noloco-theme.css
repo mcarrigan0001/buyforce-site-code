@@ -233,3 +233,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 /* Expanded (focused) column: icon on its own line above the title, slightly larger */
 [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { flex-wrap: wrap !important; }
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { flex-basis: 100%; font-size: 20px; margin: 0 0 3px; text-align: left; }
+
+/* Board collection title ("Opportunities") — match record breadcrumb size */
+[data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 12px !important; }
