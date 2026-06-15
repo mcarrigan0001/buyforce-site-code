@@ -159,9 +159,11 @@
       '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
     var equityTile = '<div><div style="font-size:11px;color:#7c7c7c;">Equity</div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
+    var payoffRaw = F['Estimated Payoff Value'];
+    var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
     var grid = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start;border-top:0.5px solid #ece9e0;padding-top:10px;">'+
-      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + '</div>';
+      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + payoffTile + '</div>';
 
     var pill='';
     if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:inline-flex;align-items:center;gap:3px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:3px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
@@ -198,7 +200,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Stage Entered At'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
