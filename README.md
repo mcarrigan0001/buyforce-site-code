@@ -44,10 +44,9 @@ When the design/content is locked and the page should rank in Google:
 
 GitHub stays the source of truth throughout — this is only a change in *where the HTML is served from*, not a rebuild.
 
-## Conventions
+## Noloco workspace theme
 
-- Brand green: `#4cb826` (darker `#2d7a10`, hover `#3fa020`)
-- Ink/near-black: `#1a1a1a`
-- Light section background: `#f7f8f5` / `#F7F7F5`
-- Font: Poppins (Google Fonts); icons: Tabler Icons (jsDelivr webfont)
-- Never commit secrets (passwords, API tokens, the HighLevel PIT).
+| File | What it is | Auto-updates? |
+|------|-----------|--------------|
+| `noloco-theme.css` | BuyForce theme for the Noloco app (green/red/amber scales, fonts, header, details-panel polish) | ✅ Yes — referenced by a `<link>` in Noloco's custom header code |
+
