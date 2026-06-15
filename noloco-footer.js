@@ -194,6 +194,7 @@
         F[norm(lab.textContent)] = vNode ? vNode.textContent.trim() : '';
       });
 
+      if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
       var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Stage Entered At'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
