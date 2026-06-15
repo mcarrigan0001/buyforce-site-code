@@ -254,3 +254,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 /* ---- BuyForce: card green border + light-gray stage background ---- */
 [data-testid="collection-group"] { background-color: #f1f1ee !important; }
 [data-testid="collection-record"] { border: 1px solid #57c822 !important; border-radius: 8px !important; }
+
+/* ---- Dim collapsed (inactive) pipeline columns; restore on hover ---- */
+[data-testid="collection-group"].w-12 { opacity: 0.55 !important; transition: opacity 0.15s ease; }
+[data-testid="collection-group"].w-12:hover { opacity: 1 !important; }
