@@ -5,6 +5,7 @@
 /* ===================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css');
 
 /* ---- Font, selection, scrollbar, focus ---- */
 *, body, button, input, textarea, select {
@@ -224,3 +225,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] {
   color: #2b6012 !important;
 }
+
+/* ---- Pipeline stage icons (injected by footer script) ---- */
+.bf-stage-icon { display:block; font-size:16px; line-height:1; color:#5f5e5a; margin:0 auto 4px; text-align:center; }
+[data-testid="collection-group"]:not(.w-12) .bf-stage-icon { color:#3b6d11; }
