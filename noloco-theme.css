@@ -231,7 +231,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { color:#3b6d11; }
 
 /* Expanded (focused) column: icon on its own line above the title, slightly larger */
-[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { flex-wrap: wrap !important; justify-content: center !important; align-items: center !important; text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { position: relative !important; flex-wrap: wrap !important; justify-content: center !important; align-items: center !important; text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) > button { position: absolute !important; top: 0 !important; left: 0 !important; }
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { font-size: 20px; margin: 0 0 4px; }
 [data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) { flex-direction: column !important; height: auto !important; justify-content: center !important; align-items: center !important; text-align: center !important; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { display: block !important; width: 100% !important; text-align: center !important; }
