@@ -243,3 +243,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 /* Collapsed column: hide the board summary number so it doesn't overlap the rotated label */
 [data-testid="collection-group"].w-12 [data-testid="collection-group-header"] [style*="horizontal-tb"] { display: none !important; }
+
+/* Expanded header: force full-width centering (override sticky-left/content-width wrappers) */
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .sticky,
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .sticky > div,
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .sticky > div > div { width: 100% !important; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .flex { justify-content: center !important; }
