@@ -231,15 +231,15 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { color:#3b6d11; }
 
 /* Expanded (focused) column: icon on its own line above the title, slightly larger */
-[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { flex-wrap: wrap !important; justify-content: center !important; align-items: center !important; }
-[data-testid="collection-group"]:not(.w-12) .bf-stage-icon { font-size: 20px; margin: 0 6px 0 0; }
+[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { position: relative !important; flex-direction: column !important; flex-wrap: nowrap !important; justify-content: flex-start !important; align-items: center !important; text-align: center !important; }
+[data-testid="collection-group"]:not(.w-12) .bf-stage-icon { font-size: 20px; margin: 0 0 4px; }
+[data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) > button { position: absolute !important; top: 0; right: 0; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .justify-between { justify-content: center !important; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { flex: 1 1 auto !important; text-align: center !important; }
 
 /* Board collection title ("Opportunities") — match record breadcrumb size */
 [data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 10px !important; }
 
-/* Breadcrumb/title leading search icon — match the small text size */
-[data-testid="view-collection"] .min-h-4.text-stone-600 .h-fit,
-.sticky.z-30 .text-stone-600.min-h-4 .h-fit { width: 12px !important; height: 12px !important; }
-[data-testid="view-collection"] .min-h-4.text-stone-600 .h-fit svg,
-.sticky.z-30 .text-stone-600.min-h-4 .h-fit svg { width: 12px !important; height: 12px !important; }
+
+/* Collapsed column: hide the board summary number so it doesn't overlap the rotated label */
+[data-testid="collection-group"].w-12 [data-testid="collection-group-header"] [style*="horizontal-tb"] { display: none !important; }
