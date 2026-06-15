@@ -209,7 +209,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 }
 /* ---- Pipeline board — neutral columns, green active column ---- */
 [data-testid="collection-group"] {
-  border-top: 3px solid #c4c4c4;
+  border-top: 3px solid #333333;
   border-radius: 6px 6px 0 0;
 }
 [data-testid="collection-group"] [data-testid="collection-group-header"] {
@@ -232,7 +232,8 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 
 /* Expanded (focused) column: icon on its own line above the title, slightly larger */
 [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) { flex-wrap: wrap !important; }
-[data-testid="collection-group"]:not(.w-12) .bf-stage-icon { flex-basis: 100%; font-size: 20px; margin: 0 0 3px; text-align: left; }
+[data-testid="collection-group"]:not(.w-12) .bf-stage-icon { flex-basis: 100%; font-size: 20px; margin: 0 0 4px; text-align: center; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .justify-between { justify-content: center !important; }
 
 /* Board collection title ("Opportunities") — match record breadcrumb size */
 [data-testid="view-collection"] .min-h-4.text-stone-600 { font-size: 10px !important; }
