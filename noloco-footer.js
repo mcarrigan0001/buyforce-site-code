@@ -271,13 +271,16 @@
     var _lc = F['Last Comment'];
     var commentLine = '';
     if (_lc) {
-      var _txt = _lc.length > 60 ? _lc.slice(0,60).trim() + '\u2026' : _lc;
+      var _txt = _lc.length > 60 ? _lc.slice(0,60).trim() + '…' : _lc;
       var _ago = F['Last Comment At'] ? agoShort(F['Last Comment At']) : '';
-      commentLine = '<div style="display:flex;align-items:flex-start;gap:5px;margin-top:9px;font-size:11px;color:#6b6b64;">' +
-        '<i class="ti ti-message-2" style="font-size:13px;color:#9aa0a6;flex:none;margin-top:1px;" aria-hidden="true"></i>' +
-        '<span style="line-height:1.3;">\u201c' + esc(_txt) + '\u201d' + (_ago ? '<span style="color:#9aa0a6;"> \u00b7 ' + _ago + '</span>' : '') + '</span></div>';
+      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:9px -4px 0;padding:3px 4px;font-size:11px;color:#6b6b64;cursor:pointer;">' +
+        '<i class="ti ti-message-2" style="font-size:13px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>' +
+        '<span style="line-height:1.3;flex:1;min-width:0;">“' + esc(_txt) + '”' + (_ago ? '<span style="color:#9aa0a6;"> · ' + _ago + '</span>' : '') + '</span>' +
+        '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;" aria-hidden="true"></i></div>';
     } else {
-      commentLine = '<div style="display:flex;align-items:center;gap:5px;margin-top:9px;font-size:11px;color:#b4b2a9;"><i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet</div>';
+      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:9px -4px 0;padding:3px 4px;font-size:11px;color:#b4b2a9;cursor:pointer;">' +
+        '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
+        '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
     return header + checklist + grid + pill + commentLine + clock;
   }
@@ -409,6 +412,19 @@
       setTimeout(function(){ location.reload(); }, 3000);
     }
   }, true);
+  var bfFocusComment=false;
+  function bfTryFocusComment(tries){
+    if(!bfFocusComment) return;
+    var box=document.querySelector('[placeholder*="omment" i], [aria-label*="dd a comment" i]');
+    if(box){ try{ box.focus(); if(box.scrollIntoView) box.scrollIntoView({block:'center'}); }catch(e){} bfFocusComment=false; return; }
+    if(tries>0) setTimeout(function(){ bfTryFocusComment(tries-1); }, 300);
+  }
+  document.addEventListener('click', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-comment'):null;
+    if(!el) return;
+    bfFocusComment=true;
+    setTimeout(function(){ bfTryFocusComment(12); }, 400);
+  }, false);
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });

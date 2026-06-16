@@ -420,3 +420,8 @@ div:has(> div > [data-testid="record-view"]) {
   [class*="inset-y-0"][class*="right-0"]:has([data-testid="record-view"]),
   div:has(> div > [data-testid="record-view"]) { width: 94vw !important; max-width: 94vw !important; height: 90vh !important; max-height: 90vh !important; }
 }
+
+/* ---- Card comment line: clickable shortcut into the record's native comments ---- */
+.bf-comment { border-radius: 6px; transition: background 0.12s; }
+.bf-comment:hover { background: #f1f1ee; }
+.bf-comment:hover .bf-comment-hint { color: #6b6b64 !important; }
