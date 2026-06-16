@@ -242,6 +242,8 @@
       commentLine = '<div style="display:flex;align-items:flex-start;gap:5px;margin-top:9px;font-size:11px;color:#6b6b64;">' +
         '<i class="ti ti-message-2" style="font-size:13px;color:#9aa0a6;flex:none;margin-top:1px;" aria-hidden="true"></i>' +
         '<span style="line-height:1.3;">\u201c' + esc(_txt) + '\u201d' + (_ago ? '<span style="color:#9aa0a6;"> \u00b7 ' + _ago + '</span>' : '') + '</span></div>';
+    } else {
+      commentLine = '<div style="display:flex;align-items:center;gap:5px;margin-top:9px;font-size:11px;color:#b4b2a9;"><i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet</div>';
     }
     return header + checklist + grid + pill + commentLine + clock;
   }
