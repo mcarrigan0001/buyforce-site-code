@@ -480,7 +480,15 @@ div:has(> div > [data-testid="record-view"]) {
 /* ===================================================================== */
 /* Stage-specific card buttons + inline fields (rendered by footer JS)    */
 /* ===================================================================== */
-.bf-stageui { margin-top: 10px; border-top: 0.5px solid #ece9e0; padding-top: 10px; }
+.bf-stageui { padding-top: 4px; }
+.bf-actions.bf-collapsed .bf-stageui { display: none; }
+.bf-collapse-bar { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0 3px; margin-top: 8px; }
+.bf-collapse-line { flex: 1; height: 0.5px; background: #ece9e0; }
+.bf-collapse-ic { font-size: 15px; color: #b4b2a9; line-height: 1; }
+.bf-collapse-bar:hover .bf-collapse-ic { color: #57c822; }
+.bf-fcol .bf-fi { max-width: 100%; width: 100%; }
+.bf-fi.bf-fwide { max-width: 100%; width: 100%; font-size: 11px; letter-spacing: 0.4px; }
+.bf-fi.bf-fwide .bf-fval { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
 .bf-fields { display: flex; flex-direction: column; gap: 7px; margin-bottom: 9px; }
 .bf-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .bf-fcol { align-items: stretch; flex-direction: column; gap: 4px; }
