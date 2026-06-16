@@ -211,7 +211,6 @@
       {l:'Copy Notes for Appraisal', a:'copynotes', i:'ti-copy'},
       {l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'} ] },
     'Appraisal Complete - Enter Offer Sheet Values': { fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
-      {l:'Copy Notes for Appraisal', a:'copynotes', i:'ti-copy'},
       {l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'},
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
       {l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'} ] },
