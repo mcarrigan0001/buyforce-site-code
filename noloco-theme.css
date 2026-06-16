@@ -356,3 +356,9 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 @media (max-width: 640px) {
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: relative !important; z-index: 5 !important; }
 }
+
+/* ---- Mobile: force header (shadow) above card list in ALL columns ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: relative !important; z-index: 30 !important; }
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] + div { position: relative !important; z-index: 0 !important; }
+}
