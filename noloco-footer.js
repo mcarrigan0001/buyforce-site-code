@@ -403,6 +403,10 @@
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
     if(el){ e.stopPropagation(); }
   }, true);
+  document.addEventListener('pointerdown', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
+    if(el){ e.stopPropagation(); }
+  }, true);
   document.addEventListener('click', function(e){
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms'):null;
     if(!el) return;
@@ -426,19 +430,11 @@
       setTimeout(function(){ location.reload(); }, 3000);
     }
   }, true);
-  var bfFocusComment=false;
-  function bfTryFocusComment(tries){
-    if(!bfFocusComment) return;
-    var box=document.querySelector('[data-placeholder*="omment" i], [aria-placeholder*="omment" i], [placeholder*="omment" i], [aria-label*="dd a comment" i]')
-         || document.querySelector('.ProseMirror[contenteditable="true"], [contenteditable="true"]');
-    if(box){ try{ if(box.scrollIntoView) box.scrollIntoView({block:'center'}); box.focus(); var fl=box.closest('[class*="border"],[class*="rounded"]')||box; fl.classList.add('bf-flash'); setTimeout(function(){ fl.classList.remove('bf-flash'); },1600); }catch(e){} bfFocusComment=false; return; }
-    if(tries>0) setTimeout(function(){ bfTryFocusComment(tries-1); }, 300);
-  }
   var bfEditing=false;
   document.addEventListener('click', function(e){
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-comment'):null;
     if(!el) return;
-    if(el.getAttribute('data-editing')){ e.stopPropagation(); return; }
+    if(el.getAttribute('data-editing')){ e.preventDefault(); e.stopPropagation(); return; }
     e.preventDefault(); e.stopPropagation();
     var card=el.closest('[data-testid="collection-record"]');
     var href=card?(card.getAttribute('href')||''):'';
