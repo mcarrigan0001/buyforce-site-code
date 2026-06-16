@@ -214,8 +214,45 @@
     });
   }
 
-  function run(){ fixLinks(); addIcons(); addCards(false); }
+  var bfArrow;
+  function bfScrollNext(sc){
+    var cb = sc.getBoundingClientRect().left;
+    var cols = sc.querySelectorAll('[data-testid="collection-group"]');
+    var cur = sc.scrollLeft, target = null;
+    for(var i=0;i<cols.length;i++){
+      var pos = cols[i].getBoundingClientRect().left - cb + cur;
+      if(pos > cur + 4){ target = pos; break; }
+    }
+    if(target===null) target = sc.scrollWidth;
+    sc.scrollTo({ left: target, behavior: 'smooth' });
+  }
+  function updateArrow(){
+    if(!bfArrow) return;
+    var sc = document.querySelector('[class*="min-h-screen-75"]');
+    if(window.innerWidth <= 640 || !sc){ bfArrow.style.display='none'; return; }
+    var more = (sc.scrollWidth - sc.scrollLeft - sc.clientWidth) > 4;
+    bfArrow.style.display = more ? 'flex' : 'none';
+  }
+  function ensureArrow(){
+    if(window.innerWidth <= 640){ if(bfArrow) bfArrow.style.display='none'; return; }
+    var sc = document.querySelector('[class*="min-h-screen-75"]');
+    if(!sc){ if(bfArrow) bfArrow.style.display='none'; return; }
+    if(!bfArrow){
+      bfArrow = document.createElement('button');
+      bfArrow.setAttribute('aria-label','Scroll to next stage');
+      bfArrow.innerHTML='<i class="ti ti-chevron-right" aria-hidden="true"></i>';
+      bfArrow.style.cssText='position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:50;width:40px;height:40px;border-radius:50%;border:none;background:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,0.18);color:#2b6012;font-size:22px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;';
+      bfArrow.addEventListener('click',function(){ var s=document.querySelector('[class*="min-h-screen-75"]'); if(s) bfScrollNext(s); });
+      bfArrow.addEventListener('mouseenter',function(){ bfArrow.style.background='#f2fbe9'; });
+      bfArrow.addEventListener('mouseleave',function(){ bfArrow.style.background='#ffffff'; });
+      document.body.appendChild(bfArrow);
+    }
+    if(!sc.getAttribute('data-bfscroll')){ sc.addEventListener('scroll', updateArrow, {passive:true}); sc.setAttribute('data-bfscroll','1'); }
+    updateArrow();
+  }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
+  window.addEventListener('resize', updateArrow);
 })();
