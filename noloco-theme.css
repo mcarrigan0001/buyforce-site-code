@@ -425,3 +425,11 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-comment { border-radius: 6px; transition: background 0.12s; }
 .bf-comment:hover { background: #f1f1ee; }
 .bf-comment:hover .bf-comment-hint { color: #6b6b64 !important; }
+
+/* ---- Green flash on the comment box when opened from a card ---- */
+@keyframes bfFlash {
+  0% { box-shadow: 0 0 0 0 rgba(87,200,34,0); }
+  18% { box-shadow: 0 0 0 4px rgba(87,200,34,0.5); }
+  100% { box-shadow: 0 0 0 0 rgba(87,200,34,0); }
+}
+.bf-flash { animation: bfFlash 1.6s ease-out 1; border-radius: 8px; }

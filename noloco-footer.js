@@ -430,7 +430,7 @@
     if(!bfFocusComment) return;
     var box=document.querySelector('[data-placeholder*="omment" i], [aria-placeholder*="omment" i], [placeholder*="omment" i], [aria-label*="dd a comment" i]')
          || document.querySelector('.ProseMirror[contenteditable="true"], [contenteditable="true"]');
-    if(box){ try{ if(box.scrollIntoView) box.scrollIntoView({block:'center'}); box.focus(); }catch(e){} bfFocusComment=false; return; }
+    if(box){ try{ if(box.scrollIntoView) box.scrollIntoView({block:'center'}); box.focus(); var fl=box.closest('[class*="border"],[class*="rounded"]')||box; fl.classList.add('bf-flash'); setTimeout(function(){ fl.classList.remove('bf-flash'); },1600); }catch(e){} bfFocusComment=false; return; }
     if(tries>0) setTimeout(function(){ bfTryFocusComment(tries-1); }, 300);
   }
   document.addEventListener('click', function(e){
