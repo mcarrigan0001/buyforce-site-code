@@ -362,3 +362,14 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: relative !important; z-index: 30 !important; }
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] + div { position: relative !important; z-index: 0 !important; }
 }
+
+/* ---- Mobile: green scroll fade lives INSIDE the card scroller (consistent during momentum scroll) ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { box-shadow: none !important; }
+  [data-testid="collection-group"]:not(.w-12) [class*="overflow-y-auto"]::before {
+    content: ""; position: sticky; top: 0; z-index: 4; flex: 0 0 auto;
+    height: 10px; margin-bottom: -10px;
+    background: linear-gradient(to bottom, rgba(87,200,34,0.32), rgba(87,200,34,0));
+    pointer-events: none;
+  }
+}
