@@ -293,3 +293,9 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   [data-testid="view-collection"] { padding-top: 6px !important; margin-bottom: 2px !important; }
   [data-testid="view-collection"] h1 { font-size: 1.2rem !important; letter-spacing: -0.2px !important; }
 }
+
+/* ---- Smaller "Add Opportunity" button on mobile ---- */
+@media (max-width: 640px) {
+  .new-button button { height: 32px !important; min-height: 32px !important; padding-left: 12px !important; padding-right: 12px !important; font-size: 13px !important; }
+  .new-button button svg { width: 14px !important; height: 14px !important; }
+}
