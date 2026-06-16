@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BuyForce — Offer Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --green:#57c822; --green-d:#2b6012; --ink:#161616; --muted:#7c7c7c; --line:#e6e4dc; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:#f1f1ee; color:var(--ink);
+    font-family:'Inter',-apple-system,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:760px; margin:0 auto; padding:24px 16px 56px; }
+  .top{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .logo{ width:30px; height:30px; border-radius:8px; background:var(--green);
+    display:flex; align-items:center; justify-content:center; color:#14330a; font-weight:700; font-size:15px; }
+  .brand{ font-weight:700; font-size:16px; letter-spacing:-0.2px; }
+  .brand span{ color:var(--green-d); }
+  h1{ font-size:20px; font-weight:600; margin:0 0 2px; letter-spacing:-0.3px; }
+  .sub{ font-size:13px; color:var(--muted); margin:0 0 18px; }
+  .sheet{ background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:0 6px 22px rgba(0,0,0,0.10); }
+  .sheet img{ display:block; width:100%; height:auto; }
+  .empty{ padding:56px 24px; text-align:center; color:var(--muted); font-size:14px; }
+  .bar{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  button{ flex:1; min-width:140px; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:inherit; font-size:14px; font-weight:600; padding:12px 16px; border-radius:10px; cursor:pointer;
+    border:1px solid transparent; transition:background .12s,border-color .12s; }
+  .primary{ background:var(--green); color:#14330a; }
+  .primary:hover{ background:#47a31b; }
+  .ghost{ background:#fff; color:#3b3b38; border-color:#d3d1c7; }
+  .ghost:hover{ border-color:#888780; background:#f6f7f3; }
+  .ico{ font-size:17px; line-height:1; }
+  .note{ margin-top:14px; font-size:12px; color:#9aa0a6; text-align:center; }
+  .toast{ position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; font-size:13px; padding:10px 18px; border-radius:999px;
+    box-shadow:0 4px 16px rgba(0,0,0,.3); opacity:0; transition:opacity .2s; pointer-events:none; }
+  .toast.show{ opacity:1; }
+  @media (max-width:520px){ button{ min-width:0; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo">B</div>
+      <div class="brand">Buy<span>Force</span></div>
+    </div>
+    <h1 id="title">Offer Sheet</h1>
+    <p class="sub" id="subtitle">Review, copy, download or share the offer sheet.</p>
+
+    <div class="sheet" id="sheet">
+      <div class="empty" id="empty">No offer sheet image found.</div>
+    </div>
+
+    <div class="bar">
+      <button class="primary" id="copyBtn"><i class="ico">⧉</i> Copy image</button>
+      <button class="ghost" id="dlBtn"><i class="ico">↓</i> Download</button>
+      <button class="ghost" id="shareBtn"><i class="ico">↗</i> Share</button>
+    </div>
+    <p class="note" id="note"></p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  function qp(k){ try{ return new URLSearchParams(location.search).get(k)||''; }catch(e){ return ''; } }
+  var img = qp('img');
+  var name = qp('name');
+  var titleEl = document.getElementById('title');
+  var subEl = document.getElementById('subtitle');
+  var sheet = document.getElementById('sheet');
+  var note = document.getElementById('note');
+  var toastEl = document.getElementById('toast');
+  var toastT;
+  function toast(m){ toastEl.textContent=m; toastEl.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(function(){ toastEl.classList.remove('show'); }, 2200); }
+
+  if(name){ titleEl.textContent = name + ' — Offer Sheet'; }
+  var fileSafe = (name? name.replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'') : 'offer-sheet').toLowerCase() + '.png';
+
+  var imgEl = null;
+  if(img){
+    document.getElementById('empty').style.display='none';
+    imgEl = document.createElement('img');
+    imgEl.alt = (name||'Offer sheet');
+    imgEl.crossOrigin = 'anonymous';
+    imgEl.referrerPolicy = 'no-referrer';
+    imgEl.src = img;
+    imgEl.onerror = function(){ sheet.innerHTML='<div class="empty">Could not load the offer sheet image.<br><a href="'+img+'" target="_blank" rel="noopener">Open the image directly</a></div>'; };
+    sheet.appendChild(imgEl);
+  } else {
+    subEl.textContent = 'No image URL was provided.';
+  }
+
+  async function getBlob(){
+    var r = await fetch(img, { mode:'cors' });
+    if(!r.ok) throw new Error('fetch failed');
+    return await r.blob();
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', async function(){
+    if(!img){ toast('No image to copy'); return; }
+    try{
+      if(!navigator.clipboard || !window.ClipboardItem) throw new Error('no clipboard');
+      var blob = await getBlob();
+      if(blob.type !== 'image/png'){
+        var bmp = await createImageBitmap(blob);
+        var c = document.createElement('canvas'); c.width=bmp.width; c.height=bmp.height;
+        c.getContext('2d').drawImage(bmp,0,0);
+        blob = await new Promise(function(res){ c.toBlob(res,'image/png'); });
+      }
+      await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+      toast('Image copied to clipboard');
+    }catch(e){
+      try{ await navigator.clipboard.writeText(img); toast('Image link copied'); }
+      catch(e2){ window.open(img,'_blank','noopener'); toast('Opened image in new tab'); }
+    }
+  });
+
+  document.getElementById('dlBtn').addEventListener('click', async function(){
+    if(!img){ toast('No image to download'); return; }
+    try{
+      var blob = await getBlob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a'); a.href=url; a.download=fileSafe; document.body.appendChild(a); a.click();
+      a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+      toast('Downloading…');
+    }catch(e){
+      var a2 = document.createElement('a'); a2.href=img; a2.download=fileSafe; a2.target='_blank'; a2.rel='noopener';
+      document.body.appendChild(a2); a2.click(); a2.remove();
+      toast('Opened image — long-press or right-click to save');
+    }
+  });
+
+  document.getElementById('shareBtn').addEventListener('click', async function(){
+    if(!img){ toast('Nothing to share'); return; }
+    var shareTitle = (name? name+' — Offer Sheet' : 'Offer Sheet');
+    try{
+      if(navigator.canShare){
+        try{
+          var blob = await getBlob();
+          var file = new File([blob], fileSafe, { type: blob.type||'image/png' });
+          if(navigator.canShare({ files:[file] })){
+            await navigator.share({ files:[file], title:shareTitle });
+            return;
+          }
+        }catch(e){}
+      }
+      if(navigator.share){ await navigator.share({ title:shareTitle, url:img }); return; }
+      await navigator.clipboard.writeText(img); toast('Share link copied');
+    }catch(e){ /* user cancelled */ }
+  });
+})();
+</script>
+</body>
+</html>

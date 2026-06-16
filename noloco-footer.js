@@ -180,6 +180,134 @@
     return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(money(val)):'—')+'</div></div>';
   }
 
+  /* ===== Stage-specific card buttons + inline fields ===== */
+  var VIEW_SHEET_PAGE = 'https://mcarrigan0001.github.io/buyforce-site-code/offer-sheet.html';
+  var GEN_SHEET_HOOK  = 'https://buyforce.app.n8n.cloud/webhook/ee9245fa-55fd-48a1-aba5-9e0093515f14';
+
+  /* inline field definitions. label = display label as it appears on the card
+     (footer reads the current value by it); key = Noloco API field key (footer
+     writes by it). NOTE: confirm `vin` matches the field your record Decode button reads. */
+  var IF = {
+    vin:      {label:'VIN',                            key:'vin',                        type:'text',     ph:'Enter VIN…'},
+    conmax:   {label:'CarMax Offer',                   key:'carMaxOffer',                type:'money',    ph:'$ —'},
+    convana:  {label:'Carvana Offer',                  key:'carvanaOffer',               type:'money',    ph:'$ —'},
+    notes:    {label:'Condition Notes',                key:'conditionNotes',             type:'textarea', ph:'Add condition notes…', copy:true},
+    accident: {label:'Accident History',               key:'accidentHistory',            type:'select',
+               options:[['Clean','Clean','g'],['ACCIDENTS','Accident(s)','r']]},
+    ncomp:    {label:'# Competing Vehicles',           key:'numberOfCompetingVehicles',  type:'number',   ph:'—'},
+    days:     {label:'Est Dealer Days to Sale',        key:'estDealerDaysToSale',        type:'number',   ph:'—'},
+    pprv:     {label:'Est Private Party Retail Value', key:'estPrivatePartyRetailValue', type:'money',    ph:'$ —'},
+    willtake: {label:'Seller Will Take',               key:'sellerWillTake',             type:'money',    ph:'$ —'}
+  };
+
+  var STAGE_UI = {
+    'Fresh Leads': { fields:['vin'], buttons:[
+      {l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'} ] },
+    'Engaged - Awaiting VIN': { fields:['vin'], buttons:[
+      {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
+    'VIN Received - Appraisal Needed': { fields:['conmax','convana','notes'], buttons:[
+      {l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link', showEmpty:'CarMax Offer'},
+      {l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link', showEmpty:'Carvana Offer'},
+      {l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'} ] },
+    'Appraisal Complete - Enter Offer Sheet Values': { fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
+      {l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'},
+      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
+      {l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'} ] },
+    'Offer Sheet Generated': { fields:[], buttons:[
+      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
+      {l:'Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', p:1, i:'ti-send'} ] },
+    'Offer Sent (0-2 Days)': { fields:['willtake'], buttons:[
+      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
+      {l:'Generate New Offer Sheet', a:'regensheet', i:'ti-file-dollar'} ] },
+    'Nurturing (Follow Up and Re-engage)': { fields:[], buttons:[
+      {l:'Follow Up Sent', a:'followup', p:1, i:'ti-rotate-clockwise'},
+      {l:'No Deal', a:'stage', to:'No Deal', i:'ti-x'} ] },
+    'Appraisal Review Needed': { fields:['willtake_ro'], buttons:[
+      {l:'Mark Review Complete', a:'stage', to:'Appraisal Review Complete', p:1, i:'ti-check'},
+      {l:'Generate New Offer Sheet', a:'regensheet', i:'ti-file-dollar'} ] },
+    'Appraisal Review Complete': { fields:[], buttons:[
+      {l:'Generate Updated Offer Sheet', a:'regensheet', i:'ti-file-dollar'},
+      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
+      {l:'Move to Nurturing', a:'stage', to:'Nurturing (Follow Up and Re-engage)', p:1, i:'ti-arrow-right'} ] },
+    'Verbal Yes - Schedule Appt': { fields:[], buttons:[
+      {l:'Mark Scheduled', a:'stage', to:'Scheduled', p:1, i:'ti-calendar-check'} ] },
+    'Scheduled': { fields:[], buttons:[
+      {l:'Appt Shown', a:'stage', to:'Appt Shown - Follow Up', p:1, i:'ti-user-check'},
+      {l:'Acquired', a:'stage', to:'Acquired', p:1, i:'ti-circle-check'},
+      {l:'No Show', a:'stage', to:'Verbal Yes - Schedule Appt', i:'ti-user-x'},
+      {l:'Mark Lost', a:'stage', to:'No Deal', i:'ti-x'} ] },
+    'Appt Shown - Follow Up': { fields:[], buttons:[
+      {l:'Acquired', a:'stage', to:'Acquired', p:1, i:'ti-circle-check'},
+      {l:'No Deal', a:'stage', to:'No Deal', i:'ti-x'} ] },
+    'Acquired': { fields:[], buttons:[
+      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'} ] },
+    'No Deal': { fields:[], buttons:[
+      {l:'Reopen', a:'stage', to:'Nurturing (Follow Up and Re-engage)', i:'ti-rotate-clockwise'} ] }
+  };
+
+  function bfInlineField(def, F, uuid, ro){
+    var val = F[def.label] || '';
+    var common = 'data-bfk="'+esc(def.key)+'" data-bfuuid="'+esc(uuid)+'" data-bftype="'+def.type+'" data-bflabel="'+esc(def.label)+'" data-bfval="'+esc(val)+'"';
+    if(def.type==='select'){
+      var pills='';
+      def.options.forEach(function(o){
+        var on = norm(val).toLowerCase()===norm(o[0]).toLowerCase();
+        var cls='bf-pill'+(on?(o[2]==='g'?' gset':' rset'):'');
+        pills += '<span class="'+cls+'" data-bfval="'+esc(o[0])+'">'+esc(o[1])+'</span>';
+      });
+      return '<div class="bf-f"><span class="bf-fl">'+esc(def.label)+'</span>'+
+        '<div class="bf-fpills" '+common+'>'+pills+'</div></div>';
+    }
+    if(def.type==='textarea'){
+      var disp = val ? esc(val) : '<span class="bf-ph">'+esc(def.ph||'')+'</span>';
+      var copyBtn = def.copy ? '<i class="ti ti-copy bf-fcopy" title="Copy" aria-hidden="true"></i>' : '';
+      return '<div class="bf-f bf-fcol"><span class="bf-fl">'+esc(def.label)+'</span>'+
+        '<div class="bf-fta-wrap" '+common+'><div class="bf-fta">'+disp+'</div>'+
+        '<div class="bf-facts">'+copyBtn+'<i class="ti ti-check bf-fsave" aria-hidden="true"></i></div></div></div>';
+    }
+    if(ro){
+      return '<div class="bf-f"><span class="bf-fl">'+esc(def.label)+'</span>'+
+        '<span class="bf-fi bf-fro"><span class="bf-fval">'+(val?esc(money(val)):'—')+'</span><i class="ti ti-lock bf-flock" aria-hidden="true"></i></span></div>';
+    }
+    var disp2 = val ? esc(money(val)) : '<span class="bf-ph">'+esc(def.ph||'—')+'</span>';
+    return '<div class="bf-f"><span class="bf-fl">'+esc(def.label)+'</span>'+
+      '<span class="bf-fi" '+common+'><span class="bf-fval">'+disp2+'</span><i class="ti ti-check bf-fsave" aria-hidden="true"></i></span></div>';
+  }
+
+  function bfButton(b, uuid){
+    var cls='bf-btn '+(b.p?'bf-btn-p':'bf-btn-s');
+    var attrs='data-bfaction="'+b.a+'" data-bfuuid="'+esc(uuid)+'"';
+    if(b.to) attrs+=' data-bfto="'+esc(b.to)+'"';
+    if(b.url) attrs+=' data-bfurl="'+esc(b.url)+'"';
+    var ic=b.i?'<i class="ti '+b.i+'" aria-hidden="true"></i>':'';
+    return '<button type="button" class="'+cls+'" '+attrs+'>'+ic+'<span>'+esc(b.l)+'</span></button>';
+  }
+
+  function renderStageUI(F, card, uuid){
+    var ui = STAGE_UI[stageOf(card)];
+    if(!ui) return '';
+    var html='';
+    if(ui.fields && ui.fields.length){
+      var fh='';
+      ui.fields.forEach(function(fid){
+        var ro=false, id=fid;
+        if(fid==='willtake_ro'){ ro=true; id='willtake'; }
+        var def=IF[id]; if(!def) return;
+        fh += bfInlineField(def, F, uuid, ro);
+      });
+      if(fh) html += '<div class="bf-fields">'+fh+'</div>';
+    }
+    if(ui.buttons && ui.buttons.length){
+      var bh='';
+      ui.buttons.forEach(function(b){
+        if(b.showEmpty && (F[b.showEmpty]||'').trim()) return;
+        bh += bfButton(b, uuid);
+      });
+      if(bh) html += '<div class="bf-btns">'+bh+'</div>';
+    }
+    return html ? '<div class="bf-stageui">'+html+'</div>' : '';
+  }
+
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
     var eq = equityInfo(F['Equity Display']);
@@ -242,7 +370,12 @@
 
     var clock='';
     var se=F['Stage Entered At'];
-    if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
+    var lf=F['Last Follow Up At'];
+    var seT=se?new Date(se).getTime():NaN;
+    var lfT=lf?new Date(lf).getTime():NaN;
+    var baseT=seT;
+    if(!isNaN(lfT) && (isNaN(seT)||lfT>seT)) baseT=lfT;
+    if(!isNaN(baseT)){ { var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
 
     var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
@@ -282,7 +415,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    return header + checklist + grid + pill + commentLine + clock;
+    return header + checklist + grid + pill + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
   function addCards(force){
@@ -302,7 +435,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
@@ -400,11 +533,11 @@
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   document.addEventListener('mousedown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-stageui'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('pointerdown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-stageui'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('click', function(e){
@@ -459,6 +592,137 @@
     inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); finish(true); } else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); } });
     inp.addEventListener('blur',function(){ finish((inp.value||'').trim().length>0); });
   }, true);
+  /* ===== inline field + stage-button interactions ===== */
+  var bfToastEl;
+  function bfToast(msg){
+    if(!bfToastEl){ bfToastEl=document.createElement('div'); bfToastEl.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:10050;background:#161616;color:#fff;font-size:13px;padding:9px 16px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.2s;pointer-events:none;'; document.body.appendChild(bfToastEl); }
+    bfToastEl.textContent=msg; bfToastEl.style.opacity='1';
+    clearTimeout(bfToastEl._t); bfToastEl._t=setTimeout(function(){ bfToastEl.style.opacity='0'; },2200);
+  }
+  function bfReadF(card){
+    var F={}; var first=card.querySelector('[data-testid="field-cell"]'); var cont=first?first.parentNode:card;
+    (cont||card).querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
+      var lab=cell.querySelector('[data-testid="field-cell-label"]'); if(!lab) return;
+      var vn=lab.nextElementSibling; F[norm(lab.textContent)]=vn?vn.textContent.trim():'';
+    });
+    return F;
+  }
+  function bfSetCell(card, label, val){
+    var cells=card.querySelectorAll('[data-testid="field-cell"]');
+    for(var i=0;i<cells.length;i++){ var lb=cells[i].querySelector('[data-testid="field-cell-label"]'); if(lb && norm(lb.textContent)===norm(label)){ var vn=lb.nextElementSibling; if(vn) vn.textContent=val; } }
+  }
+  function bfRebuild(card){ var b=card.querySelector('.bf-body'); if(b) b.removeAttribute('data-raw'); addCards(true); }
+  function bfPost(payload){ try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify(payload)}); }catch(e){} }
+
+  function bfSaveField(card, host, val){
+    var uuid=host.getAttribute('data-bfuuid')||'';
+    var key=host.getAttribute('data-bfk');
+    var type=host.getAttribute('data-bftype');
+    var label=host.getAttribute('data-bflabel');
+    if(!uuid||!key){ bfRebuild(card); return; }
+    var out=val;
+    if(type==='number'||type==='money'){ var n=parseFloat((val||'').toString().replace(/[^0-9.\-]/g,'')); out=isNaN(n)?'':n; }
+    var p={uuid:uuid}; p[key]=out; bfPost(p);
+    if(label){ bfSetCell(card, label, (out===''?'':(type==='money'?'$'+out:String(out)))); }
+    bfRebuild(card);
+  }
+
+  function bfEnterEdit(host, multiline){
+    if(bfEditing || host.getAttribute('data-editing')) return;
+    var card=host.closest('[data-testid="collection-record"]'); if(!card) return;
+    var raw=host.getAttribute('data-bfval')||'';
+    bfEditing=true; host.setAttribute('data-editing','1');
+    host.innerHTML = multiline ? '<textarea class="bf-fedit" rows="2"></textarea>' : '<input type="text" class="bf-fedit" />';
+    var inp=host.querySelector('.bf-fedit'); if(inp){ inp.value=raw; inp.focus(); try{ if(!multiline) inp.select(); }catch(e){} }
+    var done=false;
+    function finish(save){
+      if(done) return; done=true; bfEditing=false; host.removeAttribute('data-editing');
+      var v=inp?inp.value.trim():'';
+      if(save){ bfSaveField(card, host, v); } else { bfRebuild(card); }
+    }
+    inp.addEventListener('keydown', function(ev){
+      if(ev.key==='Enter' && !multiline){ ev.preventDefault(); finish(true); }
+      else if(ev.key==='Enter' && multiline && (ev.metaKey||ev.ctrlKey)){ ev.preventDefault(); finish(true); }
+      else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); }
+    });
+    inp.addEventListener('blur', function(){ setTimeout(function(){ if(!done) finish(true); }, 140); });
+  }
+
+  function bfAmountPrompt(btn){
+    if(bfEditing || btn.getAttribute('data-editing')) return;
+    var card=btn.closest('[data-testid="collection-record"]'); if(!card) return;
+    var uuid=btn.getAttribute('data-bfuuid')||'';
+    bfEditing=true; btn.setAttribute('data-editing','1');
+    var orig=btn.innerHTML;
+    btn.innerHTML='<input type="text" class="bf-amt" placeholder="$ new offer" />';
+    var inp=btn.querySelector('.bf-amt'); if(inp) inp.focus();
+    var done=false;
+    function fin(save){
+      if(done) return; done=true; bfEditing=false; btn.removeAttribute('data-editing');
+      var n=inp?parseFloat((inp.value||'').replace(/[^0-9.]/g,'')):NaN;
+      if(save && !isNaN(n)){
+        bfPost({uuid:uuid, offerAmount:n, offerSheetStatus:'Generating'});
+        try{ fetch(GEN_SHEET_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid, offerAmount:n})}); }catch(e){}
+        bfSetCell(card,'Offer Amount','$'+n); bfSetCell(card,'Offer Sheet Status','Generating');
+        bfToast('Generating updated offer sheet…');
+      }
+      btn.innerHTML=orig; bfRebuild(card);
+    }
+    inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fin(true); } else if(ev.key==='Escape'){ ev.preventDefault(); fin(false); } });
+    inp.addEventListener('blur',function(){ setTimeout(function(){ if(!done) fin(true); },140); });
+  }
+
+  function bfHandleBtn(btn){
+    var card=btn.closest('[data-testid="collection-record"]'); if(!card) return;
+    var uuid=btn.getAttribute('data-bfuuid')||'';
+    var a=btn.getAttribute('data-bfaction');
+    if(a==='url'){ var u=btn.getAttribute('data-bfurl'); if(u) window.open(u,'_blank','noopener'); return; }
+    if(!uuid) return;
+    if(a==='stage'){
+      if(bfStageBusy) return; bfStageBusy=true;
+      var to=btn.getAttribute('data-bfto');
+      var b=card.querySelector('.bf-body'); if(b){ b.style.opacity='0.45'; b.style.pointerEvents='none'; }
+      bfPost({uuid:uuid, status:to});
+      setTimeout(function(){ location.reload(); }, 2500);
+      return;
+    }
+    if(a==='viewsheet'){
+      var F=bfReadF(card); var img=F['Offer Sheet Image URL']||''; var nm=F['Vehicle Title']||'';
+      if(!img){ bfToast('No offer sheet yet'); return; }
+      window.open(VIEW_SHEET_PAGE+'?img='+encodeURIComponent(img)+'&name='+encodeURIComponent(nm),'_blank','noopener');
+      return;
+    }
+    if(a==='gensheet'){
+      try{ fetch(GEN_SHEET_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid})}); }catch(e){}
+      bfPost({uuid:uuid, offerSheetStatus:'Generating'});
+      bfSetCell(card,'Offer Sheet Status','Generating'); bfToast('Generating offer sheet…'); bfRebuild(card);
+      return;
+    }
+    if(a==='regensheet'){ bfAmountPrompt(btn); return; }
+    if(a==='followup'){
+      var iso=new Date().toISOString();
+      bfPost({uuid:uuid, lastFollowUpAt:iso});
+      bfSetCell(card,'Last Follow Up At', iso); bfToast('Follow-up logged · clock reset'); bfRebuild(card);
+      return;
+    }
+  }
+
+  document.addEventListener('click', function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('.bf-fedit, .bf-amt')){ e.preventDefault(); e.stopPropagation(); return; }
+    if(t.closest('[data-editing]')){ e.preventDefault(); e.stopPropagation(); return; }
+    var btn=t.closest('.bf-btn');
+    if(btn){ e.preventDefault(); e.stopPropagation(); bfHandleBtn(btn); return; }
+    var pill=t.closest('.bf-pill[data-bfval]');
+    if(pill){ e.preventDefault(); e.stopPropagation(); var host=pill.closest('.bf-fpills'); var c=pill.closest('[data-testid="collection-record"]'); if(host&&c) bfSaveField(c, host, pill.getAttribute('data-bfval')); return; }
+    var cp=t.closest('.bf-fcopy');
+    if(cp){ e.preventDefault(); e.stopPropagation(); var w=cp.closest('[data-bfk]'); var txt=w?(w.getAttribute('data-bfval')||''):''; try{ navigator.clipboard.writeText(txt); }catch(_){} bfToast('Copied'); return; }
+    var ta=t.closest('.bf-fta-wrap');
+    if(ta){ e.preventDefault(); e.stopPropagation(); bfEnterEdit(ta, true); return; }
+    var fi=t.closest('.bf-fi');
+    if(fi && !fi.classList.contains('bf-fro')){ e.preventDefault(); e.stopPropagation(); bfEnterEdit(fi, false); return; }
+  }, true);
+
   var BF_USERS_URL='https://buyforce.app.n8n.cloud/webhook/get-users?key=bf7q2xK9';
   var bfUserMap=null, bfUsersLoading=false, bfPop=null, bfPopTimer=null;
   function bfLoadUsers(){
