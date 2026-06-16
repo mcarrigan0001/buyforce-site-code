@@ -466,3 +466,13 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Mention: brand green + always show leading @ ---- */
 [data-testid="comments-section"] span[class*="bg-blue-200"] { color: #57C822 !important; }
 [data-testid="comments-section"] span[class*="bg-blue-200"]::before { content: "@"; color: #57C822; font-weight: 600; }
+
+/* ---- Mobile: single scroll context in record modal (fix scroll hang) ---- */
+@media (max-width: 640px) {
+  div:has(> div > [data-testid="record-view"]) { overscroll-behavior: contain !important; }
+  div:has(> div > [data-testid="record-view"]) > div { overflow: visible !important; }
+  [data-testid="record-view"] { overflow: visible !important; }
+  [data-testid="comments-section"] { max-height: none !important; }
+  [data-testid="comments-section"] #record-comments-body-wrapper,
+  [data-testid="comments-section"] .comment-scroll-container { overflow: visible !important; }
+}
