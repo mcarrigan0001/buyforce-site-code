@@ -415,8 +415,9 @@
   var bfFocusComment=false;
   function bfTryFocusComment(tries){
     if(!bfFocusComment) return;
-    var box=document.querySelector('[placeholder*="omment" i], [aria-label*="dd a comment" i]');
-    if(box){ try{ box.focus(); if(box.scrollIntoView) box.scrollIntoView({block:'center'}); }catch(e){} bfFocusComment=false; return; }
+    var box=document.querySelector('[data-placeholder*="omment" i], [aria-placeholder*="omment" i], [placeholder*="omment" i], [aria-label*="dd a comment" i]')
+         || document.querySelector('.ProseMirror[contenteditable="true"], [contenteditable="true"]');
+    if(box){ try{ if(box.scrollIntoView) box.scrollIntoView({block:'center'}); box.focus(); }catch(e){} bfFocusComment=false; return; }
     if(tries>0) setTimeout(function(){ bfTryFocusComment(tries-1); }, 300);
   }
   document.addEventListener('click', function(e){
