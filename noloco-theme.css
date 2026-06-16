@@ -346,3 +346,8 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   }
   [data-testid="collection-group"].w-12 { scroll-snap-align: none !important; }
 }
+
+/* ---- Mobile: let cards paint over the header shadow (match first column) ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: static !important; z-index: auto !important; }
+}
