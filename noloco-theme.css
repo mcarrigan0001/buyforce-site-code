@@ -482,8 +482,12 @@ div:has(> div > [data-testid="record-view"]) {
 /* ===================================================================== */
 .bf-stageui { padding-top: 4px; }
 .bf-actions.bf-collapsed .bf-stageui { display: none; }
-.bf-actions.bf-collapsed .bf-collapse-line { display: none; }
-.bf-actions.bf-collapsed .bf-collapse-bar { margin-top: 0; padding: 0; justify-content: center; }
+.bf-actions.bf-collapsed + .bf-clock { border-top: none !important; margin-top: 2px !important; padding-top: 6px !important; }
+.bf-movedtile { display: flex; align-items: center; gap: 8px; background: #e3f5cf; border: 0.5px solid #97c459; border-radius: 8px; padding: 11px 12px; font-size: 12px; color: #2b6012; position: relative; overflow: hidden; }
+.bf-movedtile .bf-movedtxt { font-weight: 500; }
+.bf-movedtile a { color: #2b6012; font-weight: 500; cursor: pointer; text-decoration: underline; }
+.bf-movedtile a.bf-openrec { margin-left: auto; }
+.bf-movedbar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: #57c822; }
 .bf-collapse-bar { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0 3px; margin-top: 8px; }
 .bf-collapse-line { flex: 1; height: 0.5px; background: #ece9e0; }
 .bf-collapse-ic { font-size: 15px; color: #b4b2a9; line-height: 1; }

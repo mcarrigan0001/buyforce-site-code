@@ -388,7 +388,7 @@
     var lfT=lf?new Date(lf).getTime():NaN;
     var baseT=seT;
     if(!isNaN(lfT) && (isNaN(seT)||lfT>seT)) baseT=lfT;
-    if(!isNaN(baseT)){ { var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
+    if(!isNaN(baseT)){ { var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div class="bf-clock" style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
 
     var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
@@ -434,8 +434,7 @@
   function addCards(force){
     if(bfEditing) return;
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
-      var _mv=(card.getAttribute('href')||'').match(/(rec[0-9a-z]+)/i);
-      if(_mv && bfMovedSet[_mv[1]]){ card.style.display='none'; return; }
+      if(card.getAttribute('data-bfmoved')) return;
       var firstCell = card.querySelector('[data-testid="field-cell"]');
       if(!firstCell) return;
       var container = firstCell.parentNode;
@@ -626,19 +625,63 @@
   function bfPost(payload){ try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify(payload)}); }catch(e){} }
   var bfMovedSet={};
   function bfFlashCard(card){ var b=card.querySelector('.bf-body'); if(!b) return; b.classList.remove('bf-flash'); void b.offsetWidth; b.classList.add('bf-flash'); }
+  function bfFindCard(uuid, stageName){
+    var found=null;
+    document.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){
+      var m=(c.getAttribute('href')||'').match(/(rec[0-9a-z]+)/i);
+      if(m && m[1]===uuid && (!stageName || stageOf(c)===stageName)) found=c;
+    });
+    return found;
+  }
+  function bfExpandColumn(stageName){
+    var groups=document.querySelectorAll('[data-testid="collection-group"]');
+    for(var i=0;i<groups.length;i++){
+      var l=groups[i].querySelector('[data-testid="collection-group-header-label"]');
+      if(l && norm(l.textContent)===stageName){
+        if(groups[i].classList.contains('w-12')){ var b=groups[i].querySelector('[data-testid="collection-group-header"] button'); if(b) b.click(); }
+        return groups[i];
+      }
+    }
+    return null;
+  }
+  function bfScrollToCard(card){
+    var sc=bfSC(); var grp=card.closest('[data-testid="collection-group"]');
+    if(sc && grp){ try{ var left=bfPos(sc, grp); sc.scrollTo({left:Math.max(0,left-14), behavior:'smooth'}); }catch(e){} }
+    setTimeout(function(){ try{ card.scrollIntoView({behavior:'smooth', block:'center', inline:'nearest'}); }catch(e){} bfFlashCard(card); }, 400);
+  }
+  function bfFallbackTile(card, uuid, to){
+    card.setAttribute('data-bfmoved','1');
+    card.setAttribute('data-bforig', stageOf(card));
+    var body=card.querySelector('.bf-body');
+    if(!body){ body=document.createElement('div'); body.className='bf-body'; var fc=card.querySelector('[data-testid="field-cell"]'); (fc?fc.parentNode:card).appendChild(body); }
+    body.innerHTML='<div class="bf-movedtile"><i class="ti ti-circle-check" aria-hidden="true"></i><span class="bf-movedtxt">Moved to '+esc(to)+'</span><a class="bf-undo">Undo</a><a class="bf-openrec">Open</a><span class="bf-movedbar"></span></div>';
+    var bar=body.querySelector('.bf-movedbar'); if(bar){ bar.style.transition='width 6s linear'; requestAnimationFrame(function(){ bar.style.width='0%'; }); }
+    card._bfFade=setTimeout(function(){
+      var hh=card.offsetHeight; card.style.overflow='hidden'; card.style.transition='opacity .4s ease, max-height .45s ease, margin .4s ease, padding .4s ease'; card.style.maxHeight=hh+'px'; void card.offsetHeight;
+      card.style.opacity='0'; card.style.maxHeight='0px'; card.style.marginTop='0'; card.style.marginBottom='0'; card.style.paddingTop='0'; card.style.paddingBottom='0';
+      setTimeout(function(){ card.style.display='none'; }, 460);
+    }, 6000);
+  }
   function bfMoveCard(card, uuid, to){
     if(!uuid || bfMovedSet[uuid]) return;
     bfMovedSet[uuid]=true;
     bfPost({uuid:uuid, status:to});
-    bfToast('Moved to '+to);
-    var h=card.offsetHeight;
-    card.style.overflow='hidden';
-    card.style.transition='opacity .3s ease, transform .3s ease, max-height .35s ease, margin .3s ease, padding .3s ease';
-    card.style.maxHeight=h+'px';
-    void card.offsetHeight;
-    card.style.opacity='0'; card.style.transform='translateX(14px)';
-    card.style.maxHeight='0px'; card.style.marginTop='0'; card.style.marginBottom='0'; card.style.paddingTop='0'; card.style.paddingBottom='0';
-    setTimeout(function(){ card.style.display='none'; }, 360);
+    bfToast('Moving to '+to+'…');
+    bfExpandColumn(to);
+    var tries=0;
+    var iv=setInterval(function(){
+      tries++;
+      var dest=bfFindCard(uuid, to);
+      if(dest){
+        clearInterval(iv); delete bfMovedSet[uuid];
+        bfExpandColumn(to);
+        bfScrollToCard(dest);
+        bfToast('Moved to '+to);
+      } else if(tries>=24){
+        clearInterval(iv); delete bfMovedSet[uuid];
+        bfFallbackTile(card, uuid, to);
+      }
+    }, 250);
   }
 
   function bfSaveField(card, host, val){
@@ -744,6 +787,10 @@
     if(t.closest('[data-editing]')){ e.preventDefault(); e.stopPropagation(); return; }
     var cbar=t.closest('.bf-collapse-bar');
     if(cbar){ e.preventDefault(); e.stopPropagation(); var cu=cbar.getAttribute('data-bfuuid'); var ck='bfcol:'+cu; var isC=bfLS(ck)==='1'; try{ if(isC) localStorage.removeItem(ck); else localStorage.setItem(ck,'1'); }catch(_){} var act=cbar.closest('.bf-actions'); if(act) act.classList.toggle('bf-collapsed'); var ic=cbar.querySelector('.bf-collapse-ic'); if(ic){ ic.classList.toggle('ti-chevron-up'); ic.classList.toggle('ti-chevron-down'); } return; }
+    var undo=t.closest('.bf-undo');
+    if(undo){ e.preventDefault(); e.stopPropagation(); var uc=undo.closest('[data-testid="collection-record"]'); if(uc){ if(uc._bfFade) clearTimeout(uc._bfFade); var om=(uc.getAttribute('href')||'').match(/(rec[0-9a-z]+)/i); var ou=om?om[1]:''; var orig=uc.getAttribute('data-bforig'); if(ou&&orig) bfPost({uuid:ou, status:orig}); uc.removeAttribute('data-bfmoved'); uc.style.opacity=''; uc.style.maxHeight=''; uc.style.marginTop=''; uc.style.marginBottom=''; uc.style.paddingTop=''; uc.style.paddingBottom=''; uc.style.overflow=''; var ub=uc.querySelector('.bf-body'); if(ub) ub.removeAttribute('data-raw'); addCards(true); bfToast('Move undone'); } return; }
+    var openr=t.closest('.bf-openrec');
+    if(openr){ e.preventDefault(); e.stopPropagation(); var oc=openr.closest('[data-testid="collection-record"]'); var oh=oc?oc.getAttribute('href'):''; if(oh){ location.href=oh; } return; }
     var btn=t.closest('.bf-btn');
     if(btn){ e.preventDefault(); e.stopPropagation(); bfHandleBtn(btn); return; }
     var pill=t.closest('.bf-pill[data-bfval]');
