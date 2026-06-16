@@ -476,10 +476,3 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="comments-section"] #record-comments-body-wrapper,
   [data-testid="comments-section"] .comment-scroll-container { overflow: visible !important; }
 }
-
-/* ---- Stage-specific card buttons ---- */
-.bf-btn { font-family: inherit; font-size: 11px; font-weight: 500; border-radius: 7px; padding: 5px 10px; cursor: pointer; border: 1px solid transparent; line-height: 1.2; }
-.bf-btn-fill { background: #57c822; color: #fff; }
-.bf-btn-fill:hover { background: #47a31b; }
-.bf-btn-out { background: #fff; color: #2b6012; border-color: #c7ec9f; }
-.bf-btn-out:hover { background: #f2fbe9; }

@@ -110,14 +110,6 @@
     'Schedule': 'Scheduled',
     'Buy': 'Acquired'
   };
-  var CARD_BUTTONS = [
-    {label:'Engaged / Asked for VIN', stages:['Fresh Leads'], action:'stage', target:'Engaged - Awaiting VIN'},
-    {label:'VIN Obtained', stages:['Fresh Leads','Engaged - Awaiting VIN'], action:'stage', target:'VIN Received - Appraisal Needed'},
-    {label:'Get CarMax Value', stages:['VIN Received - Appraisal Needed'], action:'url', target:'https://www.carmax.com/maxoffer'},
-    {label:'Get Carvana Value', stages:['VIN Received - Appraisal Needed'], action:'url', target:'https://www.carvana.com/sell-my-car'},
-    {label:'Offer Sheet Sent', stages:['Offer Sheet Generated'], action:'stage', target:'Offer Sent (0-2 Days)'},
-    {label:'Move to Nurturing', stages:['Appraisal Review Complete'], action:'stage', target:'Nurturing (Follow Up and Re-engage)'}
-  ];
 
   function fmtDuration(mins){
     if (mins < 1) return 'just now';
@@ -290,10 +282,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    var _btns='';
-    for (var _bi=0; _bi<CARD_BUTTONS.length; _bi++){ var _b=CARD_BUTTONS[_bi]; if(_b.stages.indexOf(_stg)===-1) continue; var _bc=_b.action==='url'?'bf-btn bf-btn-out':'bf-btn bf-btn-fill'; _btns+='<button class="'+_bc+'" data-bfaction="'+_b.action+'" data-bftarget="'+esc(_b.target)+'">'+esc(_b.label)+'</button>'; }
-    var buttonsBlock = _btns ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;border-top:0.5px solid #ece9e0;padding-top:10px;">'+_btns+'</div>' : '';
-    return header + checklist + grid + pill + commentLine + clock + buttonsBlock;
+    return header + checklist + grid + pill + commentLine + clock;
   }
 
   function addCards(force){
@@ -411,11 +400,11 @@
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   document.addEventListener('mousedown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-btn'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('pointerdown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-btn'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('click', function(e){
@@ -506,21 +495,6 @@
     var el=(e.target&&e.target.closest)?e.target.closest('span[class*="bg-blue-200"]'):null;
     if(!el) return;
     bfPopTimer=setTimeout(bfHideUserPop, 150);
-  }, true);
-  document.addEventListener('click', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-btn'):null;
-    if(!el) return;
-    e.preventDefault(); e.stopPropagation();
-    var act=el.getAttribute('data-bfaction'); var tgt=el.getAttribute('data-bftarget');
-    if(act==='url'){ window.open(tgt,'_blank','noopener'); return; }
-    if(act==='stage'){
-      if(bfStageBusy) return; bfStageBusy=true;
-      var card=el.closest('[data-testid="collection-record"]'); var href=card?(card.getAttribute('href')||''):''; var m=href.match(/(rec[0-9a-z]+)/i); var uuid=m?m[1]:'';
-      if(!uuid){ bfStageBusy=false; return; }
-      var b2=card.querySelector('.bf-body'); if(b2){ b2.style.opacity='0.45'; b2.style.pointerEvents='none'; }
-      try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid,status:tgt})}); }catch(err){}
-      setTimeout(function(){ location.reload(); }, 3000);
-    }
   }, true);
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); }
   run();
