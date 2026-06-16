@@ -312,3 +312,17 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   [data-testid="view-collection"] [class*="sm:flex-col"] [class*="sm:w-full"] { width: auto !important; }
   [data-testid="view-collection"] h1 { font-size: 1.05rem !important; }
 }
+
+/* ===== Sticky-board page scroll (EXPERIMENTAL — revertible) =====
+   Header scrolls away; the pipeline columns pin at the top; cards
+   keep scrolling within each column. Nav assumed 64px tall. */
+[data-testid="view-collection"] { height: auto !important; min-height: 0 !important; }
+[data-testid="view-collection"] .collection-view-board { height: auto !important; min-height: 0 !important; overflow: visible !important; flex: 0 0 auto !important; }
+[data-testid="view-collection"] [class*="min-h-screen-75"] {
+  position: sticky !important;
+  top: 0 !important;
+  height: calc(100dvh - 64px) !important;
+  min-height: calc(100dvh - 64px) !important;
+  flex: 0 0 auto !important;
+}
+/* ===== end sticky-board ===== */
