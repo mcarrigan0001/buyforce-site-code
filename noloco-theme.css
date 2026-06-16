@@ -351,3 +351,8 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 @media (max-width: 640px) {
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: static !important; z-index: auto !important; }
 }
+
+/* ---- Mobile: keep header shadow ABOVE cards in ALL columns (incl. first) ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { position: relative !important; z-index: 5 !important; }
+}
