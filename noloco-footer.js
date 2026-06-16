@@ -218,8 +218,27 @@
     if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-map-pin" style="font-size:12px;" aria-hidden="true"></i>'+esc(F['Listing Location'])+'</span>');
     var meta = metaParts.length ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:11px;color:#888780;">'+metaParts.join('')+'</div>' : '';
 
-    var header='<div style="margin-bottom:9px;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
-      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>';
+    var _n=function(x){var m=(x||'').replace(/[^0-9.]/g,'');return m?parseFloat(m):NaN;};
+    var _acv=_n(F['ACV']);
+    var _wt=_n(F['Seller Will Take']);
+    var _ask=(!isNaN(_wt)&&_wt>0)?_wt:_n(F['Asking Price']);
+    var _off=_n(F['Offer Amount']);
+    var _badge='';
+    if(!isNaN(_acv)&&_acv>0&&!isNaN(_ask)){
+      var _cmp=compInfo(F['Competition']);
+      var _cs=_cmp?(_cmp.color==='g'?40:(_cmp.color==='y'?20:0)):0;
+      var _prem=_ask-_acv;
+      var _ds=_prem<=0?30:(_prem>=4000?0:30*(1-_prem/4000));
+      var _pct=_prem/_acv;
+      var _ps=_pct<=0?20:(_pct>=0.20?0:20*(1-_pct/0.20));
+      var _eq=(!isNaN(_off))?(_acv-_off):0;
+      var _es=_eq>=2000?10:(_eq<=0?0:10*(_eq/2000));
+      var _score=Math.round(_cs+_ds+_ps+_es);
+      var _tier=_score>=75?{bg:'#e3f5cf',fg:'#2b6012',l:'Hot'}:(_score>=50?{bg:'#fbeecd',fg:'#7a4d13',l:'Warm'}:{bg:'#eceae3',fg:'#6b6b64',l:'Cool'});
+      _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
+    }
+    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
+      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>'+ _badge +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
