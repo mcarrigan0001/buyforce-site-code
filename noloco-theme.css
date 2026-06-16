@@ -433,3 +433,7 @@ div:has(> div > [data-testid="record-view"]) {
   100% { box-shadow: 0 0 0 0 rgba(87,200,34,0); }
 }
 .bf-flash { animation: bfFlash 1.6s ease-out 1; border-radius: 8px; }
+
+/* ---- Compact the record comment section ---- */
+[data-testid="comments-section"] { max-height: 320px !important; }
+[data-testid="comments-section"] [class*="py-16"] { padding-top: 18px !important; padding-bottom: 18px !important; }
