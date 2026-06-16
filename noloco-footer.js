@@ -83,17 +83,23 @@
     'Nurturing (Follow Up and Re-engage)':7,'Appraisal Review Needed':8,'Appraisal Review Complete':9,
     'Verbal Yes - Schedule Appt':10,'Scheduled':11,'Appt Shown - Follow Up':12,'Acquired':13,'No Deal':14
   };
-  var MILESTONES = [
-    {label:'Obtain VIN', stage:3},
-    {label:'Competing values', stage:3},
-    {label:'Create appraisal with notes', stage:4},
-    {label:'Finalize appraisal', stage:4},
-    {label:'Generate offer', stage:5},
-    {label:'Send offer', stage:6},
-    {label:'Follow up', stage:7},
-    {label:'Schedule', stage:11},
-    {label:'Buy', stage:13}
-  ];
+  var MILESTONES = ['Obtain VIN','Competing values','Create appraisal with notes','Finalize appraisal','Generate offer','Send offer','Follow up','Schedule','Buy'];
+  var STATUS_CHECKS = {
+    'Fresh Leads': [],
+    'Engaged - Awaiting VIN': [],
+    'VIN Received - Appraisal Needed': [0],
+    'Appraisal Complete - Enter Offer Sheet Values': [0,2],
+    'Offer Sheet Generated': [0,2,3,4],
+    'Offer Sent (0-2 Days)': [0,2,3,4,5],
+    'Nurturing (Follow Up and Re-engage)': [0,2,3,4,5],
+    'Appraisal Review Needed': [0],
+    'Appraisal Review Complete': [0,2,3],
+    'Verbal Yes - Schedule Appt': [0,2,3,4,5],
+    'Scheduled': [0,7],
+    'Appt Shown - Follow Up': [0,1,2,3,4,5],
+    'Acquired': [0,1,2,3,4,5,6,7,8],
+    'No Deal': []
+  };
 
   function fmtDuration(mins){
     if (mins < 1) return 'just now';
@@ -199,14 +205,19 @@
     var se=F['Stage Entered At'];
     if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
 
-    var _ci = STAGEORDER[stageOf(card)] || 0;
+    var _stg = stageOf(card);
+    var _checks = STATUS_CHECKS[_stg] || [];
+    var _noDeal = (_stg === 'No Deal');
     var _done = 0, _items = '';
     for (var mi = 0; mi < MILESTONES.length; mi++) {
-      var _ok = _ci >= MILESTONES[mi].stage;
+      var _ok = _checks.indexOf(mi) > -1;
       if (_ok) _done++;
-      _items += '<div style="display:flex;align-items:center;gap:5px;">' +
-        (_ok ? '<span style="width:15px;height:15px;border-radius:50%;background:#3b6d11;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;"><i class="ti ti-check" style="font-size:10px;" aria-hidden="true"></i></span>' : '<span style="width:15px;height:15px;border-radius:50%;border:1.5px solid #d3d1c7;flex:none;display:inline-block;"></span>') +
-        '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : '#9aa0a6') + ';">' + MILESTONES[mi].label + '</span></div>';
+      var _circ;
+      if (_ok) _circ = '<span style="width:15px;height:15px;border-radius:50%;background:#3b6d11;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;"><i class="ti ti-check" style="font-size:10px;" aria-hidden="true"></i></span>';
+      else if (_noDeal) _circ = '<span style="width:15px;height:15px;border-radius:50%;background:#fbe3e3;color:#c93535;display:inline-flex;align-items:center;justify-content:center;flex:none;"><i class="ti ti-x" style="font-size:10px;" aria-hidden="true"></i></span>';
+      else _circ = '<span style="width:15px;height:15px;border-radius:50%;border:1.5px solid #d3d1c7;flex:none;display:inline-block;"></span>';
+      _items += '<div style="display:flex;align-items:center;gap:5px;">' + _circ +
+        '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : (_noDeal ? '#c93535' : '#9aa0a6')) + ';">' + MILESTONES[mi] + '</span></div>';
     }
     var checklist = '<div style="padding-bottom:10px;margin-bottom:1px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
@@ -253,7 +264,7 @@
     if(open){
       if(!bfBackdrop){
         bfBackdrop=document.createElement('div');
-        bfBackdrop.style.cssText='position:fixed;inset:0;z-index:39;background:rgba(0,0,0,0.45);';
+        bfBackdrop.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.45);';
         bfBackdrop.addEventListener('click',function(){ try{ history.back(); }catch(e){} });
         document.body.appendChild(bfBackdrop);
       }
