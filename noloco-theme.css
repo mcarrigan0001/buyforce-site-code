@@ -440,3 +440,17 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Comment section: tidy centered width ---- */
 .section-comments .max-w-6xl { max-width: 820px !important; margin-left: auto !important; margin-right: auto !important; }
+
+/* ---- Tagged-user mentions in comments: bold green, no highlight ---- */
+[data-testid="comments-section"] .mention,
+[data-testid="comments-section"] [data-type="mention"],
+[data-testid="comments-section"] [data-mention],
+[data-testid="comments-section"] [data-mention-id],
+[data-testid="comments-section"] span[data-id][data-label] {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #2b6012 !important;
+  font-weight: 600 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
