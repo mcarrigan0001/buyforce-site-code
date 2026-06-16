@@ -437,3 +437,6 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Compact the record comment section ---- */
 [data-testid="comments-section"] { max-height: 320px !important; }
 [data-testid="comments-section"] [class*="py-16"] { padding-top: 18px !important; padding-bottom: 18px !important; }
+
+/* ---- Comment section: tidy centered width ---- */
+.section-comments .max-w-6xl { max-width: 820px !important; margin-left: auto !important; margin-right: auto !important; }
