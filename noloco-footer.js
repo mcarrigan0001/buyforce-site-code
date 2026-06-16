@@ -155,6 +155,16 @@
     var mo = Math.round(days/30);
     return 'Listed '+mo+' month'+(mo>1?'s':'')+' ago';
   }
+  function agoShort(raw){
+    var d=new Date(raw); if(isNaN(d.getTime())) return '';
+    var m=Math.floor((Date.now()-d.getTime())/60000); if(m<0)m=0;
+    if(m<1) return 'just now';
+    if(m<60) return m+'m ago';
+    var h=Math.floor(m/60); if(h<24) return h+'h ago';
+    var dd=Math.floor(h/24); if(dd<7) return dd+'d ago';
+    if(dd<30) return Math.floor(dd/7)+'w ago';
+    return Math.floor(dd/30)+'mo ago';
+  }
 
   function tile(lbl,val){
     return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(money(val)):'—')+'</div></div>';
@@ -224,7 +234,16 @@
       '<span style="font-size:10px;font-weight:600;letter-spacing:0.4px;color:#9aa0a6;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;">' + _done + ' of ' + MILESTONES.length + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px 6px;">' + _items + '</div></div>';
-    return header + checklist + grid + pill + clock;
+    var _lc = F['Last Comment'];
+    var commentLine = '';
+    if (_lc) {
+      var _txt = _lc.length > 60 ? _lc.slice(0,60).trim() + '\u2026' : _lc;
+      var _ago = F['Last Comment At'] ? agoShort(F['Last Comment At']) : '';
+      commentLine = '<div style="display:flex;align-items:flex-start;gap:5px;margin-top:9px;font-size:11px;color:#6b6b64;">' +
+        '<i class="ti ti-message-2" style="font-size:13px;color:#9aa0a6;flex:none;margin-top:1px;" aria-hidden="true"></i>' +
+        '<span style="line-height:1.3;">\u201c' + esc(_txt) + '\u201d' + (_ago ? '<span style="color:#9aa0a6;"> \u00b7 ' + _ago + '</span>' : '') + '</span></div>';
+    }
+    return header + checklist + grid + pill + commentLine + clock;
   }
 
   function addCards(force){
@@ -243,7 +262,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
