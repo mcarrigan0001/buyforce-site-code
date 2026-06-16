@@ -624,7 +624,7 @@
   function bfRebuild(card){ var b=card.querySelector('.bf-body'); if(b) b.removeAttribute('data-raw'); addCards(true); }
   function bfPost(payload){ try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify(payload)}); }catch(e){} }
   var bfMovedSet={};
-  function bfFlashCard(card){ var b=card.querySelector('.bf-body'); if(!b) return; b.classList.remove('bf-flash'); void b.offsetWidth; b.classList.add('bf-flash'); }
+  function bfFlashCard(card){ if(!card) return; card.classList.remove('bf-cardflash'); void card.offsetWidth; card.classList.add('bf-cardflash'); clearTimeout(card._bfFl); card._bfFl=setTimeout(function(){ card.classList.remove('bf-cardflash'); }, 1000); }
   function bfFindCard(uuid, stageName){
     var found=null;
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){
@@ -645,9 +645,20 @@
     return null;
   }
   function bfScrollToCard(card){
-    var sc=bfSC(); var grp=card.closest('[data-testid="collection-group"]');
+    var grp=card.closest('[data-testid="collection-group"]');
+    var sc=bfSC();
     if(sc && grp){ try{ var left=bfPos(sc, grp); sc.scrollTo({left:Math.max(0,left-14), behavior:'smooth'}); }catch(e){} }
-    setTimeout(function(){ try{ card.scrollIntoView({behavior:'smooth', block:'center', inline:'nearest'}); }catch(e){} bfFlashCard(card); }, 400);
+    setTimeout(function(){
+      try{
+        var vs=grp?grp.querySelector('[class*="overflow-y-auto"]'):null;
+        if(vs){
+          var cr=card.getBoundingClientRect(), vr=vs.getBoundingClientRect();
+          var delta=(cr.top - vr.top) - (vr.height/2 - cr.height/2);
+          vs.scrollBy({top:delta, behavior:'smooth'});
+        }
+      }catch(e){}
+      bfFlashCard(card);
+    }, 420);
   }
   function bfFallbackTile(card, uuid, to){
     card.setAttribute('data-bfmoved','1');
