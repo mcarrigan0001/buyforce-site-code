@@ -459,7 +459,44 @@
     inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); finish(true); } else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); } });
     inp.addEventListener('blur',function(){ finish((inp.value||'').trim().length>0); });
   }, true);
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); }
+  var BF_USERS_URL='https://buyforce.app.n8n.cloud/webhook/get-users?key=bf7q2xK9';
+  var bfUserMap=null, bfUsersLoading=false, bfPop=null, bfPopTimer=null;
+  function bfLoadUsers(){
+    if(bfUserMap||bfUsersLoading) return;
+    try{ var c=localStorage.getItem('bfusers'); if(c){ var o=JSON.parse(c); if(o&&o.m&&(Date.now()-o.t<600000)){ bfUserMap=o.m; return; } } }catch(e){}
+    bfUsersLoading=true;
+    fetch(BF_USERS_URL).then(function(r){return r.json();}).then(function(arr){
+      var m={}; (arr||[]).forEach(function(u){ if(u&&u.name) m[u.name.toLowerCase()]={role:u.role||'', last:u.lastActiveAt||''}; });
+      bfUserMap=m; try{ localStorage.setItem('bfusers',JSON.stringify({t:Date.now(),m:m})); }catch(e){}
+    }).catch(function(){}).finally(function(){ bfUsersLoading=false; });
+  }
+  function bfEnsurePop(){ if(!bfPop){ bfPop=document.createElement('div'); bfPop.style.cssText='position:fixed;z-index:10002;background:#fff;border:0.5px solid #d3d1c7;box-shadow:0 4px 16px rgba(0,0,0,0.18);border-radius:10px;padding:10px 12px;display:none;min-width:150px;pointer-events:none;font-family:Inter,-apple-system,sans-serif;'; document.body.appendChild(bfPop); } return bfPop; }
+  function bfShowUserPop(el){
+    if(!bfUserMap){ bfLoadUsers(); return; }
+    var name=(el.textContent||'').replace(/^@/,'').trim();
+    var u=bfUserMap[name.toLowerCase()]; if(!u) return;
+    var pa=name.split(' '); var ini=(((pa[0]||'')[0]||'')+((pa[pa.length-1]||'')[0]||'')).toUpperCase();
+    var last=u.last?agoShort(u.last):'';
+    var pop=bfEnsurePop();
+    pop.innerHTML='<div style="display:flex;align-items:center;gap:9px;"><span style="width:34px;height:34px;border-radius:50%;background:#e3f5cf;color:#2b6012;display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;flex:none;">'+ini+'</span><div style="min-width:0;"><div style="font-size:13px;font-weight:500;color:#161616;">'+name+'</div>'+(u.role?'<div style="font-size:11px;color:#7c7c7c;">'+u.role+'</div>':'')+(last?'<div style="font-size:11px;color:#3b6d11;margin-top:1px;">Active '+last+'</div>':'')+'</div></div>';
+    pop.style.display='block';
+    var r=el.getBoundingClientRect();
+    var top=r.top-pop.offsetHeight-8; if(top<8) top=r.bottom+8;
+    var left=r.left; if(left+pop.offsetWidth>window.innerWidth-8) left=window.innerWidth-8-pop.offsetWidth;
+    pop.style.top=top+'px'; pop.style.left=Math.max(8,left)+'px';
+  }
+  function bfHideUserPop(){ if(bfPop) bfPop.style.display='none'; }
+  document.addEventListener('mouseover', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('span[class*="bg-blue-200"]'):null;
+    if(!el || !el.closest('[data-testid="comments-section"]')) return;
+    clearTimeout(bfPopTimer); bfShowUserPop(el);
+  }, true);
+  document.addEventListener('mouseout', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('span[class*="bg-blue-200"]'):null;
+    if(!el) return;
+    bfPopTimer=setTimeout(bfHideUserPop, 150);
+  }, true);
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
