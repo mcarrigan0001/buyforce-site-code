@@ -260,14 +260,17 @@
   var bfArrowR, bfArrowL, bfBusy=false;
   var bfBackdrop;
   function manageBackdrop(){
-    var open = location.pathname.indexOf('/preview/') > -1 && document.querySelector('[data-testid="record-view"]');
-    if(open){
+    var rv = (location.pathname.indexOf('/preview/') > -1) ? document.querySelector('[data-testid="record-view"]') : null;
+    if(rv){
+      var panel = rv.closest('[class*="inset-y-0"]') || rv.parentElement;
+      var parent = panel ? panel.parentNode : document.body;
       if(!bfBackdrop){
         bfBackdrop=document.createElement('div');
         bfBackdrop.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.45);';
         bfBackdrop.addEventListener('click',function(){ try{ history.back(); }catch(e){} });
-        document.body.appendChild(bfBackdrop);
       }
+      if(panel && bfBackdrop.parentNode !== parent){ parent.insertBefore(bfBackdrop, panel); }
+      else if(!bfBackdrop.parentNode){ document.body.appendChild(bfBackdrop); }
       bfBackdrop.style.display='block';
       if(bfArrowR) bfArrowR.style.display='none';
       if(bfArrowL) bfArrowL.style.display='none';
