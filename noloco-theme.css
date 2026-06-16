@@ -382,3 +382,22 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
     background: linear-gradient(to bottom, rgba(87,200,34,0.30), rgba(87,200,34,0));
   }
 }
+
+/* ---- Record panel -> centered ~66% modal (scoped so other dialogs are untouched) ---- */
+[role="dialog"]:has([data-testid="record-view-section"]),
+[role="dialog"]:has([data-testid="record-view-body"]) {
+  left: 50% !important; right: auto !important;
+  top: 50% !important; bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  width: 66vw !important; max-width: 66vw !important;
+  height: auto !important; max-height: 88vh !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
+  overflow: auto !important;
+}
+@media (max-width: 640px) {
+  [role="dialog"]:has([data-testid="record-view-section"]),
+  [role="dialog"]:has([data-testid="record-view-body"]) {
+    width: 94vw !important; max-width: 94vw !important; max-height: 90vh !important;
+  }
+}
