@@ -462,3 +462,7 @@ div:has(> div > [data-testid="record-view"]) {
   font-weight: 600 !important;
   padding: 0 !important;
 }
+
+/* ---- Mention: brand green + always show leading @ ---- */
+[data-testid="comments-section"] span[class*="bg-blue-200"] { color: #57C822 !important; }
+[data-testid="comments-section"] span[class*="bg-blue-200"]::before { content: "@"; color: #57C822; font-weight: 600; }
