@@ -179,7 +179,7 @@
 
     var clock='';
     var se=F['Stage Entered At'];
-    if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var col='#5f5e5a'; if(th){col=mins>=th[1]?'#c93535':(mins>=th[0]?'#e8730c':'#3b6d11');} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:'+col+';"><i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
+    if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
 
     return header + grid + pill + clock;
   }
