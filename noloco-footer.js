@@ -286,6 +286,7 @@
   }
 
   function addCards(force){
+    if(bfEditing) return;
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
       var firstCell = card.querySelector('[data-testid="field-cell"]');
       if(!firstCell) return;
@@ -399,7 +400,7 @@
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   document.addEventListener('mousedown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('click', function(e){
@@ -433,12 +434,35 @@
     if(box){ try{ if(box.scrollIntoView) box.scrollIntoView({block:'center'}); box.focus(); var fl=box.closest('[class*="border"],[class*="rounded"]')||box; fl.classList.add('bf-flash'); setTimeout(function(){ fl.classList.remove('bf-flash'); },1600); }catch(e){} bfFocusComment=false; return; }
     if(tries>0) setTimeout(function(){ bfTryFocusComment(tries-1); }, 300);
   }
+  var bfEditing=false;
   document.addEventListener('click', function(e){
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-comment'):null;
     if(!el) return;
-    bfFocusComment=true;
-    setTimeout(function(){ bfTryFocusComment(12); }, 400);
-  }, false);
+    if(el.getAttribute('data-editing')){ e.stopPropagation(); return; }
+    e.preventDefault(); e.stopPropagation();
+    var card=el.closest('[data-testid="collection-record"]');
+    var href=card?(card.getAttribute('href')||''):'';
+    var m=href.match(/(rec[0-9a-z]+)/i); var uuid=m?m[1]:'';
+    if(!uuid) return;
+    bfEditing=true; el.setAttribute('data-editing','1');
+    el.innerHTML='<input type="text" placeholder="Add a comment\u2026" style="width:100%;border:1px solid #57c822;border-radius:6px;padding:5px 8px;font-size:11px;font-family:inherit;outline:none;box-sizing:border-box;" />';
+    var inp=el.querySelector('input'); if(inp) inp.focus();
+    var done=false;
+    function finish(save){
+      if(done) return; done=true; bfEditing=false;
+      var txt=inp?(inp.value||'').trim():'';
+      if(save && txt){
+        var cells=card.querySelectorAll('[data-testid="field-cell"]');
+        for(var i=0;i<cells.length;i++){ var lab=cells[i].querySelector('[data-testid="field-cell-label"]'); if(!lab) continue; var ln=norm(lab.textContent); var vn=lab.nextElementSibling; if(!vn) continue; if(ln==='Last Comment'){ vn.textContent=txt; } else if(ln==='Last Comment At'){ vn.textContent=new Date().toISOString(); } }
+        try{ fetch('https://buyforce.app.n8n.cloud/webhook/add-comment',{method:'POST',body:JSON.stringify({uuid:uuid,text:txt})}); }catch(err){}
+      }
+      el.removeAttribute('data-editing');
+      var b=card.querySelector('.bf-body'); if(b) b.removeAttribute('data-raw');
+      addCards(true);
+    }
+    inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); finish(true); } else if(ev.key==='Escape'){ ev.preventDefault(); finish(false); } });
+    inp.addEventListener('blur',function(){ finish((inp.value||'').trim().length>0); });
+  }, true);
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
