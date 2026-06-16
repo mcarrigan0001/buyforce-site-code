@@ -94,10 +94,10 @@
     'Nurturing (Follow Up and Re-engage)': [0,2,3,4,5],
     'Appraisal Review Needed': [0],
     'Appraisal Review Complete': [0,2,3],
-    'Verbal Yes - Schedule Appt': [0,2,3,4,5],
+    'Verbal Yes - Schedule Appt': [],
     'Scheduled': [0,7],
-    'Appt Shown - Follow Up': [0,1,2,3,4,5],
-    'Acquired': [0,1,2,3,4,5,6,7,8],
+    'Appt Shown - Follow Up': [0,2,3,4,5],
+    'Acquired': [0,2,3,4,5,6,7,8],
     'No Deal': []
   };
 
