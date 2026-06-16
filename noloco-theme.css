@@ -413,7 +413,7 @@ div:has(> div > [data-testid="record-view"]) {
   height: 88vh !important; max-height: 88vh !important;
   border-radius: 14px !important; border-left: none !important;
   box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
-  z-index: 9999 !important; overflow: hidden !important;
+  z-index: 9999 !important; overflow: auto !important;
 }
 @media (max-width: 640px) {
   [class*="45dvw"]:has([data-testid="record-view"]),
