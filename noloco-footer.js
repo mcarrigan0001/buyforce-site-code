@@ -100,6 +100,16 @@
     'Acquired': [0,2,3,4,5,6,7,8],
     'No Deal': []
   };
+  var CLICK_STAGE = {
+    'Obtain VIN': 'VIN Received - Appraisal Needed',
+    'Create appraisal with notes': 'Appraisal Complete - Enter Offer Sheet Values',
+    'Finalize appraisal': 'Appraisal Complete - Enter Offer Sheet Values',
+    'Generate offer': 'Offer Sheet Generated',
+    'Send offer': 'Offer Sent (0-2 Days)',
+    'Follow up': 'Nurturing (Follow Up and Re-engage)',
+    'Schedule': 'Scheduled',
+    'Buy': 'Acquired'
+  };
 
   function fmtDuration(mins){
     if (mins < 1) return 'just now';
@@ -215,19 +225,24 @@
     var se=F['Stage Entered At'];
     if(se){ var dt=new Date(se); if(!isNaN(dt.getTime())){ var mins=Math.floor((Date.now()-dt.getTime())/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
 
+    var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
     var _checks = STATUS_CHECKS[_stg] || [];
     var _noDeal = (_stg === 'No Deal');
     var _done = 0, _items = '';
     for (var mi = 0; mi < MILESTONES.length; mi++) {
-      var _ok = _checks.indexOf(mi) > -1;
+      var _label = MILESTONES[mi];
+      var _ok = (_label === 'Competing values') ? !!(_uuid && bfLS('bfcv:'+_uuid)==='1') : (_checks.indexOf(mi) > -1);
       if (_ok) _done++;
       var _circ;
       if (_ok) _circ = '<span style="width:15px;height:15px;border-radius:50%;background:#3b6d11;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none;"><i class="ti ti-check" style="font-size:10px;" aria-hidden="true"></i></span>';
       else if (_noDeal) _circ = '<span style="width:15px;height:15px;border-radius:50%;background:#fbe3e3;color:#c93535;display:inline-flex;align-items:center;justify-content:center;flex:none;"><i class="ti ti-x" style="font-size:10px;" aria-hidden="true"></i></span>';
       else _circ = '<span style="width:15px;height:15px;border-radius:50%;border:1.5px solid #d3d1c7;flex:none;display:inline-block;"></span>';
-      _items += '<div style="display:flex;align-items:center;gap:5px;">' + _circ +
-        '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : (_noDeal ? '#c93535' : '#9aa0a6')) + ';">' + MILESTONES[mi] + '</span></div>';
+      var _ctype = (_label==='Competing values') ? 'cv' : (CLICK_STAGE[_label] ? 'stage' : '');
+      var _attr = _ctype ? (' class="bf-ms" data-bfclick="'+_ctype+'"'+(_ctype==='stage'?' data-bfstage="'+esc(CLICK_STAGE[_label])+'"':'')) : '';
+      var _cur = _ctype ? 'cursor:pointer;' : '';
+      _items += '<div'+_attr+' style="display:flex;align-items:center;gap:5px;'+_cur+'">' + _circ +
+        '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : (_noDeal ? '#c93535' : '#9aa0a6')) + ';">' + _label + '</span></div>';
     }
     var checklist = '<div style="padding-bottom:10px;margin-bottom:1px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
@@ -345,6 +360,36 @@
     if(!sc.getAttribute('data-bfscroll')){ sc.addEventListener('scroll',function(){ if(!bfBusy) updateArrows(); },{passive:true}); sc.setAttribute('data-bfscroll','1'); }
     updateArrows();
   }
+  var BF_HOOK='https://buyforce.app.n8n.cloud/webhook/update-stage';
+  var bfStageBusy=false;
+  function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  document.addEventListener('mousedown', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms'):null;
+    if(el){ e.stopPropagation(); }
+  }, true);
+  document.addEventListener('click', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms'):null;
+    if(!el) return;
+    e.preventDefault(); e.stopPropagation();
+    var card=el.closest('[data-testid="collection-record"]');
+    var href=card?(card.getAttribute('href')||''):'';
+    var m=href.match(/(rec[0-9a-z]+)/i);
+    var uuid=m?m[1]:'';
+    if(!uuid) return;
+    var type=el.getAttribute('data-bfclick');
+    if(type==='cv'){
+      var k='bfcv:'+uuid;
+      try{ if(localStorage.getItem(k)==='1') localStorage.removeItem(k); else localStorage.setItem(k,'1'); }catch(err){}
+      var b=card.querySelector('.bf-body'); if(b) b.removeAttribute('data-raw');
+      addCards(true);
+    } else if(type==='stage'){
+      if(bfStageBusy) return; bfStageBusy=true;
+      var stage=el.getAttribute('data-bfstage');
+      var b2=card.querySelector('.bf-body'); if(b2){ b2.style.opacity='0.45'; b2.style.pointerEvents='none'; }
+      try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid,status:stage})}); }catch(err){}
+      setTimeout(function(){ location.reload(); }, 3000);
+    }
+  }, true);
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
