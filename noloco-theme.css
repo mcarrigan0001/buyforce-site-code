@@ -333,3 +333,16 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   z-index: 2 !important;
   box-shadow: 0 7px 11px -6px rgba(87,200,34,0.30) !important;
 }
+
+/* ---- Mobile: snap horizontal swipe to expanded columns (collapsed ride along) ---- */
+@media (max-width: 640px) {
+  [data-testid="view-collection"] [class*="min-h-screen-75"] {
+    scroll-snap-type: x mandatory !important;
+    scroll-padding-left: 6px !important;
+  }
+  [data-testid="collection-group"]:not(.w-12) {
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+  }
+  [data-testid="collection-group"].w-12 { scroll-snap-align: none !important; }
+}
