@@ -368,8 +368,8 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] { box-shadow: none !important; }
   [data-testid="collection-group"]:not(.w-12) [class*="overflow-y-auto"]::before {
     content: ""; position: sticky; top: 0; z-index: 4; flex: 0 0 auto;
-    height: 10px; margin-bottom: -10px;
-    background: linear-gradient(to bottom, rgba(87,200,34,0.32), rgba(87,200,34,0));
+    height: 12px; margin-top: -8px; margin-bottom: -12px;
+    background: linear-gradient(to bottom, rgba(87,200,34,0.30), rgba(87,200,34,0));
     pointer-events: none;
   }
 }
