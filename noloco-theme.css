@@ -284,3 +284,12 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 
 /* ---- Page title ("Opportunity Pipeline") styled like a record (YMMT) title ---- */
 [data-testid="view-collection"] h1 { font-size: 1.5rem !important; font-weight: 700 !important; color: #161616 !important; letter-spacing: -0.3px !important; }
+
+/* ---- Tighten page-header spacing (above/below title) + smaller mobile title ---- */
+[data-testid="view-collection"] { padding-top: 10px !important; margin-bottom: 4px !important; }
+[data-testid="view-collection"] h1 { margin: 0 !important; line-height: 1.2 !important; }
+[data-testid="view-collection"] .min-h-4 { min-height: 0 !important; }
+@media (max-width: 640px) {
+  [data-testid="view-collection"] { padding-top: 6px !important; margin-bottom: 2px !important; }
+  [data-testid="view-collection"] h1 { font-size: 1.2rem !important; letter-spacing: -0.2px !important; }
+}
