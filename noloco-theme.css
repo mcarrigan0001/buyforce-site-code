@@ -401,3 +401,17 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
     width: 94vw !important; max-width: 94vw !important; max-height: 90vh !important;
   }
 }
+
+/* ---- Record preview panel -> centered ~66% modal (real Noloco slide-over) ---- */
+div:has(> div > [data-testid="record-view"]) {
+  position: fixed !important; inset: auto !important;
+  left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important;
+  right: auto !important; bottom: auto !important;
+  width: 66vw !important; max-width: 66vw !important;
+  height: 88vh !important; max-height: 88vh !important;
+  border-radius: 14px !important; border-left: none !important;
+  z-index: 41 !important; overflow: hidden !important;
+}
+@media (max-width: 640px) {
+  div:has(> div > [data-testid="record-view"]) { width: 94vw !important; max-width: 94vw !important; height: 90vh !important; max-height: 90vh !important; }
+}
