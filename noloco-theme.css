@@ -326,3 +326,10 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
   flex: 0 0 auto !important;
 }
 /* ===== end sticky-board ===== */
+
+/* ---- Scroll shadow under sticky column header (so scrolled cards don't look cut off) ---- */
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] {
+  position: relative !important;
+  z-index: 2 !important;
+  box-shadow: 0 7px 9px -7px rgba(0,0,0,0.22) !important;
+}
