@@ -482,6 +482,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* ===================================================================== */
 .bf-stageui { padding-top: 4px; }
 .bf-actions.bf-collapsed .bf-stageui { display: none; }
+.bf-actions.bf-collapsed .bf-collapse-line { display: none; }
+.bf-actions.bf-collapsed .bf-collapse-bar { margin-top: 0; padding: 0; justify-content: center; }
 .bf-collapse-bar { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0 3px; margin-top: 8px; }
 .bf-collapse-line { flex: 1; height: 0.5px; background: #ece9e0; }
 .bf-collapse-ic { font-size: 15px; color: #b4b2a9; line-height: 1; }
@@ -514,8 +516,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-pill:hover { border-color: #888780; }
 .bf-pill.gset { background: #e3f5cf; border-color: #97c459; color: #2b6012; font-weight: 500; }
 .bf-pill.rset { background: #fbe3e3; border-color: #e57373; color: #862020; font-weight: 500; }
-.bf-btns { display: flex; flex-wrap: wrap; gap: 6px; }
-.bf-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; font-family: inherit; border-radius: 6px; padding: 6px 10px; cursor: pointer; border: 0.5px solid transparent; line-height: 1.1; transition: background .12s, border-color .12s; }
+.bf-btns { display: flex; flex-direction: column; gap: 6px; }
+.bf-btn { display: flex; align-items: center; justify-content: center; text-align: center; gap: 5px; width: 100%; font-size: 12px; font-weight: 500; font-family: inherit; border-radius: 6px; padding: 7px 10px; cursor: pointer; border: 0.5px solid transparent; line-height: 1.1; transition: background .12s, border-color .12s; }
 .bf-btn i { font-size: 14px; }
 .bf-btn-p { background: #57c822; color: #14330a; border-color: #57c822; }
 .bf-btn-p:hover { background: #47a31b; }
