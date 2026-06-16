@@ -454,3 +454,11 @@ div:has(> div > [data-testid="record-view"]) {
   padding: 0 !important;
   border-radius: 0 !important;
 }
+
+/* ---- @mention token actual markup: span.bg-blue-200 -> bold green, no highlight ---- */
+[data-testid="comments-section"] span[class*="bg-blue-200"] {
+  background-color: transparent !important;
+  color: #2b6012 !important;
+  font-weight: 600 !important;
+  padding: 0 !important;
+}
