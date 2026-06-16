@@ -219,16 +219,16 @@
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
   function bfNext(sc){
-    var cur=sc.scrollLeft, cols=bfExpanded(sc);
-    for(var i=0;i<cols.length;i++){ var pp=bfPos(sc,cols[i]); if(pp>cur+8) return pp; }
-    if((sc.scrollWidth - sc.clientWidth - cur) > 4) return sc.scrollWidth;
+    var vr=sc.scrollLeft + sc.clientWidth, max=sc.scrollWidth - sc.clientWidth, cols=bfExpanded(sc);
+    for(var i=0;i<cols.length;i++){ var left=bfPos(sc,cols[i]); var right=left+cols[i].offsetWidth; if(right > vr + 4){ return Math.min(max, right - sc.clientWidth + 12); } }
+    if((max - sc.scrollLeft) > 4) return max;
     return null;
   }
   function bfPrev(sc){
-    var cur=sc.scrollLeft, cols=bfExpanded(sc), t=null;
-    for(var i=0;i<cols.length;i++){ var pp=bfPos(sc,cols[i]); if(pp < cur-8) t=pp; }
+    var vl=sc.scrollLeft, cols=bfExpanded(sc), t=null;
+    for(var i=0;i<cols.length;i++){ var left=bfPos(sc,cols[i]); if(left < vl - 4){ t=Math.max(0, left - 12); } }
     if(t!==null) return t;
-    if(cur>4) return 0;
+    if(vl>4) return 0;
     return null;
   }
   function bfGo(sc, target){
