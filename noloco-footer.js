@@ -445,11 +445,11 @@
     var payoffRaw = F['Estimated Payoff Value'];
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
-    var grid = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start;border-top:0.5px solid #ece9e0;padding-top:10px;">'+
+    var grid = '<div class="bf-grid" style="border-top:0.5px solid #ece9e0;padding-top:10px;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + payoffTile + '</div>';
 
     var pill='';
-    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:inline-flex;align-items:center;gap:3px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:3px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:flex;width:calc(66.66% - 4px);align-items:center;justify-content:center;gap:4px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:4px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
@@ -711,6 +711,7 @@
     bfToastEl.textContent=msg; bfToastEl.style.opacity='1';
     clearTimeout(bfToastEl._t); bfToastEl._t=setTimeout(function(){ bfToastEl.style.opacity='0'; },2200);
   }
+  function bfOpen(url){ if(!url) return; try{ var a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener noreferrer'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){ try{ window.open(url,'_blank','noopener'); }catch(_){} } }
   function bfReadF(card){
     var F={}; var first=card.querySelector('[data-testid="field-cell"]'); var cont=first?first.parentNode:card;
     (cont||card).querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
@@ -861,7 +862,7 @@
     var card=btn.closest('[data-testid="collection-record"]'); if(!card) return;
     var uuid=btn.getAttribute('data-bfuuid')||'';
     var a=btn.getAttribute('data-bfaction');
-    if(a==='url'){ var u=btn.getAttribute('data-bfurl'); if(u) window.open(u,'_blank','noopener'); return; }
+    if(a==='url'){ bfOpen(btn.getAttribute('data-bfurl')); return; }
     if(!uuid) return;
     if(a==='stage'){
       bfMoveCard(card, uuid, btn.getAttribute('data-bfto'));
@@ -870,7 +871,7 @@
     if(a==='viewsheet'){
       var F=bfReadF(card); var img=F['Offer Sheet Image URL']||''; var nm=F['Vehicle Title']||'';
       if(!img){ bfToast('No offer sheet yet'); return; }
-      window.open(VIEW_SHEET_PAGE+'?img='+encodeURIComponent(img)+'&name='+encodeURIComponent(nm),'_blank','noopener');
+      bfOpen(VIEW_SHEET_PAGE+'?img='+encodeURIComponent(img)+'&name='+encodeURIComponent(nm));
       return;
     }
     if(a==='gensheet'){
@@ -903,7 +904,7 @@
     var t=e.target; if(!t||!t.closest) return;
     if(t.closest('.bf-fedit, .bf-amt')){ e.preventDefault(); e.stopPropagation(); return; }
     var lst=t.closest('.bf-listing');
-    if(lst){ e.preventDefault(); e.stopPropagation(); var lu=lst.getAttribute('data-bfurl'); if(lu) window.open(lu,'_blank','noopener'); return; }
+    if(lst){ e.preventDefault(); e.stopPropagation(); var lu=lst.getAttribute('data-bfurl'); bfOpen(lu); return; }
     if(t.closest('[data-editing]')){ e.preventDefault(); e.stopPropagation(); return; }
     var cbar=t.closest('.bf-collapse-bar');
     if(cbar){ e.preventDefault(); e.stopPropagation(); var cu=cbar.getAttribute('data-bfuuid'); var ck='bfcol:'+cu; var isC=bfLS(ck)==='1'; try{ if(isC) localStorage.removeItem(ck); else localStorage.setItem(ck,'1'); }catch(_){} var act=cbar.closest('.bf-actions'); if(act) act.classList.toggle('bf-collapsed'); var ic=cbar.querySelector('.bf-collapse-ic'); if(ic){ ic.classList.toggle('ti-chevron-up'); ic.classList.toggle('ti-chevron-down'); } return; }
@@ -996,10 +997,17 @@
   var bfDidScroll=false;
   function bfInitScroll(){
     if(bfDidScroll) return; if(location.pathname.indexOf('/preview/')>-1) return;
-    var sc=bfSC(); if(!sc) return; bfDidScroll=true;
-    setTimeout(function(){ try{ var nav=document.querySelector('[data-testid="navigation-sidebar"]'); var navH=nav?nav.offsetHeight:0; var top=sc.getBoundingClientRect().top+window.pageYOffset-navH; if(top>2 && window.pageYOffset<top-2) window.scrollTo({top:Math.max(0,top), behavior:'auto'}); }catch(e){} }, 350);
+    var grp=document.querySelector('[data-testid="collection-group"]'); if(!grp) return; bfDidScroll=true;
+    setTimeout(function(){ try{ grp.scrollIntoView({block:'start', inline:'nearest'}); }catch(e){ try{ grp.scrollIntoView(true); }catch(_){} } }, 450);
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); }
+  var bfDidExpandMobile=false;
+  function bfExpandAllMobile(){
+    if(window.innerWidth>640 || bfDidExpandMobile) return;
+    var cc=document.querySelectorAll('[data-testid="collection-group"].w-12'); if(!cc.length) return;
+    bfDidExpandMobile=true;
+    cc.forEach(function(g){ var b=g.querySelector('[data-testid="collection-group-header"] button'); if(b) b.click(); });
+  }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);

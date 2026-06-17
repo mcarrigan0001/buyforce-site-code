@@ -17,9 +17,14 @@ html { scroll-behavior: smooth; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #c4c4c4; border-radius: 6px; }
 ::-webkit-scrollbar-thumb:hover { background: #57C822; }
-a:focus-visible, button:focus-visible, input:focus-visible {
+a:focus-visible, button:focus-visible {
   outline: 2px solid #57C822 !important;
   outline-offset: 2px;
+}
+input:focus, input:focus-visible, textarea:focus, textarea:focus-visible, select:focus {
+  outline: none !important;
+  border-color: #57C822 !important;
+  box-shadow: 0 0 0 2px rgba(87,200,34,0.55), 0 0 7px rgba(87,200,34,0.30) !important;
 }
 
 /* ---- Green scale → BuyForce green ---- */
@@ -334,7 +339,7 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] {
   position: relative !important;
   z-index: 2 !important;
-  box-shadow: 0 7px 11px -6px rgba(87,200,34,0.30), 0 -7px 11px -6px rgba(87,200,34,0.30) !important;
+  box-shadow: 0 7px 11px -6px rgba(87,200,34,0.30) !important;
 }
 
 /* ---- Mobile: snap horizontal swipe to expanded columns (collapsed ride along) ---- */
@@ -557,3 +562,18 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Black border around pipeline stage columns (active keeps green top) ---- */
 [data-testid="collection-group"] { border: 1px solid #2c2c2c !important; border-radius: 8px 8px 0 0 !important; }
 [data-testid="collection-group"]:not(.w-12) { border-top: 2px solid #57c822 !important; }
+
+/* ---- Columns: no visible bottom (appear to run on forever) ---- */
+[data-testid="collection-group"] { border-bottom: none !important; box-shadow: none !important; }
+[data-testid="collection-group"]:not(.w-12) { box-shadow: none !important; }
+
+/* ---- Mobile: each column fills the full screen width ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) { width: calc(100vw - 16px) !important; min-width: calc(100vw - 16px) !important; max-width: calc(100vw - 16px) !important; flex: 0 0 calc(100vw - 16px) !important; }
+}
+
+/* ---- Card metric grid: gray gridlines between fields ---- */
+.bf-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+.bf-grid > div { padding: 6px 8px; }
+.bf-grid > div:not(:nth-child(3n)) { border-right: 0.5px solid #e6e4dc; }
+.bf-grid > div:nth-child(n+4) { border-top: 0.5px solid #e6e4dc; }
