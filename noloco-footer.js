@@ -449,8 +449,12 @@
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + payoffTile + '</div>';
     var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:6px;margin-bottom:0;">Price &amp; Valuation</div>';
 
-    var pill='';
-    if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:66.66%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
+    if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbe3e3;color:#c93535;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
+    else if(_accL.indexOf('clean')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#e3f5cf;color:#2b6012;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-shield-check" style="font-size:12px;" aria-hidden="true"></i>Clean</span>';
+    var _beatsPill='';
+    if(comp){ var c=COMPC[comp.color]; _beatsPill='<span style="display:inline-flex;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span>'; }
+    var pill = (_beatsPill||_accPill) ? '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;">'+_beatsPill+_accPill+'</div>' : '';
     var compBlock = '<div class="bf-comp"><div class="bf-complabels"><span class="bf-seclbl" style="flex:2;">Competition</span><span class="bf-seclbl" style="flex:1;">Equity</span></div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile +'</div>'+ pill +'</div>';
 
     var metaParts=[];
@@ -482,10 +486,10 @@
     var _right = (_listing||_badge) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
-    var _vinLine = F['VIN'] ? '<div style="font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</div>' : '';
-    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
-      (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:1px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
-      (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ _vinLine + meta +'</div>'+ _right +'</div>';
+    var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
+    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
+      (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:2px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
+      (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
@@ -659,11 +663,11 @@
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   document.addEventListener('mousedown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing, .bf-vincopy'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('pointerdown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing, .bf-vincopy'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('click', function(e){
@@ -915,6 +919,8 @@
     if(t.closest('.bf-fedit, .bf-amt')){ e.preventDefault(); e.stopPropagation(); return; }
     var lst=t.closest('.bf-listing');
     if(lst){ e.preventDefault(); e.stopPropagation(); var lu=lst.getAttribute('data-bfurl'); bfOpen(lu); return; }
+    var vc=t.closest('.bf-vincopy');
+    if(vc){ e.preventDefault(); e.stopPropagation(); var vv=vc.getAttribute('data-bfvin')||''; if(vv){ try{ navigator.clipboard.writeText(vv); }catch(_){} bfToast('VIN copied'); } return; }
     if(t.closest('[data-editing]')){ e.preventDefault(); e.stopPropagation(); return; }
     var cbar=t.closest('.bf-collapse-bar');
     if(cbar){ e.preventDefault(); e.stopPropagation(); var cu=cbar.getAttribute('data-bfuuid'); var ck='bfcol:'+cu; var isC=bfLS(ck)==='1'; try{ if(isC) localStorage.removeItem(ck); else localStorage.setItem(ck,'1'); }catch(_){} var act=cbar.closest('.bf-actions'); if(act) act.classList.toggle('bf-collapsed'); var ic=cbar.querySelector('.bf-collapse-ic'); if(ic){ ic.classList.toggle('ti-chevron-up'); ic.classList.toggle('ti-chevron-down'); } return; }
