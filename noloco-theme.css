@@ -594,11 +594,15 @@ div:has(> div > [data-testid="record-view"]) {
 .project-preview, .canvas.project-preview { background-color: #000000 !important; }
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
-.bf-comp { border-top: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; }
-.bf-complabel { width: 66.66%; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; margin-bottom: 4px; }
-.bf-comprow { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; }
-.bf-comprow > div { padding: 6px 8px; text-align: center; }
-.bf-comprow > div:nth-child(2) { border-right: 0.5px solid #e6e4dc; }
+.bf-comp { border-top: 0.5px solid #ece9e0; border-bottom: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; padding-bottom: 10px; }
+.bf-comp2 { display: grid; grid-template-columns: 7fr 3fr; align-items: stretch; }
+.bf-comp-left { border-right: 0.5px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
+.bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: end; margin-top: 2px; }
+.bf-comprow2 > div { padding: 6px 8px; text-align: center; }
+.bf-comp-beats { margin-top: 8px; }
+.bf-eqval { font-size: 14px; font-weight: 500; margin-top: 6px; }
+.bf-comp-acc { display: flex; justify-content: center; margin-top: 9px; }
 
 /* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
 .project-theme, .project-theme.light { background-color: transparent !important; }
@@ -618,7 +622,6 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Card section labels (Price & Valuation, Competition, Equity) ---- */
 .bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; }
-.bf-complabels { display: flex; margin-bottom: 4px; }
 
 /* ---- Let the title's green glow overflow its container (was clipped at the band edge) ---- */
 [data-testid="view-collection"] { overflow: visible !important; }
