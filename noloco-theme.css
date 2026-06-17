@@ -595,7 +595,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
 .bf-comp { border-top: 0.5px solid #ece9e0; border-bottom: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; padding-bottom: 10px; }
-.bf-comp2 { display: grid; grid-template-columns: 7fr 3fr; align-items: stretch; }
+.bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
 .bf-comp-left { border-right: 0.5px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: end; margin-top: 2px; }
@@ -603,7 +603,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-eqcell { margin-top: 2px; padding-top: 6px; }
 .bf-eqsub { font-size: 11px; color: #7c7c7c; }
 .bf-eqval { font-size: 14px; font-weight: 500; }
-.bf-comp-pills { display: grid; grid-template-columns: 7fr 3fr; margin-top: 9px; align-items: center; }
+.bf-comp-pills { display: grid; grid-template-columns: 3fr 2fr; margin-top: 9px; align-items: center; }
 .bf-comp-pills.bf-pills-solo { grid-template-columns: 1fr; }
 .bf-pillcell { min-width: 0; padding-right: 3px; }
 .bf-pills-solo .bf-pillcell { padding-right: 0; }
