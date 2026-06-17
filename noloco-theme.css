@@ -513,7 +513,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-listing:hover { background: #f2fbe9; border-color: #57c822; }
 .bf-listing i { font-size: 15px; }
 .bf-info { font-size: 11px; color: #7c7c7c; line-height: 1.4; padding: 0; }
-[data-testid="collection-record"] { scroll-snap-align: start; scroll-margin-top: 4px; }
+[data-testid="collection-record"] { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 4px; }
 @media (max-width: 640px) { .bf-allcollapse { bottom: 12px; left: 12px; height: 32px; padding: 0 11px; } }
 .bf-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .bf-fcol { align-items: stretch; flex-direction: column; gap: 4px; }

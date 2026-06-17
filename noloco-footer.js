@@ -727,7 +727,8 @@
         var vs=grp?grp.querySelector('[class*="overflow-y-auto"]'):null;
         if(vs){
           var cr=card.getBoundingClientRect(), vr=vs.getBoundingClientRect();
-          var delta=(cr.top - vr.top) - (vr.height/2 - cr.height/2);
+          var hd=grp.querySelector('[data-testid="collection-group-header"]'); var hh=hd?hd.offsetHeight:0;
+          var delta=(cr.top - vr.top) - hh - 4;
           vs.scrollBy({top:delta, behavior:'smooth'});
         }
       }catch(e){}
@@ -956,7 +957,7 @@
   function bfSnap(){
     document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
       var sc=g.querySelector('[class*="overflow-y-auto"]'); if(!sc) return;
-      if(sc.style.scrollSnapType!=='y proximity') sc.style.scrollSnapType='y proximity';
+      if(sc.style.scrollSnapType!=='y mandatory') sc.style.scrollSnapType='y mandatory';
       var hd=g.querySelector('[data-testid="collection-group-header"]'); var pad=(hd?hd.offsetHeight:0)+'px';
       if(sc.style.scrollPaddingTop!==pad) sc.style.scrollPaddingTop=pad;
     });
