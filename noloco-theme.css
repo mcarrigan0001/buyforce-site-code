@@ -598,3 +598,6 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-complabel { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
 .bf-comprow { display: grid; grid-template-columns: 1fr 1fr; }
 .bf-comprow > div { padding: 6px 8px; }
+
+/* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
+.project-theme, .project-theme.light { background-color: transparent !important; }
