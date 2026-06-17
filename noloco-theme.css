@@ -601,3 +601,16 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
 .project-theme, .project-theme.light { background-color: transparent !important; }
+
+/* ---- Pipeline title: green glow ---- */
+[data-testid="view-collection"] h1 { text-shadow: 0 0 14px rgba(87,200,34,0.55) !important; }
+
+/* ---- Top action buttons: green accent (leave the green primary "Add Opportunity" alone) ---- */
+[data-testid="action-button"] button:not([class*="primary"]):not([class*="bg-primary"]) {
+  border: 1px solid #57c822 !important;
+  color: #2b6012 !important;
+}
+[data-testid="action-button"] button:not([class*="primary"]):not([class*="bg-primary"]):hover {
+  background-color: #f2fbe9 !important;
+  box-shadow: 0 0 9px rgba(87,200,34,0.40) !important;
+}
