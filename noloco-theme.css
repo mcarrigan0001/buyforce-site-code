@@ -583,3 +583,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-grid > div { padding: 6px 8px; }
 .bf-grid > div:not(:nth-child(3n)) { border-right: 0.5px solid #e6e4dc; }
 .bf-grid > div:nth-child(n+4) { border-top: 0.5px solid #e6e4dc; }
+
+/* ---- Desktop: slightly wider columns so cards breathe ---- */
+@media (min-width: 641px) {
+  [data-testid="collection-group"]:not(.w-12) { width: 340px !important; min-width: 340px !important; max-width: 340px !important; flex: 0 0 340px !important; }
+}
