@@ -230,7 +230,9 @@
       {k:'notes'},
       {k:'btn', b:{l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'}}
     ] },
-    'Appraisal Complete - Enter Offer Sheet Values': { fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
+    'Appraisal Complete - Enter Offer Sheet Values': { tracks:[
+      {l:'Send offer (send sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what they’re selling for in the market, here’s what we’re willing to buy it for'}
+    ], fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
       {l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'},
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
       {l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'} ] },
@@ -320,7 +322,13 @@
   function bfFillTrack(t, F){
     var first=bfSellerFirst(F)||'there';
     var model=F['Model']||F['Vehicle Model']||'vehicle';
-    return t.replace(/\[First Name\]/gi, first).replace(/\[Model\]/gi, model);
+    var dealer=F['Dealership']||F['Dealer']||'our dealership';
+    var acc=(F['Accident History']||'').toLowerCase();
+    var carfax=(acc.indexOf('accident')>-1)?'the CarFax history, ':'';
+    return t.replace(/\[First Name\]/gi, first)
+            .replace(/\[Model\]/gi, model)
+            .replace(/\[Dealership\]/gi, dealer)
+            .replace(/\[CarFax\]/gi, carfax);
   }
   function bfTrack(wt, F){
     var filled=bfFillTrack(wt.t, F);
@@ -376,7 +384,7 @@
 
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var eq = equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']);
+    var eq = (/[0-9]/.test(F['Estimated Payoff Value']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'Unknown', color:'#9aa0a6'};
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
@@ -910,7 +918,7 @@
   var bfAllBtn;
   function bfAllCollapsed(){ return bfLS('bfcoldef')==='1'; }
   function bfClearColOverrides(){ try{ for(var i=localStorage.length-1;i>=0;i--){ var k=localStorage.key(i); if(k && k.indexOf('bfcol:')===0) localStorage.removeItem(k); } }catch(e){} }
-  function bfSyncToggle(){ if(!bfAllBtn) return; var c=bfAllCollapsed(); bfAllBtn.innerHTML='<i class="ti '+(c?'ti-chevrons-down':'ti-chevrons-up')+'" aria-hidden="true"></i><span>'+(c?'Expand all':'Collapse all')+'</span>'; }
+  function bfSyncToggle(){ if(!bfAllBtn) return; var c=bfAllCollapsed(); var want=c?'c':'e'; if(bfAllBtn.getAttribute('data-bfstate')===want) return; bfAllBtn.setAttribute('data-bfstate',want); bfAllBtn.innerHTML='<i class="ti '+(c?'ti-chevrons-down':'ti-chevrons-up')+'" aria-hidden="true"></i><span>'+(c?'Expand all':'Collapse all')+'</span>'; }
   function bfEnsureToggle(){
     if(location.pathname.indexOf('/preview/')>-1 || !bfSC()){ if(bfAllBtn) bfAllBtn.style.display='none'; return; }
     if(!bfAllBtn){
