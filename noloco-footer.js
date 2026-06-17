@@ -478,8 +478,10 @@
     }
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
     var _right = (_listing||_badge) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+'</div>' : '';
+    var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
+    var _vinLine = F['VIN'] ? '<div style="font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</div>' : '';
     var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
-      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>'+ _right +'</div>';
+      (_sub?'<div style="font-size:11px;color:#7c7c7c;margin-top:1px;line-height:1.3;">'+esc(_sub)+'</div>':'')+ _vinLine + meta +'</div>'+ _right +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
