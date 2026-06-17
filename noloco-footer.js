@@ -421,7 +421,7 @@
 
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var eq = (/[0-9]/.test(F['Estimated Payoff Value']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
+    var eq = (/positive|negative/i.test(F['Equity Status']||'') && /[0-9]/.test(F['Est Equity Position']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
