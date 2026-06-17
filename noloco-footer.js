@@ -686,7 +686,7 @@
     var m=href.match(/(rec[0-9a-z]+)/i); var uuid=m?m[1]:'';
     if(!uuid) return;
     bfEditing=true; el.setAttribute('data-editing','1');
-    el.innerHTML='<input type="text" placeholder="Add a comment\u2026" style="width:100%;border:1px solid #57c822;border-radius:6px;padding:5px 8px;font-size:11px;font-family:inherit;outline:none;box-sizing:border-box;" />';
+    el.innerHTML='<input type="text" placeholder="Add a comment\u2026" style="width:100%;border:1px solid #57c822;border-radius:6px;padding:5px 8px;font-size:16px;font-family:inherit;outline:none;box-sizing:border-box;" />';
     var inp=el.querySelector('input'); if(inp) inp.focus();
     var done=false;
     function finish(save){
