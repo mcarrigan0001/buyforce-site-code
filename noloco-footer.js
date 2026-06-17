@@ -194,6 +194,7 @@
   /* ===== Stage-specific card buttons + inline fields ===== */
   var VIEW_SHEET_PAGE = 'https://mcarrigan0001.github.io/buyforce-site-code/offer-sheet.html';
   var GEN_SHEET_HOOK  = 'https://buyforce.app.n8n.cloud/webhook/ee9245fa-55fd-48a1-aba5-9e0093515f14';
+  var CARD_DECODE_HOOK = 'https://buyforce.app.n8n.cloud/webhook/card-decode';
 
   /* inline field definitions. label = display label as it appears on the card
      (footer reads the current value by it); key = Noloco API field key (footer
@@ -212,18 +213,22 @@
   };
 
   var STAGE_UI = {
-    'Fresh Leads': { tracks:[
-      {l:'Ask for the VIN', t:'Hi [First Name], love the [Model]. Could you share the VIN so I can research the history?'},
-      {l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}
-    ], fields:['vin'], buttons:[
-      {l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'} ] },
+    'Fresh Leads': { layout: [
+      {k:'info', text:'Check the photos and description for a VIN or Plate #, if none found, ask for the VIN.'},
+      {k:'track', wt:{l:'Ask for the VIN', t:'Hi [First Name], love the [Model]. Could you share the VIN so I can research the history?'}},
+      {k:'track', wt:{l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}},
+      {k:'field', f:'vin'},
+      {k:'btn', b:{l:'Decode', a:'decode', i:'ti-scan'}},
+      {k:'btn', b:{l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'}},
+      {k:'btn', b:{l:'VIN Received - Move to Appraisal Needed', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}}
+    ] },
     'Engaged - Awaiting VIN': { tracks:[
       {l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'},
       {l:'Follow up (24h+ no VIN)', t:'Hey [First Name], sorry to be sending another message, I’m just pretty interested in the [model]. Do you have a copy of the CarFax by chance you could share? If not, I don’t mind to get one, you just don’t have the VIN in your listing'}
     ], fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
     'VIN Received - Appraisal Needed': { layout: [
-      {k:'info', text:'Enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle. We should assume most sellers know these offers.'},
+      {k:'info', text:'Enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle. We should assume most sellers already know these offers.'},
       {k:'btn', b:{l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link'}},
       {k:'field', f:'conmax'},
       {k:'btn', b:{l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link'}},
@@ -233,6 +238,7 @@
       {k:'btn', b:{l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'}}
     ] },
     'Appraisal Complete - Enter Offer Sheet Values': { layout: [
+      {k:'info', text:'View completed appraisal to obtain this information needed to generate the Offer Sheet.'},
       {k:'field', f:'accident'},
       {k:'field', f:'ncomp'},
       {k:'field', f:'days'},
@@ -859,6 +865,7 @@
       bfToast('Appraisal notes copied');
       return;
     }
+    if(a==='decode'){ var Fd=bfReadF(card); var dvin=(Fd['VIN']||'').trim(); if(!dvin){ bfToast('Enter a VIN first'); return; } try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:dvin})}); }catch(e){} bfToast('Decoding VIN\u2026'); return; }
     if(a==='regensheet'){ bfAmountPrompt(btn); return; }
     if(a==='followup'){
       var iso=new Date().toISOString();
