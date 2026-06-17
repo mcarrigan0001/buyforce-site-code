@@ -442,7 +442,7 @@
       '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
     var equityTile = '<div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
-    var payoffRaw = F['Estimated Payoff Value'];
+    var payoffRaw = F['Estimated Payoff Amount']||F['Estimated Payoff Value'];
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
@@ -583,7 +583,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
