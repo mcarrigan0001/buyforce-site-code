@@ -619,3 +619,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Card section labels (Price & Valuation, Competition, Equity) ---- */
 .bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; }
 .bf-complabels { display: flex; margin-bottom: 4px; }
+
+/* ---- Let the title's green glow overflow its container (was clipped at the band edge) ---- */
+[data-testid="view-collection"] { overflow: visible !important; }
+[data-testid="view-collection"] div:has(> h1) { overflow: visible !important; padding-bottom: 8px !important; }
