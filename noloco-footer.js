@@ -12,6 +12,7 @@
   function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function money(s){ return (s||'').replace(/\.00(?=$|[^0-9])/,''); }
+  function dval(s){ s=(s||'').trim(); return /^[\-\u2013\u2014]+$/.test(s)?'':s; }
 
   function fixLinks(){
     document.querySelectorAll('a[href^="http"]').forEach(function (a) {
@@ -516,7 +517,7 @@
         var lab = cell.querySelector('[data-testid="field-cell-label"]');
         if(!lab) return;
         var vNode = lab.nextElementSibling;
-        F[norm(lab.textContent)] = vNode ? vNode.textContent.trim() : '';
+        F[norm(lab.textContent)] = dval(vNode ? vNode.textContent : '');
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
@@ -684,7 +685,7 @@
     var F={}; var first=card.querySelector('[data-testid="field-cell"]'); var cont=first?first.parentNode:card;
     (cont||card).querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
       var lab=cell.querySelector('[data-testid="field-cell-label"]'); if(!lab) return;
-      var vn=lab.nextElementSibling; F[norm(lab.textContent)]=vn?vn.textContent.trim():'';
+      var vn=lab.nextElementSibling; F[norm(lab.textContent)]=dval(vn?vn.textContent:'');
     });
     return F;
   }
