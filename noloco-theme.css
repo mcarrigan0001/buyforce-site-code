@@ -600,9 +600,10 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: end; margin-top: 2px; }
 .bf-comprow2 > div { padding: 6px 8px; text-align: center; }
-.bf-comp-beats { margin-top: 8px; }
 .bf-eqval { font-size: 14px; font-weight: 500; margin-top: 6px; }
-.bf-comp-acc { display: flex; justify-content: center; margin-top: 9px; }
+.bf-comp-pills { display: flex; gap: 6px; margin-top: 9px; }
+.bf-pillcell { flex: 1; min-width: 0; }
+.bf-pillcell-c { display: flex; justify-content: center; }
 
 /* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
 .project-theme, .project-theme.light { background-color: transparent !important; }

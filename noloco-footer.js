@@ -454,19 +454,22 @@
     else if(_accL.indexOf('clean')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#e3f5cf;color:#2b6012;font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-shield-check" style="font-size:12px;" aria-hidden="true"></i>Clean History</span>';
     var _beatsPill='';
     if(comp){ var c=COMPC[comp.color]; _beatsPill='<span style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span>'; }
+    var _pillsRow = (_beatsPill||_accPill) ? '<div class="bf-comp-pills">'+
+      (_beatsPill?'<div class="bf-pillcell">'+_beatsPill+'</div>':'')+
+      (_accPill?'<div class="bf-pillcell bf-pillcell-c">'+_accPill+'</div>':'')+
+    '</div>' : '';
     var compBlock = '<div class="bf-comp">'+
       '<div class="bf-comp2">'+
         '<div class="bf-comp-left">'+
           '<div class="bf-seclbl">Competition</div>'+
           '<div class="bf-comprow2">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) +'</div>'+
-          (_beatsPill?'<div class="bf-comp-beats">'+_beatsPill+'</div>':'')+
         '</div>'+
         '<div class="bf-comp-right">'+
           '<div class="bf-seclbl">Equity</div>'+
           '<div class="bf-eqval" style="color:'+eq.color+';">'+eq.text+'</div>'+
         '</div>'+
       '</div>'+
-      (_accPill?'<div class="bf-comp-acc">'+_accPill+'</div>':'')+
+      _pillsRow +
     '</div>';
 
     var metaParts=[];
