@@ -302,7 +302,7 @@
   }
   function bfFillTrack(t, F){
     var first=bfSellerFirst(F)||'there';
-    var model=F['Model']||F['Vehicle Title']||'vehicle';
+    var model=F['Model']||F['Vehicle Model']||'vehicle';
     return t.replace(/\[First Name\]/g, first).replace(/\[Model\]/g, model);
   }
   function bfTrack(wt, F){
