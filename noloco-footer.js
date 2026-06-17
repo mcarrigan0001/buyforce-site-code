@@ -515,8 +515,14 @@
       _items += '<div'+_attr+' style="display:flex;align-items:center;gap:5px;'+_cur+'">' + _circ +
         '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : (_noDeal ? '#c93535' : '#9aa0a6')) + ';">' + _label + '</span></div>';
     }
+    var _pct = MILESTONES.length ? (_done / MILESTONES.length) : 0;
+    var _C = (2 * Math.PI * 6);
+    var _ringColor = _noDeal ? '#c93535' : '#57c822';
+    var _ring = '<svg width="14" height="14" viewBox="0 0 16 16" style="flex:none;display:block;">' +
+      '<circle cx="8" cy="8" r="6" fill="none" stroke="#e3e1d8" stroke-width="2.5"></circle>' +
+      '<circle cx="8" cy="8" r="6" fill="none" stroke="' + _ringColor + '" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + _C.toFixed(2) + '" stroke-dashoffset="' + (_C * (1 - _pct)).toFixed(2) + '" transform="rotate(-90 8 8)"></circle></svg>';
     var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:11px;padding-bottom:10px;margin-bottom:1px;">' +
-      '<div style="text-align:center;margin-bottom:8px;">' +
+      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">' + _ring +
       '<span style="font-size:10px;font-weight:600;letter-spacing:0.4px;color:#9aa0a6;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px 6px;">' + _items + '</div></div>';
