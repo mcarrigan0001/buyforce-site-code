@@ -207,7 +207,8 @@
     ], fields:['vin'], buttons:[
       {l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'} ] },
     'Engaged - Awaiting VIN': { tracks:[
-      {l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'}
+      {l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'},
+      {l:'Follow up (24h+ no VIN)', t:'Hey [First Name], sorry to be sending another message, I’m just pretty interested in the [model]. Do you have a copy of the CarFax by chance you could share? If not, I don’t mind to get one, you just don’t have the VIN in your listing'}
     ], fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
     'VIN Received - Appraisal Needed': { fields:['conmax','convana','notes'], buttons:[
@@ -305,7 +306,7 @@
   function bfFillTrack(t, F){
     var first=bfSellerFirst(F)||'there';
     var model=F['Model']||F['Vehicle Model']||'vehicle';
-    return t.replace(/\[First Name\]/g, first).replace(/\[Model\]/g, model);
+    return t.replace(/\[First Name\]/gi, first).replace(/\[Model\]/gi, model);
   }
   function bfTrack(wt, F){
     var filled=bfFillTrack(wt.t, F);
