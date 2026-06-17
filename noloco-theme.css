@@ -595,9 +595,10 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
 .bf-comp { border-top: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; }
-.bf-complabel { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
-.bf-comprow { display: grid; grid-template-columns: 1fr 1fr; }
+.bf-complabel { width: 66.66%; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; margin-bottom: 4px; }
+.bf-comprow { display: grid; grid-template-columns: 1fr 1fr 1fr; }
 .bf-comprow > div { padding: 6px 8px; }
+.bf-comprow > div:nth-child(2) { border-right: 0.5px solid #e6e4dc; }
 
 /* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
 .project-theme, .project-theme.light { background-color: transparent !important; }

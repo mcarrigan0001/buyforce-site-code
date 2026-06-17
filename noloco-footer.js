@@ -446,11 +446,11 @@
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
     var grid = '<div class="bf-grid" style="border-top:0.5px solid #ece9e0;padding-top:10px;">'+
-      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + equityTile + payoffTile + '</div>';
+      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + payoffTile + '</div>';
 
     var pill='';
-    if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
-    var compBlock = '<div class="bf-comp"><div class="bf-complabel">Competition</div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) +'</div>'+ pill +'</div>';
+    if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:66.66%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    var compBlock = '<div class="bf-comp"><div class="bf-complabel">Competition</div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile +'</div>'+ pill +'</div>';
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
