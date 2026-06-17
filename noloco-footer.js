@@ -1012,18 +1012,20 @@
   function bfMoveSearch(){
     if(location.pathname.indexOf('/preview/')>-1) return;
     var sb=document.querySelector('[data-testid="collection-search-button"]'); if(!sb) return;
-    if(document.getElementById('bf-search-proxy')) return;
-    var labels=['Plate-to-VIN','Window Sticker','Get CarMax','Get Carvana','Create Appraisal','Add Opportunity'];
-    var cand=document.querySelectorAll('button, a, [role="button"]'); var btn=null;
-    for(var i=0;i<cand.length && !btn;i++){ var tx=(cand[i].textContent||'').replace(/\s+/g,' ').trim(); for(var j=0;j<labels.length;j++){ if(tx.indexOf(labels[j])>-1){ btn=cand[i]; break; } } }
-    if(!btn) return;
-    var row=btn.parentElement; if(!row) return;
-    if(row.querySelectorAll('button, a, [role=button]').length<2 && row.parentElement) row=row.parentElement;
-    var proxy=document.createElement('button');
-    proxy.id='bf-search-proxy'; proxy.className='bf-search-proxy'; proxy.type='button'; proxy.setAttribute('aria-label','Search');
-    proxy.innerHTML='<i class="ti ti-search" aria-hidden="true"></i>';
-    proxy.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var real=document.querySelector('[data-testid="collection-search-button"]'); if(real) real.click(); });
-    row.insertBefore(proxy, row.firstChild);
+    var add=[...document.querySelectorAll('a,button')].find(function(n){return /Add Opportunity/i.test(n.textContent||'');});
+    if(!add) return;
+    var grp=add;
+    while(grp && grp!==document.body && !(typeof grp.className==='string' && /\bml-auto\b/.test(grp.className))) grp=grp.parentElement;
+    if(!grp || grp===document.body) grp=add.parentElement;
+    if(!grp) return;
+    var proxy=document.getElementById('bf-search-proxy');
+    if(!proxy){
+      proxy=document.createElement('button');
+      proxy.id='bf-search-proxy'; proxy.className='bf-search-proxy'; proxy.type='button'; proxy.setAttribute('aria-label','Search');
+      proxy.innerHTML='<i class="ti ti-search" aria-hidden="true"></i>';
+      proxy.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var real=document.querySelector('[data-testid="collection-search-button"]'); if(real) real.click(); });
+    }
+    if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
