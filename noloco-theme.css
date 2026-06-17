@@ -623,3 +623,9 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Let the title's green glow overflow its container (was clipped at the band edge) ---- */
 [data-testid="view-collection"] { overflow: visible !important; }
 [data-testid="view-collection"] div:has(> h1) { overflow: visible !important; padding-bottom: 8px !important; }
+
+/* ---- Relocated search: proxy button in the toolbar + hide original search row ---- */
+.bf-search-proxy { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #57c822; background: #fff; color: #2b6012; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-right: 8px; flex: none; }
+.bf-search-proxy:hover { background: #f2fbe9; box-shadow: 0 0 9px rgba(87,200,34,0.40); }
+.bf-search-proxy i { font-size: 16px; }
+.bf-search-relocated [data-testid="view-collection"] div:has(> [data-testid="collection-search-button"]) { display: none !important; }
