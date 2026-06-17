@@ -285,7 +285,7 @@ input:focus, input:focus-visible, textarea:focus, textarea:focus-visible, select
 [data-testid="collection-record"] { box-shadow: 0 3px 10px rgba(0,0,0,0.20) !important; }
 
 /* ---- Mobile: white overscroll background + no rubber-band bounce ---- */
-html, body, #root, .noloco-project, .project-page { background-color: #e7e8ec !important; }
+html, body, #root, .noloco-project, .project-page { background-color: #111317 !important; }
 .noloco-project .bg-stone-800 { background-color: #ffffff !important; }
 html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 
@@ -297,7 +297,7 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 [data-testid="collection-sort-button"] svg { width: 13px !important; height: 13px !important; }
 
 /* ---- Page title ("Opportunity Pipeline") styled like a record (YMMT) title ---- */
-[data-testid="view-collection"] h1 { font-size: 1.5rem !important; font-weight: 700 !important; color: #161616 !important; letter-spacing: -0.3px !important; }
+[data-testid="view-collection"] h1 { font-size: 1.5rem !important; font-weight: 700 !important; color: #ffffff !important; letter-spacing: -0.3px !important; }
 
 /* ---- Tighten page-header spacing (above/below title) + smaller mobile title ---- */
 [data-testid="view-collection"] { padding-top: 10px !important; margin-bottom: 4px !important; }
