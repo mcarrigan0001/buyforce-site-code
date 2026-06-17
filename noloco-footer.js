@@ -449,7 +449,7 @@
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + payoffTile + '</div>';
 
     var pill='';
-    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:flex;width:calc(66.66% - 4px);align-items:center;justify-content:center;gap:4px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:4px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:flex;width:calc(66.66% - 4px);align-items:center;justify-content:center;gap:4px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:4px 8px;border-radius:999px;box-shadow:0 2px 5px rgba(0,0,0,0.16);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
