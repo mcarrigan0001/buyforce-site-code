@@ -244,7 +244,9 @@
       {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
       {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'}}
     ] },
-    'Offer Sheet Generated': { fields:[], buttons:[
+    'Offer Sheet Generated': { tracks:[
+      {l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}
+    ], fields:[], buttons:[
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
       {l:'Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', p:1, i:'ti-send'} ] },
     'Offer Sent (0-2 Days)': { fields:['willtake'], buttons:[
@@ -460,7 +462,7 @@
     var lfT=lf?new Date(lf).getTime():NaN;
     var baseT=seT;
     if(!isNaN(lfT) && (isNaN(seT)||lfT>seT)) baseT=lfT;
-    if(!isNaN(baseT)){ var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var dotCol, txtCol, wt2, lbl; if(stage==='Nurturing (Follow Up and Re-engage)'||stage==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DAYRAMP=['#c93535','#e8730c','#c9971a','#6f9e1f','#1f9e7a','#2b86b0','#5aa0d4']; var col=DAYRAMP[Math.min(dayNum-1,DAYRAMP.length-1)]; dotCol=col; txtCol=col; wt2='500'; lbl='Day '+dayNum+' in stage'; } else { var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } txtCol='#6b6b64'; wt2='400'; if(sev==='orange'){txtCol='#e8730c';wt2='500';} else if(sev==='red'){txtCol='#c93535';wt2='500';} lbl=fmtDuration(mins)+' in stage'; } clock='<div class="bf-clock" style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt2+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+lbl+'</div>'; }
+    if(!isNaN(baseT)){ var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var dotCol, txtCol, wt2, lbl; if(stage==='Nurturing (Follow Up and Re-engage)'||stage==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DAYSTOPS=[[1,'#c93535'],[3,'#e0631f'],[5,'#e8930c'],[7,'#c79617'],[10,'#8a9a1c'],[15,'#3f9e5a'],[30,'#1f9e8f'],[45,'#3a8fc4'],[60,'#5aa6db']]; var col=DAYSTOPS[0][1]; for(var di=0;di<DAYSTOPS.length;di++){ if(dayNum>=DAYSTOPS[di][0]) col=DAYSTOPS[di][1]; } dotCol=col; txtCol=col; wt2='500'; lbl='Day '+dayNum+' in stage'; } else { var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } txtCol='#6b6b64'; wt2='400'; if(sev==='orange'){txtCol='#e8730c';wt2='500';} else if(sev==='red'){txtCol='#c93535';wt2='500';} lbl=fmtDuration(mins)+' in stage'; } clock='<div class="bf-clock" style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt2+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+lbl+'</div>'; }
 
     var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
