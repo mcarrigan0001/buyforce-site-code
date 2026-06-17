@@ -195,6 +195,7 @@
   var VIEW_SHEET_PAGE = 'https://mcarrigan0001.github.io/buyforce-site-code/offer-sheet.html';
   var GEN_SHEET_HOOK  = 'https://buyforce.app.n8n.cloud/webhook/ee9245fa-55fd-48a1-aba5-9e0093515f14';
   var CARD_DECODE_HOOK = 'https://buyforce.app.n8n.cloud/webhook/card-decode';
+  var CARD_CONFIRM_HOOK = 'https://buyforce.app.n8n.cloud/webhook/card-confirm';
 
   /* inline field definitions. label = display label as it appears on the card
      (footer reads the current value by it); key = Noloco API field key (footer
@@ -217,8 +218,7 @@
       {k:'info', text:'Check the photos and description for a VIN or Plate #, if none found, ask for the VIN.'},
       {k:'track', wt:{l:'Ask for the VIN', t:'Hi [First Name], love the [Model]. Could you share the VIN so I can research the history?'}},
       {k:'track', wt:{l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}},
-      {k:'field', f:'vin'},
-      {k:'btn', b:{l:'Decode', a:'decode', i:'ti-scan'}},
+      {k:'decode'},
       {k:'btn', b:{l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'}},
       {k:'btn', b:{l:'VIN Received - Move to Appraisal Needed', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}}
     ] },
@@ -351,6 +351,24 @@
     return '<div class="bf-f bf-fcol"><span class="bf-fl">'+esc(wt.l)+'</span>'+
       '<div class="bf-wt" data-bfwt="'+esc(filled)+'"><span class="bf-wttext">'+esc(filled)+'</span><i class="ti ti-copy bf-wtcopy" aria-hidden="true"></i></div></div>';
   }
+  function bfGet(F, cands){ for(var i=0;i<cands.length;i++){ var v=F[cands[i]]; if(v!==undefined && v!=='') return v; } return ''; }
+  function bfDecodePanel(F, uuid){
+    var st=(bfGet(F,['Decode Status','decodeStatus','Decode status'])||'').toUpperCase();
+    if(st==='PENDING_CONFIRM'){
+      var y=bfGet(F,['Staged Year','stagedYear','Decoded Year']);
+      var mk=bfGet(F,['Staged Make','stagedMake','Decoded Make']);
+      var md=bfGet(F,['Staged Model','stagedModel','Decoded Model']);
+      var tr=bfGet(F,['Staged Trim','stagedTrim','Decoded Trim']);
+      var ymmt=[y,mk,md,tr].filter(function(x){return x;}).join(' ');
+      return '<div class="bf-decodecard"><div class="bf-declabel">Decoded \u2014 is this the vehicle?</div>'+
+        '<div class="bf-decymmt">'+esc(ymmt||'No data returned')+'</div>'+
+        '<div class="bf-btns">'+
+        '<button type="button" class="bf-btn bf-btn-p" data-bfaction="confirmvin" data-bfuuid="'+esc(uuid)+'"><i class="ti ti-check" aria-hidden="true"></i><span>Confirm Vehicle</span></button>'+
+        '<button type="button" class="bf-btn bf-btn-s" data-bfaction="denyvin" data-bfuuid="'+esc(uuid)+'"><i class="ti ti-x" aria-hidden="true"></i><span>Not correct \u2014 re-enter</span></button>'+
+        '</div></div>';
+    }
+    return bfFieldHtml('vin', F, uuid) + '<div class="bf-btns"><button type="button" class="bf-btn bf-btn-s" data-bfaction="decode" data-bfuuid="'+esc(uuid)+'"><i class="ti ti-scan" aria-hidden="true"></i><span>Decode</span></button></div>';
+  }
   function bfNotesPreview(F){
     var notes=F['Notes for Appraisal']||F['Notes For Appraisal']||F['Appraisal Notes']||'';
     var disp = notes ? esc(notes) : '<span class="bf-ph">No appraisal notes yet</span>';
@@ -374,6 +392,7 @@
         else if(it.k==='track'){ inner += bfTrack(it.wt, F); }
         else if(it.k==='notes'){ inner += bfNotesPreview(F); }
         else if(it.k==='info'){ inner += '<div class="bf-info">'+esc(it.text)+'</div>'; }
+        else if(it.k==='decode'){ inner += bfDecodePanel(F, uuid); }
       });
       if(inner) html += '<div class="bf-stack">'+inner+'</div>';
     } else {
@@ -866,6 +885,8 @@
       return;
     }
     if(a==='decode'){ var Fd=bfReadF(card); var dvin=(Fd['VIN']||'').trim(); if(!dvin){ bfToast('Enter a VIN first'); return; } try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:dvin})}); }catch(e){} bfToast('Decoding VIN\u2026'); return; }
+    if(a==='confirmvin'){ try{ fetch(CARD_CONFIRM_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}); }catch(e){} bfSetCell(card,'Decode Status','CONFIRMED'); bfToast('Vehicle confirmed'); bfRebuild(card); bfFlashCard(card); return; }
+    if(a==='denyvin'){ bfPost({uuid:uuid, decodeStatus:''}); bfSetCell(card,'Decode Status',''); bfToast('Cleared \u2014 re-enter the VIN'); bfRebuild(card); return; }
     if(a==='regensheet'){ bfAmountPrompt(btn); return; }
     if(a==='followup'){
       var iso=new Date().toISOString();
@@ -969,7 +990,13 @@
       if(sc.style.scrollPaddingTop!==pad) sc.style.scrollPaddingTop=pad;
     });
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); }
+  var bfDidScroll=false;
+  function bfInitScroll(){
+    if(bfDidScroll) return; if(location.pathname.indexOf('/preview/')>-1) return;
+    var sc=bfSC(); if(!sc) return; bfDidScroll=true;
+    setTimeout(function(){ try{ var nav=document.querySelector('[data-testid="navigation-sidebar"]'); var navH=nav?nav.offsetHeight:0; var top=sc.getBoundingClientRect().top+window.pageYOffset-navH; if(top>2 && window.pageYOffset<top-2) window.scrollTo({top:Math.max(0,top), behavior:'auto'}); }catch(e){} }, 350);
+  }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);

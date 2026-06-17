@@ -516,6 +516,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-listing:hover { background: #f2fbe9; border-color: #57c822; }
 .bf-listing i { font-size: 15px; }
 .bf-info { font-size: 11px; color: #7c7c7c; line-height: 1.4; padding: 0; }
+.bf-decodecard { border: 0.5px dashed #97c459; background: #f6faf0; border-radius: 8px; padding: 9px 10px; display: flex; flex-direction: column; gap: 8px; }
+.bf-declabel { font-size: 10px; font-weight: 600; letter-spacing: .3px; color: #3b6d11; text-transform: uppercase; }
+.bf-decymmt { font-size: 14px; font-weight: 500; color: #161616; }
 [data-testid="collection-record"] { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 4px; }
 @media (max-width: 640px) { .bf-allcollapse { bottom: 12px; left: 12px; height: 32px; padding: 0 11px; } }
 .bf-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -551,3 +554,6 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-btn-s:hover { border-color: #888780; background: #f6f7f3; }
 .bf-amt { width: 110px; border: 1px solid #57c822; background: #fff; border-radius: 5px; padding: 3px 7px; font-size: 12px; font-family: inherit; outline: none; color: #161616; }
 
+/* ---- Black border around pipeline stage columns (active keeps green top) ---- */
+[data-testid="collection-group"] { border: 1px solid #2c2c2c !important; border-radius: 8px 8px 0 0 !important; }
+[data-testid="collection-group"]:not(.w-12) { border-top: 2px solid #57c822 !important; }
