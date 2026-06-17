@@ -596,7 +596,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
 .bf-comp { border-top: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; }
 .bf-complabel { width: 66.66%; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; margin-bottom: 4px; }
-.bf-comprow { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.bf-comprow { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; }
 .bf-comprow > div { padding: 6px 8px; }
 .bf-comprow > div:nth-child(2) { border-right: 0.5px solid #e6e4dc; }
 
@@ -615,3 +615,7 @@ div:has(> div > [data-testid="record-view"]) {
   background-color: #f2fbe9 !important;
   box-shadow: 0 0 9px rgba(87,200,34,0.40) !important;
 }
+
+/* ---- Card section labels (Price & Valuation, Competition, Equity) ---- */
+.bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; }
+.bf-complabels { display: flex; margin-bottom: 4px; }

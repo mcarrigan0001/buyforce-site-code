@@ -441,16 +441,17 @@
       '<div style="font-size:11px;color:#7c7c7c;">Offer</div>'+
       '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
-    var equityTile = '<div><div style="font-size:11px;color:#7c7c7c;">Equity</div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
+    var equityTile = '<div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
     var payoffRaw = F['Estimated Payoff Value'];
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
-    var grid = '<div class="bf-grid" style="border-top:0.5px solid #ece9e0;padding-top:10px;">'+
+    var grid = '<div class="bf-grid" style="padding-top:4px;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + payoffTile + '</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:9px;margin-bottom:1px;">Price &amp; Valuation</div>';
 
     var pill='';
     if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:66.66%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
-    var compBlock = '<div class="bf-comp"><div class="bf-complabel">Competition</div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile +'</div>'+ pill +'</div>';
+    var compBlock = '<div class="bf-comp"><div class="bf-complabels"><span class="bf-seclbl" style="flex:2;">Competition</span><span class="bf-seclbl" style="flex:1;">Equity</span></div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile +'</div>'+ pill +'</div>';
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
@@ -513,9 +514,9 @@
         '<span style="font-size:10px;line-height:1.15;color:' + (_ok ? '#3b3b38' : (_noDeal ? '#c93535' : '#9aa0a6')) + ';">' + _label + '</span></div>';
     }
     var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:11px;padding-bottom:10px;margin-bottom:1px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+      '<div style="text-align:center;margin-bottom:8px;">' +
       '<span style="font-size:10px;font-weight:600;letter-spacing:0.4px;color:#9aa0a6;">DEAL PROGRESS</span>' +
-      '<span style="font-size:10px;color:#9aa0a6;">' + _done + ' of ' + MILESTONES.length + '</span></div>' +
+      '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px 6px;">' + _items + '</div></div>';
     var _lc = F['Last Comment'];
     var commentLine = '';
@@ -531,7 +532,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    return header + checklist + grid + compBlock + commentLine + renderStageUI(F, card, _uuid) + clock;
+    return header + checklist + priceLabel + grid + compBlock + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
   function addCards(force){
