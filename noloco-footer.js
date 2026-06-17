@@ -220,13 +220,13 @@
       {k:'track', wt:{l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}},
       {k:'decode'},
       {k:'btn', b:{l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'}},
-      {k:'btn', b:{l:'VIN Received - Move to Appraisal Needed', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}}
+      {k:'btn', b:{l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}}
     ] },
     'Engaged - Awaiting VIN': { layout: [
       {k:'track', wt:{l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'}},
       {k:'track', wt:{l:'Follow up (24h+ no VIN)', t:'Hey [First Name], sorry to be sending another message, I’m just pretty interested in the [model]. Do you have a copy of the CarFax by chance you could share? If not, I don’t mind to get one, you just don’t have the VIN in your listing'}},
       {k:'decode'},
-      {k:'btn', b:{l:'VIN Received - Move to Appraisal Needed', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-arrow-right'}}
+      {k:'btn', b:{l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-arrow-right'}}
     ] },
     'VIN Received - Appraisal Needed': { layout: [
       {k:'info', text:'Enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle. We should assume most sellers already know these offers.'},
