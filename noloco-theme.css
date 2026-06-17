@@ -581,8 +581,8 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Card metric grid: gray gridlines between fields ---- */
 .bf-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
-.bf-grid > div { padding: 6px 8px; text-align: center; }
-.bf-grid > div:not(:nth-child(3n)) { border-right: 0.5px solid #e6e4dc; }
+.bf-grid > div { padding: 2px 8px 6px; text-align: center; position: relative; }
+.bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 0.5px; height: 60%; background: #e6e4dc; }
 .bf-grid > div:nth-child(n+4) { border-top: 0.5px solid #e6e4dc; }
 
 /* ---- Desktop: slightly wider columns so cards breathe ---- */

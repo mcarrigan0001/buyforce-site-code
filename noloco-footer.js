@@ -445,9 +445,9 @@
     var payoffRaw = F['Estimated Payoff Value'];
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
-    var grid = '<div class="bf-grid" style="padding-top:4px;">'+
+    var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + payoffTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:9px;margin-bottom:1px;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:6px;margin-bottom:0;">Price &amp; Valuation</div>';
 
     var pill='';
     if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:66.66%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
@@ -481,9 +481,11 @@
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
     var _right = (_listing||_badge) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
+    var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div style="font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</div>' : '';
     var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
-      (_sub?'<div style="font-size:11px;color:#7c7c7c;margin-top:1px;line-height:1.3;">'+esc(_sub)+'</div>':'')+ _vinLine + meta +'</div>'+ _right +'</div>';
+      (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:1px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
+      (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ _vinLine + meta +'</div>'+ _right +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
