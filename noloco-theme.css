@@ -334,7 +334,7 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] {
   position: relative !important;
   z-index: 2 !important;
-  box-shadow: 0 7px 11px -6px rgba(87,200,34,0.30) !important;
+  box-shadow: 0 7px 11px -6px rgba(87,200,34,0.30), 0 -7px 11px -6px rgba(87,200,34,0.30) !important;
 }
 
 /* ---- Mobile: snap horizontal swipe to expanded columns (collapsed ride along) ---- */
