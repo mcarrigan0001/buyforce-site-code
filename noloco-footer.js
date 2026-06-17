@@ -222,6 +222,7 @@
     ], fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
     'VIN Received - Appraisal Needed': { layout: [
+      {k:'info', text:'Enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle. We should assume most sellers know these offers.'},
       {k:'btn', b:{l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link'}},
       {k:'field', f:'conmax'},
       {k:'btn', b:{l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link'}},
@@ -230,12 +231,18 @@
       {k:'notes'},
       {k:'btn', b:{l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'}}
     ] },
-    'Appraisal Complete - Enter Offer Sheet Values': { tracks:[
-      {l:'Send offer (send sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what they’re selling for in the market, here’s what we’re willing to buy it for'}
-    ], fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
-      {l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'},
-      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
-      {l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'} ] },
+    'Appraisal Complete - Enter Offer Sheet Values': { layout: [
+      {k:'field', f:'accident'},
+      {k:'field', f:'ncomp'},
+      {k:'field', f:'days'},
+      {k:'field', f:'conmax'},
+      {k:'field', f:'convana'},
+      {k:'field', f:'pprv'},
+      {k:'track', wt:{l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}},
+      {k:'btn', b:{l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'}},
+      {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
+      {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'}}
+    ] },
     'Offer Sheet Generated': { fields:[], buttons:[
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
       {l:'Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', p:1, i:'ti-send'} ] },
@@ -338,7 +345,7 @@
   function bfNotesPreview(F){
     var notes=F['Notes for Appraisal']||F['Notes For Appraisal']||F['Appraisal Notes']||'';
     var disp = notes ? esc(notes) : '<span class="bf-ph">No appraisal notes yet</span>';
-    return '<div class="bf-f bf-fcol"><span class="bf-fl">Notes for Appraisal</span>'+
+    return '<div class="bf-f bf-fcol"><span class="bf-fl">Copy Notes for Appraisal</span>'+
       '<div class="bf-wt bf-wt-clamp" data-bfwt="'+esc(notes)+'" data-bftoast="Appraisal notes copied"><span class="bf-wttext">'+disp+'</span><i class="ti ti-copy bf-wtcopy" aria-hidden="true"></i></div></div>';
   }
 
@@ -357,6 +364,7 @@
         else if(it.k==='field'){ inner += bfFieldHtml(it.f, F, uuid); }
         else if(it.k==='track'){ inner += bfTrack(it.wt, F); }
         else if(it.k==='notes'){ inner += bfNotesPreview(F); }
+        else if(it.k==='info'){ inner += '<div class="bf-info">'+esc(it.text)+'</div>'; }
       });
       if(inner) html += '<div class="bf-stack">'+inner+'</div>';
     } else {
@@ -384,7 +392,7 @@
 
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var eq = (/[0-9]/.test(F['Estimated Payoff Value']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'Unknown', color:'#9aa0a6'};
+    var eq = (/[0-9]/.test(F['Estimated Payoff Value']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
@@ -439,8 +447,10 @@
       var _tier=_score>=75?{bg:'#e3f5cf',fg:'#2b6012',l:'Hot'}:(_score>=50?{bg:'#fbeecd',fg:'#7a4d13',l:'Warm'}:{bg:'#eceae3',fg:'#6b6b64',l:'Cool'});
       _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
     }
+    var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
+    var _right = (_listing||_badge) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+'</div>' : '';
     var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+
-      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>'+ _badge +'</div>';
+      (F['Vehicle Subtitle']?'<div style="font-size:12px;color:#7c7c7c;margin-top:1px;">'+esc(F['Vehicle Subtitle'])+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
@@ -449,7 +459,7 @@
     var lfT=lf?new Date(lf).getTime():NaN;
     var baseT=seT;
     if(!isNaN(lfT) && (isNaN(seT)||lfT>seT)) baseT=lfT;
-    if(!isNaN(baseT)){ { var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; var dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } var txtCol='#6b6b64'; var wt='400'; if(sev==='orange'){txtCol='#e8730c';wt='500';} else if(sev==='red'){txtCol='#c93535';wt='500';} clock='<div class="bf-clock" style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+fmtDuration(mins)+' in stage</div>'; } }
+    if(!isNaN(baseT)){ var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var dotCol, txtCol, wt2, lbl; if(stage==='Nurturing (Follow Up and Re-engage)'||stage==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DAYRAMP=['#c93535','#e8730c','#c9971a','#6f9e1f','#1f9e7a','#2b86b0','#5aa0d4']; var col=DAYRAMP[Math.min(dayNum-1,DAYRAMP.length-1)]; dotCol=col; txtCol=col; wt2='500'; lbl='Day '+dayNum+' in stage'; } else { var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } txtCol='#6b6b64'; wt2='400'; if(sev==='orange'){txtCol='#e8730c';wt2='500';} else if(sev==='red'){txtCol='#c93535';wt2='500';} lbl=fmtDuration(mins)+' in stage'; } clock='<div class="bf-clock" style="border-top:0.5px solid #ece9e0;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt2+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+lbl+'</div>'; }
 
     var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
@@ -510,7 +520,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
@@ -608,11 +618,11 @@
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   document.addEventListener('mousedown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('pointerdown', function(e){
-    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions'):null;
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing'):null;
     if(el){ e.stopPropagation(); }
   }, true);
   document.addEventListener('click', function(e){
@@ -857,6 +867,8 @@
   document.addEventListener('click', function(e){
     var t=e.target; if(!t||!t.closest) return;
     if(t.closest('.bf-fedit, .bf-amt')){ e.preventDefault(); e.stopPropagation(); return; }
+    var lst=t.closest('.bf-listing');
+    if(lst){ e.preventDefault(); e.stopPropagation(); var lu=lst.getAttribute('data-bfurl'); if(lu) window.open(lu,'_blank','noopener'); return; }
     if(t.closest('[data-editing]')){ e.preventDefault(); e.stopPropagation(); return; }
     var cbar=t.closest('.bf-collapse-bar');
     if(cbar){ e.preventDefault(); e.stopPropagation(); var cu=cbar.getAttribute('data-bfuuid'); var ck='bfcol:'+cu; var isC=bfLS(ck)==='1'; try{ if(isC) localStorage.removeItem(ck); else localStorage.setItem(ck,'1'); }catch(_){} var act=cbar.closest('.bf-actions'); if(act) act.classList.toggle('bf-collapsed'); var ic=cbar.querySelector('.bf-collapse-ic'); if(ic){ ic.classList.toggle('ti-chevron-up'); ic.classList.toggle('ti-chevron-down'); } return; }
@@ -938,7 +950,15 @@
     bfAllBtn.style.display='inline-flex';
     bfSyncToggle();
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); }
+  function bfSnap(){
+    document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
+      var sc=g.querySelector('[class*="overflow-y-auto"]'); if(!sc) return;
+      if(sc.style.scrollSnapType!=='y proximity') sc.style.scrollSnapType='y proximity';
+      var hd=g.querySelector('[data-testid="collection-group-header"]'); var pad=(hd?hd.offsetHeight:0)+'px';
+      if(sc.style.scrollPaddingTop!==pad) sc.style.scrollPaddingTop=pad;
+    });
+  }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
