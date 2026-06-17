@@ -23,8 +23,14 @@ a:focus-visible, button:focus-visible {
 }
 input:focus, input:focus-visible, textarea:focus, textarea:focus-visible, select:focus {
   outline: none !important;
+  box-shadow: none !important;
+}
+/* Ring the field's rounded wrapper (not the inner square input) so it hugs the outside + follows corner radius */
+*:has(> input:focus:not(.bf-fedit):not(.bf-amt)),
+*:has(> select:focus),
+*:has(> textarea:focus:not(.bf-fedit)) {
+  box-shadow: 0 0 0 2px #57C822, 0 0 7px rgba(87,200,34,0.30) !important;
   border-color: #57C822 !important;
-  box-shadow: 0 0 0 2px rgba(87,200,34,0.55), 0 0 7px rgba(87,200,34,0.30) !important;
 }
 
 /* ---- Green scale → BuyForce green ---- */
