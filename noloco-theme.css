@@ -592,3 +592,9 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- The actual page canvas (was white) -> near-black ---- */
 .project-preview, .canvas.project-preview { background-color: #000000 !important; }
+
+/* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
+.bf-comp { border-top: 0.5px solid #ece9e0; margin-top: 2px; padding-top: 8px; }
+.bf-complabel { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; margin-bottom: 4px; }
+.bf-comprow { display: grid; grid-template-columns: 1fr 1fr; }
+.bf-comprow > div { padding: 6px 8px; }

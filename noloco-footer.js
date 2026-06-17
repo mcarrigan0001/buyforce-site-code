@@ -437,8 +437,8 @@
     }
 
     var oc = comp ? COMPC[comp.color] : null;
-    var offerTile = '<div'+(oc?' style="background:'+oc.bg+';border-radius:6px;padding:2px 6px;margin:-2px -4px;"':'')+'>'+
-      '<div style="font-size:11px;color:'+(oc?oc.fg:'#7c7c7c')+';">Offer</div>'+
+    var offerTile = '<div>'+
+      '<div style="font-size:11px;color:#7c7c7c;">Offer</div>'+
       '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
     var equityTile = '<div><div style="font-size:11px;color:#7c7c7c;">Equity</div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
@@ -446,10 +446,11 @@
     var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
     var grid = '<div class="bf-grid" style="border-top:0.5px solid #ece9e0;padding-top:10px;">'+
-      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) + equityTile + payoffTile + '</div>';
+      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + equityTile + payoffTile + '</div>';
 
     var pill='';
-    if(comp){ var c=COMPC[comp.color]; pill='<div style="padding-top:11px;"><span style="display:flex;width:calc(66.66% - 4px);align-items:center;justify-content:center;gap:4px;background:'+c.bg+';color:'+c.fg+';font-size:11px;padding:4px 8px;border-radius:999px;"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    if(comp){ var c=COMPC[comp.color]; pill='<div style="margin-top:8px;"><span style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 10px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span></div>'; }
+    var compBlock = '<div class="bf-comp"><div class="bf-complabel">Competition</div><div class="bf-comprow">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) +'</div>'+ pill +'</div>';
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
@@ -530,7 +531,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    return header + checklist + grid + pill + commentLine + renderStageUI(F, card, _uuid) + clock;
+    return header + checklist + grid + compBlock + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
   function addCards(force){
