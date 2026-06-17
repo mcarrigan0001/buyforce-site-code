@@ -150,6 +150,16 @@
     if(/negative/i.test(t)) return {text:'−'+amt, color:'#c93535'};
     return {text:'+'+amt, color:'#2b6012'};
   }
+  function equityInfo2(pos, status, disp){
+    var p=(pos||'').trim();
+    var m=p.match(/[\d,]+(\.\d+)?/);
+    if(m){
+      var amt='$'+m[0];
+      var neg=/negative/i.test(status||'') || /^[\-\(−]/.test(p);
+      return neg ? {text:'−'+amt, color:'#c93535'} : {text:'+'+amt, color:'#2b6012'};
+    }
+    return equityInfo(disp);
+  }
 
   function listedAgo(raw){
     if(!raw) return '';
@@ -191,7 +201,7 @@
     vin:      {label:'VIN',                            key:'vin',                        type:'text',     ph:'Enter VIN…', wide:true, al:['Vin','VIN #','VIN Number']},
     conmax:   {label:'CarMax Offer',                   key:'carMaxOffer',                type:'money',    ph:'$ —', al:['CarMax Value','Carmax Offer','Carmax Value']},
     convana:  {label:'Carvana Offer',                  key:'carvanaOffer',               type:'money',    ph:'$ —', al:['Carvana Value']},
-    notes:    {label:'Condition Notes',                key:'conditionNotes',             type:'textarea', ph:'Add condition notes…', al:['Condition Note','Vehicle Condition Notes']},
+    notes:    {label:'Condition Notes',                key:'conditionNotes',             type:'textarea', ph:'These notes will populate into the Notes for Appraisal, which you will paste in the appraisal notes within your appraisal tool.', al:['Condition Note','Vehicle Condition Notes']},
     accident: {label:'Accident History',               key:'accidentHistory',            type:'select',   al:['Accidents','Accident History?','Accident'],
                options:[['Clean','Clean','g'],['ACCIDENTS','Accident(s)','r']]},
     ncomp:    {label:'# Competing Vehicles',           key:'numberOfCompetingVehicles',  type:'number',   ph:'—', al:['# of Competing Vehicles','Number of Competing Vehicles','Competing Vehicles','# Competing']},
@@ -211,11 +221,15 @@
       {l:'Follow up (24h+ no VIN)', t:'Hey [First Name], sorry to be sending another message, I’m just pretty interested in the [model]. Do you have a copy of the CarFax by chance you could share? If not, I don’t mind to get one, you just don’t have the VIN in your listing'}
     ], fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
-    'VIN Received - Appraisal Needed': { fields:['conmax','convana','notes'], buttons:[
-      {l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link', showEmpty:'CarMax Offer'},
-      {l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link', showEmpty:'Carvana Offer'},
-      {l:'Copy Notes for Appraisal', a:'copynotes', i:'ti-copy'},
-      {l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'} ] },
+    'VIN Received - Appraisal Needed': { layout: [
+      {k:'btn', b:{l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link'}},
+      {k:'field', f:'conmax'},
+      {k:'btn', b:{l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link'}},
+      {k:'field', f:'convana'},
+      {k:'field', f:'notes'},
+      {k:'notes'},
+      {k:'btn', b:{l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'}}
+    ] },
     'Appraisal Complete - Enter Offer Sheet Values': { fields:['accident','ncomp','days','conmax','convana','pprv'], buttons:[
       {l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'},
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
@@ -261,7 +275,7 @@
   function bfInlineField(def, F, uuid, ro){
     var r=bfResolve(F, def); var val=r.val; var lbl=r.label;
     var wide=def.wide?' bf-fwide':'';
-    var common = 'data-bfk="'+esc(def.key)+'" data-bfuuid="'+esc(uuid)+'" data-bftype="'+def.type+'" data-bflabel="'+esc(lbl)+'" data-bfval="'+esc(val)+'"';
+    var common = 'data-bfk="'+esc(def.key)+'" data-bfuuid="'+esc(uuid)+'" data-bftype="'+def.type+'" data-bflabel="'+esc(lbl)+'" data-bfval="'+esc(val)+'" data-bfph="'+esc(def.ph||'')+'"';
     if(def.type==='select'){
       var pills='';
       def.options.forEach(function(o){
@@ -313,36 +327,47 @@
     return '<div class="bf-f bf-fcol"><span class="bf-fl">'+esc(wt.l)+'</span>'+
       '<div class="bf-wt" data-bfwt="'+esc(filled)+'"><span class="bf-wttext">'+esc(filled)+'</span><i class="ti ti-copy bf-wtcopy" aria-hidden="true"></i></div></div>';
   }
+  function bfNotesPreview(F){
+    var notes=F['Notes for Appraisal']||F['Notes For Appraisal']||F['Appraisal Notes']||'';
+    var disp = notes ? esc(notes) : '<span class="bf-ph">No appraisal notes yet</span>';
+    return '<div class="bf-f bf-fcol"><span class="bf-fl">Notes for Appraisal</span>'+
+      '<div class="bf-wt bf-wt-clamp" data-bfwt="'+esc(notes)+'" data-bftoast="Appraisal notes copied"><span class="bf-wttext">'+disp+'</span><i class="ti ti-copy bf-wtcopy" aria-hidden="true"></i></div></div>';
+  }
 
+  function bfFieldHtml(id, F, uuid){
+    var ro=false; if(id==='willtake_ro'){ ro=true; id='willtake'; }
+    var def=IF[id]; return def ? bfInlineField(def, F, uuid, ro) : '';
+  }
   function renderStageUI(F, card, uuid){
     var ui = STAGE_UI[stageOf(card)];
     if(!ui) return '';
     var html='';
-    if(ui.tracks && ui.tracks.length){
-      var th='';
-      ui.tracks.forEach(function(wt){ th += bfTrack(wt, F); });
-      if(th) html += '<div class="bf-tracks">'+th+'</div>';
-    }
-    if(ui.fields && ui.fields.length){
-      var fh='';
-      ui.fields.forEach(function(fid){
-        var ro=false, id=fid;
-        if(fid==='willtake_ro'){ ro=true; id='willtake'; }
-        var def=IF[id]; if(!def) return;
-        fh += bfInlineField(def, F, uuid, ro);
+    if(ui.layout){
+      var inner='';
+      ui.layout.forEach(function(it){
+        if(it.k==='btn'){ if(it.b.showEmpty && (F[it.b.showEmpty]||'').trim()) return; inner += bfButton(it.b, uuid); }
+        else if(it.k==='field'){ inner += bfFieldHtml(it.f, F, uuid); }
+        else if(it.k==='track'){ inner += bfTrack(it.wt, F); }
+        else if(it.k==='notes'){ inner += bfNotesPreview(F); }
       });
-      if(fh) html += '<div class="bf-fields">'+fh+'</div>';
-    }
-    if(ui.buttons && ui.buttons.length){
-      var bh='';
-      ui.buttons.forEach(function(b){
-        if(b.showEmpty && (F[b.showEmpty]||'').trim()) return;
-        bh += bfButton(b, uuid);
-      });
-      if(bh) html += '<div class="bf-btns">'+bh+'</div>';
+      if(inner) html += '<div class="bf-stack">'+inner+'</div>';
+    } else {
+      if(ui.tracks && ui.tracks.length){
+        var th=''; ui.tracks.forEach(function(wt){ th += bfTrack(wt, F); });
+        if(th) html += '<div class="bf-tracks">'+th+'</div>';
+      }
+      if(ui.fields && ui.fields.length){
+        var fh=''; ui.fields.forEach(function(fid){ fh += bfFieldHtml(fid, F, uuid); });
+        if(fh) html += '<div class="bf-fields">'+fh+'</div>';
+      }
+      if(ui.buttons && ui.buttons.length){
+        var bh=''; ui.buttons.forEach(function(b){ if(b.showEmpty && (F[b.showEmpty]||'').trim()) return; bh += bfButton(b, uuid); });
+        if(bh) html += '<div class="bf-btns">'+bh+'</div>';
+      }
     }
     if(!html) return '';
-    var collapsed = bfLS('bfcol:'+uuid)==='1';
+    var ov=bfLS('bfcol:'+uuid);
+    var collapsed = (ov!==null) ? (ov==='1') : (bfLS('bfcoldef')==='1');
     var caret = collapsed?'ti-chevron-down':'ti-chevron-up';
     return '<div class="bf-actions'+(collapsed?' bf-collapsed':'')+'">'+
       '<div class="bf-collapse-bar" data-bfuuid="'+esc(uuid)+'" title="Collapse / expand actions"><span class="bf-collapse-line"></span><i class="ti '+caret+' bf-collapse-ic" aria-hidden="true"></i><span class="bf-collapse-line"></span></div>'+
@@ -351,7 +376,7 @@
 
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var eq = equityInfo(F['Equity Display']);
+    var eq = equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']);
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
@@ -477,7 +502,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
@@ -741,7 +766,8 @@
     var card=host.closest('[data-testid="collection-record"]'); if(!card) return;
     var raw=host.getAttribute('data-bfval')||'';
     bfEditing=true; host.setAttribute('data-editing','1');
-    host.innerHTML = multiline ? '<textarea class="bf-fedit" rows="2"></textarea>' : '<input type="text" class="bf-fedit" />';
+    var ph = host.getAttribute('data-bfph')||'';
+    host.innerHTML = multiline ? '<textarea class="bf-fedit" rows="2" placeholder="'+esc(ph)+'"></textarea>' : '<input type="text" class="bf-fedit" placeholder="'+esc(ph)+'" />';
     var inp=host.querySelector('.bf-fedit'); if(inp){ inp.value=raw; inp.focus(); try{ if(!multiline) inp.select(); }catch(e){} }
     var done=false;
     function finish(save){
@@ -835,7 +861,7 @@
     var pill=t.closest('.bf-pill[data-bfval]');
     if(pill){ e.preventDefault(); e.stopPropagation(); var host=pill.closest('.bf-fpills'); var c=pill.closest('[data-testid="collection-record"]'); if(host&&c) bfSaveField(c, host, pill.getAttribute('data-bfval')); return; }
     var wt=t.closest('.bf-wt');
-    if(wt){ e.preventDefault(); e.stopPropagation(); var wttxt=wt.getAttribute('data-bfwt')||''; try{ navigator.clipboard.writeText(wttxt); }catch(_){} bfToast('Copied — paste into Messenger'); return; }
+    if(wt){ e.preventDefault(); e.stopPropagation(); var wttxt=wt.getAttribute('data-bfwt')||''; if(!wttxt){ bfToast('Nothing to copy yet'); return; } try{ navigator.clipboard.writeText(wttxt); }catch(_){} bfToast(wt.getAttribute('data-bftoast')||'Copied — paste into Messenger'); return; }
     var cp=t.closest('.bf-fcopy');
     if(cp){ e.preventDefault(); e.stopPropagation(); var w=cp.closest('[data-bfk]'); var txt=w?(w.getAttribute('data-bfval')||''):''; try{ navigator.clipboard.writeText(txt); }catch(_){} bfToast('Copied'); return; }
     var ta=t.closest('.bf-fta-wrap');
@@ -881,7 +907,30 @@
     if(!el) return;
     bfPopTimer=setTimeout(bfHideUserPop, 150);
   }, true);
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); }
+  var bfAllBtn;
+  function bfAllCollapsed(){ return bfLS('bfcoldef')==='1'; }
+  function bfClearColOverrides(){ try{ for(var i=localStorage.length-1;i>=0;i--){ var k=localStorage.key(i); if(k && k.indexOf('bfcol:')===0) localStorage.removeItem(k); } }catch(e){} }
+  function bfSyncToggle(){ if(!bfAllBtn) return; var c=bfAllCollapsed(); bfAllBtn.innerHTML='<i class="ti '+(c?'ti-chevrons-down':'ti-chevrons-up')+'" aria-hidden="true"></i><span>'+(c?'Expand all':'Collapse all')+'</span>'; }
+  function bfEnsureToggle(){
+    if(location.pathname.indexOf('/preview/')>-1 || !bfSC()){ if(bfAllBtn) bfAllBtn.style.display='none'; return; }
+    if(!bfAllBtn){
+      bfAllBtn=document.createElement('button');
+      bfAllBtn.className='bf-allcollapse';
+      bfAllBtn.setAttribute('aria-label','Expand or collapse all cards');
+      bfAllBtn.addEventListener('click', function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        var nowC=bfAllCollapsed();
+        try{ localStorage.setItem('bfcoldef', nowC?'0':'1'); }catch(e){}
+        bfClearColOverrides();
+        document.querySelectorAll('.bf-body').forEach(function(b){ b.removeAttribute('data-raw'); });
+        addCards(true); bfSyncToggle();
+      });
+      document.body.appendChild(bfAllBtn);
+    }
+    bfAllBtn.style.display='inline-flex';
+    bfSyncToggle();
+  }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); }
   run();
   new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
