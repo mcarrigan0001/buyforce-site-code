@@ -604,7 +604,7 @@ div:has(> div > [data-testid="record-view"]) {
 .project-theme, .project-theme.light { background-color: transparent !important; }
 
 /* ---- Pipeline title: green glow ---- */
-[data-testid="view-collection"] h1 { text-shadow: 0 0 14px rgba(87,200,34,0.55) !important; }
+[data-testid="view-collection"] h1 { text-shadow: 0 0 16px rgba(87,200,34,0.9), 0 0 6px rgba(87,200,34,0.6) !important; }
 
 /* ---- Top action buttons: green accent (leave the green primary "Add Opportunity" alone) ---- */
 [data-testid="action-button"] button:not([class*="primary"]):not([class*="bg-primary"]) {
