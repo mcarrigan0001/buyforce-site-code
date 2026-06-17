@@ -603,9 +603,12 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-eqcell { margin-top: 2px; padding-top: 6px; }
 .bf-eqsub { font-size: 11px; color: #7c7c7c; }
 .bf-eqval { font-size: 14px; font-weight: 500; }
-.bf-comp-pills { display: grid; grid-template-columns: 7fr 3fr; gap: 6px; margin-top: 9px; align-items: center; }
-.bf-pillcell { min-width: 0; }
-.bf-pillcell-c { display: flex; justify-content: center; }
+.bf-comp-pills { display: grid; grid-template-columns: 7fr 3fr; margin-top: 9px; align-items: center; }
+.bf-comp-pills.bf-pills-solo { grid-template-columns: 1fr; }
+.bf-pillcell { min-width: 0; padding-right: 3px; }
+.bf-pills-solo .bf-pillcell { padding-right: 0; }
+.bf-pillcell-c { display: flex; justify-content: center; padding-left: 3px; }
+.bf-pills-solo .bf-pillcell-c { padding-left: 0; }
 
 /* ---- Remove the translucent white theme tint that was graying out the black canvas ---- */
 .project-theme, .project-theme.light { background-color: transparent !important; }
