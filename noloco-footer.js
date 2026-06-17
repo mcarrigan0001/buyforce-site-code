@@ -483,7 +483,10 @@
       _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
     }
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
-    var _right = (_listing||_badge) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+'</div>' : '';
+    var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
+    var _travel='';
+    if(_dt||_dist){ var _tl=_dt||_dist; var _tsub=(_dt&&_dist)?_dist:''; _travel='<span title="Drive time / distance to listing" style="display:inline-flex;align-items:center;gap:3px;background:#eef0ea;color:#5b5f57;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;"><i class="ti ti-car" style="font-size:12px;" aria-hidden="true"></i>'+esc(_tl)+(_tsub?' · '+esc(_tsub):'')+'</span>'; }
+    var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
