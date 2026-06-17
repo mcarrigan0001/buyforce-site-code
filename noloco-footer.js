@@ -201,7 +201,10 @@
   };
 
   var STAGE_UI = {
-    'Fresh Leads': { fields:['vin'], buttons:[
+    'Fresh Leads': { tracks:[
+      {l:'Ask for the VIN', t:'Hi [First Name], love the [Model]. Could you share the VIN so I can research the history?'},
+      {l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}
+    ], fields:['vin'], buttons:[
       {l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'} ] },
     'Engaged - Awaiting VIN': { fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
@@ -291,10 +294,32 @@
     return '<button type="button" class="'+cls+'" '+attrs+'>'+ic+'<span>'+esc(b.l)+'</span></button>';
   }
 
+  function bfSellerFirst(F){
+    var s=F['Seller Name']||'';
+    if(!s){ var sub=F['Vehicle Subtitle']||''; var m=sub.match(/Seller:\s*(.+)$/i); if(m) s=m[1]; }
+    s=(s||'').trim();
+    return (s.split(/\s+/)[0]||'').trim();
+  }
+  function bfFillTrack(t, F){
+    var first=bfSellerFirst(F)||'there';
+    var model=F['Model']||F['Vehicle Title']||'vehicle';
+    return t.replace(/\[First Name\]/g, first).replace(/\[Model\]/g, model);
+  }
+  function bfTrack(wt, F){
+    var filled=bfFillTrack(wt.t, F);
+    return '<div class="bf-f bf-fcol"><span class="bf-fl">'+esc(wt.l)+'</span>'+
+      '<div class="bf-wt" data-bfwt="'+esc(filled)+'"><span class="bf-wttext">'+esc(filled)+'</span><i class="ti ti-copy bf-wtcopy" aria-hidden="true"></i></div></div>';
+  }
+
   function renderStageUI(F, card, uuid){
     var ui = STAGE_UI[stageOf(card)];
     if(!ui) return '';
     var html='';
+    if(ui.tracks && ui.tracks.length){
+      var th='';
+      ui.tracks.forEach(function(wt){ th += bfTrack(wt, F); });
+      if(th) html += '<div class="bf-tracks">'+th+'</div>';
+    }
     if(ui.fields && ui.fields.length){
       var fh='';
       ui.fields.forEach(function(fid){
@@ -806,6 +831,8 @@
     if(btn){ e.preventDefault(); e.stopPropagation(); bfHandleBtn(btn); return; }
     var pill=t.closest('.bf-pill[data-bfval]');
     if(pill){ e.preventDefault(); e.stopPropagation(); var host=pill.closest('.bf-fpills'); var c=pill.closest('[data-testid="collection-record"]'); if(host&&c) bfSaveField(c, host, pill.getAttribute('data-bfval')); return; }
+    var wt=t.closest('.bf-wt');
+    if(wt){ e.preventDefault(); e.stopPropagation(); var wttxt=wt.getAttribute('data-bfwt')||''; try{ navigator.clipboard.writeText(wttxt); }catch(_){} bfToast('Copied — paste into Messenger'); return; }
     var cp=t.closest('.bf-fcopy');
     if(cp){ e.preventDefault(); e.stopPropagation(); var w=cp.closest('[data-bfk]'); var txt=w?(w.getAttribute('data-bfval')||''):''; try{ navigator.clipboard.writeText(txt); }catch(_){} bfToast('Copied'); return; }
     var ta=t.closest('.bf-fta-wrap');
