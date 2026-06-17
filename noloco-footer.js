@@ -206,7 +206,9 @@
       {l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}
     ], fields:['vin'], buttons:[
       {l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'} ] },
-    'Engaged - Awaiting VIN': { fields:['vin'], buttons:[
+    'Engaged - Awaiting VIN': { tracks:[
+      {l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'}
+    ], fields:['vin'], buttons:[
       {l:'VIN Obtained', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-license'} ] },
     'VIN Received - Appraisal Needed': { fields:['conmax','convana','notes'], buttons:[
       {l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link', showEmpty:'CarMax Offer'},
