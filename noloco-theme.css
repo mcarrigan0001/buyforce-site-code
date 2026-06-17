@@ -589,3 +589,6 @@ div:has(> div > [data-testid="record-view"]) {
 @media (min-width: 641px) {
   [data-testid="collection-group"]:not(.w-12) { width: 340px !important; min-width: 340px !important; max-width: 340px !important; flex: 0 0 340px !important; }
 }
+
+/* ---- The actual page canvas (was white) -> near-black ---- */
+.project-preview, .canvas.project-preview { background-color: #111317 !important; }
