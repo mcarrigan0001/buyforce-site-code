@@ -236,6 +236,9 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { font-size: 20px; margin: 0 0 4px; }
 [data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) { flex-direction: column !important; height: auto !important; justify-content: center !important; align-items: center !important; text-align: center !important; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { display: block !important; width: 100% !important; text-align: center !important; }
+/* Expanded column title: allow wrap to 2 lines, smaller, no ellipsis truncation */
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { font-size: 13px !important; line-height: 1.18 !important; white-space: normal !important; overflow: visible !important; text-overflow: clip !important; word-break: normal !important; }
+[data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header"] .truncate { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
 [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] + * { display: flex !important; justify-content: center !important; margin-top: 3px !important; }
 
 /* Board collection title ("Opportunities") — match record breadcrumb size */
