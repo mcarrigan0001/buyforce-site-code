@@ -190,6 +190,11 @@
   function tile(lbl,val){
     return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(money(val)):'—')+'</div></div>';
   }
+  function _truthy(v){ v=(v||'').trim().toLowerCase(); return v!=='' && v!=='no' && v!=='false' && v!=='0' && v!=='off'; }
+  function compTile(lbl,val,noflag){
+    var inner = _truthy(noflag) ? '<span style="color:#9aa0a6;">No Offer</span>' : (val?esc(money(val)):'—');
+    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+inner+'</div></div>';
+  }
 
   /* ===== Stage-specific card buttons + inline fields ===== */
   var VIEW_SHEET_PAGE = 'https://mcarrigan0001.github.io/buyforce-site-code/offer-sheet.html';
@@ -421,7 +426,9 @@
 
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var eq = (/positive|negative/i.test(F['Equity Status']||'') && /[0-9]/.test(F['Est Equity Position']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
+    var _payoff = F['Estimated Payoff Amount']||F['Estimated Payoff Value']||'';
+    var _hasPayoff = /[0-9]/.test(_payoff) || _truthy(F['No Payoff']);
+    var eq = (_hasPayoff && /[0-9]/.test(F['Est Equity Position']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
@@ -442,11 +449,9 @@
       '<div style="font-size:14px;font-weight:500;color:'+(oc?oc.fg:'#161616')+';">'+(F['Offer Amount']?esc(money(F['Offer Amount'])):'—')+'</div></div>';
 
     var equityTile = '<div><div style="font-size:14px;font-weight:500;color:'+eq.color+';">'+eq.text+'</div></div>';
-    var payoffRaw = F['Estimated Payoff Amount']||F['Estimated Payoff Value'];
-    var payoffTile = (payoffRaw && /[0-9]/.test(payoffRaw)) ? tile('Payoff', payoffRaw) : '';
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
-      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + payoffTile + '</div>';
+      '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
     var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:6px;margin-bottom:0;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
@@ -463,7 +468,7 @@
       '<div class="bf-comp2">'+
         '<div class="bf-comp-left">'+
           '<div class="bf-seclbl">Competition</div>'+
-          '<div class="bf-comprow2">'+ tile('CarMax',F['CarMax Offer']) + tile('Carvana',F['Carvana Offer']) +'</div>'+
+          '<div class="bf-comprow2">'+ compTile('CarMax',F['CarMax Offer'],F['CarMax No Offer']) + compTile('Carvana',F['Carvana Offer'],F['Carvana No Offer']) +'</div>'+
         '</div>'+
         '<div class="bf-comp-right">'+
           '<div class="bf-seclbl">Equity</div>'+
@@ -566,7 +571,8 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    return header + checklist + priceLabel + grid + compBlock + commentLine + renderStageUI(F, card, _uuid) + clock;
+    var commentLabel = '<div class="bf-seclbl" style="margin-top:10px;margin-bottom:0;">Comments</div>';
+    return header + checklist + priceLabel + grid + compBlock + commentLabel + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
   function addCards(force){
@@ -587,7 +593,7 @@
       });
 
       if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Estimated Payoff Value'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
+      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Estimated Payoff Value'],F['CarMax No Offer'],F['Carvana No Offer'],F['No Payoff'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
 
       var body = container.querySelector(':scope > .bf-body');
       if(body && !force && body.getAttribute('data-raw')===raw){
