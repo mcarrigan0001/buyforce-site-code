@@ -255,7 +255,7 @@
       {k:'track', wt:{l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}},
       {k:'btn', b:{l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'}},
       {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
-      {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', g:1, i:'ti-arrow-right'}}
+      {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', p:1, i:'ti-arrow-right'}}
     ] },
     'Offer Sheet Generated': { headline:'Send Offer Sheet Image & Message', layout: [
       {k:'track', wt:{l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}},
@@ -548,7 +548,7 @@
       var _es=_eq>=2000?10:(_eq<=0?0:10*(_eq/2000));
       var _score=Math.round(_cs+_ds+_ps+_es);
       var _tier=_score>=75?{bg:'#e3f5cf',fg:'#2b6012',l:'Hot'}:(_score>=50?{bg:'#fbeecd',fg:'#7a4d13',l:'Warm'}:{bg:'#eceae3',fg:'#6b6b64',l:'Cool'});
-      _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
+      _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 6px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
     }
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
     var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
@@ -557,7 +557,8 @@
       var _tl=[_dist,_dt].filter(Boolean).join(' · ');
       _travel='<div title="Travel distance / time to listing" style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;margin-top:2px;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_tl)+'</div>';
     }
-    var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+_travel+'</div>' : '';
+    var _topRight = (_badge||_listing) ? '<div style="display:flex;align-items:center;gap:6px;flex:none;">'+_badge+_listing+'</div>' : '';
+    var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;">'+_topRight+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';

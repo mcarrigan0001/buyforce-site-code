@@ -657,3 +657,18 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-choicecaret { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; transition: transform .12s; }
 .bf-choicewrap.bf-open .bf-choicecaret { transform: translateY(-50%) rotate(180deg); }
 .bf-apptin { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border: 1px solid; border-radius: 6px; padding: 6px 9px; background: #faf9f5; }
+
+/* ---- Mobile only: one-line stage header (icon · name · count centered; chevron stays far-left). Desktop keeps the stacked layout. ---- */
+@media (max-width: 640px) {
+  [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon),
+  [data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+  }
+  [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { display: inline-flex !important; font-size: 17px !important; margin: 0 !important; }
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { display: inline !important; width: auto !important; }
+  [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] + * { margin-top: 0 !important; }
+}
