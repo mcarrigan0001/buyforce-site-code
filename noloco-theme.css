@@ -696,3 +696,13 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Hide Noloco record-preview fullscreen/expand control (the first stone-400 icon in the preview header). Keeps the close X and the history clock. ---- */
 .absolute.right-2.top-0.flex.h-full.items-center.space-x-2 > svg:first-child { display: none !important; }
+
+/* ---- Record page: sticky side rail = the opportunity card (reuses buildCard). Reflows record-view-body into main + pinned rail. ---- */
+[data-testid="record-view-body"].bf-hasrail { display: flex !important; gap: 22px; align-items: flex-start; }
+.bf-recmain { flex: 1 1 auto; min-width: 0; }
+.bf-recrail { flex: 0 0 320px; width: 320px; position: sticky; top: 12px; align-self: flex-start; }
+.bf-railbody { background: #fff; border: 1px solid #e6e6e6; border-radius: 14px; padding: 14px 14px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+@media (max-width: 900px) {
+  [data-testid="record-view-body"].bf-hasrail { display: block !important; }
+  .bf-recrail { width: auto; position: static; margin-top: 18px; }
+}
