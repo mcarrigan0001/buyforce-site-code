@@ -528,8 +528,8 @@
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
     if(la) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;flex:none;white-space:nowrap;"><i class="ti ti-calendar" style="font-size:12px;" aria-hidden="true"></i>'+la+'</span>');
-    if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;"><i class="ti ti-map-pin" style="font-size:12px;flex:none;" aria-hidden="true"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(F['Listing Location'])+'</span></span>');
-    var meta = metaParts.length ? '<div style="display:flex;flex-wrap:nowrap;gap:10px;margin-top:4px;font-size:11px;color:#888780;min-width:0;overflow:hidden;">'+metaParts.join('')+'</div>' : '';
+    if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-map-pin" style="font-size:12px;flex:none;" aria-hidden="true"></i><span style="white-space:nowrap;">'+esc(F['Listing Location'])+'</span></span>');
+    var meta = metaParts.length ? '<div style="display:flex;flex-wrap:wrap;gap:3px 10px;margin-top:3px;font-size:11px;color:#888780;">'+metaParts.join('')+'</div>' : '';
 
     var _n=function(x){var m=(x||'').replace(/[^0-9.]/g,'');return m?parseFloat(m):NaN;};
     var _acv=_n(F['ACV']);
@@ -554,8 +554,10 @@
     var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
     var _travel='';
     if(_dt||_dist){
-      var _tl=[_dist,_dt].filter(Boolean).join(' · ');
-      _travel='<div title="Travel distance / time to listing" style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;margin-top:2px;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_tl)+'</div>';
+      _travel='<div title="Travel distance / time to listing" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;margin-top:2px;">'+
+        (_dist?'<div style="display:flex;align-items:center;gap:3px;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_dist)+'</div>':'')+
+        (_dt?'<div style="display:flex;align-items:center;gap:3px;"><i class="ti ti-clock-hour-4" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_dt)+'</div>':'')+
+      '</div>';
     }
     var _topRight = (_badge||_listing) ? '<div style="display:flex;align-items:center;gap:6px;flex:none;">'+_badge+_listing+'</div>' : '';
     var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;">'+_topRight+_travel+'</div>' : '';
@@ -563,8 +565,8 @@
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
     var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div class="bf-title" style="font-size:14px;font-weight:700;color:#161616;line-height:1.25;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:clip;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
-      (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:2px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
-      (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
+      (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:3px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
+      (_subSeller?'<div style="font-size:11px;color:#7c7c7c;margin-top:3px;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
     var clock='';
     var se=F['Stage Entered At'];
