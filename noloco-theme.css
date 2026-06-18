@@ -506,7 +506,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Card flash on follow/save: soft green glow around the card edges ---- */
 [data-testid="collection-record"].bf-cardflash { transition: box-shadow .3s ease; box-shadow: 0 0 0 1px rgba(87,200,34,0.45), 0 0 14px 2px rgba(87,200,34,0.42), 0 3px 10px rgba(0,0,0,0.18) !important; }
 .bf-collapse-bar { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0 3px; margin-top: 8px; }
-.bf-collapse-line { flex: 1; height: 0.5px; background: #ece9e0; }
+.bf-collapse-line { flex: 1; height: 1px; background: #ece9e0; }
 .bf-collapse-ic { font-size: 15px; color: #b4b2a9; line-height: 1; }
 .bf-collapse-bar:hover .bf-collapse-ic { color: #57c822; }
 .bf-fcol .bf-fi { max-width: 100%; width: 100%; }
@@ -582,8 +582,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Card metric grid: gray gridlines between fields ---- */
 .bf-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
 .bf-grid > div { padding: 2px 8px 5px; text-align: center; position: relative; }
-.bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 0.5px; height: 60%; background: #e6e4dc; }
-.bf-grid > div:nth-child(n+4) { border-top: 0.5px solid #e6e4dc; }
+.bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 1px; height: 60%; background: #e6e4dc; }
+.bf-grid > div:nth-child(n+4) { border-top: 1px solid #e6e4dc; }
 
 /* ---- Desktop: slightly wider columns so cards breathe ---- */
 @media (min-width: 641px) {
@@ -594,9 +594,9 @@ div:has(> div > [data-testid="record-view"]) {
 .project-preview, .canvas.project-preview { background-color: #000000 !important; }
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
-.bf-comp { border-top: 0.5px solid #ece9e0; border-bottom: 0.5px solid #ece9e0; margin-top: 0; padding-top: 5px; padding-bottom: 10px; }
+.bf-comp { border-top: 1px solid #ece9e0; border-bottom: 1px solid #ece9e0; margin-top: 0; padding-top: 5px; padding-bottom: 10px; }
 .bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
-.bf-comp-left { border-right: 0.5px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
+.bf-comp-left { border-right: 1px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: start; margin-top: 0; }
 .bf-comprow2 > div { padding: 2px 8px 5px; text-align: center; }
