@@ -1125,23 +1125,8 @@
   }
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
-  var bfRunQueued=false, bfLastRun=0;
-  function bfRelevant(muts){
-    for(var i=0;i<muts.length;i++){
-      var m=muts[i];
-      if(!(m.addedNodes.length||m.removedNodes.length)) continue;
-      var t=m.target;
-      if(t && t.nodeType===1 && t.closest && t.closest('[class*=\"bf-\"]')) continue;
-      return true;
-    }
-    return false;
-  }
-  function bfDoRun(){ bfRunQueued=false; bfLastRun=Date.now(); run(); }
-  function bfScheduleRun(muts){
-    if(bfRunQueued || !bfRelevant(muts)) return;
-    bfRunQueued=true;
-    setTimeout(bfDoRun, Math.max(16, 200-(Date.now()-bfLastRun)));
-  }
+  var bfRunQueued=false;
+  function bfScheduleRun(){ if(bfRunQueued) return; bfRunQueued=true; requestAnimationFrame(function(){ bfRunQueued=false; run(); }); }
   new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
   window.addEventListener('resize', updateArrows);
