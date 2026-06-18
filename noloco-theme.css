@@ -506,7 +506,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Card flash on follow/save: soft green glow around the card edges ---- */
 [data-testid="collection-record"].bf-cardflash { transition: box-shadow .3s ease; box-shadow: 0 0 0 1px rgba(87,200,34,0.45), 0 0 14px 2px rgba(87,200,34,0.42), 0 3px 10px rgba(0,0,0,0.18) !important; }
 .bf-collapse-bar { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px 0 3px; margin-top: 8px; }
-.bf-collapse-line { flex: 1; height: 1px; background: #8a8a8a; }
+.bf-collapse-line { flex: 1; height: 1px; background: #cfcfcf; }
 .bf-collapse-ic { font-size: 15px; color: #b4b2a9; line-height: 1; }
 .bf-collapse-bar:hover .bf-collapse-ic { color: #57c822; }
 .bf-fcol .bf-fi { max-width: 100%; width: 100%; }
@@ -595,7 +595,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
 .bf-comp { margin-top: 0; padding-top: 5px; padding-bottom: 10px; position: relative; }
-.bf-comp::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 2px; background: #b8b8b8; }
+.bf-comp::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 2px; background: #d4d4d4; border-radius: 2px; }
 .bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
 .bf-comp-left { padding-right: 8px; display: flex; flex-direction: column; position: relative; }
 .bf-comp-left::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 1px; height: 55%; background: #c4c4c4; }
@@ -644,7 +644,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-search-proxy i { font-size: 16px; }
 .bf-search-relocated div:has(> span > [data-testid="collection-search-button"]) { display: none !important; }
 .bf-thdiv { position: relative; }
-.bf-thdiv::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 2px; background: #b8b8b8; }
+.bf-thdiv::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 2px; background: #d4d4d4; border-radius: 2px; }
 
 .bf-headline { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #6b6b64; text-transform: uppercase; text-align: left; margin: 0 0 7px; line-height: 1.3; }
 .bf-btn-g { background: #2b6012; color: #ffffff; border-color: #2b6012; }

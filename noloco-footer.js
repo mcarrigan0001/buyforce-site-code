@@ -460,6 +460,14 @@
       '<div class="bf-stageui">'+(ui.headline?'<div class="bf-headline">'+esc(ui.headline)+'</div>':'')+html+'</div></div>';
   }
 
+  function bfFitTitle(scope){
+    var els=(scope||document).querySelectorAll('.bf-title');
+    for(var i=0;i<els.length;i++){
+      var el=els[i]; if(!el.clientWidth) continue;
+      var size=14; el.style.fontSize='14px'; var g=0;
+      while(el.scrollWidth>el.clientWidth+0.5 && size>10 && g<24){ size-=0.5; el.style.fontSize=size+'px'; g++; }
+    }
+  }
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
     var _payoff = F['Estimated Payoff Amount']||F['Estimated Payoff Value']||'';
@@ -553,7 +561,7 @@
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
-    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:14px;font-weight:700;color:#161616;line-height:1.25;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
+    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div class="bf-title" style="font-size:14px;font-weight:700;color:#161616;line-height:1.25;letter-spacing:-0.3px;white-space:nowrap;overflow:hidden;text-overflow:clip;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
       (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:2px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
       (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
@@ -641,6 +649,7 @@
       }
       if(!body){ body=document.createElement('div'); body.className='bf-body'; container.appendChild(body); }
       body.innerHTML = buildCard(F, card);
+      bfFitTitle(body);
       body.setAttribute('data-raw', raw);
       container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ cell.style.display='none'; });
     });
