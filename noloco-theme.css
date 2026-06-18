@@ -598,9 +598,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
 .bf-comp-left { border-right: 0.5px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: end; margin-top: 2px; }
-.bf-comprow2 > div { padding: 6px 8px; text-align: center; }
-.bf-eqcell { margin-top: 2px; padding-top: 6px; }
+.bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: start; margin-top: 0; }
+.bf-comprow2 > div { padding: 2px 8px 6px; text-align: center; }
+.bf-eqcell { margin-top: 0; padding-top: 2px; }
 .bf-eqsub { font-size: 11px; color: #7c7c7c; }
 .bf-eqval { font-size: 14px; font-weight: 500; }
 .bf-comp-pills { display: grid; grid-template-columns: 3fr 2fr; margin-top: 9px; align-items: center; }
