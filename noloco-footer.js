@@ -1125,8 +1125,9 @@
   }
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
-  var bfRunQueued=false;
-  function bfScheduleRun(){ if(bfRunQueued) return; bfRunQueued=true; requestAnimationFrame(function(){ bfRunQueued=false; run(); }); }
+  var bfLast=0, bfTimer=null;
+  function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
+  function bfScheduleRun(){ var since=Date.now()-bfLast; if(since>=150){ bfFire(); } else if(!bfTimer){ bfTimer=setTimeout(bfFire, 150-since); } }
   new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
   window.addEventListener('resize', updateArrows);
