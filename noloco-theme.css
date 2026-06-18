@@ -646,6 +646,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-choicewrap { display: flex; flex-direction: column; }
 .bf-choice { display: none; flex-direction: column; gap: 6px; margin-top: 6px; }
 .bf-choicewrap.bf-open .bf-choice { display: flex; }
-.bf-choicecaret { margin-left: auto; font-size: 13px; transition: transform .12s; }
-.bf-choicewrap.bf-open .bf-choicecaret { transform: rotate(180deg); }
+.bf-btn-choice { position: relative; }
+.bf-choicecaret { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; transition: transform .12s; }
+.bf-choicewrap.bf-open .bf-choicecaret { transform: translateY(-50%) rotate(180deg); }
 .bf-apptin { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border: 1px solid; border-radius: 6px; padding: 6px 9px; background: #faf9f5; }

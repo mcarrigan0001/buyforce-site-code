@@ -346,7 +346,7 @@
     if(b.choices){
       var sub=''; b.choices.forEach(function(c){ sub+=bfButton(c, uuid); });
       var bic=b.i?'<i class="ti '+b.i+'" aria-hidden="true"></i>':'';
-      return '<div class="bf-choicewrap"><button type="button" class="'+bfBtnCls(b)+'" data-bfaction="choice" data-bfuuid="'+esc(uuid)+'">'+bic+'<span>'+esc(b.l)+'</span><i class="ti ti-chevron-down bf-choicecaret" aria-hidden="true"></i></button><div class="bf-choice">'+sub+'</div></div>';
+      return '<div class="bf-choicewrap"><button type="button" class="'+bfBtnCls(b)+' bf-btn-choice" data-bfaction="choice" data-bfuuid="'+esc(uuid)+'">'+bic+'<span>'+esc(b.l)+'</span><i class="ti ti-chevron-down bf-choicecaret" aria-hidden="true"></i></button><div class="bf-choice">'+sub+'</div></div>';
     }
     var cls=bfBtnCls(b);
     var attrs='data-bfaction="'+b.a+'" data-bfuuid="'+esc(uuid)+'"';
