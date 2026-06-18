@@ -332,14 +332,8 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
    Header scrolls away; the pipeline columns pin at the top; cards
    keep scrolling within each column. Nav assumed 64px tall. */
 [data-testid="view-collection"] { height: auto !important; min-height: 0 !important; }
-[data-testid="view-collection"] .collection-view-board { height: auto !important; min-height: 0 !important; overflow: visible !important; flex: 0 0 auto !important; }
-[data-testid="view-collection"] [class*="min-h-screen-75"] {
-  position: sticky !important;
-  top: 0 !important;
-  height: calc(100dvh - 64px) !important;
-  min-height: calc(100dvh - 64px) !important;
-  flex: 0 0 auto !important;
-}
+[data-testid="view-collection"] .collection-view-board { height: auto !important; min-height: 0 !important; overflow: hidden !important; flex: 1 1 0% !important; }
+/* (former min-h-screen-75 wrapper rule removed: Noloco dropped that class; column height-bounding now comes from the .collection-view-board rule above + native app-body-scroll-container) */
 /* ===== end sticky-board ===== */
 
 /* ---- Scroll shadow under sticky column header (so scrolled cards don't look cut off) ---- */
@@ -351,7 +345,7 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
 
 /* ---- Mobile: snap horizontal swipe to expanded columns (collapsed ride along) ---- */
 @media (max-width: 640px) {
-  [data-testid="view-collection"] [class*="min-h-screen-75"] {
+  div:has(> [data-testid="collection-group"]) {
     scroll-snap-type: x mandatory !important;
     scroll-padding-left: 6px !important;
   }

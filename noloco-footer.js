@@ -689,7 +689,7 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
-  function bfSC(){ return document.querySelector('[class*="min-h-screen-75"]'); }
+  function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
   function bfNext(sc){
