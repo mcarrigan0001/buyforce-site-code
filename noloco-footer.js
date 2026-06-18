@@ -483,9 +483,9 @@
 
     var metaParts=[];
     var la=listedAgo(F['Date Listed']);
-    if(la) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-calendar" style="font-size:12px;" aria-hidden="true"></i>'+la+'</span>');
-    if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;"><i class="ti ti-map-pin" style="font-size:12px;" aria-hidden="true"></i>'+esc(F['Listing Location'])+'</span>');
-    var meta = metaParts.length ? '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:11px;color:#888780;">'+metaParts.join('')+'</div>' : '';
+    if(la) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;flex:none;white-space:nowrap;"><i class="ti ti-calendar" style="font-size:12px;" aria-hidden="true"></i>'+la+'</span>');
+    if(F['Listing Location']) metaParts.push('<span style="display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;"><i class="ti ti-map-pin" style="font-size:12px;flex:none;" aria-hidden="true"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(F['Listing Location'])+'</span></span>');
+    var meta = metaParts.length ? '<div style="display:flex;flex-wrap:nowrap;gap:10px;margin-top:4px;font-size:11px;color:#888780;min-width:0;overflow:hidden;">'+metaParts.join('')+'</div>' : '';
 
     var _n=function(x){var m=(x||'').replace(/[^0-9.]/g,'');return m?parseFloat(m):NaN;};
     var _acv=_n(F['ACV']);
