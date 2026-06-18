@@ -199,6 +199,10 @@ return [{ json: {
 ```
 **What changed from the HighLevel version:** every `inputData.*` swapped to the real Noloco key; `vehicle_mileage`→`mileage`, decoded `vehicle_year/make/model/trim`→`year/make/model/trim`, `retail_market_value`→`estPrivatePartyRetailValue`, `competing_vehicles`→`numberOfCompetingVehicles`, `dealer_days_to_sale`→`estDealerDaysToSale`, `offer_amount`→`offerAmount`, tax rate now from `dealership.salesTaxRate`; **added** `fast_cash_dealerName` (from `dealershipName`) and `logo_url` (dealer image); **dropped** `voucher_number`; accident check made case-insensitive and the display value normalized to `Clean`/`Accident(s)`; output wrapped in n8n's `[{ json: … }]` shape.
 
+## APITemplate text/merge field names (confirmed)
+- `fast_cash_dealerName` — top header (`FAST CASH - [DEALERNAME] OFFER`, template applies `| upper`).
+- `tax_rate_display` — sales-tax rate as string (from `dealership.salesTaxRate`); already emitted by the transform.
+
 ## APITemplate image element names (confirmed)
 Override images by element `name` with `src`: `{ "name": "<element>", "src": "<public url>" }`.
 - **`dealerLogoURL`** — the circled image on the PURCHASE VOUCHER (per Michael 6/18). Fed by Dealership dealer-logo URL.
@@ -206,6 +210,4 @@ Override images by element `name` with `src`: `{ "name": "<element>", "src": "<p
 
 ## Remaining to lock before/at build
 1. Create **Sales Tax Rate** (number) on Dealership → API `salesTaxRate` (confirm the auto-name after you add it).
-2. Create the dealer **image URL fields** on Dealership (e.g. `Logo URL` → `logoUrl`); tell me the final names so I map every slot.
-3. The **APITemplate element names** for each image slot + the 3 remaining **template IDs** (one per variation).
-4. API key as an n8n **Header Auth** credential (`X-API-KEY`), domains `*.apitemplate.io` — you enter it.
+2. Create the dealer **image URL fields** on Dealership (e.g. `Logo URL` → `logo
