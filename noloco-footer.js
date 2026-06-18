@@ -510,10 +510,8 @@
     var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
     var _travel='';
     if(_dt||_dist){
-      var _trow='';
-      if(_dist) _trow += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;" aria-hidden="true"></i>'+esc(_dist)+'</div>';
-      if(_dt) _trow += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;"><i class="ti ti-clock" style="font-size:12px;color:#9aa0a6;" aria-hidden="true"></i>'+esc(_dt)+'</div>';
-      _travel='<div title="Travel distance / time to listing" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;">'+_trow+'</div>';
+      var _tl=[_dist,_dt].filter(Boolean).join(' · ');
+      _travel='<div title="Travel distance / time to listing" style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;margin-top:2px;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_tl)+'</div>';
     }
     var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
