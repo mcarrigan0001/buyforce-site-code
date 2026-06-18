@@ -84,7 +84,7 @@
     'Nurturing (Follow Up and Re-engage)':7,'Appraisal Review Needed':8,'Appraisal Review Complete':9,
     'Verbal Yes - Schedule Appt':10,'Scheduled':11,'Appt Shown - Follow Up':12,'Acquired':13,'No Deal':14
   };
-  var MILESTONES = ['Obtain VIN','Competing values','Create appraisal with notes','Finalize appraisal','Generate offer','Send offer','Follow up','Schedule','Buy'];
+  var MILESTONES = ['Obtain VIN','Competing values','Create Appraisal','Finalize appraisal','Generate offer','Send offer','Follow up','Schedule','Buy'];
   var STATUS_CHECKS = {
     'Fresh Leads': [],
     'Engaged - Awaiting VIN': [],
@@ -103,7 +103,7 @@
   };
   var CLICK_STAGE = {
     'Obtain VIN': 'VIN Received - Appraisal Needed',
-    'Create appraisal with notes': 'Appraisal Complete - Enter Offer Sheet Values',
+    'Create Appraisal': 'Appraisal Complete - Enter Offer Sheet Values',
     'Finalize appraisal': 'Appraisal Complete - Enter Offer Sheet Values',
     'Generate offer': 'Offer Sheet Generated',
     'Send offer': 'Offer Sent (0-2 Days)',
@@ -452,7 +452,7 @@
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:0;padding-top:5px;margin-bottom:0;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:0;padding-top:5px;margin-bottom:1px;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
     if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
@@ -574,7 +574,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    var commentLabel = '<div class="bf-seclbl" style="margin-top:5px;margin-bottom:0;">Comments</div>';
+    var commentLabel = '<div class="bf-seclbl" style="margin-top:5px;margin-bottom:1px;">Comments</div>';
     return header + checklist + priceLabel + grid + compBlock + commentLabel + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
