@@ -581,7 +581,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Card metric grid: gray gridlines between fields ---- */
 .bf-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
-.bf-grid > div { padding: 2px 8px 6px; text-align: center; position: relative; }
+.bf-grid > div { padding: 2px 8px 5px; text-align: center; position: relative; }
 .bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 0.5px; height: 60%; background: #e6e4dc; }
 .bf-grid > div:nth-child(n+4) { border-top: 0.5px solid #e6e4dc; }
 
@@ -594,16 +594,16 @@ div:has(> div > [data-testid="record-view"]) {
 .project-preview, .canvas.project-preview { background-color: #000000 !important; }
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
-.bf-comp { border-top: 0.5px solid #ece9e0; border-bottom: 0.5px solid #ece9e0; margin-top: 0; padding-top: 10px; padding-bottom: 10px; }
+.bf-comp { border-top: 0.5px solid #ece9e0; border-bottom: 0.5px solid #ece9e0; margin-top: 0; padding-top: 5px; padding-bottom: 10px; }
 .bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
 .bf-comp-left { border-right: 0.5px solid #e6e4dc; padding-right: 8px; display: flex; flex-direction: column; }
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: start; margin-top: 0; }
-.bf-comprow2 > div { padding: 2px 8px 6px; text-align: center; }
+.bf-comprow2 > div { padding: 2px 8px 5px; text-align: center; }
 .bf-eqcell { margin-top: 0; padding-top: 2px; }
 .bf-eqsub { font-size: 11px; color: #7c7c7c; }
-.bf-eqval { font-size: 14px; font-weight: 500; }
-.bf-comp-pills { display: grid; grid-template-columns: 3fr 2fr; margin-top: 9px; align-items: center; }
+.bf-eqval { font-size: 14px; font-weight: 500; margin-top: 1px; }
+.bf-comp-pills { display: grid; grid-template-columns: 3fr 2fr; margin-top: 5px; align-items: center; }
 .bf-comp-pills.bf-pills-solo { grid-template-columns: 1fr; }
 .bf-pillcell { min-width: 0; padding-right: 3px; }
 .bf-pills-solo .bf-pillcell { padding-right: 0; }
@@ -627,7 +627,7 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 /* ---- Card section labels (Price & Valuation, Competition, Equity) ---- */
-.bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #9aa0a6; text-transform: uppercase; text-align: center; }
+.bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #6b6b64; text-transform: uppercase; text-align: center; }
 
 /* ---- Let the title's green glow overflow its container (was clipped at the band edge) ---- */
 [data-testid="view-collection"] { overflow: visible !important; }

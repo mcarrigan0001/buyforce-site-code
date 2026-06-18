@@ -188,12 +188,12 @@
   }
 
   function tile(lbl,val){
-    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(val?esc(money(val)):'—')+'</div></div>';
+    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;margin-top:1px;">'+(val?esc(money(val)):'—')+'</div></div>';
   }
   function _truthy(v){ v=(v||'').trim().toLowerCase(); return v!=='' && v!=='no' && v!=='false' && v!=='0' && v!=='off'; }
   function compTile(lbl,val,noflag){
     var inner = _truthy(noflag) ? '<span style="color:#9aa0a6;">No Offer</span>' : (val?esc(money(val)):'—');
-    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;">'+inner+'</div></div>';
+    return '<div><div style="font-size:11px;color:#7c7c7c;">'+lbl+'</div><div style="font-size:14px;font-weight:500;color:#161616;margin-top:1px;">'+inner+'</div></div>';
   }
 
   /* ===== Stage-specific card buttons + inline fields ===== */
@@ -440,7 +440,7 @@
         '<div style="font-size:14px;font-weight:500;color:#161616;display:flex;align-items:center;justify-content:center;gap:3px;">'+esc(money(willTake))+'<i class="ti ti-arrow-down-right" style="font-size:13px;color:#2b6012;margin-right:-16px;" aria-hidden="true"></i></div>'+
         (asking?'<div style="font-size:10px;color:#b4b2a9;text-decoration:line-through;">was '+esc(money(asking))+'</div>':'');
     } else {
-      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div><div style="font-size:14px;font-weight:500;color:#161616;">'+(asking?esc(money(asking)):'—')+'</div>';
+      askInner = '<div style="font-size:11px;color:#7c7c7c;">Asking</div><div style="font-size:14px;font-weight:500;color:#161616;margin-top:1px;">'+(asking?esc(money(asking)):'—')+'</div>';
     }
 
     var oc = comp ? COMPC[comp.color] : null;
@@ -452,7 +452,7 @@
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:0;padding-top:10px;margin-bottom:0;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:0;padding-top:5px;margin-bottom:0;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
     if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
@@ -504,7 +504,7 @@
       var _es=_eq>=2000?10:(_eq<=0?0:10*(_eq/2000));
       var _score=Math.round(_cs+_ds+_ps+_es);
       var _tier=_score>=75?{bg:'#e3f5cf',fg:'#2b6012',l:'Hot'}:(_score>=50?{bg:'#fbeecd',fg:'#7a4d13',l:'Warm'}:{bg:'#eceae3',fg:'#6b6b64',l:'Cool'});
-      _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
+      _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 8px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
     }
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
     var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
@@ -517,7 +517,7 @@
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
-    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:14px;font-weight:500;color:#161616;line-height:1.25;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
+    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:14px;font-weight:700;color:#161616;line-height:1.25;letter-spacing:-0.3px;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
       (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:2px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
       (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
@@ -555,9 +555,9 @@
     var _ring = '<svg width="14" height="14" viewBox="0 0 16 16" style="flex:none;display:block;">' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="#e3e1d8" stroke-width="2.5"></circle>' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="' + _ringColor + '" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + _C.toFixed(2) + '" stroke-dashoffset="' + (_C * (1 - _pct)).toFixed(2) + '" transform="rotate(-90 8 8)"></circle></svg>';
-    var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:10px;padding-bottom:10px;margin-bottom:1px;">' +
-      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">' + _ring +
-      '<span style="font-size:10px;font-weight:600;letter-spacing:0.4px;color:#9aa0a6;">DEAL PROGRESS</span>' +
+    var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:5px;padding-bottom:10px;margin-bottom:1px;">' +
+      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">' + _ring +
+      '<span style="font-size:10px;font-weight:600;letter-spacing:1px;color:#6b6b64;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px 6px;">' + _items + '</div></div>';
     var _lc = F['Last Comment'];
@@ -574,7 +574,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    var commentLabel = '<div class="bf-seclbl" style="margin-top:10px;margin-bottom:0;">Comments</div>';
+    var commentLabel = '<div class="bf-seclbl" style="margin-top:5px;margin-bottom:0;">Comments</div>';
     return header + checklist + priceLabel + grid + compBlock + commentLabel + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
