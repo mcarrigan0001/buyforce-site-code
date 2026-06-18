@@ -509,7 +509,12 @@
     var _listing = F['Listing Link'] ? '<button type="button" class="bf-listing" data-bfurl="'+esc(F['Listing Link'])+'" title="View listing" aria-label="View listing"><i class="ti ti-external-link" aria-hidden="true"></i></button>' : '';
     var _dt=(F['Drive Time to Listing']||'').trim(); var _dist=(F['Distance to Listing']||'').trim();
     var _travel='';
-    if(_dt||_dist){ var _tl=_dt||_dist; var _tsub=(_dt&&_dist)?_dist:''; _travel='<span title="Drive time / distance to listing" style="display:inline-flex;align-items:center;gap:3px;background:#eef0ea;color:#5b5f57;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;"><i class="ti ti-car" style="font-size:12px;" aria-hidden="true"></i>'+esc(_tl)+(_tsub?' · '+esc(_tsub):'')+'</span>'; }
+    if(_dt||_dist){
+      var _trow='';
+      if(_dist) _trow += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;"><i class="ti ti-route" style="font-size:12px;color:#9aa0a6;" aria-hidden="true"></i>'+esc(_dist)+'</div>';
+      if(_dt) _trow += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:3px;font-size:11px;font-weight:600;color:#5b5f57;white-space:nowrap;"><i class="ti ti-clock" style="font-size:12px;color:#9aa0a6;" aria-hidden="true"></i>'+esc(_dt)+'</div>';
+      _travel='<div title="Travel distance / time to listing" style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:2px;">'+_trow+'</div>';
+    }
     var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;">'+_listing+_badge+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
