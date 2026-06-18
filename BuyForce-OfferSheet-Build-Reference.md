@@ -2,6 +2,40 @@
 
 Source-of-truth notes for rebuilding the offer-sheet generator in **n8n** (Noloco-driven), replacing the old HighLevel → APITemplate flow.
 
+## Noloco fields to add / verify (full spec)
+
+### DEALERSHIP collection — ADD (new)
+| Field | Type | Format / settings | API name | Used for |
+|---|---|---|---|---|
+| Sales Tax Rate | Number | whole percent, e.g. `7` (means 7%), NOT 0.07; decimals allowed | `salesTaxRate` | trade-in value calc + `tax_rate_display` "7%" |
+| Dealer Logo | URL (Text) **or** File(Image) | pick ONE approach for all 3 images (below) | `dealerLogoUrl` / `dealerLogo` | APITemplate element `dealerLogoURL` |
+| Dealer Rep Image | URL (Text) **or** File(Image) | same approach | `dealerRepImageUrl` / `dealerRepImage` | APITemplate rep image element (name TBD) |
+| Dealer Why Sell Image | URL (Text) **or** File(Image) | same approach | `dealerWhySellImageUrl` / `dealerWhySellImage` | APITemplate why-sell element (name TBD) |
+
+Image approach — choose one for all three:
+- **Recommended: URL (Text)** — paste a public link (host on GitHub Pages `/dealers/`, Cloudinary, or HighLevel media). Always fetchable by APITemplate.
+- **File (Image, single file)** — only if the incognito test showed Noloco file URLs are public/permanent.
+
+### OPPORTUNITY collection — VERIFY exist (card already writes them); create if missing
+| Field | Type | API name |
+|---|---|---|
+| Offer Amount | Number/Currency | `offerAmount` |
+| CarMax Offer | Number | `carMaxOffer` |
+| Carvana Offer | Number | `carvanaOffer` |
+| Est Private Party Retail Value | Number | `estPrivatePartyRetailValue` |
+| # Competing Vehicles | Number | `numberOfCompetingVehicles` |
+| Est Dealer Days to Sale | Number | `estDealerDaysToSale` |
+| Accident History | Single Option (Clean / Accident(s)) | `accidentHistory` |
+| Mileage, Year, Make, Model, Trim, First Name, Last Name | (exist) | mileage/year/make/model/trim/firstName/lastName |
+| Offer Sheet Image URL | Text/URL (write-back target) | `offerSheetImageUrl` |
+| Offer Sheet Status | Single Option (Generating/Generated/Sent) — optional | `offerSheetStatus` |
+These must be FILLED on the deal (Appraisal Complete stage) before generating, or they render blank/0.
+
+### RELATIONSHIPS
+- **Opportunity → Dealership** (Many-to-One): ALREADY EXISTS. The workflow reads `dealership.salesTaxRate` + dealer images through this link automatically. No new relationship needed. (Settings already set: Link to another record = Dealership; "Allow linking to multiple records?" OFF on the opportunity side.)
+- No new relationships required.
+- OPTIONAL: Lookup fields on Opportunity (pull tax rate/images through the link) only if you want them visible on the opportunity record/card — not needed for generation.
+
 ## Trigger / flow (new)
 Noloco card "Generate Offer Sheet" → existing webhook `…/ee9245fa` → n8n:
 1. Fetch the opportunity by `uuid` (+ follow the **Dealership** relationship for dealer name + image URLs).
@@ -174,40 +208,4 @@ const isClean = String(accident).toLowerCase().includes("clean");
 return [{ json: {
   fast_cash_dealerName: dealerName,                                  // template uppercases via | upper
   vehicle_title:       [year, make, model, trim].filter(Boolean).join(" "),
-  mileage_display:     miles.toLocaleString("en-US") + " MILES",
-  mileage_limit:       (miles + 150).toLocaleString("en-US"),
-  offer_amount:        usd2(offer),
-  offer_amount_raw:    offer,
-  trade_in_value:      usd(Math.round(offer * (1 + taxRate/100))),
-  tax_rate_display:    String(taxRate) + "%",                         // e.g. "7%" — do NOT also put a literal % in the template element
-  carmax_offer:        usd(carmax),
-  carvana_offer:       usd(carvana),
-  sell_yourself_range: usd(low) + " - " + usd(retail),
-  check_amount_words:  amountToCheckWords(offer),
-  offer_date:          eDate(now),
-  expire_date:         eDate(exp),
-  accident_history:    isClean ? "Clean" : "Accident(s)",             // normalized for display (raw is Clean/ACCIDENTS)
-  accident_icon_url:   isClean ? CLEAN_URL : ACCIDENT_URL,
-  competing_vehicles:  competing,
-  dealer_days_to_sale: daysToSale,
-  seller_name:         (firstName + " " + lastName).trim(),
-  logo_url:            logoUrl,
-  // variation routing flags (which of the 4 templates):
-  _hasCarMax:  carmax  > 0,
-  _hasCarvana: carvana > 0
-}}];
-```
-**What changed from the HighLevel version:** every `inputData.*` swapped to the real Noloco key; `vehicle_mileage`→`mileage`, decoded `vehicle_year/make/model/trim`→`year/make/model/trim`, `retail_market_value`→`estPrivatePartyRetailValue`, `competing_vehicles`→`numberOfCompetingVehicles`, `dealer_days_to_sale`→`estDealerDaysToSale`, `offer_amount`→`offerAmount`, tax rate now from `dealership.salesTaxRate`; **added** `fast_cash_dealerName` (from `dealershipName`) and `logo_url` (dealer image); **dropped** `voucher_number`; accident check made case-insensitive and the display value normalized to `Clean`/`Accident(s)`; output wrapped in n8n's `[{ json: … }]` shape.
-
-## APITemplate text/merge field names (confirmed)
-- `fast_cash_dealerName` — top header (`FAST CASH - [DEALERNAME] OFFER`, template applies `| upper`).
-- `tax_rate_display` — sales-tax rate as string (from `dealership.salesTaxRate`); already emitted by the transform.
-
-## APITemplate image element names (confirmed)
-Override images by element `name` with `src`: `{ "name": "<element>", "src": "<public url>" }`.
-- **`dealerLogoURL`** — the circled image on the PURCHASE VOUCHER (per Michael 6/18). Fed by Dealership dealer-logo URL.
-- _(still need element names for the Dealer Rep Image and Dealer Why-Sell Image slots)_
-
-## Remaining to lock before/at build
-1. Create **Sales Tax Rate** (number) on Dealership → API `salesTaxRate` (confirm the auto-name after you add it).
-2. Create the dealer **image URL fields** on Dealership (e.g. `Logo URL` → `logo
+  mileage_display:     miles.toLocaleString("en-US"
