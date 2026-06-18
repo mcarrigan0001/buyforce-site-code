@@ -215,11 +215,12 @@
     ncomp:    {label:'# Competing Vehicles',           key:'numberOfCompetingVehicles',  type:'number',   ph:'—', al:['# of Competing Vehicles','Number of Competing Vehicles','Competing Vehicles','# Competing']},
     days:     {label:'Est Dealer Days to Sale',        key:'estDealerDaysToSale',        type:'number',   ph:'—', al:['Estimated Dealer Days to Sale','Est. Dealer Days to Sale','Dealer Days to Sale']},
     pprv:     {label:'Est Private Party Retail Value', key:'estPrivatePartyRetailValue', type:'money',    ph:'$ —', al:['Estimated Private Party Retail Value','Est. Private Party Retail Value','Private Party Retail Value']},
-    willtake: {label:'Seller Will Take',               key:'sellerWillTake',             type:'money',    ph:'$ —', al:['Seller Will Take Amount']}
+    willtake: {label:'Seller Will Take',               key:'sellerWillTake',             type:'money',    ph:'$ —', al:['Seller Will Take Amount']},
+    offer:    {label:'Offer Amount',                   key:'offerAmount',                type:'money',    ph:'$ —', al:['Offer']}
   };
 
   var STAGE_UI = {
-    'Fresh Leads': { layout: [
+    'Fresh Leads': { headline:'Start Conversation / Obtain VIN', layout: [
       {k:'info', text:'Check the photos and description for a VIN or Plate #, if none found, ask for the VIN.'},
       {k:'track', wt:{l:'Ask for the VIN', t:'Hi [First Name], love the [Model]. Could you share the VIN so I can research the history?'}},
       {k:'track', wt:{l:'Ask why selling', t:'Hey [First Name], love the [Model]. Can I ask why you’re selling it?'}},
@@ -227,13 +228,13 @@
       {k:'btn', b:{l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', p:1, i:'ti-message-2'}},
       {k:'btn', b:{l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}}
     ] },
-    'Engaged - Awaiting VIN': { layout: [
+    'Engaged - Awaiting VIN': { headline:'Obtain VIN', layout: [
       {k:'track', wt:{l:'Follow up (6h+ no VIN)', t:'Just hoping to check out the CarFax and make an offer'}},
       {k:'track', wt:{l:'Follow up (24h+ no VIN)', t:'Hey [First Name], sorry to be sending another message, I’m just pretty interested in the [model]. Do you have a copy of the CarFax by chance you could share? If not, I don’t mind to get one, you just don’t have the VIN in your listing'}},
       {k:'decode'},
       {k:'btn', b:{l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', p:1, i:'ti-arrow-right'}}
     ] },
-    'VIN Received - Appraisal Needed': { layout: [
+    'VIN Received - Appraisal Needed': { headline:'Obtain Competing Values & Create Appraisal', layout: [
       {k:'info', text:'Enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle. We should assume most sellers already know these offers.'},
       {k:'btn', b:{l:'Get CarMax Value',  a:'url', url:'https://www.carmax.com/sell-my-car',  i:'ti-external-link'}},
       {k:'field', f:'conmax'},
@@ -243,7 +244,7 @@
       {k:'notes'},
       {k:'btn', b:{l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', p:1, i:'ti-clipboard-check'}}
     ] },
-    'Appraisal Complete - Enter Offer Sheet Values': { layout: [
+    'Appraisal Complete - Enter Offer Sheet Values': { headline:'Generate & Send Offer Sheet', layout: [
       {k:'info', text:'View completed appraisal to obtain this information needed to generate the Offer Sheet.'},
       {k:'field', f:'accident'},
       {k:'field', f:'ncomp'},
@@ -254,34 +255,48 @@
       {k:'track', wt:{l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}},
       {k:'btn', b:{l:'Generate Offer Sheet', a:'gensheet', p:1, i:'ti-file-invoice'}},
       {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
-      {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', i:'ti-arrow-right'}}
+      {k:'btn', b:{l:'Move to Offer Sheet Generated', a:'stage', to:'Offer Sheet Generated', g:1, i:'ti-arrow-right'}}
     ] },
-    'Offer Sheet Generated': { tracks:[
-      {l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}
-    ], fields:[], buttons:[
-      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
-      {l:'Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', p:1, i:'ti-send'} ] },
+    'Offer Sheet Generated': { headline:'Send Offer Sheet Image & Message', layout: [
+      {k:'track', wt:{l:'Send offer (send offer sheet image first)', t:'Thank you. I work with [Dealership], we’re interested in purchasing it for our inventory. Based on [CarFax]the miles, equipment, and what [model]s like it are selling for in the market, here’s where we can get to on it'}},
+      {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
+      {k:'btn', b:{l:'Move to Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', p:1, i:'ti-send'}}
+    ] },
     'Offer Sent (0-2 Days)': { fields:['willtake'], buttons:[
       {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
       {l:'Generate New Offer Sheet', a:'regensheet', i:'ti-file-dollar'} ] },
-    'Nurturing (Follow Up and Re-engage)': { fields:[], buttons:[
+    'Nurturing (Follow Up and Re-engage)': { headline:'Follow Up and Get Seller Re-engaged', fields:[], buttons:[
       {l:'Follow Up Sent', a:'followup', p:1, i:'ti-rotate-clockwise'},
       {l:'No Deal', a:'stage', to:'No Deal', i:'ti-x'} ] },
-    'Appraisal Review Needed': { fields:['willtake_ro'], buttons:[
-      {l:'Mark Review Complete', a:'stage', to:'Appraisal Review Complete', p:1, i:'ti-check'},
-      {l:'Generate New Offer Sheet', a:'regensheet', i:'ti-file-dollar'} ] },
-    'Appraisal Review Complete': { fields:[], buttons:[
-      {l:'Generate Updated Offer Sheet', a:'regensheet', i:'ti-file-dollar'},
-      {l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'},
-      {l:'Move to Nurturing', a:'stage', to:'Nurturing (Follow Up and Re-engage)', p:1, i:'ti-arrow-right'} ] },
-    'Verbal Yes - Schedule Appt': { fields:[], buttons:[
+    'Appraisal Review Needed': { headline:'Enter the New Price the Seller Will Accept and Paste in Appraisal Notes', layout: [
+      {k:'field', f:'willtake'},
+      {k:'track', wt:{l:'Copy update for appraiser', t:'UPDATE: Seller will accept [[Seller Will Take]] - Please review appraisal and advise. - [[Rep/User Name]] [[Current Date]]'}},
+      {k:'btn', b:{l:'Mark Review Complete', a:'stage', to:'Appraisal Review Complete', p:1, i:'ti-check'}},
+      {k:'btn', b:{l:'Generate New Offer Sheet', a:'regensheet', i:'ti-file-dollar'}}
+    ] },
+    'Appraisal Review Complete': { headline:'Generate and Send New Offer Sheet & Message', layout: [
+      {k:'field', f:'offer'},
+      {k:'btn', b:{l:'Generate Updated Offer Sheet', a:'regensheet', i:'ti-file-dollar'}},
+      {k:'btn', b:{l:'View Offer Sheet', a:'viewsheet', i:'ti-eye'}},
+      {k:'btn', b:{l:'Move to Verbal Yes - Schedule Appt', a:'stage', to:'Verbal Yes - Schedule Appt', p:1, i:'ti-progress-check'}},
+      {k:'btn', b:{l:'Schedule Appt', a:'soon', i:'ti-calendar-plus'}},
+      {k:'btn', b:{l:'Move to Nurturing', a:'stage', to:'Nurturing (Follow Up and Re-engage)', i:'ti-arrow-right'}}
+    ] },
+    'Verbal Yes - Schedule Appt': { headline:'Schedule Appt', fields:[], buttons:[
+      {l:'Schedule Appt', a:'soon', i:'ti-calendar-plus'},
       {l:'Mark Scheduled', a:'stage', to:'Scheduled', p:1, i:'ti-calendar-check'} ] },
-    'Scheduled': { fields:[], buttons:[
-      {l:'Appt Shown', a:'stage', to:'Appt Shown - Follow Up', p:1, i:'ti-user-check'},
-      {l:'Acquired', a:'stage', to:'Acquired', p:1, i:'ti-circle-check'},
-      {l:'No Show', a:'stage', to:'Verbal Yes - Schedule Appt', i:'ti-user-x'},
-      {l:'Mark Lost', a:'stage', to:'No Deal', i:'ti-x'} ] },
-    'Appt Shown - Follow Up': { fields:[], buttons:[
+    'Scheduled': { headline:'Confirm Appt', layout: [
+      {k:'apptin'},
+      {k:'track', wt:{l:'Appt confirmation message (day before appt)', t:'Hey [First Name]! Just a reminder I have you down for [Appt Time] tomorrow.\n\nDon’t forget to bring both sets of keys (if you have 2), title if you have it (if not we can help take care of that), your drivers license and I’ll make sure you’re in and out, usually less than 30 min.\n\nThe address is:\n\n [Dealership Address]\n\nLooking forward to it!'}},
+      {k:'btn', b:{l:'Acquired', a:'stage', to:'Acquired', p:1, i:'ti-circle-check'}},
+      {k:'btn', b:{l:'Appt Shown - Did Not Buy', a:'choice', i:'ti-user-check', choices:[
+        {l:'Schedule Purchase Appt Later', a:'stage', to:'Verbal Yes - Schedule Appt', i:'ti-calendar-plus'},
+        {l:'Move to Appt Shown - Follow Up', a:'stage', to:'Appt Shown - Follow Up', i:'ti-phone'}
+      ]}},
+      {k:'btn', b:{l:'No Show', a:'stage', to:'Verbal Yes - Schedule Appt', i:'ti-user-x'}},
+      {k:'btn', b:{l:'Mark Lost - Sold Elsewhere', a:'stage', to:'No Deal', i:'ti-x'}}
+    ] },
+    'Appt Shown - Follow Up': { headline:'Follow Up and Re-engage', fields:[], buttons:[
       {l:'Acquired', a:'stage', to:'Acquired', p:1, i:'ti-circle-check'},
       {l:'No Deal', a:'stage', to:'No Deal', i:'ti-x'} ] },
     'Acquired': { fields:[], buttons:[
@@ -326,8 +341,14 @@
       '<span class="bf-fi'+wide+'" '+common+'><span class="bf-fval">'+disp2+'</span><i class="ti ti-check bf-fsave" aria-hidden="true"></i></span></div>';
   }
 
+  function bfBtnCls(b){ return 'bf-btn '+(b.p?'bf-btn-p':(b.g?'bf-btn-g':'bf-btn-s')); }
   function bfButton(b, uuid){
-    var cls='bf-btn '+(b.p?'bf-btn-p':'bf-btn-s');
+    if(b.choices){
+      var sub=''; b.choices.forEach(function(c){ sub+=bfButton(c, uuid); });
+      var bic=b.i?'<i class="ti '+b.i+'" aria-hidden="true"></i>':'';
+      return '<div class="bf-choicewrap"><button type="button" class="'+bfBtnCls(b)+'" data-bfaction="choice" data-bfuuid="'+esc(uuid)+'">'+bic+'<span>'+esc(b.l)+'</span><i class="ti ti-chevron-down bf-choicecaret" aria-hidden="true"></i></button><div class="bf-choice">'+sub+'</div></div>';
+    }
+    var cls=bfBtnCls(b);
     var attrs='data-bfaction="'+b.a+'" data-bfuuid="'+esc(uuid)+'"';
     if(b.to) attrs+=' data-bfto="'+esc(b.to)+'"';
     if(b.url) attrs+=' data-bfurl="'+esc(b.url)+'"';
@@ -341,16 +362,30 @@
     s=(s||'').trim();
     return (s.split(/\s+/)[0]||'').trim();
   }
+  function bfApptRaw(F){ return bfGet(F,['Appointment Date/Time','Appointment Time','Scheduled Appt Time','Appt Date/Time','Appointment Date','Scheduled At','Appt Time','Appointment']); }
+  function bfDateShort(iso){ var d=iso?new Date(iso):new Date(); if(isNaN(d.getTime())) d=new Date(); return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear(); }
+  function bfApptTimeStr(F){ var raw=bfApptRaw(F); if(!raw) return '[time]'; var d=new Date(raw); if(isNaN(d.getTime())) return '[time]'; var h=d.getHours(), m=d.getMinutes(), ap=h>=12?'PM':'AM', h12=h%12; if(h12===0)h12=12; return h12+(m?':'+(m<10?'0'+m:m):'')+' '+ap; }
+  function bfApptIn(F){ var raw=bfApptRaw(F); if(!raw) return '<div class="bf-info">Add an Appointment Date/Time field on the opportunity to show the countdown.</div>'; var d=new Date(raw); if(isNaN(d.getTime())) return ''; var ms=d.getTime()-Date.now(); var col,lbl; if(ms<=0){ col='#c93535'; lbl='Appt time has passed'; } else { col='#2b6012'; lbl='Appt in: '+fmtDuration(Math.floor(ms/60000)); } return '<div class="bf-apptin" style="border-color:'+col+';color:'+col+';"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+esc(lbl)+'</div>'; }
   function bfFillTrack(t, F){
     var first=bfSellerFirst(F)||'there';
     var model=F['Model']||F['Vehicle Model']||'vehicle';
     var dealer=F['Dealership']||F['Dealer']||'our dealership';
     var acc=(F['Accident History']||'').toLowerCase();
     var carfax=(acc.indexOf('accident')>-1)?'the CarFax history, ':'';
+    var willtake=money(F['Seller Will Take']||'')||'$___';
+    var rep=bfGet(F,['Rep','Rep/User Name','Assigned User','Assigned To','Owner','User','Sales Rep'])||'[your name]';
+    var cdate=bfDateShort(bfGet(F,['Stage Entered At']));
+    var apptaddr=bfGet(F,['Dealership Address'])||'[dealership address]';
+    var appttime=bfApptTimeStr(F);
     return t.replace(/\[First Name\]/gi, first)
             .replace(/\[Model\]/gi, model)
+            .replace(/\[Dealership Address\]/gi, apptaddr)
             .replace(/\[Dealership\]/gi, dealer)
-            .replace(/\[CarFax\]/gi, carfax);
+            .replace(/\[Appt Time\]/gi, appttime)
+            .replace(/\[CarFax\]/gi, carfax)
+            .replace(/\[\[Seller Will Take\]\]/gi, willtake)
+            .replace(/\[\[Rep\/User Name\]\]/gi, rep)
+            .replace(/\[\[Current Date[^\]]*\]\]/gi, cdate);
   }
   function bfTrack(wt, F){
     var filled=bfFillTrack(wt.t, F);
@@ -399,6 +434,7 @@
         else if(it.k==='notes'){ inner += bfNotesPreview(F); }
         else if(it.k==='info'){ inner += '<div class="bf-info">'+esc(it.text)+'</div>'; }
         else if(it.k==='decode'){ inner += bfDecodePanel(F, uuid); }
+        else if(it.k==='apptin'){ inner += bfApptIn(F); }
       });
       if(inner) html += '<div class="bf-stack">'+inner+'</div>';
     } else {
@@ -421,7 +457,7 @@
     var caret = collapsed?'ti-chevron-down':'ti-chevron-up';
     return '<div class="bf-actions'+(collapsed?' bf-collapsed':'')+'">'+
       '<div class="bf-collapse-bar" data-bfuuid="'+esc(uuid)+'" title="Collapse / expand actions"><span class="bf-collapse-line"></span><i class="ti '+caret+' bf-collapse-ic" aria-hidden="true"></i><span class="bf-collapse-line"></span></div>'+
-      '<div class="bf-stageui">'+html+'</div></div>';
+      '<div class="bf-stageui">'+(ui.headline?'<div class="bf-headline">'+esc(ui.headline)+'</div>':'')+html+'</div></div>';
   }
 
   function buildCard(F, card){
@@ -455,10 +491,10 @@
     var priceLabel = '<div class="bf-seclbl bf-thdiv" style="margin-top:0.25px;padding-top:5px;margin-bottom:1.5px;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
-    if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
-    else if(_accL.indexOf('clean')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#e3f5cf;color:#2b6012;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-shield-check" style="font-size:12px;" aria-hidden="true"></i>Clean History</span>';
+    if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
+    else if(_accL.indexOf('clean')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#e3f5cf;color:#2b6012;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-shield-check" style="font-size:12px;" aria-hidden="true"></i>Clean History</span>';
     var _beatsPill='';
-    if(comp){ var c=COMPC[comp.color]; _beatsPill='<span style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:5px 14px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span>'; }
+    if(comp){ var c=COMPC[comp.color]; _beatsPill='<span style="display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:5px;background:'+c.bg+';color:'+c.fg+';font-size:11px;font-weight:700;padding:4px 14px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti '+comp.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+comp.label+'</span>'; }
     var _pillsSolo = ((_beatsPill?1:0)+(_accPill?1:0)===1);
     var _pillsRow = (_beatsPill||_accPill) ? '<div class="bf-comp-pills'+(_pillsSolo?' bf-pills-solo':'')+'">'+
       (_beatsPill?'<div class="bf-pillcell">'+_beatsPill+'</div>':'')+
@@ -908,6 +944,8 @@
     var uuid=btn.getAttribute('data-bfuuid')||'';
     var a=btn.getAttribute('data-bfaction');
     if(a==='url'){ bfOpen(btn.getAttribute('data-bfurl')); return; }
+    if(a==='choice'){ var cw=btn.closest('.bf-choicewrap'); if(cw) cw.classList.toggle('bf-open'); return; }
+    if(a==='soon'){ bfToast('Scheduling tool coming soon'); return; }
     if(!uuid) return;
     if(a==='stage'){
       bfMoveCard(card, uuid, btn.getAttribute('data-bfto'));
