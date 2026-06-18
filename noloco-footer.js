@@ -1125,7 +1125,9 @@
   }
   function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
-  new MutationObserver(function(){ run(); }).observe(document.body, { childList: true, subtree: true });
+  var bfRunQueued=false;
+  function bfScheduleRun(){ if(bfRunQueued) return; bfRunQueued=true; requestAnimationFrame(function(){ bfRunQueued=false; run(); }); }
+  new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
   window.addEventListener('resize', updateArrows);
 })();
