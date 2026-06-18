@@ -84,7 +84,7 @@
     'Nurturing (Follow Up and Re-engage)':7,'Appraisal Review Needed':8,'Appraisal Review Complete':9,
     'Verbal Yes - Schedule Appt':10,'Scheduled':11,'Appt Shown - Follow Up':12,'Acquired':13,'No Deal':14
   };
-  var MILESTONES = ['Obtain VIN','Competing values','Create Appraisal','Finalize appraisal','Generate offer','Send offer','Follow up','Schedule','Buy'];
+  var MILESTONES = ['Obtain VIN','Competing values','Create Appraisal','Finalize appraisal','Generate offer','Send offer','Follow up','Schedule Appt','Buy'];
   var STATUS_CHECKS = {
     'Fresh Leads': [],
     'Engaged - Awaiting VIN': [],
@@ -108,7 +108,7 @@
     'Generate offer': 'Offer Sheet Generated',
     'Send offer': 'Offer Sent (0-2 Days)',
     'Follow up': 'Nurturing (Follow Up and Re-engage)',
-    'Schedule': 'Scheduled',
+    'Schedule Appt': 'Scheduled',
     'Buy': 'Acquired'
   };
 
