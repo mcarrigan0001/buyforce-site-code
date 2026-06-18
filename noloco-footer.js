@@ -452,7 +452,7 @@
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:10px;padding-top:6px;margin-bottom:0;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:0.5px solid #ece9e0;margin-top:0;padding-top:10px;margin-bottom:0;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
     if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
@@ -517,7 +517,7 @@
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
     var _vinLine = F['VIN'] ? '<div class="bf-vincopy" data-bfvin="'+esc(F['VIN'])+'" title="Click to copy VIN" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-top:3px;max-width:100%;font-size:10px;color:#9aa0a6;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.3px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIN '+esc(F['VIN'])+'</span><i class="ti ti-copy" style="font-size:11px;flex:none;" aria-hidden="true"></i></div>' : '';
-    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:15px;font-weight:500;color:#161616;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
+    var header='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:9px;"><div style="min-width:0;"><div style="font-size:14px;font-weight:500;color:#161616;line-height:1.25;">'+esc(F['Vehicle Title']||'')+'</div>'+ _vinLine +
       (_subM?'<div style="font-size:11px;color:#7c7c7c;margin-top:2px;line-height:1.3;">'+esc(_subM)+'</div>':'')+
       (_subSeller?'<div style="font-size:11px;color:#7c7c7c;line-height:1.3;">Seller: '+esc(_subSeller)+'</div>':'')+ meta +'</div>'+ _right +'</div>';
 
@@ -555,7 +555,7 @@
     var _ring = '<svg width="14" height="14" viewBox="0 0 16 16" style="flex:none;display:block;">' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="#e3e1d8" stroke-width="2.5"></circle>' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="' + _ringColor + '" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + _C.toFixed(2) + '" stroke-dashoffset="' + (_C * (1 - _pct)).toFixed(2) + '" transform="rotate(-90 8 8)"></circle></svg>';
-    var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:11px;padding-bottom:10px;margin-bottom:1px;">' +
+    var checklist = '<div style="border-top:0.5px solid #ece9e0;padding-top:10px;padding-bottom:10px;margin-bottom:1px;">' +
       '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">' + _ring +
       '<span style="font-size:10px;font-weight:600;letter-spacing:0.4px;color:#9aa0a6;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
@@ -565,12 +565,12 @@
     if (_lc) {
       var _txt = _lc.length > 60 ? _lc.slice(0,60).trim() + '…' : _lc;
       var _ago = F['Last Comment At'] ? agoShort(F['Last Comment At']) : '';
-      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:9px -4px 0;padding:3px 4px;font-size:11px;color:#6b6b64;cursor:pointer;">' +
+      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:8px -4px 0;padding:3px 4px;font-size:11px;color:#6b6b64;cursor:pointer;">' +
         '<i class="ti ti-message-2" style="font-size:13px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>' +
         '<span style="line-height:1.3;flex:1;min-width:0;">“' + esc(_txt) + '”' + (_ago ? '<span style="color:#9aa0a6;"> · ' + _ago + '</span>' : '') + '</span>' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;" aria-hidden="true"></i></div>';
     } else {
-      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:9px -4px 0;padding:3px 4px;font-size:11px;color:#b4b2a9;cursor:pointer;">' +
+      commentLine = '<div class="bf-comment" style="display:flex;align-items:center;gap:5px;margin:8px -4px 0;padding:3px 4px;font-size:11px;color:#b4b2a9;cursor:pointer;">' +
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
