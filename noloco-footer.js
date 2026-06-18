@@ -692,48 +692,6 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
-  function bfReadRecordFields(){
-    var F={}; var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return F;
-    rv.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
-      var lab=cell.querySelector('[data-testid="field-cell-label"]'); if(!lab) return;
-      var key=norm(lab.textContent); if(key in F) return;
-      var v=lab.nextElementSibling; var vtext=v?v.textContent:cell.textContent.replace(lab.textContent,'');
-      F[key]=dval(vtext);
-    });
-    return F;
-  }
-  function bfHchip(txt,bg,fg){ return '<span class="bf-hchip" style="background:'+bg+';color:'+fg+';">'+txt+'</span>'; }
-  function bfRecordHero(F){
-    var title=esc(F['Vehicle Title']||''); var sub=esc(F['Vehicle Subtitle']||'');
-    var loc=esc(F['Listing Location']||''); var dist=esc(F['Distance to Listing']||''); var drive=esc(F['Drive Time to Listing']||'');
-    var offer=esc(F['Offer Amount']||''); var eq=equityInfo2(F['Est Equity Position'],F['Equity Status'],F['Equity Display']);
-    var comp=compInfo(F['Competition']); var acc=norm(F['Accident History']||'');
-    var travel=[dist,drive].filter(Boolean).join(' · ');
-    var locline=[loc,travel].filter(Boolean).join(' · ');
-    var chips='';
-    if(comp){ var cm={g:['#eaf3de','#2b6012'],y:['#faeeda','#854f0b'],r:['#fceaea','#a32d2d']}[comp.color]||['#eef0f2','#444444']; chips+=bfHchip(esc(comp.label),cm[0],cm[1]); }
-    if(acc){ var cl=/clean/i.test(acc); chips+=bfHchip(cl?'CARFAX clean':esc(acc), cl?'#eaf3de':'#fceaea', cl?'#2b6012':'#a32d2d'); }
-    return '<div class="bf-hero-id">'+
-        '<div class="bf-hero-title">'+title+'</div>'+
-        (sub?'<div class="bf-hero-sub">'+sub+'</div>':'')+
-        (locline?'<div class="bf-hero-sub">'+locline+'</div>':'')+
-        (chips?'<div class="bf-hero-chips">'+chips+'</div>':'')+
-      '</div>'+
-      '<div class="bf-hero-nums">'+
-        (offer?'<div class="bf-hero-num"><div class="bf-hero-numlab">Our offer</div><div class="bf-hero-numval" style="color:#2b6012;">'+offer+'</div></div>':'')+
-        '<div class="bf-hero-num"><div class="bf-hero-numlab">Equity</div><div class="bf-hero-numval" style="color:'+eq.color+';">'+esc(eq.text)+'</div></div>'+
-      '</div>';
-  }
-  function bfRecord(){
-    if(location.pathname.indexOf('/preview/')<0) return;
-    var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
-    var F=bfReadRecordFields();
-    var raw=[F['Vehicle Title'],F['Vehicle Subtitle'],F['Listing Location'],F['Distance to Listing'],F['Drive Time to Listing'],F['Offer Amount'],F['Est Equity Position'],F['Equity Status'],F['Equity Display'],F['Competition'],F['Accident History']].join('|');
-    var hero=body.querySelector(':scope > .bf-hero');
-    if(hero && hero.getAttribute('data-raw')===raw) return;
-    if(!hero){ hero=document.createElement('div'); hero.className='bf-hero'; body.insertBefore(hero, body.firstChild); }
-    hero.innerHTML=bfRecordHero(F); hero.setAttribute('data-raw', raw);
-  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1165,7 +1123,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfRecord(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

@@ -696,13 +696,3 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Hide Noloco record-preview fullscreen/expand control (the first stone-400 icon in the preview header). Keeps the close X and the history clock. ---- */
 .absolute.right-2.top-0.flex.h-full.items-center.space-x-2 > svg:first-child { display: none !important; }
-
-/* ---- Record page: balanced hero band (pass 1; additive, sits atop record-view-body; sticky rail to follow) ---- */
-.bf-hero{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 18px; margin:0 0 14px; background:#fff; border:1px solid #ececec; border-radius:12px; }
-.bf-hero-title{ font-size:18px; font-weight:600; color:#161616; line-height:1.2; }
-.bf-hero-sub{ font-size:12px; color:#7c7c7c; margin-top:3px; }
-.bf-hero-chips{ display:flex; gap:6px; margin-top:9px; flex-wrap:wrap; }
-.bf-hchip{ font-size:11px; padding:3px 9px; border-radius:8px; white-space:nowrap; font-weight:500; }
-.bf-hero-nums{ display:flex; gap:22px; }
-.bf-hero-numlab{ font-size:11px; color:#7c7c7c; }
-.bf-hero-numval{ font-size:20px; font-weight:600; line-height:1.1; margin-top:1px; }
