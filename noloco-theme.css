@@ -658,14 +658,32 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-choicewrap.bf-open .bf-choicecaret { transform: translateY(-50%) rotate(180deg); }
 .bf-apptin { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border: 1px solid; border-radius: 6px; padding: 6px 9px; background: #faf9f5; }
 
-/* ---- Mobile only: one-line stage header (icon · name · count centered; chevron stays far-left). Desktop keeps the stacked layout. ---- */
+/* ---- Mobile only: one-line stage header — [icon][name][count] centered as a cluster, collapse chevron pinned far-left. Desktop keeps the stacked layout. ---- */
 @media (max-width: 640px) {
-  [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon),
-  [data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) {
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
+  /* ROW: center the cluster + anchor the absolute chevron */
+  [data-testid="collection-group"]:not(.w-12) div:has(> div > [data-testid="collection-group-header-label"]) {
+    position: relative !important;
     justify-content: center !important;
+    align-items: center !important;
+  }
+  /* icon container: shrink to just the icon, centered (chevron taken out of flow below) */
+  [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) {
+    position: static !important;
+    width: auto !important;
+    flex: 0 0 auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  /* collapse chevron: pin far-left so it doesn't sit between the icon and the name */
+  [data-testid="collection-group"]:not(.w-12) div:has(> .bf-stage-icon) > button {
+    position: absolute !important; left: 8px !important; top: 50% !important; transform: translateY(-50%) !important;
+  }
+  /* name+count container: shrink to content, lay them in a row */
+  [data-testid="collection-group"]:not(.w-12) div:has(> [data-testid="collection-group-header-label"]) {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 7px !important;
   }
   [data-testid="collection-group"]:not(.w-12) .bf-stage-icon { display: inline-flex !important; font-size: 17px !important; margin: 0 !important; }
