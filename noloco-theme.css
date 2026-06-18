@@ -332,8 +332,15 @@ html, body, .app-body-scroll-container { overscroll-behavior: none !important; }
    Header scrolls away; the pipeline columns pin at the top; cards
    keep scrolling within each column. Nav assumed 64px tall. */
 [data-testid="view-collection"] { height: auto !important; min-height: 0 !important; }
-[data-testid="view-collection"] .collection-view-board { height: auto !important; min-height: 0 !important; overflow: hidden !important; flex: 1 1 0% !important; }
-/* (former min-h-screen-75 wrapper rule removed: Noloco dropped that class; column height-bounding now comes from the .collection-view-board rule above + native app-body-scroll-container) */
+[data-testid="view-collection"] .collection-view-board { height: auto !important; min-height: 0 !important; overflow: visible !important; flex: 0 0 auto !important; }
+/* Sticky-board pin: the row holding the columns (Noloco's old min-h-screen-75 element, now matched by a stable :has hook). Page title scrolls away, then columns pin to the top; cards scroll within each column. Tune the 64px (nav height) if the pin sits too high/low. */
+div:has(> [data-testid="collection-group"]) {
+  position: sticky !important;
+  top: 0 !important;
+  height: calc(100dvh - 64px) !important;
+  min-height: calc(100dvh - 64px) !important;
+  flex: 0 0 auto !important;
+}
 /* ===== end sticky-board ===== */
 
 /* ---- Scroll shadow under sticky column header (so scrolled cards don't look cut off) ---- */
