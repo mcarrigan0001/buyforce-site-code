@@ -582,7 +582,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Card metric grid: gray gridlines between fields ---- */
 .bf-grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; }
 .bf-grid > div { padding: 2px 8px 5px; text-align: center; position: relative; }
-.bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 1px; height: 60%; background: #8a8a8a; }
+.bf-grid > div:not(:nth-child(3n))::after { content: ''; position: absolute; top: 50%; right: 0; transform: translateY(-50%); width: 1px; height: 60%; background: #c4c4c4; }
 .bf-grid > div:nth-child(n+4) { border-top: 1px solid #8a8a8a; }
 
 /* ---- Desktop: slightly wider columns so cards breathe ---- */
@@ -594,9 +594,12 @@ div:has(> div > [data-testid="record-view"]) {
 .project-preview, .canvas.project-preview { background-color: #000000 !important; }
 
 /* ---- Competition block on card (CarMax/Carvana grouped, no divider, centered label) ---- */
-.bf-comp { border-top: 1px solid #8a8a8a; border-bottom: 1px solid #8a8a8a; margin-top: 0; padding-top: 5px; padding-bottom: 10px; }
+.bf-comp { margin-top: 0; padding-top: 5px; padding-bottom: 10px; position: relative; }
+.bf-comp::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 1px; background: #8a8a8a; }
+.bf-comp::after { content: ''; position: absolute; bottom: 0; left: 12.5%; width: 75%; height: 1px; background: #8a8a8a; }
 .bf-comp2 { display: grid; grid-template-columns: 3fr 2fr; align-items: stretch; }
-.bf-comp-left { border-right: 1px solid #8a8a8a; padding-right: 8px; display: flex; flex-direction: column; }
+.bf-comp-left { padding-right: 8px; display: flex; flex-direction: column; position: relative; }
+.bf-comp-left::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 1px; height: 55%; background: #c4c4c4; }
 .bf-comp-right { padding-left: 8px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bf-comprow2 { display: grid; grid-template-columns: 1fr 1fr; align-items: start; margin-top: 0; }
 .bf-comprow2 > div { padding: 2px 8px 5px; text-align: center; }
@@ -627,7 +630,7 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 /* ---- Card section labels (Price & Valuation, Competition, Equity) ---- */
-.bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #6b6b64; text-transform: uppercase; text-align: center; margin-bottom: 1px; }
+.bf-seclbl { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #6b6b64; text-transform: uppercase; text-align: center; margin-top: 0.25px; margin-bottom: 1.5px; }
 
 /* ---- Let the title's green glow overflow its container (was clipped at the band edge) ---- */
 [data-testid="view-collection"] { overflow: visible !important; }
@@ -641,3 +644,5 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-search-proxy:hover { background: #f2fbe9; box-shadow: 0 0 9px rgba(87,200,34,0.40); }
 .bf-search-proxy i { font-size: 16px; }
 .bf-search-relocated div:has(> span > [data-testid="collection-search-button"]) { display: none !important; }
+.bf-thdiv { position: relative; }
+.bf-thdiv::before { content: ''; position: absolute; top: 0; left: 12.5%; width: 75%; height: 1px; background: #8a8a8a; }

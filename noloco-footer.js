@@ -452,7 +452,7 @@
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:1px solid #8a8a8a;margin-top:0;padding-top:5px;margin-bottom:1px;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl bf-thdiv" style="margin-top:0.25px;padding-top:5px;margin-bottom:1.5px;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
     if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
@@ -555,8 +555,8 @@
     var _ring = '<svg width="14" height="14" viewBox="0 0 16 16" style="flex:none;display:block;">' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="#e3e1d8" stroke-width="2.5"></circle>' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="' + _ringColor + '" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + _C.toFixed(2) + '" stroke-dashoffset="' + (_C * (1 - _pct)).toFixed(2) + '" transform="rotate(-90 8 8)"></circle></svg>';
-    var checklist = '<div style="border-top:1px solid #8a8a8a;padding-top:5px;padding-bottom:10px;margin-bottom:1px;">' +
-      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">' + _ring +
+    var checklist = '<div style="border-top:1px solid #8a8a8a;padding-top:5.25px;padding-bottom:10px;margin-bottom:1px;">' +
+      '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4.5px;">' + _ring +
       '<span style="font-size:10px;font-weight:600;letter-spacing:1px;color:#6b6b64;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px 6px;padding:0 22px;">' + _items + '</div></div>';
@@ -574,7 +574,7 @@
         '<i class="ti ti-message-2" style="font-size:13px;color:#b4b2a9;flex:none;" aria-hidden="true"></i>No comments yet' +
         '<i class="ti ti-pencil bf-comment-hint" style="font-size:12px;color:#b4b2a9;flex:none;margin-left:auto;" aria-hidden="true"></i></div>';
     }
-    var commentLabel = '<div class="bf-seclbl" style="margin-top:5px;margin-bottom:1px;">Comments</div>';
+    var commentLabel = '<div class="bf-seclbl" style="margin-top:5.25px;margin-bottom:1.5px;">Comments</div>';
     return header + checklist + priceLabel + grid + compBlock + commentLabel + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
