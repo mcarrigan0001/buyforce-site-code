@@ -692,25 +692,6 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
-  function bfRail(){
-    if(location.pathname.indexOf('/preview/')<0) return;
-    var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
-    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
-    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
-    var F=bfReadF(card);
-    var raw=[F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Est Equity Position'],F['Equity Status'],F['Accident History'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['VIN'],stageOf(card)].join('|');
-    var main=body.querySelector(':scope > .bf-recmain');
-    var rail=body.querySelector(':scope > .bf-recrail');
-    if(!main){ main=document.createElement('div'); main.className='bf-recmain'; while(body.firstChild){ main.appendChild(body.firstChild); } body.appendChild(main); }
-    if(!rail){ rail=document.createElement('div'); rail.className='bf-recrail'; body.appendChild(rail); }
-    body.classList.add('bf-hasrail');
-    var kids=[].slice.call(body.children);
-    for(var i=0;i<kids.length;i++){ if(kids[i]!==main && kids[i]!==rail) main.appendChild(kids[i]); }
-    if(rail.getAttribute('data-raw')===raw) return;
-    rail.innerHTML='<div class="bf-body bf-railbody">'+buildCard(F, card)+'</div>';
-    bfFitTitle(rail);
-    rail.setAttribute('data-raw', raw);
-  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1142,7 +1123,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); bfRail(); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
+  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
