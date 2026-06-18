@@ -452,7 +452,7 @@
 
     var grid = '<div class="bf-grid" style="padding-top:0;">'+
       '<div>'+askInner+'</div>'+ tile('ACV',F['ACV']) + offerTile + '</div>';
-    var priceLabel = '<div class="bf-seclbl" style="border-top:1px solid #3a3a3a;margin-top:0;padding-top:5px;margin-bottom:1px;">Price &amp; Valuation</div>';
+    var priceLabel = '<div class="bf-seclbl" style="border-top:1px solid #8a8a8a;margin-top:0;padding-top:5px;margin-bottom:1px;">Price &amp; Valuation</div>';
 
     var _accL=(F['Accident History']||'').trim().toLowerCase(); var _accPill='';
     if(_accL.indexOf('accident')>-1) _accPill='<span style="display:inline-flex;align-items:center;gap:4px;background:#fbeecd;color:#7a4d13;font-size:11px;font-weight:700;padding:5px 10px;border-radius:8px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-alert-triangle" style="font-size:12px;" aria-hidden="true"></i>Accident(s)</span>';
@@ -528,7 +528,7 @@
     var lfT=lf?new Date(lf).getTime():NaN;
     var baseT=seT;
     if(!isNaN(lfT) && (isNaN(seT)||lfT>seT)) baseT=lfT;
-    if(!isNaN(baseT)){ var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var dotCol, txtCol, wt2, lbl; if(stage==='Nurturing (Follow Up and Re-engage)'||stage==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DAYSTOPS=[[1,'#c93535'],[3,'#e0631f'],[5,'#e8930c'],[7,'#c79617'],[10,'#8a9a1c'],[15,'#3f9e5a'],[30,'#1f9e8f'],[45,'#3a8fc4'],[60,'#5aa6db']]; var col=DAYSTOPS[0][1]; for(var di=0;di<DAYSTOPS.length;di++){ if(dayNum>=DAYSTOPS[di][0]) col=DAYSTOPS[di][1]; } dotCol=col; txtCol=col; wt2='500'; lbl='Day '+dayNum+' in stage'; } else { var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } txtCol='#6b6b64'; wt2='400'; if(sev==='orange'){txtCol='#e8730c';wt2='500';} else if(sev==='red'){txtCol='#c93535';wt2='500';} lbl=fmtDuration(mins)+' in stage'; } clock='<div class="bf-clock" style="border-top:1px solid #3a3a3a;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt2+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+lbl+'</div>'; }
+    if(!isNaN(baseT)){ var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var stage=stageOf(card); var dotCol, txtCol, wt2, lbl; if(stage==='Nurturing (Follow Up and Re-engage)'||stage==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DAYSTOPS=[[1,'#c93535'],[3,'#e0631f'],[5,'#e8930c'],[7,'#c79617'],[10,'#8a9a1c'],[15,'#3f9e5a'],[30,'#1f9e8f'],[45,'#3a8fc4'],[60,'#5aa6db']]; var col=DAYSTOPS[0][1]; for(var di=0;di<DAYSTOPS.length;di++){ if(dayNum>=DAYSTOPS[di][0]) col=DAYSTOPS[di][1]; } dotCol=col; txtCol=col; wt2='500'; lbl='Day '+dayNum+' in stage'; } else { var th=THRESH.hasOwnProperty(stage)?THRESH[stage]:null; dotCol='#9aa0a6'; var sev='green'; if(th){ if(mins>=th[1]){dotCol='#c93535';sev='red';} else if(mins>=th[0]){dotCol='#e8730c';sev='orange';} else {dotCol='#3b6d11';sev='green';} } txtCol='#6b6b64'; wt2='400'; if(sev==='orange'){txtCol='#e8730c';wt2='500';} else if(sev==='red'){txtCol='#c93535';wt2='500';} lbl=fmtDuration(mins)+' in stage'; } clock='<div class="bf-clock" style="border-top:1px solid #8a8a8a;margin-top:11px;padding-top:9px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:'+wt2+';color:'+txtCol+';"><span style="width:8px;height:8px;border-radius:50%;background:'+dotCol+';flex:none;"></span><i class="ti ti-clock" style="font-size:13px;color:#a09e96;" aria-hidden="true"></i>'+lbl+'</div>'; }
 
     var _uuid = (function(){ var h=card.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); return mm?mm[1]:''; })();
     var _stg = stageOf(card);
@@ -555,7 +555,7 @@
     var _ring = '<svg width="14" height="14" viewBox="0 0 16 16" style="flex:none;display:block;">' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="#e3e1d8" stroke-width="2.5"></circle>' +
       '<circle cx="8" cy="8" r="6" fill="none" stroke="' + _ringColor + '" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="' + _C.toFixed(2) + '" stroke-dashoffset="' + (_C * (1 - _pct)).toFixed(2) + '" transform="rotate(-90 8 8)"></circle></svg>';
-    var checklist = '<div style="border-top:1px solid #3a3a3a;padding-top:5px;padding-bottom:10px;margin-bottom:1px;">' +
+    var checklist = '<div style="border-top:1px solid #8a8a8a;padding-top:5px;padding-bottom:10px;margin-bottom:1px;">' +
       '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">' + _ring +
       '<span style="font-size:10px;font-weight:600;letter-spacing:1px;color:#6b6b64;">DEAL PROGRESS</span>' +
       '<span style="font-size:10px;color:#9aa0a6;"> · ' + _done + ' of ' + MILESTONES.length + '</span></div>' +
