@@ -693,3 +693,6 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Vertical card snap: scroll freely through a card, then snap the next card's top to just-below the column header. proximity (not mandatory) lets tall cards scroll fully before snapping. ---- */
 [data-testid="collection-group"]:not(.w-12) [class*="overflow-y-auto"] { scroll-snap-type: y proximity !important; scroll-padding-top: 8px !important; }
+
+/* ---- Hide Noloco record-preview fullscreen/expand control (the first stone-400 icon in the preview header). Keeps the close X and the history clock. ---- */
+.absolute.right-2.top-0.flex.h-full.items-center.space-x-2 > svg:first-child { display: none !important; }
