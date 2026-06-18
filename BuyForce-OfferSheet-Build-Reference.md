@@ -179,7 +179,7 @@ return [{ json: {
   offer_amount:        usd2(offer),
   offer_amount_raw:    offer,
   trade_in_value:      usd(Math.round(offer * (1 + taxRate/100))),
-  tax_rate_display:    String(taxRate),
+  tax_rate_display:    String(taxRate) + "%",                         // e.g. "7%" — do NOT also put a literal % in the template element
   carmax_offer:        usd(carmax),
   carvana_offer:       usd(carvana),
   sell_yourself_range: usd(low) + " - " + usd(retail),
