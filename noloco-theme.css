@@ -532,7 +532,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-decodecard { border: 0.5px dashed #97c459; background: #f6faf0; border-radius: 8px; padding: 9px 10px; display: flex; flex-direction: column; gap: 8px; }
 .bf-declabel { font-size: 10px; font-weight: 600; letter-spacing: .3px; color: #3b6d11; text-transform: uppercase; }
 .bf-decymmt { font-size: 14px; font-weight: 500; color: #161616; }
-[data-testid="collection-record"] { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 4px; }
+[data-testid="collection-record"] { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 8px; }
 @media (max-width: 640px) { .bf-allcollapse { bottom: 12px; left: 12px; height: 32px; padding: 0 11px; } }
 .bf-f { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .bf-fcol { align-items: stretch; flex-direction: column; gap: 4px; }
@@ -672,3 +672,6 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] { display: inline !important; width: auto !important; }
   [data-testid="collection-group"]:not(.w-12) [data-testid="collection-group-header-label"] + * { margin-top: 0 !important; }
 }
+
+/* ---- Vertical card snap: scroll freely through a card, then snap the next card's top to just-below the column header. proximity (not mandatory) lets tall cards scroll fully before snapping. ---- */
+[data-testid="collection-group"]:not(.w-12) [class*="overflow-y-auto"] { scroll-snap-type: y proximity !important; scroll-padding-top: 8px !important; }
