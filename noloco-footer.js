@@ -725,7 +725,7 @@
     var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
-    (function(){ var _c=compInfo(F['Competition']); var _oc=_c?(_c.color==='g'?'#2b6012':(_c.color==='y'?'#7a4d13':'#c93535')):''; if(!_oc) return; var _sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!_sb) return; _sb.querySelectorAll('[class*="section-highlights"] [class*="rounded"]').forEach(function(ce){ var lb=ce.querySelector('label,[class*="text-stone"]'); var vl=ce.querySelector('[class*="font-medium"]:not(label)'); if(lb&&vl&&/offer amount/i.test(lb.textContent)){ vl.style.setProperty('color', _oc, 'important'); } }); })();
+    (function(){ var _c=compInfo(F['Competition']); var _oc=_c?(_c.color==='g'?'#2b6012':(_c.color==='y'?'#7a4d13':'#c93535')):''; if(!_oc) return; var _sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!_sb) return; _sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(ce){ var lb=ce.querySelector('[data-testid="highlight-label"]'); var vl=ce.querySelector('[data-testid="highlight-value"]'); if(lb&&vl&&/offer amount/i.test(lb.textContent||'')){ vl.style.setProperty('color', _oc, 'important'); } }); })();
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
     var days=F['Days Working']||''; var daysDisp=days?(/[a-z]/i.test(days)?days:String(days).replace(/[^0-9.]/g,'')+'d'):'';
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
@@ -775,6 +775,27 @@
       if(v.querySelector('a,img,svg')){ cell.style.removeProperty('display'); return; }
       var t=(v.textContent||'').replace(/\s+/g,' ').trim();
       if(t==='' || /^[-–—\s]+$/.test(t)){ cell.style.display='none'; } else { cell.style.removeProperty('display'); }
+    });
+  }
+  function bfRecTweaks(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return;
+    var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])');
+    var scope=sb||rv;
+    var unknown=/equity unknown/i.test(rv.textContent||'');
+    if(sb&&unknown){
+      sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(ce){
+        var lb=ce.querySelector('[data-testid="highlight-label"]'); var vl=ce.querySelector('[data-testid="highlight-value"]');
+        if(lb&&vl&&/est equity position/i.test(lb.textContent||'')){ if(vl.textContent.trim()!=='-') vl.textContent='-'; }
+      });
+    }
+    scope.querySelectorAll('[class*="section-notice"]').forEach(function(n){
+      var t=(n.textContent||'').toLowerCase();
+      if(/equity/.test(t)){ n.classList.add('bf-noti-eq'); }
+      else if(/beat/.test(t)){ n.classList.add('bf-noti-beats'); }
+    });
+    [].forEach.call(scope.querySelectorAll('h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
+      if(el.children.length===0 && /^offers to beat$/i.test((el.textContent||'').trim())){ el.style.whiteSpace='nowrap'; }
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
@@ -1236,7 +1257,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); bfRecTop(); bfRecHideEmpty(); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
+  function run(){ fixLinks(); addIcons(); addCards(false); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

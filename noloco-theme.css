@@ -1099,3 +1099,7 @@ div:has(> div > [data-testid="record-view"]) {
     margin-top: 0 !important; top: 0 !important;
   }
 }
+
+/* ---- Est Equity Position notices: hide the label, show value only (all sizes) ---- */
+[data-testid="record-view"] .bf-noti-eq h5 { display: none !important; }
+[data-testid="record-view"] .bf-noti-eq .grow { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; height: 100% !important; }
