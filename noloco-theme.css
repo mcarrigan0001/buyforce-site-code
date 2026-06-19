@@ -950,3 +950,19 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > h5 { text-align: center !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > div { white-space: normal !important; text-align: center !important; font-size: 13px !important; line-height: 1.15 !important; }
 }
+
+/* ---- Mobile sidebar refinement pass ---- */
+@media (max-width: 900px) {
+  /* center all highlight card text (centers "ACV: $..." too) */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+  /* labels -1px */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice h5 { font-size: 8.5px !important; }
+  /* highlight values +1px */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 15px !important; }
+  /* notice values (Est Equity / CarMax / Carvana): smaller + space below the label */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > div { font-size: 12px !important; margin-top: 4px !important; }
+  /* uniform square size for ALL notices (Est Equity, CarMax, Carvana, Beats Both) */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice { aspect-ratio: 1 / 1 !important; padding: 6px 4px !important; }
+  /* standardize spacing between objects to match the highlights grid gap */
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-3"] { gap: 10px !important; }
+}
