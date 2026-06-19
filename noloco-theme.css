@@ -753,7 +753,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Record sidebar: distinct panel background (sits behind the white summary/comments cards) ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
-  background: #0e100d !important; border-radius: 14px !important; padding: 14px !important; box-shadow: -16px 0 40px -8px rgba(87,200,34,0.5), -3px 0 0 0 rgba(87,200,34,0.55) !important;
+  background: #0e100d !important; border-radius: 14px !important; padding: 12px 6px 12px 12px !important; box-shadow: -16px 0 40px -8px rgba(87,200,34,0.5), -3px 0 0 0 rgba(87,200,34,0.55) !important;
 }
 
 /* ---- Record sections: card-style ALL-CAPS titles + divider above fields ---- */
