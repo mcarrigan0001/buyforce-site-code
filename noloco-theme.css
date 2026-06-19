@@ -1041,3 +1041,8 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Highlight values: keep whole (no mid-number break) when the card narrows ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { white-space: nowrap !important; }
+
+/* ---- Sidebar: cancel inner negative margins (-mx-3 etc.) so all objects respect the uniform sidebar padding on every side ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mt-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-top: 0 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mb-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-bottom: 0 !important; }
