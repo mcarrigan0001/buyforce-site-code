@@ -793,6 +793,8 @@
       var t=(n.textContent||'').toLowerCase();
       if(/equity/.test(t)){ n.classList.add('bf-noti-eq'); }
       else if(/beat/.test(t)){ n.classList.add('bf-noti-beats'); }
+      else if(/carmax/.test(t)){ n.classList.add('bf-noti-cm'); }
+      else if(/carvana/.test(t)){ n.classList.add('bf-noti-cv'); }
     });
     [].forEach.call(scope.querySelectorAll('h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
       if(el.children.length===0 && /^offers to beat$/i.test((el.textContent||'').trim())){ el.classList.add('bf-otb'); }
