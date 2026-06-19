@@ -1092,3 +1092,10 @@ div:has(> div > [data-testid="record-view"]) {
 @media (max-width: 900px) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { aspect-ratio: 2 / 1 !important; }
 }
+
+/* ---- Desktop: remove white gap above the sidebar (align its top with main) ---- */
+@media (min-width: 901px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+    margin-top: 0 !important; top: 0 !important;
+  }
+}
