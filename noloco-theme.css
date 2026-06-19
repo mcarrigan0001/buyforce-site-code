@@ -1210,3 +1210,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rechdr-main .bf-rtstatv { font-size: 14px !important; line-height: 1.1 !important; }
 .bf-rechdr-main .bf-rtstatl { line-height: 1.1 !important; }
 .bf-rechdr-main .bf-rtstats { gap: 6px !important; }
+
+/* ---- Header: bottom-align title+pill so title sits right above VIN (~4px) ---- */
+.bf-rechdr-titlewrap { align-items: flex-end !important; }
+.bf-rtaccpill { padding: 2px 9px !important; }
