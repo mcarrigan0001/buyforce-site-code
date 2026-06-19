@@ -783,3 +783,13 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Sidebar dark theme: light headings, white-glow highlight cards ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { color: #e7ece2 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { background: #ffffff !important; box-shadow: 0 0 16px rgba(255,255,255,0.5) !important; }
+
+/* ---- Record cockpit -> CSS grid so the sidebar spans full height (up to the header) ---- */
+[data-testid="record-view-body"] { display: grid !important; grid-template-columns: 63% 35% !important; gap: 14px 2% !important; align-items: start !important; }
+[data-testid="record-view-body"] > * { grid-column: 1 / -1 !important; }
+[data-testid="record-view-body"] > .bf-rectop { grid-column: 1 !important; grid-row: 1 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 1 !important; grid-row: 2 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 2 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 12px !important; }
+/* VIN & Vehicle + all main sections full width in the left column */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="grid-cols-12"] > div { grid-column: 1 / -1 !important; }
+@media (max-width: 900px) { [data-testid="record-view-body"] { display: block !important; } }

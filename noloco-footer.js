@@ -719,11 +719,12 @@
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
-    var sub1=[mileage?(esc(mileage)+(/mi/i.test(mileage)?'':' mi')):'', color?esc(color):'', seller?('Seller: '+esc(seller)):''].filter(Boolean).join(' \u00b7 ');
+    var mc=[mileage?(esc(mileage)+(/mi/i.test(mileage)?'':' mi')):'', color?esc(color):''].filter(Boolean).join(' \u00b7 ');
+    var sellerLine=seller?('Seller: '+esc(seller)):'';
     var sub2=[];
     if(loc) sub2.push('<span class="bf-rtchip"><i class="ti ti-map-pin" aria-hidden="true"></i>'+esc(loc)+'</span>');
     if(listed) sub2.push('<span class="bf-rtchip"><i class="ti ti-calendar" aria-hidden="true"></i>'+esc(listed)+'</span>');
-    var metaL='<div class="bf-rtmetaL">'+vinLine+(sub1?'<div class="bf-rtsub1">'+sub1+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
+    var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+mc+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+'</div>';
