@@ -968,7 +968,7 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 /* ---- Cockpit: hide Noloco's native header bar (only when our header band is present = safe fallback) ---- */
-[data-testid="record-view"]:has(.bf-rectop) > [class*="sticky"] { display: none !important; }
+[data-testid="record-view"]:has(.bf-rectop) [class*="sticky"][class*="top-0"] { display: none !important; }
 
 /* ---- Header block (title + meta + stats/visit + tabs) at top of Main ---- */
 .bf-rechdr { display: flex; flex-direction: column; gap: 8px; }
@@ -979,3 +979,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rectabs { display: flex; gap: 4px; border-bottom: 1px solid #e3e1d8; margin-top: 4px; flex-wrap: wrap; }
 .bf-rectab { background: transparent; border: none; border-bottom: 2px solid transparent; padding: 8px 12px; font-size: 14px; font-weight: 500; color: #6b6b64; cursor: pointer; }
 .bf-rectab-on { color: #3b6d11; border-bottom-color: #57c822; }
+
+/* ---- Mobile: force-center highlight card content (ACV, -- included) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
+}

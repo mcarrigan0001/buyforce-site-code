@@ -765,6 +765,7 @@
   }
   function bfRecHideEmpty(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
+    [].forEach.call(document.querySelectorAll('[data-testid="record-view"] label, [data-testid="record-view"] [class*="text-stone"], [data-testid="record-view"] h5'), function(el){ if(el.children.length===0 && el.textContent.trim()==='Estimated Payoff Amount'){ el.textContent='Est Payoff Amount'; } });
     document.querySelectorAll('[data-testid="details-section"] form > div').forEach(function(cell){
       if(cell.querySelector('input,textarea,select,button')){ cell.style.removeProperty('display'); return; }
       var v=cell.querySelector('[id="field-cell"]'); if(!v){ return; }
