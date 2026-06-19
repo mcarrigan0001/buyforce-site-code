@@ -831,3 +831,19 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Card-style meta injected into the record header (under the title) ---- */
 .bf-hdrmeta { margin-top: 5px; }
+
+/* ---- Highlight cards: fixed squares (do not reshape on resize) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { display: grid !important; grid-template-columns: repeat(auto-fill, 128px) !important; justify-content: center !important; gap: 10px !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: 128px !important; height: 128px !important; min-height: 128px !important; max-width: 128px !important; flex: 0 0 128px !important; }
+
+/* ---- Notices (Est Equity / CarMax / Carvana / Beats): true full width ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"],
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) :has(> [class*="section-notice"]) { display: block !important; width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important; grid-column: 1 / -1 !important; box-sizing: border-box !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="max-w-"] { max-width: none !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] > * { width: 100% !important; box-sizing: border-box !important; }
+
+/* ---- Mobile: highlights flex to fit the narrow sidebar (override fixed squares) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: 100% !important; max-width: 100% !important; height: auto !important; min-height: 46px !important; }
+}
