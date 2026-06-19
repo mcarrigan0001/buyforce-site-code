@@ -1152,3 +1152,9 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Highlight card icons (centered above label) ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { display: block !important; width: 100% !important; text-align: center !important; font-size: 17px !important; line-height: 1 !important; color: #6b6b64 !important; margin: 0 0 5px 0 !important; }
+
+/* ---- Desktop only: hide CarMax/Carvana highlight cards (they show as notices on desktop); mobile keeps them as the 3rd/4th highlights ---- */
+@media (min-width: 901px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(3),
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(4) { display: none !important; }
+}

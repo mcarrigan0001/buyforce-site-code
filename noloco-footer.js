@@ -882,6 +882,28 @@
       inner.insertBefore(ic, inner.firstChild);
     });
   }
+  var bfHlResizeBound=false;
+  function bfRecHlSwap(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
+    var grid=sb.querySelector('[class*="section-highlights"] [class*="grid"]'); if(!grid) return;
+    var payoff=null, equity=null;
+    sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){
+      var lb=it.querySelector('[data-testid="highlight-label"]'); var t=lb?(lb.textContent||''):'';
+      if(/payoff/i.test(t)) payoff=it; else if(/equity/i.test(t)) equity=it;
+    });
+    if(!payoff||!equity) return;
+    if(!bfHlResizeBound){ bfHlResizeBound=true; window.addEventListener('resize', function(){ try{ bfRecHlSwap(); }catch(e){} }, {passive:true}); }
+    if(window.innerWidth<=900){
+      var beats=sb.querySelector('.bf-noti-beats');
+      var bw=beats?(beats.closest('[class*="section-notice"]')||beats):null;
+      if(!bw||!bw.parentNode) return;
+      if(bw.nextElementSibling!==payoff){ bw.parentNode.insertBefore(payoff, bw.nextSibling); }
+      if(payoff.nextElementSibling!==equity){ payoff.parentNode.insertBefore(equity, payoff.nextSibling); }
+    } else {
+      if(grid.lastElementChild!==equity){ if(!grid.contains(payoff)) grid.appendChild(payoff); if(!grid.contains(equity)) grid.appendChild(equity); }
+    }
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1345,7 +1367,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecHlSwap(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
