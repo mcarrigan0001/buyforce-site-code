@@ -10,6 +10,31 @@
 /* ===================================================================== */
 (function () {
   window.BF_VERSION='2026-06-19-a';
+  window.bfInspect=function(){
+    function rect(e){ if(!e) return null; var r=e.getBoundingClientRect(); return {w:Math.round(r.width),h:Math.round(r.height),top:Math.round(r.top)}; }
+    function fs(e){ return e?getComputedStyle(e).fontSize:null; }
+    function cs(e,p){ if(!e) return null; var c=getComputedStyle(e),o={}; p.forEach(function(k){o[k]=c[k];}); return o; }
+    function txt(e){ return e?(e.textContent||'').replace(/\s+/g,' ').trim():null; }
+    var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])');
+    var main=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"]))');
+    var o={ version:window.BF_VERSION, vw:window.innerWidth, sidebar:!!sb, sbRect:rect(sb), mainRect:rect(main), rectopRect:rect(document.querySelector('.bf-rectop')) };
+    if(!sb){ try{copy(JSON.stringify(o,null,2));}catch(e){} console.log(JSON.stringify(o,null,2)); return o; }
+    o.highlights=[].map.call(sb.querySelectorAll('[data-testid="highlight-item"]'), function(h){
+      var l=h.querySelector('[data-testid="highlight-label"]'), v=h.querySelector('[data-testid="highlight-value"]');
+      return { label:txt(l), value:txt(v), labelFS:fs(l), valueFS:fs(v) };
+    });
+    o.notices=[].map.call(sb.querySelectorAll('[class*="section-notice"]'), function(n){
+      var card=n.querySelector('[class*="rounded-lg"]'), grow=n.querySelector('.grow'), h5=n.querySelector('h5'), val=(grow&&(grow.querySelector('p')||grow.querySelector('div:not(:has(*))')))||null;
+      return { type:(n.className.match(/bf-noti-\w+/)||['(untagged)'])[0], text:txt(n).slice(0,40),
+        cardCS:cs(card,['display','flexDirection','alignItems','justifyContent','overflow','aspectRatio','gap']), cardRect:rect(card),
+        h5:txt(h5), h5FS:fs(h5), valText:txt(val), valFS:fs(val), growW:grow?Math.round(grow.getBoundingClientRect().width):null };
+    });
+    var otb=null; [].forEach.call(sb.querySelectorAll('[class*="section-title"]'), function(e){ if(/offers to beat/i.test(txt(e)||'')&&!otb) otb=e; });
+    o.offersToBeat=otb?{ text:txt(otb), hasBfOtb:otb.classList.contains('bf-otb'), fontSize:fs(otb), whiteSpace:getComputedStyle(otb).whiteSpace, rect:rect(otb) }:'NOT FOUND';
+    try{ copy(JSON.stringify(o,null,2)); console.log('bfInspect: COPIED to clipboard'); }catch(e){}
+    console.log(JSON.stringify(o,null,2));
+    return o;
+  };
   /* Inject theme CSS with a cache-bust so updates reach all devices (incl. mobile) immediately. */
   try{ if(!document.getElementById('bf-theme-css')){ var __l=document.createElement('link'); __l.id='bf-theme-css'; __l.rel='stylesheet'; __l.href='https://mcarrigan0001.github.io/buyforce-site-code/noloco-theme.css?v='+Date.now(); document.head.appendChild(__l); } }catch(e){}
   function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
