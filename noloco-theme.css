@@ -753,7 +753,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Record sidebar: distinct panel background (sits behind the white summary/comments cards) ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
-  background: #0e100d !important; border-radius: 14px !important; padding: 12px !important; box-shadow: 16px 0 40px -8px rgba(87,200,34,0.35), 3px 0 0 0 rgba(87,200,34,0.385) !important;
+  background: #0e100d !important; border-radius: 0 14px 14px 0 !important; padding: 12px !important; box-shadow: 16px 0 40px -8px rgba(87,200,34,0.35), 3px 0 0 0 rgba(87,200,34,0.385) !important;
 }
 
 /* ---- Record sections: card-style ALL-CAPS titles + divider above fields ---- */
@@ -1046,3 +1046,13 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mt-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-top: 0 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mb-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-bottom: 0 !important; }
+
+/* ---- Highlight cards: center label/value/ACV at ALL widths ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
+/* ---- Highlight labels -> uppercase DEAL PROGRESS format (broadened selector) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-stone"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-muted"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; }
+/* ---- Comments object: fill to the same edges as other objects ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { padding-left: 0 !important; padding-right: 0 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
