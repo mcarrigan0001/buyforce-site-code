@@ -828,3 +828,6 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 46px !important; padding: 4px !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { font-size: 11px !important; }
 }
+
+/* ---- Card-style meta injected into the record header (under the title) ---- */
+.bf-hdrmeta { margin-top: 5px; }

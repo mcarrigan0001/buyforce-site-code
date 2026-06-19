@@ -731,7 +731,9 @@
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
     var rv=document.querySelector('[data-testid="record-view"]');
     var slot=rv?rv.querySelector('[class*="sticky"] [class*="min-w-[150px]"]'):null;
-    var meta='<div class="bf-rthdr">'+metaL+(slot?'':stats)+'</div>';
+    var h1=rv?rv.querySelector('[class*="sticky"] h1'):null;
+    var hcol=h1?h1.parentElement:null;
+    var meta='<div class="bf-rthdr">'+(hcol?'':metaL)+(slot?'':stats)+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -753,6 +755,14 @@
         [].forEach.call(rv.querySelectorAll('button,a'),function(b){ if(b.closest('.bf-rthdrstats')) return; var tt=(b.textContent||'').replace(/\s+/g,' ').trim(); if(tt==='Generate Offer Sheet'||tt==='View Offer Sheet'||tt==='Visit Listing'){ b.style.display='none'; } });
         if(ex) ex.remove();
         slot.insertAdjacentHTML('beforeend','<div class="bf-rthdrstats" data-raw="'+esc(raw)+'">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+visit+'</div>');
+      }
+    }
+    if(rv && hcol){
+      var hm=hcol.querySelector(':scope > .bf-hdrmeta');
+      if(!hm || hm.getAttribute('data-raw')!==raw){
+        [].forEach.call(hcol.children,function(ch){ if(ch.tagName!=='H1' && !(ch.classList&&ch.classList.contains('bf-hdrmeta'))) ch.style.display='none'; });
+        if(hm) hm.remove();
+        h1.insertAdjacentHTML('afterend','<div class="bf-hdrmeta" data-raw="'+esc(raw)+'">'+metaL+'</div>');
       }
     }
     var top=body.querySelector(':scope > .bf-rectop');
