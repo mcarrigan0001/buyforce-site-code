@@ -929,3 +929,11 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- "Offers to beat" is an H1 in the sidebar -> white ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h1 { color: #ffffff !important; }
+
+/* ---- Mobile tile internals: consistent icon / label / value sizing ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] i { font-size: 14px !important; margin: 0 0 2px !important; opacity: .85 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 9.5px !important; font-weight: 500 !important; line-height: 1.12 !important; letter-spacing: .2px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.18 !important; white-space: normal !important; overflow-wrap: break-word !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 14px !important; font-weight: 700 !important; }
+}
