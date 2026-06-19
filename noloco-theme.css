@@ -1192,3 +1192,10 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rechdr-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; margin-top: 8px; }
 .bf-rechdr-main .bf-rtmetaL { flex: 1 1 190px; min-width: 0; }
 .bf-rechdr-main .bf-rtstats { flex: 0 0 auto; display: grid !important; grid-template-columns: repeat(2, auto); gap: 8px !important; margin-top: 0 !important; }
+
+/* ---- Header tighten: title->VIN gap + compact stat blocks to match meta height ---- */
+.bf-rechdr-main { margin-top: 2px !important; }
+.bf-rectitle { line-height: 1.12 !important; }
+.bf-rechdr-main .bf-rtstat { padding: 6px 10px !important; gap: 2px !important; }
+.bf-rechdr-main .bf-rtstatv { font-size: 14px !important; }
+.bf-rechdr-main .bf-rtstats { gap: 7px !important; align-content: start !important; }
