@@ -399,24 +399,7 @@ div:has(> [data-testid="collection-group"]) {
   }
 }
 
-/* ---- Record panel -> centered ~66% modal (scoped so other dialogs are untouched) ---- */
-[role="dialog"]:has([data-testid="record-view-section"]),
-[role="dialog"]:has([data-testid="record-view-body"]) {
-  left: 50% !important; right: auto !important;
-  top: 50% !important; bottom: auto !important;
-  transform: translate(-50%, -50%) !important;
-  width: 66vw !important; max-width: 66vw !important;
-  height: auto !important; max-height: 88vh !important;
-  border-radius: 14px !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35) !important;
-  overflow: auto !important;
-}
-@media (max-width: 640px) {
-  [role="dialog"]:has([data-testid="record-view-section"]),
-  [role="dialog"]:has([data-testid="record-view-body"]) {
-    width: 94vw !important; max-width: 94vw !important; max-height: 90vh !important;
-  }
-}
+/* Record-panel 66vw modal treatment removed: it clipped Noloco builder controls (overflow:auto) and narrowed the record. Record now uses native full width for the cockpit layout. */
 
 /* ---- Record preview panel -> centered ~66% modal (real Noloco slide-over) ---- */
 [class*="45dvw"]:has([data-testid="record-view"]),
