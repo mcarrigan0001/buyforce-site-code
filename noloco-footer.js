@@ -539,13 +539,13 @@
     var _badge='';
     if(!isNaN(_acv)&&_acv>0&&!isNaN(_ask)){
       var _cmp=compInfo(F['Competition']);
-      var _cs=_cmp?(_cmp.color==='g'?40:(_cmp.color==='y'?20:0)):0;
+      var _cs=_cmp?(_cmp.color==='g'?40:(_cmp.color==='y'?15:0)):0;
       var _prem=_ask-_acv;
-      var _ds=_prem<=0?30:(_prem>=4000?0:30*(1-_prem/4000));
+      var _ds=_prem<=2000?30:(_prem<=3000?25:(_prem<=4000?15:(_prem<=5000?7.5:0)));
       var _pct=_prem/_acv;
       var _ps=_pct<=0?20:(_pct>=0.20?0:20*(1-_pct/0.20));
-      var _eq=(!isNaN(_off))?(_acv-_off):0;
-      var _es=_eq>=2000?10:(_eq<=0?0:10*(_eq/2000));
+      var _eqp=_n(F['Est Equity Position']);
+      var _es=isNaN(_eqp)?0:(_eqp>=2000?10:(_eqp<=0?0:10*(_eqp/2000)));
       var _score=Math.round(_cs+_ds+_ps+_es);
       var _tier=_score>=75?{bg:'#e3f5cf',fg:'#2b6012',l:'Hot'}:(_score>=50?{bg:'#fbeecd',fg:'#7a4d13',l:'Warm'}:{bg:'#eceae3',fg:'#6b6b64',l:'Cool'});
       _badge='<span title="'+_tier.l+' '+_score+'/100 (beats '+_cs+', $gap '+Math.round(_ds)+', %gap '+Math.round(_ps)+', equity '+Math.round(_es)+')" style="flex:none;display:inline-flex;align-items:center;gap:3px;background:'+_tier.bg+';color:'+_tier.fg+';font-size:11px;font-weight:500;padding:3px 6px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);"><i class="ti ti-flame" style="font-size:12px;" aria-hidden="true"></i>'+_score+'</span>';
@@ -697,13 +697,13 @@
     var acv=bfRecNum(F['ACV']), ask=bfRecNum(F['Asking Price']), off=bfRecNum(F['Offer Amount']);
     if(isNaN(acv)||acv<=0||isNaN(ask)) return null;
     var cmp=compInfo(F['Competition']);
-    var cs=cmp?(cmp.color==='g'?40:(cmp.color==='y'?20:0)):0;
+    var cs=cmp?(cmp.color==='g'?40:(cmp.color==='y'?15:0)):0;
     var prem=ask-acv;
-    var ds=prem<=0?30:(prem>=4000?0:30*(1-prem/4000));
+    var ds=prem<=2000?30:(prem<=3000?25:(prem<=4000?15:(prem<=5000?7.5:0)));
     var pct=prem/acv;
     var ps=pct<=0?20:(pct>=0.20?0:20*(1-pct/0.20));
-    var eq=(!isNaN(off))?(acv-off):0;
-    var es=eq>=2000?10:(eq<=0?0:10*(eq/2000));
+    var eqp=bfRecNum(F['Est Equity Position']);
+    var es=isNaN(eqp)?0:(eqp>=2000?10:(eqp<=0?0:10*(eqp/2000)));
     var score=Math.round(cs+ds+ps+es);
     var tier=score>=75?{bg:'#e3f5cf',fg:'#2b6012'}:(score>=50?{bg:'#fbeecd',fg:'#7a4d13'}:{bg:'#eceae3',fg:'#6b6b64'});
     return {score:score,tier:tier};
