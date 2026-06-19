@@ -795,7 +795,7 @@
       else if(/beat/.test(t)){ n.classList.add('bf-noti-beats'); }
     });
     [].forEach.call(scope.querySelectorAll('h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
-      if(el.children.length===0 && /^offers to beat$/i.test((el.textContent||'').trim())){ el.style.whiteSpace='nowrap'; }
+      if(el.children.length===0 && /^offers to beat$/i.test((el.textContent||'').trim())){ el.classList.add('bf-otb'); }
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
@@ -1257,7 +1257,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); addCards(false); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); manageBackdrop(); bfLoadUsers(); if(!onRec){ ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

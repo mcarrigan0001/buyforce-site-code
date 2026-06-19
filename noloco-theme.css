@@ -1114,3 +1114,10 @@ div:has(> div > [data-testid="record-view"]) {
   }
   [data-testid="record-view-body"] > .bf-rectop { margin-top: 50px !important; }
 }
+
+/* ---- Notice content fixes: eq vertical-center, beats stacked+centered, "Offers to beat" fit ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"] { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq .grow { text-align: center !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 3px !important; text-align: center !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats .grow { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; width: 100% !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb { display: block !important; white-space: nowrap !important; overflow: visible !important; text-overflow: clip !important; font-size: 12px !important; letter-spacing: .3px !important; }
