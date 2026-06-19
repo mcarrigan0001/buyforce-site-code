@@ -769,6 +769,11 @@
     (function(){ var _c=compInfo(F['Competition']); var _oc=_c?(_c.color==='g'?'#2b6012':(_c.color==='y'?'#7a4d13':'#c93535')):''; if(!_oc) return; var _sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!_sb) return; _sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(ce){ var lb=ce.querySelector('[data-testid="highlight-label"]'); var vl=ce.querySelector('[data-testid="highlight-value"]'); if(lb&&vl&&/offer amount/i.test(lb.textContent||'')){ vl.style.setProperty('color', _oc, 'important'); } }); })();
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
     var days=F['Days Working']||''; var daysDisp=days?(/[a-z]/i.test(days)?days:String(days).replace(/[^0-9.]/g,'')+'d'):'';
+    var _accL=(F['Accident History']||'').trim().toLowerCase(); var accPill='';
+    if(_accL.indexOf('accident')>-1) accPill='<span class="bf-rtaccpill" style="background:#fbeecd;color:#7a4d13;"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Accident(s)</span>';
+    else if(_accL.indexOf('clean')>-1) accPill='<span class="bf-rtaccpill" style="background:#e3f5cf;color:#2b6012;"><i class="ti ti-shield-check" aria-hidden="true"></i>Clean History</span>';
+    var tisHtml='';
+    (function(){ var se=F['Stage Entered At']; var baseT=se?new Date(se).getTime():NaN; if(isNaN(baseT)) return; var mins=Math.floor((Date.now()-baseT)/60000); if(mins<0)mins=0; var txtCol,lbl; if(stg==='Nurturing (Follow Up and Re-engage)'||stg==='Appt Shown - Follow Up'){ var dayNum=Math.floor(mins/1440)+1; var DS=[[1,'#c93535'],[3,'#e0631f'],[5,'#e8930c'],[7,'#c79617'],[10,'#8a9a1c'],[15,'#3f9e5a'],[30,'#1f9e8f'],[45,'#3a8fc4'],[60,'#5aa6db']]; var col=DS[0][1]; for(var di=0;di<DS.length;di++){ if(dayNum>=DS[di][0]) col=DS[di][1]; } txtCol=col; lbl='Day '+dayNum; } else { var th=(typeof THRESH!=='undefined'&&THRESH.hasOwnProperty(stg))?THRESH[stg]:null; txtCol='#3b3b38'; if(th){ if(mins>=th[1])txtCol='#c93535'; else if(mins>=th[0])txtCol='#e8730c'; else txtCol='#3b6d11'; } lbl=fmtDuration(mins); } tisHtml='<div class="bf-rtstat"><div class="bf-rtstatv" style="color:'+txtCol+';"><i class="ti ti-clock" aria-hidden="true"></i>'+esc(lbl)+'</div><div class="bf-rtstatl">TIME IN STAGE</div></div>'; })();
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var mc=_sub, sellerName=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ mc=_sm[0]; sellerName=_sm[1]; }
@@ -779,14 +784,14 @@
     var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+esc(mc)+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
-    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
+    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+tisHtml+'</div>';
     var listing=F['Listing Link']||'';
     var visit=listing?('<a class="bf-rtvisiticon" href="'+esc(listing)+'" target="_blank" rel="noopener" aria-label="Visit listing" title="Visit listing"><i class="ti ti-external-link" aria-hidden="true"></i></a>'):'';
     var title=esc(F['Vehicle Title']||'');
     var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
     var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
     var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle bf-title">'+title+'</div>'+visit+'</div>'+metaL+'<div class="bf-rechdr-row">'+stats+'</div>'+tabs+'</div>';
+    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rechdr-titlewrap"><div class="bf-rectitle bf-title">'+title+'</div>'+accPill+'</div>'+visit+'</div><div class="bf-rechdr-main">'+metaL+stats+'</div>'+tabs+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -799,7 +804,7 @@
       steps+='<div class="'+_cls+'"'+_att+'>'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
-    var raw=[F['Vehicle Title'],curSeg,stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],uuid].join('|');
+    var raw=[F['Vehicle Title'],curSeg,stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],F['Accident History'],F['Stage Entered At'],uuid].join('|');
     var top=body.querySelector(':scope > .bf-rectop');
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
