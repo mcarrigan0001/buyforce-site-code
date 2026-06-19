@@ -966,3 +966,16 @@ div:has(> div > [data-testid="record-view"]) {
   /* standardize spacing between objects to match the highlights grid gap */
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-3"] { gap: 10px !important; }
 }
+
+/* ---- Cockpit: hide Noloco's native header bar (only when our header band is present = safe fallback) ---- */
+[data-testid="record-view"]:has(.bf-rectop) > [class*="sticky"] { display: none !important; }
+
+/* ---- Header block (title + meta + stats/visit + tabs) at top of Main ---- */
+.bf-rechdr { display: flex; flex-direction: column; gap: 8px; }
+.bf-rechdr-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.bf-rectitle { font-size: 20px; font-weight: 600; color: #161616; line-height: 1.15; }
+.bf-recclose { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; color: #555; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.bf-rechdr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.bf-rectabs { display: flex; gap: 4px; border-bottom: 1px solid #e3e1d8; margin-top: 4px; flex-wrap: wrap; }
+.bf-rectab { background: transparent; border: none; border-bottom: 2px solid transparent; padding: 8px 12px; font-size: 14px; font-weight: 500; color: #6b6b64; cursor: pointer; }
+.bf-rectab-on { color: #3b6d11; border-bottom-color: #57c822; }

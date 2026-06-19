@@ -730,11 +730,13 @@
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
-    var rv=document.querySelector('[data-testid="record-view"]');
-    var slot=rv?rv.querySelector('[class*="sticky"] [class*="min-w-[150px]"]'):null;
-    var h1=rv?rv.querySelector('[class*="sticky"] h1'):null;
-    var hcol=h1?h1.parentElement:null;
-    var meta='<div class="bf-rthdr">'+(hcol?'':metaL)+(slot?'':stats)+'</div>';
+    var listing=F['Listing Link']||'';
+    var visit=listing?('<a class="bf-rtvisit" href="'+esc(listing)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>Visit Listing</a>'):'';
+    var title=esc(F['Vehicle Title']||'');
+    var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
+    var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
+    var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
+    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle">'+title+'</div><button class="bf-recclose" aria-label="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div>'+metaL+'<div class="bf-rechdr-row">'+stats+visit+'</div>'+tabs+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -747,25 +749,7 @@
       steps+='<div class="'+_cls+'"'+_att+'>'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
-    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],uuid].join('|');
-    if(rv && slot){
-      var listing=F['Listing Link']||'';
-      var visit=listing?('<a class="bf-rtvisit" href="'+esc(listing)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>Visit Listing</a>'):'';
-      var ex=slot.querySelector(':scope > .bf-rthdrstats');
-      if(!ex || ex.getAttribute('data-raw')!==raw){
-        [].forEach.call(rv.querySelectorAll('button,a'),function(b){ if(b.closest('.bf-rthdrstats')) return; var tt=(b.textContent||'').replace(/\s+/g,' ').trim(); if(tt==='Generate Offer Sheet'||tt==='View Offer Sheet'||tt==='Visit Listing'){ b.style.display='none'; } });
-        if(ex) ex.remove();
-        slot.insertAdjacentHTML('beforeend','<div class="bf-rthdrstats" data-raw="'+esc(raw)+'">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+visit+'</div>');
-      }
-    }
-    if(rv && hcol){
-      var hm=hcol.querySelector(':scope > .bf-hdrmeta');
-      if(!hm || hm.getAttribute('data-raw')!==raw){
-        [].forEach.call(hcol.children,function(ch){ if(ch.tagName!=='H1' && !(ch.classList&&ch.classList.contains('bf-hdrmeta'))) ch.style.display='none'; });
-        if(hm) hm.remove();
-        h1.insertAdjacentHTML('afterend','<div class="bf-hdrmeta" data-raw="'+esc(raw)+'">'+metaL+'</div>');
-      }
-    }
+    var raw=[F['Vehicle Title'],curSeg,stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],uuid].join('|');
     var top=body.querySelector(':scope > .bf-rectop');
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
@@ -873,6 +857,18 @@
     if(!uuid||!to) return;
     var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
     if(card){ bfMoveCard(card, uuid, to); } else { bfPost({uuid:uuid, status:to}); bfToast('Moving to '+to+'…'); }
+  }, true);
+  document.addEventListener('click', function(e){
+    var t=(e.target&&e.target.closest)?e.target.closest('.bf-rectab'):null;
+    if(!t) return; e.preventDefault(); e.stopPropagation();
+    var seg=t.getAttribute('data-bftab'); var rv=document.querySelector('[data-testid="record-view"]');
+    var link=rv?rv.querySelector('a[href$="/'+seg+'"]'):null;
+    if(link){ link.click(); } else { var base=location.pathname.replace(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/,''); location.href=base+'/'+seg; }
+  }, true);
+  document.addEventListener('click', function(e){
+    var c=(e.target&&e.target.closest)?e.target.closest('.bf-recclose'):null;
+    if(!c) return; e.preventDefault(); e.stopPropagation();
+    try{ history.back(); }catch(_){ location.href='/opportunities-1'; }
   }, true);
   var bfEditing=false;
   document.addEventListener('click', function(e){
