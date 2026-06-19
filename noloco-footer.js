@@ -9,18 +9,18 @@
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
-  window.BF_VERSION='2026-06-19-b';
-  /* Default pipeline columns: keep only the active stages open, collapse the rest, once per browser. Reps can open any column; Noloco persists their choice. Collapsed columns don't render their cards -> faster board. */
-  var bfFirstDefault=false, bfColSwept=false;
+  window.BF_VERSION='2026-06-19-c';
+  /* Default pipeline columns: keep only the active stages open, collapse EVERY other stage (incl. null/"No value" and any future stage), once per browser. Reps can open any column; Noloco persists their choice. Collapsed columns don't render their cards -> faster board. */
+  var bfFirstDefault=false, bfDefaultAt=0;
+  var BF_KEEPOPEN={FRESH_LEADS:1, APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES:1, OFFER_SHEET_GENERATED:1, OFFER_SENT_0_2_DAYS:1};
   try{
     var BF_VIEW='vewccBG0hsX0eorteOnayUs_';
-    var BF_KEEP=['FRESH_LEADS','APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES','OFFER_SHEET_GENERATED','OFFER_SENT_0_2_DAYS'];
-    var BF_COLLAPSE=['ENGAGED_AWAITING_VIN','VIN_RECEIVED_APPRAISAL_NEEDED','VIN_RECD_APPRAISAL_NEEDED','NURTURING_FOLLOW_UP_AND_RE_ENGAGE','APPRAISAL_REVIEW_NEEDED','APPRAISAL_REVIEW_COMPLETE','VERBAL_YES_SCHEDULE_APPT','SCHEDULED','ACQUIRED','APPT_SHOWN_FOLLOW_UP','NO_DEAL','QUALIFIED','APPRAISAL_NEEDED'];
-    if(!localStorage.getItem('bf.colDefaults.v2')){
-      BF_KEEP.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','false'); }catch(e){} });
-      BF_COLLAPSE.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','true'); }catch(e){} });
-      localStorage.setItem('bf.colDefaults.v2','1');
-      bfFirstDefault=true;
+    if(!localStorage.getItem('bf.colDefaults.v3')){
+      var bfRe=new RegExp('^group\\.'+BF_VIEW+'\\.(.+)\\.collapse$');
+      Object.keys(localStorage).forEach(function(k){ var m=k.match(bfRe); if(m){ try{ localStorage.setItem(k, BF_KEEPOPEN[m[1]]?'false':'true'); }catch(e){} } });
+      Object.keys(BF_KEEPOPEN).forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','false'); }catch(e){} });
+      localStorage.setItem('bf.colDefaults.v3','1');
+      bfFirstDefault=true; bfDefaultAt=Date.now();
     }
   }catch(e){}
   window.bfInspect=function(){
@@ -856,12 +856,10 @@
     if(eq){ var ec=eq.querySelector('[class*="rounded-lg"]'); if(ec){ var val=(eq.textContent||'').replace(/est\.?\s*equity position/i,'').trim(); var m=val.match(/[\d,]+(\.\d+)?/); var bg,fg,label; if(!m||/unknown/i.test(val)){ bg='#eceee9'; fg='#6b6b64'; label='Equity Unknown'; } else { var neg=/negative/i.test(val)||/^\s*[\-\(\u2212]/.test(val); fg=neg?'#c93535':'#2b6012'; bg=neg?'#fbe3e3':'#e3f5cf'; label='Equity '+(neg?'\u2212':'+')+'$'+m[0]; } setPill(ec,bg,fg,'',label,'e|'+label); } }
   }
   function bfColDefaultSweep(){
-    if(bfColSwept) return;
+    if(!bfFirstDefault || (Date.now()-bfDefaultAt>8000)) return;
     if(/\/(preview|view)\//.test(location.pathname)) return;
     var groups=document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)');
-    if(!groups.length) return;
     var KEEP=/fresh leads|appraisal complete|offer sheet generated|offer sent/i;
-    bfColSwept=true;
     [].forEach.call(groups,function(g){
       var lab=g.querySelector('[data-testid="collection-group-header-label"]');
       var t=lab?(lab.textContent||'').trim():'';
