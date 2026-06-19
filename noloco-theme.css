@@ -1056,3 +1056,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Comments object: fill to the same edges as other objects ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { padding-left: 0 !important; padding-right: 0 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
+
+/* ---- Highlight LABEL is span.text-black -> uppercase DEAL PROGRESS format ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-black"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
+/* ---- Center: neutralize mr-auto that left-aligns the card content ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="mr-auto"] { margin-left: auto !important; margin-right: auto !important; }
