@@ -943,3 +943,10 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] { display: flex !important; flex-direction: column !important; flex-wrap: wrap !important; align-items: center !important; gap: 0 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] > * { flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; text-align: center !important; }
 }
+
+/* ---- THE FIX: mobile notice label/value stack (override base .section-notice .grow flex-row) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 1px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > h5 { text-align: center !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > div { white-space: normal !important; text-align: center !important; font-size: 13px !important; line-height: 1.15 !important; }
+}
