@@ -1023,8 +1023,8 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Desktop: pull sidebar flush to the record's right edge (remove pink-marked padding) ---- */
 @media (min-width: 901px) {
-  [data-testid="record-view-body"] { padding-left: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: -10px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: 0 !important; padding: 12px 6px 12px 14px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] > *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
 }
 
 /* ---- Highlight labels: match the card DEAL PROGRESS label style ---- */
