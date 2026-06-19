@@ -1103,3 +1103,6 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Est Equity Position notices: hide the label, show value only (all sizes) ---- */
 [data-testid="record-view"] .bf-noti-eq h5 { display: none !important; }
 [data-testid="record-view"] .bf-noti-eq .grow { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; height: 100% !important; }
+
+/* ---- Remove the 24px top margin above the record body (white gap above sidebar) ---- */
+[data-testid="record-view-body"] { margin-top: 0 !important; }
