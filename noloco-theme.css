@@ -803,7 +803,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 32% 66% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 20% 78% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
@@ -814,4 +814,17 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 58px !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] { font-size: 15px !important; }
+}
+
+/* ---- Header stat cluster (flame/distance/drive/days) + Visit Listing, injected into native header ---- */
+.bf-rthdrstats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.bf-rtvisit { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 7px 12px; border-radius: 8px; background: #57c822; color: #fff; text-decoration: none; }
+.bf-rtvisit i { font-size: 14px; }
+
+/* ---- Mobile: shrink sidebar further for the ~20% width ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 10px !important; padding: 6px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] { font-size: 13px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 46px !important; padding: 4px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { font-size: 11px !important; }
 }

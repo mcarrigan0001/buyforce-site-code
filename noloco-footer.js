@@ -729,7 +729,9 @@
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
-    var meta='<div class="bf-rthdr">'+metaL+stats+'</div>';
+    var rv=document.querySelector('[data-testid="record-view"]');
+    var slot=rv?rv.querySelector('[class*="sticky"] [class*="min-w-[150px]"]'):null;
+    var meta='<div class="bf-rthdr">'+metaL+(slot?'':stats)+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -743,6 +745,16 @@
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
     var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],uuid].join('|');
+    if(rv && slot){
+      var listing=F['Listing Link']||'';
+      var visit=listing?('<a class="bf-rtvisit" href="'+esc(listing)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>Visit Listing</a>'):'';
+      var ex=slot.querySelector(':scope > .bf-rthdrstats');
+      if(!ex || ex.getAttribute('data-raw')!==raw){
+        [].forEach.call(rv.querySelectorAll('button,a'),function(b){ if(b.closest('.bf-rthdrstats')) return; var tt=(b.textContent||'').replace(/\s+/g,' ').trim(); if(tt==='Generate Offer Sheet'||tt==='View Offer Sheet'||tt==='Visit Listing'){ b.style.display='none'; } });
+        if(ex) ex.remove();
+        slot.insertAdjacentHTML('beforeend','<div class="bf-rthdrstats" data-raw="'+esc(raw)+'">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+visit+'</div>');
+      }
+    }
     var top=body.querySelector(':scope > .bf-rectop');
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
