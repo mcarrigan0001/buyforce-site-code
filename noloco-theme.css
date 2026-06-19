@@ -803,12 +803,12 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 24% 74% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 27% 73% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important;
-        box-shadow: 16px 0 34px -8px rgba(87,200,34,0.35), 3px 0 0 0 rgba(87,200,34,0.385) !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important; min-height: 100% !important;
+        box-shadow: 16px 0 34px -8px rgba(87,200,34,0.175), 3px 0 0 0 rgba(87,200,34,0.19) !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { display: none !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 11px !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
@@ -1219,3 +1219,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rechdr-main { align-items: flex-end !important; }
 .bf-rechdr-left { flex: 1 1 190px !important; min-width: 0 !important; }
 .bf-rechdr-left .bf-rtmetaL { margin-top: 2px !important; flex: none !important; }
+
+/* ---- Accident pill nudged up 2.5px (both views); mobile link icon moved down to clear the X close ---- */
+.bf-rtaccpill { transform: translateY(-2.5px); }
+@media (max-width: 900px) {
+  .bf-rtvisiticon { top: 52px !important; right: 6px !important; }
+}
