@@ -709,7 +709,7 @@
     return {score:score,tier:tier};
   }
   function bfRecTop(){
-    if(location.pathname.indexOf('/preview/')<0) return;
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
@@ -762,7 +762,7 @@
     top.setAttribute('data-raw', raw);
   }
   function bfRecHideEmpty(){
-    if(location.pathname.indexOf('/preview/')<0) return;
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
     document.querySelectorAll('[data-testid="details-section"] form > div').forEach(function(cell){
       if(cell.querySelector('input,textarea,select,button')){ cell.style.removeProperty('display'); return; }
       var v=cell.querySelector('[id="field-cell"]'); if(!v){ return; }
