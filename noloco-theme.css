@@ -1167,6 +1167,6 @@ div:has(> div > [data-testid="record-view"]) {
 @media (min-width: 901px) {
   [data-testid="record-view-body"] > .bf-rectop,
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) {
-    margin-left: 36px !important;
+    margin-left: 36px !important; width: calc(100% - 36px) !important; box-sizing: border-box !important;
   }
 }
