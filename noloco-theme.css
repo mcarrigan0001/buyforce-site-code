@@ -803,7 +803,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 24% 74% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 30% 68% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
@@ -853,4 +853,16 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > * { min-width: 0 !important; overflow-x: hidden !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; min-width: 0 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; min-width: 0 !important; }
+}
+
+/* ---- Mobile sidebar: contain everything inside the narrow column (no bleed), stack notice label/value, shrink text ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { overflow: hidden !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) * { min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="justify-between"],
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="flex"]:not([class*="flex-col"]) { flex-wrap: wrap !important; row-gap: 1px !important; justify-content: flex-start !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 10px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-4xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-lg"] { font-size: 13px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { padding: 5px 4px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { white-space: normal !important; overflow-wrap: normal !important; }
 }
