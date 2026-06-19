@@ -803,11 +803,11 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 20% 78% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 24% 74% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 8px !important; padding: 8px !important;
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important;
         box-shadow: 16px 0 34px -8px rgba(87,200,34,0.5), 3px 0 0 0 rgba(87,200,34,0.55) !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { display: none !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 11px !important; }
@@ -846,4 +846,11 @@ div:has(> div > [data-testid="record-view"]) {
 @media (max-width: 900px) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: 100% !important; max-width: 100% !important; height: auto !important; min-height: 46px !important; }
+}
+
+/* ---- Mobile: keep main clamped to its column (no bleed under the sidebar) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > * { min-width: 0 !important; overflow-x: hidden !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; min-width: 0 !important; }
+  [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; min-width: 0 !important; }
 }
