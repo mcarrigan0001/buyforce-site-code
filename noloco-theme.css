@@ -1012,3 +1012,17 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rtlabel { position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; width: 58px !important; font-size: 9px !important; }
 .bf-rtstep:nth-child(odd) .bf-rtlabel { top: calc(50% + 16px) !important; bottom: auto !important; }
 .bf-rtstep:nth-child(even) .bf-rtlabel { bottom: calc(50% + 16px) !important; top: auto !important; }
+
+/* ---- Highlight cards: fill column, center h+v, full values (no "..."); 2-up desktop, 1-up mobile ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr 1fr !important; justify-content: stretch !important; gap: 8px !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: auto !important; max-width: none !important; flex: none !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; padding: 8px 6px !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; white-space: normal !important; overflow-wrap: break-word !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 16px !important; font-weight: 700 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; }
+@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; } }
+
+/* ---- Desktop: pull sidebar flush to the record's right edge (remove pink-marked padding) ---- */
+@media (min-width: 901px) {
+  [data-testid="record-view-body"] { padding-right: 0 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-right: -10px !important; }
+}
