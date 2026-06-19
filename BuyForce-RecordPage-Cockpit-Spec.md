@@ -65,3 +65,15 @@ record page affords.
   (header band, progress bar) and styles native structure.
 - Record-page field values are read from the matching board card (`[data-testid="collection-record"]`
   with the record uuid in its href) via `bfReadF()` — reliable as long as the board has loaded.
+
+## Parked / removed during cockpit rebuild (restore if needed)
+All recoverable from git history; listed for quick reference.
+1. Record dark backdrop overlay (manageBackdrop in noloco-footer.js) — dimmed pipeline behind the
+   record, click-off-to-close, mobile close button. Disabled (display:'none') because it covered the
+   Noloco builder controls. Restore: re-enable display:'block', ideally only when NOT in builder mode.
+2. 66vw centered record-modal CSS (noloco-theme.css) — centered ~66vw modal (rounded, shadow,
+   overflow:auto, transform). Removed because overflow:auto clipped the builder width dropdown and it
+   narrowed the record. If re-adding a contained look later: drop overflow:auto and transform (both
+   break builder popovers) and widen to ~90vw to fit main + sidebar.
+3. Record-preview fullscreen icon hide (noloco-theme.css) — STILL ACTIVE. Hides the first
+   text-stone-400 icon in the preview header. Restore: remove that rule.
