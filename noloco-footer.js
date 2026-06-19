@@ -692,6 +692,50 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
+  function bfRecNum(v){ var n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,'')); return isNaN(n)?NaN:n; }
+  function bfRecScore(F){
+    var acv=bfRecNum(F['ACV']), ask=bfRecNum(F['Asking Price']), off=bfRecNum(F['Offer Amount']);
+    if(isNaN(acv)||acv<=0||isNaN(ask)) return null;
+    var cmp=compInfo(F['Competition']);
+    var cs=cmp?(cmp.color==='g'?40:(cmp.color==='y'?20:0)):0;
+    var prem=ask-acv;
+    var ds=prem<=0?30:(prem>=4000?0:30*(1-prem/4000));
+    var pct=prem/acv;
+    var ps=pct<=0?20:(pct>=0.20?0:20*(1-pct/0.20));
+    var eq=(!isNaN(off))?(acv-off):0;
+    var es=eq>=2000?10:(eq<=0?0:10*(eq/2000));
+    var score=Math.round(cs+ds+ps+es);
+    var tier=score>=75?{bg:'#e3f5cf',fg:'#2b6012'}:(score>=50?{bg:'#fbeecd',fg:'#7a4d13'}:{bg:'#eceae3',fg:'#6b6b64'});
+    return {score:score,tier:tier};
+  }
+  function bfRecTop(){
+    if(location.pathname.indexOf('/preview/')<0) return;
+    var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
+    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
+    var F=bfReadF(card); var stg=stageOf(card);
+    var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
+    var sc=bfRecScore(F);
+    var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
+    function chip(ic,txt){ return txt?('<span class="bf-rtchip"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(txt)+'</span>'):''; }
+    var flame=sc?('<span class="bf-rtflame" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</span>'):'';
+    var meta='<div class="bf-rtmeta">'+flame+chip('ti-route',dist)+chip('ti-clock',drive)+chip('ti-map-pin',loc)+chip('ti-calendar',listed)+'</div>';
+    var done=0, steps='';
+    for(var i=0;i<MILESTONES.length;i++){
+      var lab=MILESTONES[i];
+      var ok=(lab==='Competing values')?!!(uuid&&bfLS('bfcv:'+uuid)==='1'):(checks.indexOf(i)>-1);
+      if(ok) done++;
+      var circ=ok?'<span class="bf-rtcirc bf-rtdone"><i class="ti ti-check" aria-hidden="true"></i></span>':(noDeal?'<span class="bf-rtcirc bf-rtno"><i class="ti ti-x" aria-hidden="true"></i></span>':'<span class="bf-rtcirc bf-rtopen"></span>');
+      steps+='<div class="bf-rtstep'+(ok?' bf-rtdonestep':'')+'">'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
+    }
+    var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
+    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],uuid].join('|');
+    var top=body.querySelector(':scope > .bf-rectop');
+    if(top && top.getAttribute('data-raw')===raw) return;
+    if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
+    top.innerHTML=meta+prog;
+    top.setAttribute('data-raw', raw);
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1123,7 +1167,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ fixLinks(); addIcons(); addCards(false); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
+  function run(){ fixLinks(); addIcons(); addCards(false); bfRecTop(); ensureArrow(); manageBackdrop(); bfLoadUsers(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

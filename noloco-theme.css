@@ -715,3 +715,26 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) * {
   overflow-wrap: normal !important; word-break: keep-all !important;
 }
+
+/* ---- Record page top band: vehicle meta (flame/drive/distance/location/listed) + big 9-step deal-progress bar ---- */
+.bf-rectop { background: #fff; border: 1px solid #e6e6e6; border-radius: 12px; padding: 12px 16px; margin: 0 0 14px; }
+.bf-rtmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 9px 14px; font-size: 12px; color: #6b6b64; }
+.bf-rtmeta i { margin-right: 4px; }
+.bf-rtchip { display: inline-flex; align-items: center; }
+.bf-rtflame { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 8px; }
+.bf-rtflame i { margin-right: 0; }
+.bf-rtprog { margin-top: 12px; border-top: 1px solid #ececec; padding-top: 10px; }
+.bf-rthd { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.bf-rttitle { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: #6b6b64; }
+.bf-rtcount { font-size: 11px; color: #9aa0a6; }
+.bf-rtsteps { display: flex; align-items: flex-start; }
+.bf-rtstep { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; position: relative; min-width: 0; }
+.bf-rtstep:not(:last-child)::after { content: ''; position: absolute; top: 10px; left: 50%; width: 100%; height: 2px; background: #e3e1d8; z-index: 0; }
+.bf-rtstep.bf-rtdonestep:not(:last-child)::after { background: #3b6d11; }
+.bf-rtcirc { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative; z-index: 1; font-size: 12px; }
+.bf-rtdone { background: #3b6d11; color: #fff; }
+.bf-rtopen { background: #fff; border: 2px solid #d3d1c7; }
+.bf-rtno { background: #fbe3e3; color: #c93535; }
+.bf-rtlabel { font-size: 10px; line-height: 1.2; color: #9aa0a6; max-width: 82px; }
+.bf-rtlon { color: #3b3b38; }
+@media (max-width: 640px) { .bf-rtlabel { font-size: 9px; } .bf-rtcirc { width: 18px; height: 18px; } }
