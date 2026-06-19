@@ -9,6 +9,7 @@
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
+  window.BF_VERSION='2026-06-19-a';
   /* Inject theme CSS with a cache-bust so updates reach all devices (incl. mobile) immediately. */
   try{ if(!document.getElementById('bf-theme-css')){ var __l=document.createElement('link'); __l.id='bf-theme-css'; __l.rel='stylesheet'; __l.href='https://mcarrigan0001.github.io/buyforce-site-code/noloco-theme.css?v='+Date.now(); document.head.appendChild(__l); } }catch(e){}
   function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
@@ -798,8 +799,8 @@
       else if(/carmax/.test(t)){ n.classList.add('bf-noti-cm'); }
       else if(/carvana/.test(t)){ n.classList.add('bf-noti-cv'); }
     });
-    [].forEach.call(scope.querySelectorAll('h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
-      if(el.children.length===0 && /^offers to beat$/i.test((el.textContent||'').trim())){ el.classList.add('bf-otb'); }
+    [].forEach.call(scope.querySelectorAll('[class*="section-title"],h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
+      if(/^offers to beat$/i.test((el.textContent||'').replace(/\s+/g,' ').trim())){ el.classList.add('bf-otb'); }
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
