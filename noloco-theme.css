@@ -803,7 +803,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 30% 68% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 24% 74% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
@@ -1214,3 +1214,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Header: bottom-align title+pill so title sits right above VIN (~4px) ---- */
 .bf-rechdr-titlewrap { align-items: flex-end !important; }
 .bf-rtaccpill { padding: 2px 9px !important; }
+
+/* ---- Header: tabs removed; left column = title+meta, 2x2 stats bottom-right ---- */
+.bf-rechdr-main { align-items: flex-end !important; }
+.bf-rechdr-left { flex: 1 1 190px !important; min-width: 0 !important; }
+.bf-rechdr-left .bf-rtmetaL { margin-top: 2px !important; flex: none !important; }

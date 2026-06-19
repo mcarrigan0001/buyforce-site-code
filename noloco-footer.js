@@ -784,14 +784,14 @@
     var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+esc(mc)+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
-    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+tisHtml+'</div>';
+    var stats='<div class="bf-rtstats">'+rstat('ti-route',dist,'DISTANCE')+flameStat+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+tisHtml+'</div>';
     var listing=F['Listing Link']||'';
     var visit=listing?('<a class="bf-rtvisiticon" href="'+esc(listing)+'" target="_blank" rel="noopener" aria-label="Visit listing" title="Visit listing"><i class="ti ti-external-link" aria-hidden="true"></i></a>'):'';
     var title=esc(F['Vehicle Title']||'');
     var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
     var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
     var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rechdr-titlewrap"><div class="bf-rectitle bf-title">'+title+'</div>'+accPill+'</div>'+visit+'</div><div class="bf-rechdr-main">'+metaL+stats+'</div>'+tabs+'</div>';
+    var meta='<div class="bf-rechdr">'+visit+'<div class="bf-rechdr-main"><div class="bf-rechdr-left"><div class="bf-rechdr-titlewrap"><div class="bf-rectitle bf-title">'+title+'</div>'+accPill+'</div>'+metaL+'</div>'+stats+'</div></div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
