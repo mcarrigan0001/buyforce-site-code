@@ -1087,3 +1087,8 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] > *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding-left: 0 !important; padding-right: 0 !important; }
 }
+
+/* ---- Mobile: half-height for Est Equity + Beats notices ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { aspect-ratio: 2 / 1 !important; }
+}
