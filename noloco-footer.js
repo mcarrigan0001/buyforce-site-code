@@ -1287,7 +1287,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); addCards(false); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); manageBackdrop(); bfLoadUsers(); if(!onRec){ ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
