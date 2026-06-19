@@ -9,14 +9,18 @@
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
-  window.BF_VERSION='2026-06-19-a';
-  /* Default-collapse low-traffic pipeline columns once per browser (cards in collapsed columns don't render -> faster board). Reps can open any column; Noloco persists their choice. */
+  window.BF_VERSION='2026-06-19-b';
+  /* Default pipeline columns: keep only the active stages open, collapse the rest, once per browser. Reps can open any column; Noloco persists their choice. Collapsed columns don't render their cards -> faster board. */
+  var bfFirstDefault=false, bfColSwept=false;
   try{
     var BF_VIEW='vewccBG0hsX0eorteOnayUs_';
-    var BF_COLLAPSE_DEFAULT=['APPRAISAL_REVIEW_NEEDED','APPRAISAL_REVIEW_COMPLETE','VERBAL_YES_SCHEDULE_APPT','SCHEDULED','ACQUIRED','APPT_SHOWN_FOLLOW_UP','NO_DEAL','QUALIFIED','APPRAISAL_NEEDED'];
-    if(!localStorage.getItem('bf.colDefaults.v1')){
-      BF_COLLAPSE_DEFAULT.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','true'); }catch(e){} });
-      localStorage.setItem('bf.colDefaults.v1','1');
+    var BF_KEEP=['FRESH_LEADS','APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES','OFFER_SHEET_GENERATED','OFFER_SENT_0_2_DAYS'];
+    var BF_COLLAPSE=['ENGAGED_AWAITING_VIN','VIN_RECEIVED_APPRAISAL_NEEDED','VIN_RECD_APPRAISAL_NEEDED','NURTURING_FOLLOW_UP_AND_RE_ENGAGE','APPRAISAL_REVIEW_NEEDED','APPRAISAL_REVIEW_COMPLETE','VERBAL_YES_SCHEDULE_APPT','SCHEDULED','ACQUIRED','APPT_SHOWN_FOLLOW_UP','NO_DEAL','QUALIFIED','APPRAISAL_NEEDED'];
+    if(!localStorage.getItem('bf.colDefaults.v2')){
+      BF_KEEP.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','false'); }catch(e){} });
+      BF_COLLAPSE.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','true'); }catch(e){} });
+      localStorage.setItem('bf.colDefaults.v2','1');
+      bfFirstDefault=true;
     }
   }catch(e){}
   window.bfInspect=function(){
@@ -851,6 +855,19 @@
     var eq=sb.querySelector('.bf-noti-eq');
     if(eq){ var ec=eq.querySelector('[class*="rounded-lg"]'); if(ec){ var val=(eq.textContent||'').replace(/est\.?\s*equity position/i,'').trim(); var m=val.match(/[\d,]+(\.\d+)?/); var bg,fg,label; if(!m||/unknown/i.test(val)){ bg='#eceee9'; fg='#6b6b64'; label='Equity Unknown'; } else { var neg=/negative/i.test(val)||/^\s*[\-\(\u2212]/.test(val); fg=neg?'#c93535':'#2b6012'; bg=neg?'#fbe3e3':'#e3f5cf'; label='Equity '+(neg?'\u2212':'+')+'$'+m[0]; } setPill(ec,bg,fg,'',label,'e|'+label); } }
   }
+  function bfColDefaultSweep(){
+    if(bfColSwept) return;
+    if(/\/(preview|view)\//.test(location.pathname)) return;
+    var groups=document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)');
+    if(!groups.length) return;
+    var KEEP=/fresh leads|appraisal complete|offer sheet generated|offer sent/i;
+    bfColSwept=true;
+    [].forEach.call(groups,function(g){
+      var lab=g.querySelector('[data-testid="collection-group-header-label"]');
+      var t=lab?(lab.textContent||'').trim():'';
+      if(t && !KEEP.test(t)){ var btn=g.querySelector('[data-testid="collection-group-header"] button'); if(btn) btn.click(); }
+    });
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1314,7 +1331,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
