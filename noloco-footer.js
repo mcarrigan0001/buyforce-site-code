@@ -694,7 +694,7 @@
     });
   }
 
-  var bfArrowR, bfArrowL, bfBusy=false;
+  var bfArrowR, bfArrowL, bfBusy=false, bfArrowResize=false;
   var bfBackdrop;
   var bfCloseBtn;
   function manageBackdrop(){
@@ -885,8 +885,12 @@
     if(!sc){ if(bfArrowR)bfArrowR.style.display='none'; if(bfArrowL)bfArrowL.style.display='none'; return; }
     if(!bfArrowR){ bfArrowR=bfMkArrow('r'); document.body.appendChild(bfArrowR); }
     if(!bfArrowL){ bfArrowL=bfMkArrow('l'); document.body.appendChild(bfArrowL); }
-    if(!sc.getAttribute('data-bfscroll')){ sc.addEventListener('scroll',function(){ if(!bfBusy) updateArrows(); },{passive:true}); sc.setAttribute('data-bfscroll','1'); }
-    updateArrows();
+    if(!sc.getAttribute('data-bfscroll')){
+      sc.addEventListener('scroll',function(){ if(!bfBusy) updateArrows(); },{passive:true});
+      sc.setAttribute('data-bfscroll','1');
+      if(!bfArrowResize){ bfArrowResize=true; window.addEventListener('resize',function(){ updateArrows(); },{passive:true}); }
+      updateArrows();
+    }
   }
   var BF_HOOK='https://buyforce.app.n8n.cloud/webhook/update-stage';
   var bfStageBusy=false;
@@ -1301,9 +1305,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function T(n,fn){ var s=performance.now(); fn(); var P=(window.__bfPerf=window.__bfPerf||{}); var p=P[n]=P[n]||{c:0,ms:0}; p.c++; p.ms+=performance.now()-s; }
-  window.bfPerf=function(){ var P=window.__bfPerf||{}; return Object.keys(P).map(function(k){return {fn:k,calls:P[k].c,ms:Math.round(P[k].ms)};}).sort(function(a,b){return b.ms-a.ms;}); };
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); T('fixLinks',fixLinks); T('addIcons',addIcons); T('bfRecTop',bfRecTop); T('bfRecHideEmpty',bfRecHideEmpty); T('bfRecTweaks',bfRecTweaks); T('bfRecPills',bfRecPills); T('manageBackdrop',manageBackdrop); T('bfLoadUsers',bfLoadUsers); if(!onRec){ T('addCards',function(){addCards(false);}); T('ensureArrow',ensureArrow); T('bfEnsureToggle',bfEnsureToggle); T('bfSnap',bfSnap); T('bfInitScroll',bfInitScroll); T('bfExpandAllMobile',bfExpandAllMobile); T('bfMoveSearch',bfMoveSearch); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
