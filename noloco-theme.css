@@ -1067,3 +1067,8 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Asking Price / Est Payoff labels use text-white-400 -> same DEAL PROGRESS format ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-white-400"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
+
+/* ---- Sidebar: uniform 8px gap between ALL objects (flex column + zero per-component margins) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * > * { margin-top: 0 !important; margin-bottom: 0 !important; }
