@@ -1225,3 +1225,20 @@ div:has(> div > [data-testid="record-view"]) {
 @media (max-width: 900px) {
   .bf-rtvisiticon { top: 52px !important; right: 6px !important; }
 }
+
+/* ===== Record section redesign: status header + field tiles ===== */
+[data-testid="details-section"] h2 { display: flex !important; align-items: center !important; gap: 10px !important; flex-wrap: wrap !important; }
+.bf-rscc { font-size: 22px !important; flex: none !important; line-height: 1 !important; }
+.bf-rsec-done .bf-rscc { color: #2b6012 !important; }
+.bf-rsec-current .bf-rscc { color: #57C822 !important; }
+.bf-rsec-upcoming .bf-rscc { color: #c9c7bd !important; }
+.bf-rsicon { font-size: 17px !important; flex: none !important; line-height: 1 !important; color: #2b6012 !important; }
+.bf-rsec-upcoming .bf-rsicon { color: #9aa0a6 !important; }
+.bf-rschip { font-size: 11px !important; font-weight: 500 !important; padding: 3px 9px !important; border-radius: 8px !important; background: #EAF3DE !important; color: #27500A !important; margin-left: auto !important; text-transform: none !important; letter-spacing: 0 !important; }
+[data-testid="details-section"].bf-rsec-current { border-left: 4px solid #57C822 !important; }
+[data-testid="details-section"].bf-rsec-done { border-left: 4px solid #2b6012 !important; }
+[data-testid="details-section"].bf-rsec-upcoming { border-left: 4px solid #e3e1d8 !important; }
+/* field cells -> tiles */
+[data-testid="details-section"] form { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; gap: 10px !important; align-items: start !important; }
+[data-testid="details-section"] form > div { background: #f6f6f4 !important; border-radius: 8px !important; padding: 9px 11px !important; }
+[data-testid="details-section"] form > div:has(textarea) { grid-column: 1 / -1 !important; }

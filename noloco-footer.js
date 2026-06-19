@@ -911,6 +911,33 @@
       else if(pill){ pill.remove(); }
     }
   }
+  function bfRecSectionsUI(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
+    var stg=stageOf(card); var checks=STATUS_CHECKS[stg]||[];
+    var MAP=[[/vin\s*&|vin and|vin &amp;|vin\b/i,'ti-car',0],[/competing offers/i,'ti-scale',2],[/make the offer/i,'ti-businessplan',4],[/send offer/i,'ti-send',5],[/schedule/i,'ti-calendar-event',7],[/payoff/i,'ti-receipt',8]];
+    var firstNotDone=false;
+    [].forEach.call(document.querySelectorAll('[data-testid="details-section"]'),function(sec){
+      var h=sec.querySelector('h2'); if(!h) return;
+      var t=h.textContent.replace(/\s+/g,' ').trim();
+      var info=null; for(var i=0;i<MAP.length;i++){ if(MAP[i][0].test(t)){ info=MAP[i]; break; } }
+      if(!info) return;
+      var done=checks.indexOf(info[2])>-1;
+      var status=done?'done':(firstNotDone?'upcoming':'current');
+      if(!done&&!firstNotDone) firstNotDone=true;
+      sec.classList.add('bf-rsec');
+      sec.classList.remove('bf-rsec-done','bf-rsec-current','bf-rsec-upcoming');
+      sec.classList.add('bf-rsec-'+status);
+      var cc=h.querySelector(':scope > .bf-rscc');
+      if(!cc){ var ic=document.createElement('span'); ic.className='bf-rsicon'; ic.innerHTML='<i class="ti '+info[1]+'" aria-hidden="true"></i>'; h.insertBefore(ic,h.firstChild); cc=document.createElement('span'); cc.className='bf-rscc'; h.insertBefore(cc,h.firstChild); }
+      var iconCls=done?'ti-circle-check':(status==='current'?'ti-circle-dot':'ti-circle');
+      if(cc.getAttribute('data-st')!==status){ cc.innerHTML='<i class="ti '+iconCls+'" aria-hidden="true"></i>'; cc.setAttribute('data-st',status); }
+      var chip=h.querySelector(':scope > .bf-rschip');
+      if(status==='current'){ if(!chip){ chip=document.createElement('span'); chip.className='bf-rschip'; chip.textContent='Current step'; h.appendChild(chip); } chip.style.display=''; }
+      else if(chip){ chip.style.display='none'; }
+    });
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1374,7 +1401,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
