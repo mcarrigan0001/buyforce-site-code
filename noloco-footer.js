@@ -10,6 +10,15 @@
 /* ===================================================================== */
 (function () {
   window.BF_VERSION='2026-06-19-a';
+  /* Default-collapse low-traffic pipeline columns once per browser (cards in collapsed columns don't render -> faster board). Reps can open any column; Noloco persists their choice. */
+  try{
+    var BF_VIEW='vewccBG0hsX0eorteOnayUs_';
+    var BF_COLLAPSE_DEFAULT=['APPRAISAL_REVIEW_NEEDED','APPRAISAL_REVIEW_COMPLETE','VERBAL_YES_SCHEDULE_APPT','SCHEDULED','ACQUIRED','APPT_SHOWN_FOLLOW_UP','NO_DEAL','QUALIFIED','APPRAISAL_NEEDED'];
+    if(!localStorage.getItem('bf.colDefaults.v1')){
+      BF_COLLAPSE_DEFAULT.forEach(function(k){ try{ localStorage.setItem('group.'+BF_VIEW+'.'+k+'.collapse','true'); }catch(e){} });
+      localStorage.setItem('bf.colDefaults.v1','1');
+    }
+  }catch(e){}
   window.bfInspect=function(){
     function rect(e){ if(!e) return null; var r=e.getBoundingClientRect(); return {w:Math.round(r.width),h:Math.round(r.height),top:Math.round(r.top)}; }
     function fs(e){ return e?getComputedStyle(e).fontSize:null; }
