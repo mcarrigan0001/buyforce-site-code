@@ -926,3 +926,6 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class~="gap-4"] > * { width: 100% !important; text-align: center !important; margin: 0 auto !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
 }
+
+/* ---- "Offers to beat" is an H1 in the sidebar -> white ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h1 { color: #ffffff !important; }
