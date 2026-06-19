@@ -1199,3 +1199,14 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rechdr-main .bf-rtstat { padding: 6px 10px !important; gap: 2px !important; }
 .bf-rechdr-main .bf-rtstatv { font-size: 14px !important; }
 .bf-rechdr-main .bf-rtstats { gap: 7px !important; align-content: start !important; }
+
+/* ---- Header tighten pass 2: float visit icon, zero meta top gap, shrink stat blocks ---- */
+.bf-rechdr { position: relative; }
+.bf-rtvisiticon { position: absolute !important; top: 0 !important; right: 0 !important; }
+.bf-rechdr-titlewrap { padding-right: 42px !important; }
+.bf-rechdr-main { margin-top: 0 !important; }
+.bf-rechdr-main .bf-rtmetaL { padding-top: 0 !important; }
+.bf-rechdr-main .bf-rtstat { padding: 4px 9px !important; gap: 1px !important; }
+.bf-rechdr-main .bf-rtstatv { font-size: 14px !important; line-height: 1.1 !important; }
+.bf-rechdr-main .bf-rtstatl { line-height: 1.1 !important; }
+.bf-rechdr-main .bf-rtstats { gap: 6px !important; }
