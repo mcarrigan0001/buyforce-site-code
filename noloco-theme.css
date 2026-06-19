@@ -1149,3 +1149,6 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] i { font-size: 11px !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb * { justify-content: center !important; }
 }
+
+/* ---- Highlight card icons (centered above label) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { display: block !important; width: 100% !important; text-align: center !important; font-size: 17px !important; line-height: 1 !important; color: #6b6b64 !important; margin: 0 0 5px 0 !important; }

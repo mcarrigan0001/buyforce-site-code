@@ -866,6 +866,22 @@
       if(t && !KEEP.test(t)){ var btn=g.querySelector('[data-testid="collection-group-header"] button'); if(btn) btn.click(); }
     });
   }
+  function bfRecHlIcons(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
+    var MAP=[[/asking price/i,'ti-tag'],[/offer amount/i,'ti-cash'],[/payoff/i,'ti-credit-card'],[/equity/i,'ti-wallet'],[/carmax/i,'ti-trending-up'],[/carvana/i,'ti-trending-up']];
+    sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){
+      var lb=it.querySelector('[data-testid="highlight-label"]'); if(!lb) return;
+      var t=lb.textContent||''; var icon='';
+      for(var i=0;i<MAP.length;i++){ if(MAP[i][0].test(t)){ icon=MAP[i][1]; break; } }
+      if(!icon) return;
+      var inner=lb.closest('[class*="flex-col"]')||lb.parentElement.parentElement; if(!inner) return;
+      var ex=inner.querySelector(':scope > .bf-hicon');
+      if(ex){ if(ex.getAttribute('data-ic')!==icon){ ex.className='ti '+icon+' bf-hicon'; ex.setAttribute('data-ic',icon); } return; }
+      var ic=document.createElement('i'); ic.className='ti '+icon+' bf-hicon'; ic.setAttribute('data-ic',icon); ic.setAttribute('aria-hidden','true');
+      inner.insertBefore(ic, inner.firstChild);
+    });
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1329,7 +1345,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
