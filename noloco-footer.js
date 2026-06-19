@@ -460,11 +460,12 @@
       '<div class="bf-stageui">'+(ui.headline?'<div class="bf-headline">'+esc(ui.headline)+'</div>':'')+html+'</div></div>';
   }
 
-  function bfFitTitle(scope){
+  function bfFitTitle(scope, startSize){
+    var start = startSize || 14;
     var els=(scope||document).querySelectorAll('.bf-title');
     for(var i=0;i<els.length;i++){
       var el=els[i]; if(!el.clientWidth) continue;
-      var size=14; el.style.fontSize='14px'; var g=0;
+      var size=start; el.style.fontSize=start+'px'; var g=0;
       while(el.scrollWidth>el.clientWidth+0.5 && size>10 && g<24){ size-=0.5; el.style.fontSize=size+'px'; g++; }
     }
   }
@@ -724,6 +725,7 @@
     var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
+    (function(){ var _c=compInfo(F['Competition']); var _oc=_c?(_c.color==='g'?'#2b6012':(_c.color==='y'?'#7a4d13':'#c93535')):''; if(!_oc) return; var _sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!_sb) return; _sb.querySelectorAll('[class*="section-highlights"] [class*="rounded"]').forEach(function(ce){ var lb=ce.querySelector('label,[class*="text-stone"]'); var vl=ce.querySelector('[class*="font-medium"]:not(label)'); if(lb&&vl&&/offer amount/i.test(lb.textContent)){ vl.style.setProperty('color', _oc, 'important'); } }); })();
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
     var days=F['Days Working']||''; var daysDisp=days?(/[a-z]/i.test(days)?days:String(days).replace(/[^0-9.]/g,'')+'d'):'';
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
@@ -761,7 +763,7 @@
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
     top.innerHTML=meta+prog;
-    bfFitTitle(top);
+    bfFitTitle(top, window.innerWidth<=900?15:17);
     top.setAttribute('data-raw', raw);
   }
   function bfRecHideEmpty(){
