@@ -701,3 +701,17 @@ div:has(> div > [data-testid="record-view"]) {
 [role="dialog"]:has([data-testid="record-view-body"]),
 [data-testid="record-view"],
 [data-testid="record-view-body"] { background: #f4f4f2 !important; }
+
+/* ---- Record sidebar highlights: fit values in the narrow column (2-up cards, smaller numbers, no mid-number breaks). Scoped to the highlights container only. ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="grid-cols"] {
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+}
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-4xl"],
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"],
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"],
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] {
+  font-size: 17px !important; line-height: 1.2 !important;
+}
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) * {
+  overflow-wrap: normal !important; word-break: keep-all !important;
+}
