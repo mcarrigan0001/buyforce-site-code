@@ -911,3 +911,9 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="gap-4"] > * { width: 100% !important; text-align: center !important; flex: none !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
 }
+
+/* ---- Mobile: extend sidebar flush to the record's left edge ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] { padding-left: 0 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: -16px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+}
