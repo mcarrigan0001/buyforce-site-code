@@ -1061,3 +1061,6 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-black"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
 /* ---- Center: neutralize mr-auto that left-aligns the card content ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="mr-auto"] { margin-left: auto !important; margin-right: auto !important; }
+
+/* ---- All highlight labels uppercase (target every non-value text in the card; value classes excluded) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] *:not([class*="font-medium"]):not([class*="text-lg"]):not([class*="text-2xl"]):not([class*="break-words"]) { text-transform: uppercase !important; }
