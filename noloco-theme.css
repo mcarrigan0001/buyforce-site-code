@@ -968,7 +968,7 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 /* ---- Cockpit: hide Noloco's native header bar (only when our header band is present = safe fallback) ---- */
-[data-testid="record-view"]:has(.bf-rectop) [class*="sticky"][class*="top-0"] { display: none !important; }
+[data-testid="record-view"] [class*="sticky"][class*="top-0"] { display: none !important; }
 
 /* ---- Header block (title + meta + stats/visit + tabs) at top of Main ---- */
 .bf-rechdr { display: flex; flex-direction: column; gap: 8px; }
