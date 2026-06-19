@@ -882,3 +882,22 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5 { font-size: 11px !important; line-height: 1.2 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 600 !important; margin: 0 !important; }
 }
+
+/* ---- Mobile sidebar: uniform square tiles (highlights + notices), icon/label/value stacked centered ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"],
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] {
+    width: 100% !important; max-width: 100% !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important;
+    display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+    text-align: center !important; padding: 6px 4px !important; gap: 1px !important; overflow: hidden !important; box-sizing: border-box !important;
+  }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] > * { width: 100% !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="flex"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 0 !important; width: 100% !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="grow"] { flex: none !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5,
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"],
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label { font-size: 10px !important; line-height: 1.1 !important; font-weight: 500 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.15 !important; margin: 0 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) svg { font-size: 13px !important; width: 14px !important; height: 14px !important; flex: none !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] * { white-space: normal !important; overflow-wrap: break-word !important; }
+}
