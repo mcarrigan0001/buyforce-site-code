@@ -700,7 +700,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Record page: restore a light background behind the cockpit (was showing black after removing the modal styling) ---- */
 [role="dialog"]:has([data-testid="record-view-body"]),
 [data-testid="record-view"],
-[data-testid="record-view-body"] { background: #f4f4f2 !important; }
+[data-testid="record-view-body"] { background: #ffffff !important; }
 
 /* ---- Record sidebar highlights: fit values in the narrow column (2-up cards, smaller numbers, no mid-number breaks). Scoped to the highlights container only. ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="grid-cols"] {
@@ -753,7 +753,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Record sidebar: distinct panel background (sits behind the white summary/comments cards) ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
-  background: #edf2e8 !important; border-radius: 14px !important; padding: 12px !important;
+  background: #0e100d !important; border-radius: 14px !important; padding: 14px !important; box-shadow: -16px 0 40px -8px rgba(87,200,34,0.5), -3px 0 0 0 rgba(87,200,34,0.55) !important;
 }
 
 /* ---- Record sections: card-style ALL-CAPS titles + divider above fields ---- */
@@ -764,3 +764,22 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="details-section"] form {
   border-top: 1px solid #e3e1d8 !important; padding-top: 14px !important; margin-top: 6px !important;
 }
+
+/* ---- Record header band (card-style: VIN+copy, mileage/color/seller, location/listed, labeled score/distance/drive) ---- */
+.bf-rthdr { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.bf-rtmetaL { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.bf-rtvin { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; font-family: ui-monospace,Menlo,Consolas,monospace; font-size: 11px; letter-spacing: .3px; color: #9aa0a6; }
+.bf-rtvin i { font-size: 12px; }
+.bf-rtsub1 { font-size: 13px; color: #3b3b38; font-weight: 500; }
+.bf-rtsub2 { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: #6b6b64; }
+.bf-rtsub2 i { margin-right: 4px; }
+.bf-rtstats { display: flex; gap: 10px; }
+.bf-rtstat { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 66px; padding: 7px 10px; background: #f7f7f5; border: 1px solid #ececec; border-radius: 10px; }
+.bf-rtstatv { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; color: #3b3b38; }
+.bf-rtstatv i { font-size: 14px; }
+.bf-rtflamev { padding: 2px 8px; border-radius: 8px; }
+.bf-rtstatl { font-size: 9px; font-weight: 600; letter-spacing: .6px; color: #9aa0a6; }
+
+/* ---- Sidebar dark theme: light headings, white-glow highlight cards ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { color: #e7ece2 !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { background: #ffffff !important; box-shadow: 0 0 16px rgba(255,255,255,0.5) !important; }

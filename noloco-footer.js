@@ -717,9 +717,17 @@
     var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
-    function chip(ic,txt){ return txt?('<span class="bf-rtchip"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(txt)+'</span>'):''; }
-    var flame=sc?('<span class="bf-rtflame" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</span>'):'';
-    var meta='<div class="bf-rtmeta">'+flame+chip('ti-route',dist)+chip('ti-clock',drive)+chip('ti-map-pin',loc)+chip('ti-calendar',listed)+'</div>';
+    var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
+    var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
+    var sub1=[mileage?(esc(mileage)+(/mi/i.test(mileage)?'':' mi')):'', color?esc(color):'', seller?('Seller: '+esc(seller)):''].filter(Boolean).join(' \u00b7 ');
+    var sub2=[];
+    if(loc) sub2.push('<span class="bf-rtchip"><i class="ti ti-map-pin" aria-hidden="true"></i>'+esc(loc)+'</span>');
+    if(listed) sub2.push('<span class="bf-rtchip"><i class="ti ti-calendar" aria-hidden="true"></i>'+esc(listed)+'</span>');
+    var metaL='<div class="bf-rtmetaL">'+vinLine+(sub1?'<div class="bf-rtsub1">'+sub1+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
+    function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
+    var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
+    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+'</div>';
+    var meta='<div class="bf-rthdr">'+metaL+stats+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -732,7 +740,7 @@
       steps+='<div class="'+_cls+'"'+_att+'>'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
-    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],uuid].join('|');
+    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],uuid].join('|');
     var top=body.querySelector(':scope > .bf-rectop');
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
