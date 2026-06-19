@@ -1170,3 +1170,9 @@ div:has(> div > [data-testid="record-view"]) {
     margin-left: 36px !important; width: calc(100% - 36px) !important; box-sizing: border-box !important;
   }
 }
+
+/* ---- Dollar-badge icon sizing (CarMax/Carvana) ---- */
+.bf-dbadge { width: 17px; height: 17px; display: inline-block; vertical-align: middle; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] .bf-dbadge { width: 18px; height: 18px; }
+/* ---- Mobile: nudge ACV sub-line up so it centers in the Offer Amount card ---- */
+@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] [class*="text-stone-600"] { margin-top: -3px !important; } }

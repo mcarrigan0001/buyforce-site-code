@@ -834,8 +834,8 @@
       var t=(n.textContent||'').toLowerCase();
       if(/equity/.test(t)){ n.classList.add('bf-noti-eq'); }
       else if(/beat/.test(t)){ n.classList.add('bf-noti-beats'); }
-      else if(/carmax/.test(t)){ n.classList.add('bf-noti-cm'); }
-      else if(/carvana/.test(t)){ n.classList.add('bf-noti-cv'); }
+      else if(/carmax/.test(t)){ n.classList.add('bf-noti-cm'); bfSetNoticeIcon(n); }
+      else if(/carvana/.test(t)){ n.classList.add('bf-noti-cv'); bfSetNoticeIcon(n); }
     });
     [].forEach.call(scope.querySelectorAll('[class*="section-title"],h1,h2,h3,h4,h5,h6,label,span,p,div'), function(el){
       if(/^offers to beat$/i.test((el.textContent||'').replace(/\s+/g,' ').trim())){ el.classList.add('bf-otb'); }
@@ -866,20 +866,24 @@
       if(t && !KEEP.test(t)){ var btn=g.querySelector('[data-testid="collection-group-header"] button'); if(btn) btn.click(); }
     });
   }
+  var BF_DBADGE='<svg class="bf-dbadge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>';
+  function bfSetNoticeIcon(n){ var ii=n.querySelector('i.ti'); var sp=ii?ii.parentElement:null; if(sp && sp.getAttribute('data-bficon')!=='1'){ sp.setAttribute('data-bficon','1'); sp.innerHTML=BF_DBADGE; } }
   function bfRecHlIcons(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
-    var MAP=[[/asking price/i,'ti-tag'],[/offer amount/i,'ti-cash'],[/payoff/i,'ti-credit-card'],[/equity/i,'ti-wallet'],[/carmax/i,'ti-trending-up'],[/carvana/i,'ti-trending-up']];
+    var MAP=[[/asking price/i,'ti-tag'],[/offer amount/i,'ti-cash'],[/payoff/i,'ti-credit-card'],[/equity/i,'ti-wallet'],[/carmax/i,'$'],[/carvana/i,'$']];
     sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){
       var lb=it.querySelector('[data-testid="highlight-label"]'); if(!lb) return;
       var t=lb.textContent||''; var icon='';
       for(var i=0;i<MAP.length;i++){ if(MAP[i][0].test(t)){ icon=MAP[i][1]; break; } }
       if(!icon) return;
       var inner=lb.closest('[class*="flex-col"]')||lb.parentElement.parentElement; if(!inner) return;
+      var content = icon==='$' ? BF_DBADGE : '<i class="ti '+icon+'" aria-hidden="true"></i>';
       var ex=inner.querySelector(':scope > .bf-hicon');
-      if(ex){ if(ex.getAttribute('data-ic')!==icon){ ex.className='ti '+icon+' bf-hicon'; ex.setAttribute('data-ic',icon); } return; }
-      var ic=document.createElement('i'); ic.className='ti '+icon+' bf-hicon'; ic.setAttribute('data-ic',icon); ic.setAttribute('aria-hidden','true');
-      inner.insertBefore(ic, inner.firstChild);
+      if(ex && ex.getAttribute('data-ic')===icon) return;
+      if(ex) ex.remove();
+      var sp=document.createElement('span'); sp.className='bf-hicon'; sp.setAttribute('data-ic',icon); sp.setAttribute('aria-hidden','true'); sp.innerHTML=content;
+      inner.insertBefore(sp, inner.firstChild);
     });
   }
   var bfHlResizeBound=false;
