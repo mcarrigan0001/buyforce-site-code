@@ -985,3 +985,30 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
 }
+
+/* ---- Mobile sidebar: sticky on scroll ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { position: sticky !important; top: 0 !important; align-self: start !important; max-height: 100vh !important; overflow-y: auto !important; }
+}
+
+/* ---- Stat tiles (SCORE / DISTANCE / DRIVE TIME): uniform, icon stacked over value ---- */
+@media (max-width: 900px) {
+  .bf-rtstats { gap: 6px !important; width: 100% !important; }
+  .bf-rtstat { flex: 1 1 0 !important; min-width: 0 !important; padding: 6px 3px !important; }
+  .bf-rtstatv { flex-direction: column !important; gap: 1px !important; font-size: 12px !important; line-height: 1.05 !important; }
+  .bf-rtstatv i { font-size: 14px !important; margin: 0 !important; }
+  .bf-rtstatl { font-size: 8px !important; }
+}
+
+/* ---- Tabs on mobile: horizontal equal-width ---- */
+@media (max-width: 900px) {
+  .bf-rectabs { flex-wrap: nowrap !important; }
+  .bf-rectab { flex: 1 1 0 !important; min-width: 0 !important; padding: 6px 3px !important; font-size: 10px !important; text-align: center !important; line-height: 1.1 !important; }
+}
+
+/* ---- Deal-progress: alternating labels above/below the circles (legible) ---- */
+.bf-rtstep { flex-direction: row !important; align-items: center !important; justify-content: center !important; height: 64px !important; gap: 0 !important; }
+.bf-rtstep:not(:last-child)::after { top: 50% !important; transform: translateY(-50%) !important; }
+.bf-rtlabel { position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; width: 58px !important; font-size: 9px !important; }
+.bf-rtstep:nth-child(odd) .bf-rtlabel { top: calc(50% + 16px) !important; bottom: auto !important; }
+.bf-rtstep:nth-child(even) .bf-rtlabel { bottom: calc(50% + 16px) !important; top: auto !important; }
