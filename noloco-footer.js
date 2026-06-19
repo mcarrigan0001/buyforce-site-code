@@ -9,6 +9,8 @@
 /* Hosted in GitHub; loaded by a <script src> in Noloco footer code.     */
 /* ===================================================================== */
 (function () {
+  /* Inject theme CSS with a cache-bust so updates reach all devices (incl. mobile) immediately. */
+  try{ if(!document.getElementById('bf-theme-css')){ var __l=document.createElement('link'); __l.id='bf-theme-css'; __l.rel='stylesheet'; __l.href='https://mcarrigan0001.github.io/buyforce-site-code/noloco-theme.css?v='+Date.now(); document.head.appendChild(__l); } }catch(e){}
   function norm(s){ return (s||'').replace(/[‐-―]/g,'-').replace(/\s+/g,' ').trim(); }
   function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function money(s){ return (s||'').replace(/\.00(?=$|[^0-9])/,''); }
