@@ -673,7 +673,7 @@
       }
       if(panel && bfBackdrop.parentNode !== parent){ parent.insertBefore(bfBackdrop, panel); }
       else if(!bfBackdrop.parentNode){ document.body.appendChild(bfBackdrop); }
-      bfBackdrop.style.display='block';
+      bfBackdrop.style.display='none';
       if(bfArrowR) bfArrowR.style.display='none';
       if(bfArrowL) bfArrowL.style.display='none';
       if(window.innerWidth<=640){
