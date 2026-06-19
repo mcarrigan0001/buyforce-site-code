@@ -874,3 +874,11 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding-left: 6px !important; padding-right: 6px !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) svg { font-size: 12px !important; width: 13px !important; height: 13px !important; flex: none !important; }
 }
+
+/* ---- Mobile notices: stack label over value (was side-by-side and overflowing), tighten padding ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding: 8px 6px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="w-full"][class*="gap-4"] { flex-direction: column !important; gap: 0 !important; align-items: flex-start !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5 { font-size: 11px !important; line-height: 1.2 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 600 !important; margin: 0 !important; }
+}
