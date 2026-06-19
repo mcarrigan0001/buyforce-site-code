@@ -720,12 +720,13 @@
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
     var days=F['Days Working']||''; var daysDisp=days?(/[a-z]/i.test(days)?days:String(days).replace(/[^0-9.]/g,'')+'d'):'';
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
-    var mc=[mileage?(esc(mileage)+(/mi/i.test(mileage)?'':' mi')):'', color?esc(color):''].filter(Boolean).join(' \u00b7 ');
-    var sellerLine=seller?('Seller: '+esc(seller)):'';
+    var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
+    var mc=_sub, sellerName=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ mc=_sm[0]; sellerName=_sm[1]; }
+    var sellerLine=sellerName?('Seller: '+esc(sellerName)):'';
     var sub2=[];
-    if(loc) sub2.push('<span class="bf-rtchip"><i class="ti ti-map-pin" aria-hidden="true"></i>'+esc(loc)+'</span>');
     if(listed) sub2.push('<span class="bf-rtchip"><i class="ti ti-calendar" aria-hidden="true"></i>'+esc(listed)+'</span>');
-    var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+mc+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
+    if(loc) sub2.push('<span class="bf-rtchip"><i class="ti ti-map-pin" aria-hidden="true"></i>'+esc(loc)+'</span>');
+    var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+esc(mc)+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
