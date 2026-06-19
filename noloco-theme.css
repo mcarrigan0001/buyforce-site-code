@@ -1140,3 +1140,12 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Equity + Beats rendered as card-style pills (override the half-height/centering notice rules) ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"][data-bfpill], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"][data-bfpill] { aspect-ratio: auto !important; min-height: 0 !important; height: auto !important; flex-direction: row !important; gap: 6px !important; }
+
+/* ---- Pill refinements: center text (shrink span to content), fit long Beats labels on mobile, center Offers-to-beat on mobile ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] > span, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] > span { width: auto !important; max-width: 100% !important; justify-content: center !important; white-space: nowrap !important; }
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] { padding: 6px 8px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] > span, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] > span { font-size: 10px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] i { font-size: 11px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb * { justify-content: center !important; }
+}
