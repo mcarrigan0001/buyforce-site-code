@@ -800,3 +800,18 @@ div:has(> div > [data-testid="record-view"]) {
 }
 /* ---- CarMax/Carvana (all) notices full width in the sidebar ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { grid-column: 1 / -1 !important; width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
+
+/* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 32% 66% !important; gap: 10px 2% !important; align-items: start !important; }
+  [data-testid="record-view-body"] > * { grid-column: 2 !important; }
+  [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 8px !important; padding: 8px !important;
+        box-shadow: 16px 0 34px -8px rgba(87,200,34,0.5), 3px 0 0 0 rgba(87,200,34,0.55) !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { display: none !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 11px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 58px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] { font-size: 15px !important; }
+}
