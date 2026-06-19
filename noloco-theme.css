@@ -1072,3 +1072,10 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { display: flex !important; flex-direction: column !important; gap: 8px !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * { margin-top: 0 !important; margin-bottom: 0 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+/* ---- Mobile: notices match highlight square size + 8px grid gap ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { aspect-ratio: auto !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="rounded-lg"] { aspect-ratio: 1 / 1 !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="grid-cols-12"] { gap: 8px !important; }
+}
