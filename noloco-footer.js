@@ -726,7 +726,10 @@
       var ok=(lab==='Competing values')?!!(uuid&&bfLS('bfcv:'+uuid)==='1'):(checks.indexOf(i)>-1);
       if(ok) done++;
       var circ=ok?'<span class="bf-rtcirc bf-rtdone"><i class="ti ti-check" aria-hidden="true"></i></span>':(noDeal?'<span class="bf-rtcirc bf-rtno"><i class="ti ti-x" aria-hidden="true"></i></span>':'<span class="bf-rtcirc bf-rtopen"></span>');
-      steps+='<div class="bf-rtstep'+(ok?' bf-rtdonestep':'')+'">'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
+      var _isCV=(lab==='Competing values'); var _clk=_isCV||CLICK_STAGE[lab];
+      var _cls='bf-rtstep'+(ok?' bf-rtdonestep':'')+(_clk?' bf-rtclick':'');
+      var _att=_clk?(_isCV?(' data-bfcv="'+esc(uuid)+'"'):(' data-bfstage="'+esc(CLICK_STAGE[lab])+'" data-bfuuid="'+esc(uuid)+'"')):'';
+      steps+='<div class="'+_cls+'"'+_att+'>'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
     var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],uuid].join('|');
@@ -811,6 +814,22 @@
     } else if(type==='stage'){
       bfMoveCard(card, uuid, el.getAttribute('data-bfstage'));
     }
+  }, true);
+  document.addEventListener('click', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-rtclick'):null;
+    if(!el) return;
+    e.preventDefault(); e.stopPropagation();
+    var cv=el.getAttribute('data-bfcv');
+    if(cv){
+      var k='bfcv:'+cv; try{ if(localStorage.getItem(k)==='1') localStorage.removeItem(k); else localStorage.setItem(k,'1'); }catch(err){}
+      var t=document.querySelector('[data-testid="record-view-body"] > .bf-rectop'); if(t) t.removeAttribute('data-raw'); bfRecTop();
+      var bc=document.querySelector('[data-testid="collection-record"][href*="'+cv+'"]'); if(bc){ var bb=bc.querySelector('.bf-body'); if(bb) bb.removeAttribute('data-raw'); } addCards(true);
+      return;
+    }
+    var uuid=el.getAttribute('data-bfuuid'), to=el.getAttribute('data-bfstage');
+    if(!uuid||!to) return;
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
+    if(card){ bfMoveCard(card, uuid, to); } else { bfPost({uuid:uuid, status:to}); bfToast('Moving to '+to+'…'); }
   }, true);
   var bfEditing=false;
   document.addEventListener('click', function(e){
