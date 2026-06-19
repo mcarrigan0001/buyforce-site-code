@@ -625,36 +625,43 @@
     return header + checklist + priceLabel + grid + compBlock + commentLabel + commentLine + renderStageUI(F, card, _uuid) + clock;
   }
 
+  function bfDecorateCard(card, force){
+    if(bfEditing) return;
+    if(card.getAttribute('data-bfmoved')) return;
+    var firstCell = card.querySelector('[data-testid="field-cell"]');
+    if(!firstCell) return;
+    var container = firstCell.parentNode;
+    if(!container) return;
+    var F = {};
+    container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
+      var lab = cell.querySelector('[data-testid="field-cell-label"]');
+      if(!lab) return;
+      var vNode = lab.nextElementSibling;
+      F[norm(lab.textContent)] = dval(vNode ? vNode.textContent : '');
+    });
+    if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
+    var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Estimated Payoff Value'],F['CarMax No Offer'],F['Carvana No Offer'],F['No Payoff'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
+    var body = container.querySelector(':scope > .bf-body');
+    if(body && !force && body.getAttribute('data-raw')===raw){
+      container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ if(cell.style.display!=='none') cell.style.display='none'; });
+      return;
+    }
+    if(!body){ body=document.createElement('div'); body.className='bf-body'; container.appendChild(body); }
+    body.innerHTML = buildCard(F, card);
+    bfFitTitle(body);
+    body.setAttribute('data-raw', raw);
+    container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ cell.style.display='none'; });
+  }
+  var bfIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ bfIO.unobserve(en.target); bfDecorateCard(en.target, false); } });
+  }, { root: null, rootMargin: '900px 900px', threshold: 0 }) : null;
   function addCards(force){
     if(bfEditing) return;
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
       if(card.getAttribute('data-bfmoved')) return;
-      var firstCell = card.querySelector('[data-testid="field-cell"]');
-      if(!firstCell) return;
-      var container = firstCell.parentNode;
-      if(!container) return;
-
-      var F = {};
-      container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){
-        var lab = cell.querySelector('[data-testid="field-cell-label"]');
-        if(!lab) return;
-        var vNode = lab.nextElementSibling;
-        F[norm(lab.textContent)] = dval(vNode ? vNode.textContent : '');
-      });
-
-      if(!('Vehicle Title' in F) && !('Offer Amount' in F)) return;
-      var raw = [F['Vehicle Title'],F['Vehicle Subtitle'],F['Date Listed'],F['Listing Location'],F['Asking Price'],F['Seller Will Take'],F['ACV'],F['Offer Amount'],F['CarMax Offer'],F['Carvana Offer'],F['Competition'],F['Equity Display'],F['Estimated Payoff Amount'],F['Estimated Payoff Value'],F['CarMax No Offer'],F['Carvana No Offer'],F['No Payoff'],F['Stage Entered At'],F['Last Comment'],F['Last Comment At'],F['Offer Sheet Image URL'],F['Offer Sheet Status'],F['Last Follow Up At'],F['VIN'],F['Condition Notes'],F['Accident History'],F['# Competing Vehicles'],F['Est Dealer Days to Sale'],F['Est Private Party Retail Value'],F['Est Equity Position'],F['Equity Status'],F['Notes for Appraisal'],F['Model'],F['Listing Link'],stageOf(card)].join('|');
-
-      var body = container.querySelector(':scope > .bf-body');
-      if(body && !force && body.getAttribute('data-raw')===raw){
-        container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ if(cell.style.display!=='none') cell.style.display='none'; });
-        return;
-      }
-      if(!body){ body=document.createElement('div'); body.className='bf-body'; container.appendChild(body); }
-      body.innerHTML = buildCard(F, card);
-      bfFitTitle(body);
-      body.setAttribute('data-raw', raw);
-      container.querySelectorAll('[data-testid="field-cell"]').forEach(function(cell){ cell.style.display='none'; });
+      if(card.querySelector('.bf-body')){ bfDecorateCard(card, force); return; }
+      if(bfIO && !force){ bfIO.observe(card); }
+      else { bfDecorateCard(card, force); }
     });
   }
 
