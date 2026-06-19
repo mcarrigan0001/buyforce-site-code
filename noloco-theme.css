@@ -1106,3 +1106,11 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Remove the 24px top margin above the record body (white gap above sidebar) ---- */
 [data-testid="record-view-body"] { margin-top: 0 !important; }
+
+/* ---- Desktop: full-height sticky sidebar rail + 50px breathing room above Main (header + sections) ---- */
+@media (min-width: 901px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+    min-height: calc(100vh - 80px) !important; align-self: stretch !important;
+  }
+  [data-testid="record-view-body"] > .bf-rectop { margin-top: 50px !important; }
+}
