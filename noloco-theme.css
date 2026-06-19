@@ -973,7 +973,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Header block (title + meta + stats/visit + tabs) at top of Main ---- */
 .bf-rechdr { display: flex; flex-direction: column; gap: 8px; }
 .bf-rechdr-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-.bf-rectitle { font-size: 20px; font-weight: 600; color: #161616; line-height: 1.15; }
+.bf-rectitle { font-weight: 700; color: #161616; line-height: 1.25; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: clip; }
 .bf-recclose { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #e0e0e0; background: #fff; color: #555; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
 .bf-rechdr-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .bf-rectabs { display: flex; gap: 4px; border-bottom: 1px solid #e3e1d8; margin-top: 4px; flex-wrap: wrap; }
@@ -1025,4 +1025,11 @@ div:has(> div > [data-testid="record-view"]) {
 @media (min-width: 901px) {
   [data-testid="record-view-body"] { padding-right: 0 !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-right: -10px !important; }
+}
+
+/* ---- Highlight labels: match the card DEAL PROGRESS label style ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; text-transform: uppercase !important; }
+/* ---- Desktop: bump highlight value font +7px ---- */
+@media (min-width: 901px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 23px !important; }
 }

@@ -743,7 +743,7 @@
     var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
     var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
     var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle">'+title+'</div></div>'+metaL+'<div class="bf-rechdr-row">'+stats+visit+'</div>'+tabs+'</div>';
+    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle bf-title">'+title+'</div></div>'+metaL+'<div class="bf-rechdr-row">'+stats+visit+'</div>'+tabs+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -761,6 +761,7 @@
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
     top.innerHTML=meta+prog;
+    bfFitTitle(top);
     top.setAttribute('data-raw', raw);
   }
   function bfRecHideEmpty(){
