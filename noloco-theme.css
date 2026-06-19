@@ -755,3 +755,12 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
   background: #edf2e8 !important; border-radius: 14px !important; padding: 12px !important;
 }
+
+/* ---- Record sections: card-style ALL-CAPS titles + divider above fields ---- */
+[data-testid="details-section"] h2 {
+  text-transform: uppercase !important; font-size: 14px !important; letter-spacing: 0.5px !important;
+  font-weight: 600 !important; color: #3b3b38 !important;
+}
+[data-testid="details-section"] form {
+  border-top: 1px solid #e3e1d8 !important; padding-top: 14px !important; margin-top: 6px !important;
+}
