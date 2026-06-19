@@ -1158,3 +1158,7 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(3),
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(4) { display: none !important; }
 }
+
+/* ---- Header: Visit Listing as a compact external-link icon in the top-right corner ---- */
+.bf-rtvisiticon { flex: 0 0 auto; width: 34px; height: 34px; border: 1px solid #e3e1d8; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; color: #2b6012; font-size: 16px; text-decoration: none; background: #fff; }
+.bf-rtvisiticon:hover { background: #f2fbe9; border-color: #97c459; }

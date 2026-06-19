@@ -781,12 +781,12 @@
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
     var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
     var listing=F['Listing Link']||'';
-    var visit=listing?('<a class="bf-rtvisit" href="'+esc(listing)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>Visit Listing</a>'):'';
+    var visit=listing?('<a class="bf-rtvisiticon" href="'+esc(listing)+'" target="_blank" rel="noopener" aria-label="Visit listing" title="Visit listing"><i class="ti ti-external-link" aria-hidden="true"></i></a>'):'';
     var title=esc(F['Vehicle Title']||'');
     var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
     var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
     var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle bf-title">'+title+'</div></div>'+metaL+'<div class="bf-rechdr-row">'+stats+visit+'</div>'+tabs+'</div>';
+    var meta='<div class="bf-rechdr"><div class="bf-rechdr-top"><div class="bf-rectitle bf-title">'+title+'</div>'+visit+'</div>'+metaL+'<div class="bf-rechdr-row">'+stats+'</div>'+tabs+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
