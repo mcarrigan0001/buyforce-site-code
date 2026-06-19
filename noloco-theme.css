@@ -937,3 +937,9 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.18 !important; white-space: normal !important; overflow-wrap: break-word !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 14px !important; font-weight: 700 !important; }
 }
+
+/* ---- Mobile: force notice label/value row to stack (direct $SB selector, no section-notice middle) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] { display: flex !important; flex-direction: column !important; flex-wrap: wrap !important; align-items: center !important; gap: 0 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] > * { flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; text-align: center !important; }
+}
