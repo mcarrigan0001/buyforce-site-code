@@ -1242,3 +1242,7 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="details-section"] form { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; gap: 10px !important; align-items: start !important; }
 [data-testid="details-section"] form > div { background: #f6f6f4 !important; border-radius: 8px !important; padding: 9px 11px !important; }
 [data-testid="details-section"] form > div:has(textarea) { grid-column: 1 / -1 !important; }
+
+/* ---- Section field tiles: small uppercase label typography ---- */
+[data-testid="details-section"] form > div label { font-size: 10px !important; letter-spacing: .5px !important; text-transform: uppercase !important; color: #8a8a82 !important; font-weight: 600 !important; }
+[data-testid="details-section"] form > div > div:first-child { margin-bottom: 2px !important; }
