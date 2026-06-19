@@ -1301,7 +1301,9 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function T(n,fn){ var s=performance.now(); fn(); var P=(window.__bfPerf=window.__bfPerf||{}); var p=P[n]=P[n]||{c:0,ms:0}; p.c++; p.ms+=performance.now()-s; }
+  window.bfPerf=function(){ var P=window.__bfPerf||{}; return Object.keys(P).map(function(k){return {fn:k,calls:P[k].c,ms:Math.round(P[k].ms)};}).sort(function(a,b){return b.ms-a.ms;}); };
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); T('fixLinks',fixLinks); T('addIcons',addIcons); T('bfRecTop',bfRecTop); T('bfRecHideEmpty',bfRecHideEmpty); T('bfRecTweaks',bfRecTweaks); T('bfRecPills',bfRecPills); T('manageBackdrop',manageBackdrop); T('bfLoadUsers',bfLoadUsers); if(!onRec){ T('addCards',function(){addCards(false);}); T('ensureArrow',ensureArrow); T('bfEnsureToggle',bfEnsureToggle); T('bfSnap',bfSnap); T('bfInitScroll',bfInitScroll); T('bfExpandAllMobile',bfExpandAllMobile); T('bfMoveSearch',bfMoveSearch); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
