@@ -1291,7 +1291,12 @@
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
-  function bfScheduleRun(){ var since=Date.now()-bfLast; if(since>=150){ bfFire(); } else if(!bfTimer){ bfTimer=setTimeout(bfFire, 150-since); } }
+  function bfScheduleRun(){
+    var since=Date.now()-bfLast;
+    if(since>=700){ if(bfTimer){ clearTimeout(bfTimer); bfTimer=null; } bfFire(); return; } /* maxWait: force a pass so we never starve */
+    if(bfTimer) clearTimeout(bfTimer);
+    bfTimer=setTimeout(bfFire, 200); /* debounce: run after mutations settle */
+  }
   new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
   window.addEventListener('resize', updateArrows);
