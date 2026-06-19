@@ -696,3 +696,8 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] { display: block !important; }
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"] { position: static !important; }
 }
+
+/* ---- Record page: restore a light background behind the cockpit (was showing black after removing the modal styling) ---- */
+[role="dialog"]:has([data-testid="record-view-body"]),
+[data-testid="record-view"],
+[data-testid="record-view-body"] { background: #f4f4f2 !important; }
