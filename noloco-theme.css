@@ -679,3 +679,20 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Hide Noloco record-preview fullscreen/expand control (the first stone-400 icon in the preview header). Keeps the close X and the history clock. ---- */
 .absolute.right-2.top-0.flex.h-full.items-center.space-x-2 > svg:first-child { display: none !important; }
+
+/* ---- Record cockpit: main + sticky sidebar via the two Noloco containers ---- */
+/* Safe-failure: every direct child defaults to full width; only the two matched containers split 63/35. */
+[data-testid="record-view-body"] { display: flex !important; flex-wrap: wrap !important; align-items: flex-start !important; justify-content: space-between !important; gap: 16px 0 !important; }
+[data-testid="record-view-body"] > * { flex: 0 0 100% !important; }
+/* Sidebar = the container that holds Comments */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-comments"]) {
+  flex: 0 0 35% !important; position: sticky !important; top: 12px !important; align-self: flex-start !important;
+}
+/* Main = the container that holds the detail sections (and not comments) */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-comments"])) {
+  flex: 0 0 63% !important;
+}
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] { display: block !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"] { position: static !important; }
+}
