@@ -793,3 +793,10 @@ div:has(> div > [data-testid="record-view"]) {
 /* VIN & Vehicle + all main sections full width in the left column */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="grid-cols-12"] > div { grid-column: 1 / -1 !important; }
 @media (max-width: 900px) { [data-testid="record-view-body"] { display: block !important; } }
+
+/* ---- Highlight cards: center title + value (h & v) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] {
+  display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; min-height: 86px !important;
+}
+/* ---- CarMax/Carvana (all) notices full width in the sidebar ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { grid-column: 1 / -1 !important; width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }

@@ -718,6 +718,7 @@
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
     var vin=F['VIN']||'', mileage=F['Mileage']||'', color=F['Exterior Color']||'', seller=F['Seller Name']||'';
+    var days=F['Days Working']||''; var daysDisp=days?(/[a-z]/i.test(days)?days:String(days).replace(/[^0-9.]/g,'')+'d'):'';
     var vinLine=vin?('<div class="bf-vincopy bf-rtvin" data-bfvin="'+esc(vin)+'" title="Click to copy VIN"><span>VIN '+esc(vin)+'</span><i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
     var mc=[mileage?(esc(mileage)+(/mi/i.test(mileage)?'':' mi')):'', color?esc(color):''].filter(Boolean).join(' \u00b7 ');
     var sellerLine=seller?('Seller: '+esc(seller)):'';
@@ -727,7 +728,7 @@
     var metaL='<div class="bf-rtmetaL">'+vinLine+(mc?'<div class="bf-rtsub1">'+mc+'</div>':'')+(sellerLine?'<div class="bf-rtsub1">'+sellerLine+'</div>':'')+(sub2.length?'<div class="bf-rtsub2">'+sub2.join('')+'</div>':'')+'</div>';
     function rstat(ic,val,lab){ return val?('<div class="bf-rtstat"><div class="bf-rtstatv"><i class="ti '+ic+'" aria-hidden="true"></i>'+esc(val)+'</div><div class="bf-rtstatl">'+lab+'</div></div>'):''; }
     var flameStat=sc?('<div class="bf-rtstat"><div class="bf-rtstatv bf-rtflamev" style="background:'+sc.tier.bg+';color:'+sc.tier.fg+';"><i class="ti ti-flame" aria-hidden="true"></i>'+sc.score+'</div><div class="bf-rtstatl">SCORE</div></div>'):'';
-    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+'</div>';
+    var stats='<div class="bf-rtstats">'+flameStat+rstat('ti-route',dist,'DISTANCE')+rstat('ti-clock',drive,'DRIVE TIME')+rstat('ti-briefcase',daysDisp,'DAYS WORKING')+'</div>';
     var meta='<div class="bf-rthdr">'+metaL+stats+'</div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
@@ -741,7 +742,7 @@
       steps+='<div class="'+_cls+'"'+_att+'>'+circ+'<span class="bf-rtlabel'+(ok?' bf-rtlon':'')+'">'+esc(lab)+'</span></div>';
     }
     var prog='<div class="bf-rtprog"><div class="bf-rthd"><span class="bf-rttitle">DEAL PROGRESS</span><span class="bf-rtcount">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-rtsteps">'+steps+'</div></div>';
-    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],uuid].join('|');
+    var raw=[stg,dist,drive,loc,listed,(sc?sc.score:''),F['Competition'],F['VIN'],F['Mileage'],F['Exterior Color'],F['Seller Name'],F['Days Working'],uuid].join('|');
     var top=body.querySelector(':scope > .bf-rectop');
     if(top && top.getAttribute('data-raw')===raw) return;
     if(!top){ top=document.createElement('div'); top.className='bf-rectop'; body.insertBefore(top, body.firstChild); }
