@@ -750,3 +750,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rtclick { cursor: pointer; }
 .bf-rtclick:hover .bf-rtcirc { box-shadow: 0 0 0 3px rgba(87,200,34,0.25); }
 .bf-rtclick:hover .bf-rtlabel { color: #3b6d11; }
+
+/* ---- Record sidebar: distinct panel background (sits behind the white summary/comments cards) ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+  background: #edf2e8 !important; border-radius: 14px !important; padding: 12px !important;
+}
