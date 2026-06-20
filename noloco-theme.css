@@ -1322,7 +1322,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: Previous / Next Record nav buttons in sidebar ---- */
 @media (max-width: 900px) {
-  .bf-mobnav { grid-column: 1 / -1 !important; display: flex !important; gap: 8px !important; margin-top: 10px !important; }
+  .bf-mobnav { grid-column: 1 / -1 !important; display: flex !important; flex-direction: column !important; gap: 8px !important; margin-top: 10px !important; }
   .bf-mobnav-btn { flex: 1 1 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; min-height: 46px !important; padding: 8px 6px !important; border-radius: 11px !important; border: 1px solid rgba(255,255,255,0.16) !important; background: rgba(255,255,255,0.08) !important; color: #fff !important; font-family: inherit !important; font-size: 11px !important; font-weight: 600 !important; line-height: 1.15 !important; text-align: center !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent; transition: background .12s, transform .08s; }
   .bf-mobnav-btn:active { transform: scale(0.97) !important; background: rgba(255,255,255,0.15) !important; }
   .bf-mobnav-btn .ti { font-size: 17px !important; flex: none !important; }
