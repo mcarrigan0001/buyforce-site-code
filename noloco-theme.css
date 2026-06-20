@@ -1336,7 +1336,4 @@ div:has(> div > [data-testid="record-view"]) {
   .bf-mobnav-btn[disabled] { opacity: .3 !important; pointer-events: none !important; }
 }
 
-/* ---- Experiment: virtualization-lite. Browser skips layout/paint of off-screen
-   board cards until they scroll near; renders visible ones fully. No visual change;
-   intrinsic-size is a self-correcting placeholder (auto = remember real height after first render). ---- */
-[data-testid="collection-record"] { content-visibility: auto !important; contain-intrinsic-size: auto 260px !important; }
+
