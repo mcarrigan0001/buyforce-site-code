@@ -1161,7 +1161,7 @@
       var raw=(sv||'').replace(/[^0-9.]/g,''); var n=raw!==''?Number(raw):'';
       var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
       var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload);
-      el.textContent = n===''?'—':(fmt==='acv'?('ACV: $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
+      el.textContent = n===''?'-':(fmt==='acv'?('ACV: $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
       bfToast(lbl+' saved');
       if(key==='offerAmount'){ try{ bfRecTop(); }catch(_){} }
     }
