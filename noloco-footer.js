@@ -1842,7 +1842,7 @@
     ws=document.createElement('div'); ws.className='bf-ws'; ws.setAttribute('data-uuid',uuid);
     ws.innerHTML=bfWsHtml(stg,F);
     var _sn=(F['Seller Name']||F['Seller']||'').replace(/^seller:\s*/i,'').trim().split(/\s+/)[0]||'';
-    ws._bfDeal={ vehicle:(F['Vehicle Title']||''), stage:stg, sellerFirst:_sn, asking:(F['Asking Price']||''), acv:(F['ACV']||''), offer:(F['Offer Amount']||''), carmax:(F['CarMax Offer']||''), carvana:(F['Carvana Offer']||''), competition:(F['Competition']||''), accident:(F['Accident History']||''), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
+    ws._bfDeal={ vehicle:(F['Vehicle Title']||''), dealership:(F['Dealership']||F['Dealer']||''), stage:stg, sellerFirst:_sn, asking:(F['Asking Price']||''), acv:(F['ACV']||''), offer:(F['Offer Amount']||''), carmax:(F['CarMax Offer']||''), carvana:(F['Carvana Offer']||''), competition:(F['Competition']||''), accident:(F['Accident History']||''), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
     host.insertBefore(ws, host.firstChild);
     var def=bfWsTabMem[uuid]||BF_WSDEF[stg]||'timeline';
     bfWsActivate(ws, def);
