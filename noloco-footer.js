@@ -758,23 +758,51 @@
   var bfSwipeBound=false;
   function bfRecSwipe(){
     if(bfSwipeBound) return; bfSwipeBound=true;
-    var sx=0, sy=0, st=0, active=false;
+    var panel=null, sx=0, sy=0, dir=0, w=0;
+    function getPanel(){ var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return null; return rv.closest('[class*="inset-y-0"]')||rv.parentElement; }
+    function clearStyles(p){ p.style.transition=''; p.style.transform=''; p.style.opacity=''; p.style.willChange=''; }
     document.addEventListener('touchstart', function(e){
-      if(location.pathname.indexOf('/preview/')<0){ active=false; return; }
-      if(!e.touches||e.touches.length!==1){ active=false; return; }
-      var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); active=true;
+      panel=null; dir=0;
+      if(location.pathname.indexOf('/preview/')<0) return;
+      if(!e.touches||e.touches.length!==1) return;
+      var tgt=e.target;
+      if(tgt&&tgt.closest&&tgt.closest('input,textarea,[contenteditable],select,button,a,[role="button"],[data-testid="action-button"],.bf-flip')) return;
+      panel=getPanel(); if(!panel) return;
+      var t=e.touches[0]; sx=t.clientX; sy=t.clientY; w=(panel.getBoundingClientRect().width)||window.innerWidth;
     }, {passive:true});
+    document.addEventListener('touchmove', function(e){
+      if(!panel||!e.touches||!e.touches.length) return;
+      var t=e.touches[0]; var dx=t.clientX-sx, dy=t.clientY-sy;
+      if(dir===0){
+        if(Math.abs(dx)<6 && Math.abs(dy)<6) return;
+        dir = (Math.abs(dx)>Math.abs(dy)*1.25) ? 1 : -1;   /* lock direction; -1 = vertical, leave scroll alone */
+        if(dir===1){ panel.style.transition='none'; panel.style.willChange='transform'; }
+      }
+      if(dir===1){
+        if(e.cancelable) e.preventDefault();               /* block vertical scroll while dragging across */
+        var hasTarget = dx<0 ? (bfFlipR&&bfFlipR.style.display!=='none') : (bfFlipL&&bfFlipL.style.display!=='none');
+        var move = hasTarget ? dx : dx*0.25;                /* rubber-band when no card that direction */
+        panel.style.transform='translateX('+move+'px)';
+        panel.style.opacity=String(Math.max(0.55, 1-Math.abs(move)/(w*1.6)));
+      }
+    }, {passive:false});
     document.addEventListener('touchend', function(e){
-      if(!active) return; active=false;
-      var t=e.changedTouches&&e.changedTouches[0]; if(!t) return;
-      var dx=t.clientX-sx, dy=t.clientY-sy, dt=Date.now()-st;
-      if(Math.abs(dx)<90) return;                 /* deliberate distance, less twitchy than board */
-      if(Math.abs(dx)<Math.abs(dy)*1.8) return;   /* mostly horizontal */
-      if(dt>1200) return;                          /* ignore slow holds */
+      if(!panel||dir!==1){ panel=null; return; }
+      var t=e.changedTouches&&e.changedTouches[0]; var dx=t?t.clientX-sx:0;
+      var threshold=Math.min(110, w*0.28);
       var go=null;
-      if(dx<0){ if(bfFlipR&&bfFlipR.style.display!=='none') go=bfFlipR.getAttribute('data-bfgo'); }
-      else { if(bfFlipL&&bfFlipL.style.display!=='none') go=bfFlipL.getAttribute('data-bfgo'); }
-      if(go) bfFlipGo(go);
+      if(dx<=-threshold){ if(bfFlipR&&bfFlipR.style.display!=='none') go=bfFlipR.getAttribute('data-bfgo'); }
+      else if(dx>=threshold){ if(bfFlipL&&bfFlipL.style.display!=='none') go=bfFlipL.getAttribute('data-bfgo'); }
+      var p=panel; panel=null;
+      if(go){
+        p.style.transition='transform .16s ease-out, opacity .16s ease-out';
+        p.style.transform='translateX('+(dx<0?-w:w)+'px)'; p.style.opacity='0.25';
+        setTimeout(function(){ clearStyles(p); bfFlipGo(go); }, 160);
+      } else {
+        p.style.transition='transform .2s ease-out, opacity .2s ease-out';
+        p.style.transform='translateX(0)'; p.style.opacity='1';
+        setTimeout(function(){ clearStyles(p); }, 210);
+      }
     }, {passive:true});
   }
   function bfFlipGo(u){
