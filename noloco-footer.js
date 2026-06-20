@@ -1155,6 +1155,15 @@
   }
   function bfRecEditableHl(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
+    document.querySelectorAll('[class*="section-notice"]').forEach(function(n){
+      var key=null,lbl=null;
+      if(n.classList.contains('bf-noti-cm')){ key='carMaxOffer'; lbl='CarMax Offer'; }
+      else if(n.classList.contains('bf-noti-cv')){ key='carvanaOffer'; lbl='Carvana Offer'; }
+      if(!key) return;
+      var cand=n.querySelectorAll('p,span,h5,h4,div'), valEl=null;
+      for(var i=0;i<cand.length;i++){ var e=cand[i]; if(e.children.length===0 && /\$[\d,]/.test(e.textContent||'')){ valEl=e; break; } }
+      if(valEl && !valEl.classList.contains('bf-edit')){ valEl.classList.add('bf-edit'); valEl.setAttribute('data-bfkey',key); valEl.setAttribute('data-bflabel',lbl); valEl.setAttribute('data-bffmt','money'); }
+    });
     var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
     sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){
       var lb=it.querySelector('[data-testid="highlight-label"]'); if(!lb) return; var t=lb.textContent||'';
@@ -1188,6 +1197,7 @@
       var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
       var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload);
       el.textContent = n===''?'-':(fmt==='acv'?('ACV: $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
+      try{ var _d=el.textContent; document.querySelectorAll('.bf-edit[data-bfkey="'+key+'"]').forEach(function(o){ if(o!==el && o.getAttribute('data-editing')!=='1'){ o.textContent=_d; } }); }catch(_2){}
       bfToast(lbl+' saved');
       if(key==='offerAmount'){ try{ bfRecTop(); }catch(_){} }
     }
