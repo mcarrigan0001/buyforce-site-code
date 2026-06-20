@@ -728,7 +728,7 @@
     bfCollapsedFor=key;
   }
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
-  var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0;
+  var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0, bfBoardDirty=true;
   function bfBuildFullOrder(){
     var groups=[].slice.call(document.querySelectorAll('[data-testid="collection-group"]'));
     if(!groups.length) return null;
@@ -1585,17 +1585,22 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
-  var bfLast=0, bfTimer=null;
-  function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
-  function bfScheduleRun(){
+  var bfLast=0, bfTimer=null, bfObs=null;
+  function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
+  function bfFire(){ bfTimer=null; bfLast=Date.now(); if(bfObs){ try{ bfObs.disconnect(); }catch(e){} } try{ run(); }catch(e){} bfStartObs(); }
+  function bfScheduleRun(muts){
+    if(muts){ for(var i=0;i<muts.length;i++){ var m=muts[i], t=m.target;
+      if(t&&t.closest&&t.closest('[data-testid="collection-record"],[data-testid="collection-group"]')){ bfBoardDirty=true; break; }
+      var an=m.addedNodes; if(an&&an.length){ for(var j=0;j<an.length;j++){ var n=an[j]; if(n.nodeType===1&&n.matches&&(n.matches('[data-testid="collection-record"]')||(n.querySelector&&n.querySelector('[data-testid="collection-record"]')))){ bfBoardDirty=true; break; } } }
+    } }
     var since=Date.now()-bfLast;
-    if(since>=700){ if(bfTimer){ clearTimeout(bfTimer); bfTimer=null; } bfFire(); return; } /* maxWait: force a pass so we never starve */
+    if(since>=700){ if(bfTimer){ clearTimeout(bfTimer); bfTimer=null; } bfFire(); return; } /* maxWait */
     if(bfTimer) clearTimeout(bfTimer);
-    bfTimer=setTimeout(bfFire, 200); /* debounce: run after mutations settle */
+    bfTimer=setTimeout(bfFire, 200); /* debounce */
   }
-  new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
+  bfStartObs();
   setInterval(function(){ addCards(true); }, 60000);
   window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
