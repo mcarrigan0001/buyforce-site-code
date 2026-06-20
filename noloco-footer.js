@@ -989,6 +989,41 @@
       ex.innerHTML='<div class="bf-secdiv"></div><div class="bf-stack">'+html+'</div>';
     });
   }
+  function bfRecEditableHl(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
+    sb.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){
+      var lb=it.querySelector('[data-testid="highlight-label"]'); if(!lb) return; var t=lb.textContent||'';
+      var vl=it.querySelector('[data-testid="highlight-value"]');
+      if(/offer amount/i.test(t)){
+        if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','offerAmount'); vl.setAttribute('data-bflabel','Offer Amount'); vl.setAttribute('data-bffmt','money'); }
+        var acv=it.querySelector('[class*="text-stone-600"]'); if(acv && !acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); }
+      } else if(/payoff/i.test(t)){
+        if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','estimatedPayoffAmount'); vl.setAttribute('data-bflabel','Est Payoff'); vl.setAttribute('data-bffmt','money'); }
+      }
+    });
+  }
+  document.addEventListener('click', function(e){
+    var el=(e.target&&e.target.closest)?e.target.closest('.bf-edit'):null;
+    if(!el || el.getAttribute('data-editing')==='1' || (e.target&&e.target.tagName==='INPUT')) return;
+    e.preventDefault(); e.stopPropagation();
+    var key=el.getAttribute('data-bfkey'), lbl=el.getAttribute('data-bflabel'), fmt=el.getAttribute('data-bffmt');
+    var cur=(el.textContent||'').replace(/[^0-9.]/g,'');
+    el.setAttribute('data-editing','1'); el.setAttribute('data-orig', el.innerHTML);
+    el.innerHTML='<input class="bf-edit-input" type="text" inputmode="decimal" value="'+cur+'">';
+    var inp=el.querySelector('input'); if(inp){ inp.focus(); try{inp.select();}catch(_){} }
+    var done=false;
+    function fin(sv){ if(done)return; done=true; el.removeAttribute('data-editing'); el.removeAttribute('data-orig');
+      var raw=(sv||'').replace(/[^0-9.]/g,''); var n=raw!==''?Number(raw):'';
+      var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
+      var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload);
+      el.textContent = n===''?'—':(fmt==='acv'?('ACV: $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
+      bfToast(lbl+' saved');
+      if(key==='offerAmount'){ try{ bfRecTop(); }catch(_){} }
+    }
+    function cancel(){ if(done)return; done=true; el.removeAttribute('data-editing'); el.innerHTML=el.getAttribute('data-orig')||''; el.removeAttribute('data-orig'); }
+    if(inp){ inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fin(inp.value); } else if(ev.key==='Escape'){ ev.preventDefault(); cancel(); } }); inp.addEventListener('blur', function(){ fin(inp.value); }); }
+  }, true);
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1453,7 +1488,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

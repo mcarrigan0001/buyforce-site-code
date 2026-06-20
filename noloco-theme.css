@@ -1274,3 +1274,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Ported card stage-UI inside record sections ---- */
 .bf-secport { margin-top: 14px !important; grid-column: 1 / -1 !important; }
 .bf-secport .bf-secdiv { border-top: 1px solid #e3e1d8 !important; margin: 0 0 12px 0 !important; }
+
+/* ---- Editable highlights (Offer / ACV / Est Payoff) ---- */
+.bf-edit { cursor: pointer; }
+.bf-edit:hover { outline: 1px dashed rgba(87,200,34,0.55); outline-offset: 2px; border-radius: 4px; }
+.bf-edit-input { width: 100% !important; box-sizing: border-box !important; font: inherit !important; text-align: center !important; border: 1px solid #57C822 !important; border-radius: 6px !important; padding: 2px 4px !important; background: #fff !important; color: #161616 !important; }
