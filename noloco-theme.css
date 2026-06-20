@@ -1289,3 +1289,12 @@ div:has(> div > [data-testid="record-view"]) {
 /* title shouldn't wrap awkwardly in the header */
 [data-testid="details-section"] h2 { flex-wrap: nowrap !important; min-width: 0 !important; }
 [data-testid="details-section"] h2 .bf-rschip { flex: none !important; }
+
+/* ===== Record flip arrows (prev/next card; column-boundary labeled) ===== */
+.bf-flip { align-items: center; justify-content: center; gap: 4px; background: #fff; color: #2b6012; border: none; border-radius: 999px; box-shadow: 0 3px 14px rgba(0,0,0,0.22); width: 46px; height: 46px; font-size: 22px; line-height: 1; }
+.bf-flip:hover { background: #f2fbe9; }
+.bf-flip-col { width: auto !important; height: auto !important; border-radius: 14px !important; padding: 9px 13px !important; flex-direction: column !important; font-size: 12px; }
+.bf-flipcap { font-size: 9px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a9a6a; }
+.bf-flipcol { font-size: 12px; font-weight: 600; white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.bf-flip-col i { font-size: 16px; }
+@media (max-width: 900px) { .bf-flip { width: 40px; height: 40px; font-size: 19px; } .bf-flipcol { max-width: 84px; } }

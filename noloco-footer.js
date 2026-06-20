@@ -710,6 +710,37 @@
   var bfArrowR, bfArrowL, bfBusy=false, bfArrowResize=false;
   var bfBackdrop;
   var bfCloseBtn;
+  var bfFlipL=null, bfFlipR=null;
+  function bfMkFlip(side){
+    var b=document.createElement('button'); b.type='button'; b.className='bf-flip';
+    b.style.cssText='position:fixed;'+(side==='r'?'right':'left')+':12px;top:50%;transform:translateY(-50%);z-index:10050;display:none;cursor:pointer;';
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(!u) return; var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]'); if(tc){ tc.click(); } else { location.href='/opportunities-1/preview/'+u+'/overview'; } });
+    document.body.appendChild(b); return b;
+  }
+  function bfRecFlip(){
+    if(location.pathname.indexOf('/preview/')<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
+    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    var order=[];
+    document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
+      var lab=g.querySelector('[data-testid="collection-group-header-label"]'); var cn=lab?norm(lab.textContent):'';
+      g.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){ var h=c.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); if(mm) order.push({u:mm[1], col:cn}); });
+    });
+    if(!order.length) return;
+    var idx=-1; for(var i=0;i<order.length;i++){ if(order[i].u===uuid){ idx=i; break; } }
+    if(idx<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
+    if(!bfFlipL) bfFlipL=bfMkFlip('l'); if(!bfFlipR) bfFlipR=bfMkFlip('r');
+    function upd(btn, side){
+      var ni=side==='r'?idx+1:idx-1;
+      if(ni<0||ni>=order.length){ btn.style.display='none'; return; }
+      var nxt=order[ni]; var cross=(order[idx].col!==nxt.col);
+      btn.setAttribute('data-bfgo', nxt.u);
+      btn.setAttribute('aria-label', side==='r'?'Next record':'Previous record');
+      if(cross){ btn.className='bf-flip bf-flip-col'; var cap=(side==='r'?'Next stage':'Prev stage'); var chev='<i class="ti ti-chevrons-'+(side==='r'?'right':'left')+'" aria-hidden="true"></i>'; btn.innerHTML='<span class="bf-flipcap">'+cap+'</span><span class="bf-flipcol">'+esc(nxt.col)+'</span>'+chev; }
+      else { btn.className='bf-flip'; btn.innerHTML='<i class="ti ti-chevron-'+(side==='r'?'right':'left')+'" aria-hidden="true"></i>'; }
+      btn.style.display='inline-flex';
+    }
+    upd(bfFlipR,'r'); upd(bfFlipL,'l');
+  }
   function manageBackdrop(){
     var rv = (location.pathname.indexOf('/preview/') > -1) ? document.querySelector('[data-testid="record-view"]') : null;
     if(rv){
@@ -722,7 +753,7 @@
       }
       if(panel && bfBackdrop.parentNode !== parent){ parent.insertBefore(bfBackdrop, panel); }
       else if(!bfBackdrop.parentNode){ document.body.appendChild(bfBackdrop); }
-      bfBackdrop.style.display='none';
+      bfBackdrop.style.display='';
       if(bfArrowR) bfArrowR.style.display='none';
       if(bfArrowL) bfArrowL.style.display='none';
       if(window.innerWidth<=640){
@@ -1493,7 +1524,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
