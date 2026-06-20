@@ -1246,3 +1246,13 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Section field tiles: small uppercase label typography ---- */
 [data-testid="details-section"] form > div label { font-size: 10px !important; letter-spacing: .5px !important; text-transform: uppercase !important; color: #8a8a82 !important; font-weight: 600 !important; }
 [data-testid="details-section"] form > div > div:first-child { margin-bottom: 2px !important; }
+
+/* ---- Section check-circle: left of caret; solid green done (white check) like deal progress ---- */
+.bf-rscc { width: 20px !important; height: 20px !important; border-radius: 50% !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: none !important; font-size: 13px !important; box-sizing: border-box !important; margin-right: 2px !important; }
+.bf-rsec-done .bf-rscc { background: #2b6012 !important; color: #fff !important; border: none !important; }
+.bf-rsec-current .bf-rscc { border: 2px solid #57C822 !important; background: transparent !important; color: #57C822 !important; }
+.bf-rsec-upcoming .bf-rscc { border: 2px solid #d3d1c7 !important; background: transparent !important; }
+.bf-secblurb { font-size: 13px !important; color: #6b6b64 !important; line-height: 1.5 !important; margin: 0 0 12px 0 !important; }
+/* ---- Top section spacing: desktop -50%, mobile +10px ---- */
+@media (min-width: 901px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: -25px !important; } }
+@media (max-width: 900px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: 10px !important; } }

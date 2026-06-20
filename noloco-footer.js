@@ -929,13 +929,16 @@
       sec.classList.add('bf-rsec');
       sec.classList.remove('bf-rsec-done','bf-rsec-current','bf-rsec-upcoming');
       sec.classList.add('bf-rsec-'+status);
-      var cc=h.querySelector(':scope > .bf-rscc');
-      if(!cc){ var ic=document.createElement('span'); ic.className='bf-rsicon'; ic.innerHTML='<i class="ti '+info[1]+'" aria-hidden="true"></i>'; h.insertBefore(ic,h.firstChild); cc=document.createElement('span'); cc.className='bf-rscc'; h.insertBefore(cc,h.firstChild); }
-      var iconCls=done?'ti-circle-check':(status==='current'?'ti-circle-dot':'ti-circle');
-      if(cc.getAttribute('data-st')!==status){ cc.innerHTML='<i class="ti '+iconCls+'" aria-hidden="true"></i>'; cc.setAttribute('data-st',status); }
+      var ic=h.querySelector(':scope > .bf-rsicon');
+      if(!ic){ ic=document.createElement('span'); ic.className='bf-rsicon'; ic.innerHTML='<i class="ti '+info[1]+'" aria-hidden="true"></i>'; h.insertBefore(ic,h.firstChild); }
+      var par=h.parentElement;
+      var cc=par.querySelector(':scope > .bf-rscc');
+      if(!cc){ cc=document.createElement('span'); cc.className='bf-rscc'; par.insertBefore(cc, par.firstChild); }
+      if(cc.getAttribute('data-st')!==status){ cc.innerHTML = done?'<i class="ti ti-check" aria-hidden="true"></i>':''; cc.setAttribute('data-st',status); }
       var chip=h.querySelector(':scope > .bf-rschip');
       if(status==='current'){ if(!chip){ chip=document.createElement('span'); chip.className='bf-rschip'; chip.textContent='Current step'; h.appendChild(chip); } chip.style.display=''; }
       else if(chip){ chip.style.display='none'; }
+      if(/competing offers/i.test(t)){ var form=sec.querySelector('form'); if(form && !sec.querySelector(':scope .bf-secblurb')){ var bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; form.parentNode.insertBefore(bl, form); } }
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
