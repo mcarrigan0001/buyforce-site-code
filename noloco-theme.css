@@ -1303,3 +1303,6 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rtstagerow { margin: 2px 0 4px 0; }
 .bf-rtstagepill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 11px; border-radius: 999px; background: #eef3e6; color: #3b6d11; white-space: nowrap; }
 .bf-rtstagepill i { font-size: 13px; }
+
+/* ---- Collapsed-section safety: never show ports/buttons when collapsed ---- */
+.bf-sec-collapsed .bf-secport, .bf-sec-collapsed [data-testid="action-button"] { display: none !important; }

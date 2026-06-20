@@ -711,6 +711,7 @@
   var bfArrowR, bfArrowL, bfBusy=false, bfArrowResize=false;
   var bfBackdrop;
   var bfCloseBtn;
+  function bfRecSecClass(){ if(!/\/(preview|view)\//.test(location.pathname)) return; document.querySelectorAll('[data-testid="details-section"]').forEach(function(sx){ sx.classList.toggle('bf-sec-collapsed', !sx.querySelector('form')); }); }
   var bfCollapsedFor=null;
   function bfRecCollapseDefault(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
@@ -728,10 +729,36 @@
   }
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
   var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0;
+  function bfBuildFullOrder(){
+    var groups=[].slice.call(document.querySelectorAll('[data-testid="collection-group"]'));
+    if(!groups.length) return null;
+    var edges=null;
+    try{
+      var g0=groups[0]; var fk=Object.keys(g0).find(function(k){return k.indexOf('__reactFiber')===0;});
+      var node=g0[fk],d=0;
+      while(node&&d<60){ var p=node.memoizedProps; if(p){ for(var k in p){ var v=p[k]; if(v&&typeof v==='object'&&Array.isArray(v.edges)&&v.edges.length>10){ edges=v.edges; break; } } } if(edges)break; node=node.return; d++; }
+    }catch(e){}
+    var byStatus={};
+    if(edges){ edges.forEach(function(ed){ var r=ed&&ed.node; if(r&&r.uuid){ (byStatus[r.status]=byStatus[r.status]||[]).push(r.uuid); } }); }
+    var order=[], seen={};
+    groups.forEach(function(gr){
+      var lab=norm(((gr.querySelector('[data-testid="collection-group-header-label"]')||{}).textContent||'').trim());
+      var st=null; try{ var fk2=Object.keys(gr).find(function(k){return k.indexOf('__reactFiber')===0;}); var n=gr[fk2],dd=0; while(n&&dd<12&&!st){ var p2=n.memoizedProps; if(p2){ for(var k2 in p2){ var v2=p2[k2]; if(typeof v2==='string'&&/^[A-Z][A-Z0-9_]{3,}$/.test(v2)){ st=v2; break; } } } n=n.return; dd++; } }catch(e){}
+      var domCards=[].slice.call(gr.querySelectorAll('[data-testid="collection-record"]')).map(function(c){return ((c.getAttribute('href')||'').match(/(rec[0-9a-z]+)/i)||[])[1];}).filter(Boolean);
+      var ids = domCards.length?domCards:((st&&byStatus[st])?byStatus[st]:[]);
+      ids.forEach(function(u){ if(u&&!seen[u]){ seen[u]=1; order.push({u:u,col:lab}); } });
+    });
+    return order.length?order:null;
+  }
+  function bfFlipGo(u){
+    var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]');
+    if(tc){ tc.click(); }
+    else { try{ history.pushState({},'','/opportunities-1/preview/'+u+'/overview'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/opportunities-1/preview/'+u+'/overview'; } }
+  }
   function bfMkFlip(side){
     var b=document.createElement('button'); b.type='button'; b.className='bf-flip';
     b.style.cssText='position:fixed;'+(side==='r'?'right':'left')+':12px;top:50%;transform:translateY(-50%);z-index:10050;display:none;cursor:pointer;';
-    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(!u) return; var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]'); if(tc){ tc.click(); } else { location.href='/opportunities-1/preview/'+u+'/overview'; } });
+    b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(u) bfFlipGo(u); });
     document.body.appendChild(b); return b;
   }
   function bfRecFlip(){
@@ -741,14 +768,10 @@
     var order=bfFlipOrder;
     var stale=!order||cnt!==bfFlipCount||!order.some(function(o){return o.u===uuid;});
     if(stale){
-      order=[];
-      document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
-        var lab=g.querySelector('[data-testid="collection-group-header-label"]'); var cn=lab?norm(lab.textContent):'';
-        g.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){ var h=c.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); if(mm) order.push({u:mm[1], col:cn}); });
-      });
-      bfFlipOrder=order; bfFlipCount=cnt;
+      order=bfBuildFullOrder();
+      if(order){ bfFlipOrder=order; bfFlipCount=cnt; }
     }
-    if(!order.length) return;
+    if(!order||!order.length) return;
     var idx=-1; for(var i=0;i<order.length;i++){ if(order[i].u===uuid){ idx=i; break; } }
     if(idx<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
     if(!bfFlipL) bfFlipL=bfMkFlip('l'); if(!bfFlipR) bfFlipR=bfMkFlip('r');
@@ -772,7 +795,7 @@
       if(!bfBackdrop){
         bfBackdrop=document.createElement('div');
         bfBackdrop.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.45);';
-        bfBackdrop.addEventListener('click',function(){ try{ history.back(); }catch(e){} });
+        bfBackdrop.addEventListener('click',function(){ try{ document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',code:'Escape',keyCode:27,which:27,bubbles:true})); }catch(e){} });
       }
       if(panel && bfBackdrop.parentNode !== parent){ parent.insertBefore(bfBackdrop, panel); }
       else if(!bfBackdrop.parentNode){ document.body.appendChild(bfBackdrop); }
@@ -1557,7 +1580,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
