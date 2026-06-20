@@ -1161,7 +1161,7 @@
       var vl=it.querySelector('[data-testid="highlight-value"]');
       if(/offer amount/i.test(t)){
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','offerAmount'); vl.setAttribute('data-bflabel','Offer Amount'); vl.setAttribute('data-bffmt','money'); }
-        var acv=it.querySelector('[class*="text-stone-600"]'); if(acv && !acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); }
+        var acv=it.querySelector('[class*="text-stone-600"]'); if(acv){ if(!acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); } if(window.innerWidth<=900){ acv.style.setProperty('color','#141414','important'); } else { acv.style.removeProperty('color'); } }
       } else if(/payoff/i.test(t)){
         if(/estimated payoff/i.test(t) && lb.textContent.trim().toUpperCase()!=='EST PAYOFF AMOUNT'){ lb.textContent='Est Payoff Amount'; }
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','estimatedPayoffAmount'); vl.setAttribute('data-bflabel','Est Payoff'); vl.setAttribute('data-bffmt','money'); }
