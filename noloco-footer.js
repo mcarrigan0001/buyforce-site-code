@@ -1137,7 +1137,13 @@
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','offerAmount'); vl.setAttribute('data-bflabel','Offer Amount'); vl.setAttribute('data-bffmt','money'); }
         var acv=it.querySelector('[class*="text-stone-600"]'); if(acv && !acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); }
       } else if(/payoff/i.test(t)){
+        if(/estimated payoff/i.test(t) && lb.textContent.trim().toUpperCase()!=='EST PAYOFF AMOUNT'){ lb.textContent='Est Payoff Amount'; }
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','estimatedPayoffAmount'); vl.setAttribute('data-bflabel','Est Payoff'); vl.setAttribute('data-bffmt','money'); }
+        if(vl && vl.getAttribute('data-editing')!=='1'){ var pv=(vl.textContent||'').trim(); if(pv===''||/^[-\u2013\u2014]+$/.test(pv)){ if(vl.textContent!=='-') vl.textContent='-'; } }
+      } else if(/carmax/i.test(t)){
+        if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','carMaxOffer'); vl.setAttribute('data-bflabel','CarMax Offer'); vl.setAttribute('data-bffmt','money'); }
+      } else if(/carvana/i.test(t)){
+        if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','carvanaOffer'); vl.setAttribute('data-bflabel','Carvana Offer'); vl.setAttribute('data-bffmt','money'); }
       }
     });
   }
