@@ -699,10 +699,11 @@
   }, { root: null, rootMargin: '900px 900px', threshold: 0 }) : null;
   function addCards(force){
     if(bfEditing) return;
+    var onR=/\/(preview|view)\//.test(location.pathname);
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
       if(card.getAttribute('data-bfmoved')) return;
       if(card.querySelector('.bf-body')){ bfDecorateCard(card, force); return; }
-      if(bfIO && !force){ bfIO.observe(card); }
+      if(bfIO && !force && !onR){ bfIO.observe(card); }
       else { bfDecorateCard(card, force); }
     });
   }
@@ -822,7 +823,8 @@
     var curSeg=(location.pathname.match(/\/(overview|vehicle-appraisal|offers-next-steps)\/?$/)||[])[1]||'overview';
     var TABS=[['overview','Overview'],['vehicle-appraisal','Vehicle & Appraisal'],['offers-next-steps','Offers & Next Steps']];
     var tabs='<div class="bf-rectabs">'+TABS.map(function(t){return '<button class="bf-rectab'+(t[0]===curSeg?' bf-rectab-on':'')+'" data-bftab="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>';
-    var meta='<div class="bf-rechdr">'+visit+'<div class="bf-rechdr-main"><div class="bf-rechdr-left"><div class="bf-rechdr-titlewrap"><div class="bf-rectitle bf-title">'+title+'</div>'+accPill+'</div>'+metaL+'</div>'+stats+'</div></div>';
+    var stagePill=stg?'<span class="bf-rtstagepill"><i class="ti ti-progress" aria-hidden="true"></i>'+esc(stg)+'</span>':'';
+    var meta='<div class="bf-rechdr">'+visit+'<div class="bf-rechdr-main"><div class="bf-rechdr-left"><div class="bf-rechdr-titlewrap"><div class="bf-rectitle bf-title">'+title+'</div>'+accPill+'</div>'+(stagePill?'<div class="bf-rtstagerow">'+stagePill+'</div>':'')+metaL+'</div>'+stats+'</div></div>';
     var done=0, steps='';
     for(var i=0;i<MILESTONES.length;i++){
       var lab=MILESTONES[i];
@@ -1060,6 +1062,15 @@
     function cancel(){ if(done)return; done=true; el.removeAttribute('data-editing'); el.innerHTML=el.getAttribute('data-orig')||''; el.removeAttribute('data-orig'); }
     if(inp){ inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fin(inp.value); } else if(ev.key==='Escape'){ ev.preventDefault(); cancel(); } }); inp.addEventListener('blur', function(){ fin(inp.value); }); }
   }, true);
+  function bfRecHideBottomBtns(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return;
+    var SBSEL='[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])';
+    rv.querySelectorAll('[data-testid="action-button"]').forEach(function(b){
+      if(b.closest('[data-testid="details-section"]')||b.closest('.bf-rectop')||b.closest('.bf-secport')||b.closest(SBSEL)) return;
+      b.style.display='none';
+    });
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1524,7 +1535,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

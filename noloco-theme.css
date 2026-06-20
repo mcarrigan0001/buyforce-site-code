@@ -785,7 +785,7 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { background: #ffffff !important; box-shadow: 0 0 8px rgba(90,90,90,0.35) !important; }
 
 /* ---- Record cockpit -> CSS grid so the sidebar spans full height (up to the header) ---- */
-[data-testid="record-view-body"] { display: grid !important; grid-template-columns: 35% 63% !important; gap: 14px 2% !important; align-items: start !important; }
+[data-testid="record-view-body"] { display: grid !important; grid-template-columns: 35% 63% !important; grid-template-rows: auto 1fr !important; gap: 14px 2% !important; align-items: start !important; }
 [data-testid="record-view-body"] > * { grid-column: 1 / -1 !important; }
 [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
@@ -1298,3 +1298,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-flipcol { font-size: 12px; font-weight: 600; white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
 .bf-flip-col i { font-size: 16px; }
 @media (max-width: 900px) { .bf-flip { width: 40px; height: 40px; font-size: 19px; } .bf-flipcol { max-width: 84px; } }
+
+/* ---- Header current-stage pill ---- */
+.bf-rtstagerow { margin: 2px 0 4px 0; }
+.bf-rtstagepill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 11px; border-radius: 999px; background: #eef3e6; color: #3b6d11; white-space: nowrap; }
+.bf-rtstagepill i { font-size: 13px; }
