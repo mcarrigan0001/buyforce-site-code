@@ -1455,3 +1455,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-ws-due { font-size:10px; font-weight:600; letter-spacing:.3px; border-radius:6px; padding:2px 7px; display:inline-block; margin-top:3px; }
 .bf-ws-due.soon { background:#fbeecd; color:#7a4d13; }
 .bf-ws-due.later { background:#f1f1ee; color:#6b6b64; }
+
+/* Workspace schedule inputs (any date/time + pickup) */
+.bf-ws-dateinput, .bf-ws-timeinput, .bf-ws-pickupinput { width:100%; margin-top:6px; border:1px solid #d3d1c7; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; color:#161616; background:#faf9f5; outline:none; box-sizing:border-box; }
+.bf-ws-pickupinput::placeholder { color:#9aa0a6; }
+.bf-ws-dateinput:focus-visible, .bf-ws-timeinput:focus-visible, .bf-ws-pickupinput:focus-visible { outline:2px solid #57C822; outline-offset:1px; }
