@@ -1266,7 +1266,7 @@
     function fin(sv){ if(done)return; done=true; el.removeAttribute('data-editing'); el.removeAttribute('data-orig');
       var raw=(sv||'').replace(/[^0-9.]/g,''); var n=raw!==''?Number(raw):'';
       var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
-      var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload);
+      var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload); if(key==='estimatedPayoffAmount'||key==='acv'){ try{ bfRecRecalcEquity(uuid, key, n); }catch(_e){} }
       el.textContent = n===''?'-':(fmt==='acv'?('ACV $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
       try{ var _d=el.textContent; document.querySelectorAll('.bf-edit[data-bfkey="'+key+'"]').forEach(function(o){ if(o!==el && o.getAttribute('data-editing')!=='1'){ o.textContent=_d; } }); }catch(_2){}
       bfToast(lbl+' saved');
@@ -1275,6 +1275,18 @@
     function cancel(){ if(done)return; done=true; el.removeAttribute('data-editing'); el.innerHTML=el.getAttribute('data-orig')||''; el.removeAttribute('data-orig'); }
     if(inp){ inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fin(inp.value); } else if(ev.key==='Escape'){ ev.preventDefault(); cancel(); } }); inp.addEventListener('blur', function(){ fin(inp.value); }); }
   }, true);
+  function bfRecNumFromEdit(k){ var el=document.querySelector('.bf-edit[data-bfkey="'+k+'"]'); if(!el) return NaN; var s=(el.textContent||'').replace(/[^0-9.]/g,''); return s===''?NaN:Number(s); }
+  function bfRecRecalcEquity(uuid, changedKey, changedVal){
+    var acv = changedKey==='acv' ? (changedVal===''?NaN:Number(changedVal)) : bfRecNumFromEdit('acv');
+    var payoff = changedKey==='estimatedPayoffAmount' ? (changedVal===''?NaN:Number(changedVal)) : bfRecNumFromEdit('estimatedPayoffAmount');
+    if(isNaN(acv)||isNaN(payoff)) return;
+    var eq = Math.round(acv - payoff);
+    var disp = (eq<0?'-$':'+$')+Math.abs(eq).toLocaleString('en-US');
+    var status = eq>=0?'Positive':'Negative';
+    bfPost({uuid:uuid, estimatedEquityPosition:eq, estEquityPosition:eq, equityPosition:eq, equityDisplay:disp, equityStatus:status});
+    try{ document.querySelectorAll('.bf-eqval,[data-bfeq]').forEach(function(o){ o.textContent=disp; }); }catch(_e){}
+    bfToast('Equity updated to '+disp);
+  }
   function bfRecHideBottomBtns(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return;
