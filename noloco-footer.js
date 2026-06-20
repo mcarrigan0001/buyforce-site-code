@@ -436,12 +436,24 @@
     var cdate=bfDateShort(bfGet(F,['Stage Entered At']));
     var apptaddr=bfGet(F,['Dealership Address'])||'[dealership address]';
     var appttime=bfApptTimeStr(F);
+    var mileage=bfGet(F,['Mileage','Miles','Odometer'])||'';
+    var askingv=money(F['Asking Price']||'')||'';
+    var offerv=money(F['Offer Amount']||'')||'';
+    var acvv=money(F['ACV']||'')||'';
+    var colorv=bfGet(F,['Color','Exterior Color','Ext Color'])||'';
+    var trimv=bfGet(F,['Trim','Trim Level'])||'';
     return t.replace(/\[First Name\]/gi, first)
             .replace(/\[Model\]/gi, model)
             .replace(/\[Dealership Address\]/gi, apptaddr)
             .replace(/\[Dealership\]/gi, dealer)
             .replace(/\[Appt Time\]/gi, appttime)
             .replace(/\[CarFax\]/gi, carfax)
+            .replace(/\[Mileage\]/gi, mileage)
+            .replace(/\[Asking\]/gi, askingv)
+            .replace(/\[Offer\]/gi, offerv)
+            .replace(/\[ACV\]/gi, acvv)
+            .replace(/\[Color\]/gi, colorv)
+            .replace(/\[Trim\]/gi, trimv)
             .replace(/\[\[Seller Will Take\]\]/gi, willtake)
             .replace(/\[\[Rep\/User Name\]\]/gi, rep)
             .replace(/\[\[Current Date[^\]]*\]\]/gi, cdate);
@@ -1842,7 +1854,7 @@
     ws=document.createElement('div'); ws.className='bf-ws'; ws.setAttribute('data-uuid',uuid);
     ws.innerHTML=bfWsHtml(stg,F);
     var _sn=(F['Seller Name']||F['Seller']||'').replace(/^seller:\s*/i,'').trim().split(/\s+/)[0]||'';
-    ws._bfDeal={ vehicle:(F['Vehicle Title']||''), dealership:(F['Dealership']||F['Dealer']||''), stage:stg, sellerFirst:_sn, asking:(F['Asking Price']||''), acv:(F['ACV']||''), offer:(F['Offer Amount']||''), carmax:(F['CarMax Offer']||''), carvana:(F['Carvana Offer']||''), competition:(F['Competition']||''), accident:(F['Accident History']||''), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
+    ws._bfDeal={ vehicle:(F['Vehicle Title']||''), dealership:(F['Dealership']||F['Dealer']||''), mileage:(bfGet(F,['Mileage','Miles','Odometer'])||''), color:(bfGet(F,['Color','Exterior Color','Ext Color'])||''), trim:(bfGet(F,['Trim','Trim Level'])||''), payoff:(bfGet(F,['Est Payoff Amount','Payoff Amount','Payoff'])||''), equity:(bfGet(F,['Est Equity Position','Equity Position'])||''), retail:(bfGet(F,['Est Private Party Retail Value','Private Party Retail Value'])||''), dealerDays:(bfGet(F,['Est Dealer Days to Sale','Dealer Days to Sale'])||''), stage:stg, sellerFirst:_sn, asking:(F['Asking Price']||''), acv:(F['ACV']||''), offer:(F['Offer Amount']||''), carmax:(F['CarMax Offer']||''), carvana:(F['Carvana Offer']||''), competition:(F['Competition']||''), accident:(F['Accident History']||''), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
     host.insertBefore(ws, host.firstChild);
     var def=bfWsTabMem[uuid]||BF_WSDEF[stg]||'timeline';
     bfWsActivate(ws, def);

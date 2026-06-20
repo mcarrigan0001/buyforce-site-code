@@ -1291,11 +1291,11 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="details-section"] h2 .bf-rschip { flex: none !important; }
 
 /* ===== Record flip arrows (prev/next card; column-boundary labeled) ===== */
-.bf-flip { align-items: center; justify-content: center; gap: 4px; background: #fff; color: #2b6012; border: none; border-radius: 999px; box-shadow: 0 3px 14px rgba(0,0,0,0.22); width: 46px; height: 46px; font-size: 22px; line-height: 1; }
+.bf-flip { align-items: center; justify-content: center; gap: 2px; background: #fff; color: #2b6012; border: none; border-radius: 16px; box-shadow: 0 3px 14px rgba(0,0,0,0.22); width: 84px; height: 76px; font-size: 26px; line-height: 1; }
 .bf-flip:hover { background: #f2fbe9; }
-.bf-flip-col { width: auto !important; height: auto !important; border-radius: 14px !important; padding: 9px 13px !important; flex-direction: column !important; font-size: 12px; }
+.bf-flip-col { width: 84px !important; height: 76px !important; border-radius: 16px !important; padding: 8px 8px !important; flex-direction: column !important; font-size: 12px; }
 .bf-flipcap { font-size: 9px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a9a6a; }
-.bf-flipcol { font-size: 12px; font-weight: 600; white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+.bf-flipcol { font-size: 11px; font-weight: 600; white-space: normal; line-height: 1.12; max-width: 100%; text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .bf-flip-col i { font-size: 16px; }
 @media (max-width: 900px) { .bf-flip { width: 40px; height: 40px; font-size: 19px; } .bf-flipcol { max-width: 84px; } }
 
@@ -1459,6 +1459,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* Workspace schedule inputs (any date/time + pickup) */
 .bf-ws-dateinput, .bf-ws-timeinput, .bf-ws-pickupinput { width:100%; margin-top:6px; border:1px solid #d3d1c7; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; color:#161616; background:#faf9f5; outline:none; box-sizing:border-box; }
 .bf-ws-pickupinput::placeholder { color:#9aa0a6; }
+.bf-ws-pickupinput { border-color:#57C822 !important; box-shadow:0 0 0 3px rgba(87,200,34,0.16); background:#f6fcf0; }
 .bf-ws-dateinput:focus-visible, .bf-ws-timeinput:focus-visible, .bf-ws-pickupinput:focus-visible { outline:2px solid #57C822; outline-offset:1px; }
 
 /* Schedule predicted drive-time / leave-by */
