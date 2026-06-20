@@ -1460,3 +1460,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-ws-dateinput, .bf-ws-timeinput, .bf-ws-pickupinput { width:100%; margin-top:6px; border:1px solid #d3d1c7; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; color:#161616; background:#faf9f5; outline:none; box-sizing:border-box; }
 .bf-ws-pickupinput::placeholder { color:#9aa0a6; }
 .bf-ws-dateinput:focus-visible, .bf-ws-timeinput:focus-visible, .bf-ws-pickupinput:focus-visible { outline:2px solid #57C822; outline-offset:1px; }
+
+/* Schedule predicted drive-time / leave-by */
+.bf-ws-eta{margin:10px 0 0;font-size:13px;color:#3c4043;display:flex;align-items:flex-start;gap:6px;line-height:1.45;}
+.bf-ws-eta:empty{display:none;}
+.bf-ws-eta i{color:#1a73e8;font-size:15px;margin-top:1px;flex:0 0 auto;}
+.bf-ws-eta b{color:#161616;font-weight:600;}
