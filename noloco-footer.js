@@ -738,16 +738,21 @@
       var node=g0[fk],d=0;
       while(node&&d<60){ var p=node.memoizedProps; if(p){ for(var k in p){ var v=p[k]; if(v&&typeof v==='object'&&Array.isArray(v.edges)&&v.edges.length>10){ edges=v.edges; break; } } } if(edges)break; node=node.return; d++; }
     }catch(e){}
-    var byStatus={};
-    if(edges){ edges.forEach(function(ed){ var r=ed&&ed.node; if(r&&r.uuid){ (byStatus[r.status]=byStatus[r.status]||[]).push(r.uuid); } }); }
+    if(!edges) return null;
+    var byStatus={}, valid={};
+    edges.forEach(function(ed){ var r=ed&&ed.node; if(r&&r.uuid){ var st=String(r.status); (byStatus[st]=byStatus[st]||[]).push(r.uuid); valid[st]=1; } });
+    function grpStatus(gr){
+      try{ var fk2=Object.keys(gr).find(function(k){return k.indexOf('__reactFiber')===0;}); var n=gr[fk2],dd=0;
+        while(n&&dd<20){ var p2=n.memoizedProps; if(p2){ for(var k2 in p2){ var v2=p2[k2]; if(typeof v2==='string'&&valid[v2]) return v2; if(v2&&typeof v2==='object'){ if(typeof v2.value==='string'&&valid[v2.value]) return v2.value; if(typeof v2.key==='string'&&valid[v2.key]) return v2.key; } } } n=n.return; dd++; } }catch(e){}
+      return null;
+    }
     var order=[], seen={};
     groups.forEach(function(gr){
-      var lab=norm(((gr.querySelector('[data-testid="collection-group-header-label"]')||{}).textContent||'').trim());
-      var st=null; try{ var fk2=Object.keys(gr).find(function(k){return k.indexOf('__reactFiber')===0;}); var n=gr[fk2],dd=0; while(n&&dd<12&&!st){ var p2=n.memoizedProps; if(p2){ for(var k2 in p2){ var v2=p2[k2]; if(typeof v2==='string'&&/^[A-Z][A-Z0-9_]{3,}$/.test(v2)){ st=v2; break; } } } n=n.return; dd++; } }catch(e){}
-      var domCards=[].slice.call(gr.querySelectorAll('[data-testid="collection-record"]')).map(function(c){return ((c.getAttribute('href')||'').match(/(rec[0-9a-z]+)/i)||[])[1];}).filter(Boolean);
-      var ids = domCards.length?domCards:((st&&byStatus[st])?byStatus[st]:[]);
-      ids.forEach(function(u){ if(u&&!seen[u]){ seen[u]=1; order.push({u:u,col:lab}); } });
+      var st=grpStatus(gr); if(!st||!byStatus[st]) return;
+      var col=norm(((gr.querySelector('[data-testid="collection-group-header-label"]')||{}).textContent||''));
+      byStatus[st].forEach(function(u){ if(!seen[u]){ seen[u]=1; order.push({u:u,col:col}); } });
     });
+    Object.keys(byStatus).forEach(function(st){ byStatus[st].forEach(function(u){ if(!seen[u]){ seen[u]=1; order.push({u:u,col:''}); } }); });
     return order.length?order:null;
   }
   function bfFlipGo(u){
@@ -766,7 +771,7 @@
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var cards=document.querySelectorAll('[data-testid="collection-record"]'); var cnt=cards.length;
     var order=bfFlipOrder;
-    var stale=!order||cnt!==bfFlipCount||!order.some(function(o){return o.u===uuid;});
+    var stale=!order||!order.some(function(o){return o.u===uuid;});
     if(stale){
       order=bfBuildFullOrder();
       if(order){ bfFlipOrder=order; bfFlipCount=cnt; }
