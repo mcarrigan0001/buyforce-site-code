@@ -1177,12 +1177,12 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-dbadge { width: 17px; height: 17px; display: inline-block; vertical-align: middle; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] .bf-dbadge { width: 18px; height: 18px; }
 /* ---- Mobile: nudge ACV sub-line up so it centers in the Offer Amount card ---- */
-@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] [class*="text-stone-600"] { margin-top: -3px !important; } }
+@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] [class*="text-stone-600"] { margin-top: -5px !important; } }
 
 /* ---- Mobile offers-to-beat group injected into highlights grid ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb-m { grid-column: 1 / -1 !important; color: #fff !important; font-size: 12px !important; font-weight: 500 !important; text-align: center !important; letter-spacing: .3px !important; margin: 2px 0 0 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats { grid-column: 1 / -1 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 999px !important; padding: 7px 14px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important; box-sizing: border-box !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats span { display: inline-flex !important; align-items: center !important; gap: 6px !important; font-size: 10.75px !important; font-weight: 700 !important; white-space: nowrap !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats { grid-column: 1 / -1 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 999px !important; padding: 6px 9px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important; box-sizing: border-box !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats span { display: inline-flex !important; align-items: center !important; gap: 4px !important; font-size: 9px !important; font-weight: 700 !important; white-space: nowrap !important; }
 @media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats { display: none !important; } }
 
 /* ---- Header redesign: title + accident pill, meta & stats side-by-side (compact) ---- */
@@ -1306,3 +1306,11 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Collapsed-section safety: never show ports/buttons when collapsed ---- */
 .bf-sec-collapsed .bf-secport, .bf-sec-collapsed [data-testid="action-button"] { display: none !important; }
+
+/* ---- Mobile sidebar polish (Offer/ACV, hide flip arrows + collapse-all on record) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { margin-bottom: 4px !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"] { color: #141414 !important; }
+  .bf-flip { display: none !important; }
+  body.bf-rec-open .bf-allcollapse { display: none !important; }
+}
