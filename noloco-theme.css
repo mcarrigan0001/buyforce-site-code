@@ -1239,7 +1239,7 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="details-section"].bf-rsec-done { border-left: 4px solid #2b6012 !important; }
 [data-testid="details-section"].bf-rsec-upcoming { border-left: 4px solid #e3e1d8 !important; }
 /* field cells -> tiles */
-[data-testid="details-section"] form { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important; gap: 10px !important; align-items: start !important; }
+[data-testid="details-section"] form { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; gap: 10px !important; align-items: start !important; }
 [data-testid="details-section"] form > div { background: #f6f6f4 !important; border-radius: 8px !important; padding: 9px 11px !important; }
 [data-testid="details-section"] form > div:has(textarea) { grid-column: 1 / -1 !important; }
 
@@ -1266,3 +1266,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-pillval.bf-pg { background: #e3f5cf !important; color: #27500a !important; }
 .bf-pillval.bf-pa { background: #fbeecd !important; color: #7a4d13 !important; }
 .bf-pillval.bf-pr { background: #fbe3e3 !important; color: #a32d2d !important; }
+
+/* ---- Release field cells from the old grid-cols-12 full-width rule so they sit side-by-side ---- */
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:not(:has(textarea)) { grid-column: auto !important; }
+[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:has(textarea), [data-testid="record-view-body"] [data-testid="details-section"] form > div.bf-secblurb, [data-testid="record-view-body"] [data-testid="details-section"] .bf-secblurb { grid-column: 1 / -1 !important; }
