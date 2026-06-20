@@ -1744,7 +1744,79 @@
       else if(sx.querySelector('[class*="section-details"]')){ if(!sx.classList.contains('bf-main')) sx.classList.add('bf-main'); }
     });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  /* ===== Workspace: tabbed object replacing the comments box ===== */
+  var BF_WH='https://buyforce.app.n8n.cloud/webhook';
+  function bfPostEvent(p){ try{ fetch(BF_WH+'/add-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); }catch(e){} }
+  function bfGetEvents(uuid){ return fetch(BF_WH+'/get-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}).then(function(r){return r.json();}).catch(function(){return {events:[]};}); }
+  function bfCurUser(){ try{ var v=localStorage.getItem('bf.user'); if(v) return v; }catch(e){} return 'Me'; }
+  function bfInits(n){ n=(n||'').trim(); if(!n) return '?'; var p=n.split(/\s+/); return (((p[0]||'')[0]||'')+((p[1]||'')[0]||'')).toUpperCase()||'?'; }
+  function bfRel(iso){ if(!iso) return ''; var t=new Date(iso).getTime(); if(isNaN(t)) return ''; var s=Math.floor((Date.now()-t)/1000); if(s<60) return 'just now'; var m=Math.floor(s/60); if(m<60) return m+'m ago'; var h=Math.floor(m/60); if(h<24) return h+'h ago'; var d=Math.floor(h/24); if(d===1) return 'Yesterday'; if(d<7) return d+'d ago'; var w=Math.floor(d/7); if(w<5) return w+(w===1?' week ago':' weeks ago'); var mo=Math.floor(d/30); return mo+(mo===1?' month ago':' months ago'); }
+  var BF_EVT={ call:['ti-phone','g'], text:['ti-message-2','g'], message:['ti-message-2','g'], email:['ti-mail','g'], vm:['ti-microphone-2','g'], stage_change:['ti-arrow-right','g'], offer_generated:['ti-file-text','g'], offer_sent:['ti-send','g'], competing_values:['ti-alert-triangle','a'], vin_received:['ti-scan','x'], appt_booked:['ti-calendar-event','g'], lead_created:['ti-user-plus','x'] };
+  var BF_WSDEF={ 'Fresh Leads':'aiforce','Engaged - Awaiting VIN':'aiforce','VIN Received - Appraisal Needed':'scripts','Appraisal Complete - Enter Offer Sheet Values':'aiforce','Offer Sheet Generated':'scripts','Offer Sent (0-2 Days)':'aiforce','Nurturing (Follow Up and Re-engage)':'tasks','Appraisal Review Needed':'scripts','Appraisal Review Complete':'scripts','Verbal Yes - Schedule Appt':'schedule','Scheduled':'schedule','Appt Shown - Follow Up':'log' };
+  var BF_LOGLBL={ message:'Messaged', call:'Called', text:'Texted', email:'Emailed', vm:'Left VM' };
+  var bfWsTabMem={};
+  function bfWsEvtHtml(e){
+    if(e.type==='note'){ return '<div class="bf-ws-item"><span class="bf-ws-dot note">'+esc(bfInits(e.actor))+'</span><div class="bf-ws-ib"><div class="bf-ws-it"><span class="bf-ws-kind">Note</span>'+esc(e.actor||'Note')+'</div><div class="bf-ws-note">'+esc(e.text||'')+'</div><div class="bf-ws-meta">'+esc(bfRel(e.createdAt))+'</div></div></div>'; }
+    var ic=BF_EVT[e.type]||['ti-circle-dot','x']; var dc=ic[1]==='g'?'green':(ic[1]==='a'?'amber':'gray');
+    var meta=[]; if(e.actor) meta.push(esc(e.actor)); var rt=bfRel(e.createdAt); if(rt) meta.push(rt);
+    return '<div class="bf-ws-item"><span class="bf-ws-dot '+dc+'"><i class="ti '+ic[0]+'" aria-hidden="true"></i></span><div class="bf-ws-ib"><div class="bf-ws-it">'+esc(e.text||'')+'</div><div class="bf-ws-meta">'+meta.join(' · ')+'</div></div></div>';
+  }
+  function bfWsFeed(ws, events){ var f=ws.querySelector('.bf-ws-tl'); if(!f) return; if(!events||!events.length){ f.innerHTML='<div class="bf-ws-empty">No activity yet — add a note or log a touch to start the timeline.</div>'; return; } f.innerHTML=events.map(bfWsEvtHtml).join(''); }
+  function bfWsLoad(ws, uuid){ var f=ws.querySelector('.bf-ws-tl'); if(f) f.innerHTML='<div class="bf-ws-empty">Loading…</div>'; bfGetEvents(uuid).then(function(d){ if(ws.getAttribute('data-uuid')!==uuid||!ws.isConnected) return; bfWsFeed(ws, (d&&d.events)||[]); }); }
+  function bfWsPrepend(ws, e){ var f=ws.querySelector('.bf-ws-tl'); if(!f) return; var emp=f.querySelector('.bf-ws-empty'); if(emp) f.innerHTML=''; f.insertAdjacentHTML('afterbegin', bfWsEvtHtml(e)); }
+  function bfWsScripts(stg, F){
+    var ui=STAGE_UI[stg]; var tr=[];
+    if(ui&&ui.layout){ ui.layout.forEach(function(it){ if(it.k==='track'&&it.wt) tr.push(it.wt); }); }
+    if(!tr.length) return '<div class="bf-ws-empty">No scripts for this stage.</div>';
+    var h=''; tr.forEach(function(wt){ var txt=bfFillTrack(wt.t, F); h+='<div class="bf-ws-track"><div class="bf-ws-trh"><span class="bf-ws-trn">'+esc(wt.l)+'</span><button class="bf-ws-copy"><i class="ti ti-copy" aria-hidden="true"></i>Copy</button></div><div class="bf-ws-track-txt">'+esc(txt)+'</div></div>'; });
+    return h;
+  }
+  function bfWsHtml(stg, F){
+    function T(id,label,icon,badge){ return '<button class="bf-ws-tab" data-tab="'+id+'" type="button"'+(badge?' data-badge="'+badge+'"':'')+'><i class="ti '+icon+'" aria-hidden="true"></i>'+label+'</button>'; }
+    var tabs='<div class="bf-ws-tabs" role="tablist">'+T('timeline','Timeline','ti-clock')+T('aiforce','AIForce','ti-sparkles','AI')+T('scripts','Scripts','ti-align-left')+T('log','Log','ti-checkbox')+T('schedule','Schedule','ti-calendar')+T('tasks','Tasks','ti-bell')+'</div>';
+    var pTL='<section class="bf-ws-panel" data-panel="timeline"><div class="bf-ws-composer"><input class="bf-ws-noteinput" placeholder="Add a note for the team…"><button class="bf-ws-send" data-act="note" type="button" aria-label="Post note"><i class="ti ti-send" aria-hidden="true"></i></button></div><p class="bf-ws-micro">Notes drop into the timeline and become the deal’s <b>Last Comment</b>. Notes, calls, stage moves, offers, appointments — all show here newest-first.</p><div class="bf-ws-tl"></div></section>';
+    var pAI='<section class="bf-ws-panel" data-panel="aiforce"><div class="bf-ws-lbl">Seller’s last message</div><textarea class="bf-ws-seller" placeholder="Paste the seller’s last message here…"></textarea><button class="bf-ws-btn ghost" data-act="aiforce" type="button"><i class="ti ti-sparkles" aria-hidden="true"></i>Get AIForce replies</button><p class="bf-ws-micro">AIForce drafts 2–3 replies in your voice from your word tracks + this deal. You copy and send — <b>it never sends on its own.</b> <span class="bf-ws-soon">Activates once your Claude API key is added in n8n.</span></p></section>';
+    var pSC='<section class="bf-ws-panel" data-panel="scripts"><div class="bf-ws-rowsplit"><div class="bf-ws-lbl" style="margin:0;">Scripts for this stage</div><span class="bf-ws-stage">'+esc(stg||'')+'</span></div><div class="bf-ws-scripts">'+bfWsScripts(stg,F)+'</div></section>';
+    var pLG='<section class="bf-ws-panel" data-panel="log"><div class="bf-ws-lbl">Log a touch</div><div class="bf-ws-row">'+['Messaged|message|ti-message-2','Called|call|ti-phone','Texted|text|ti-message-dots','Emailed|email|ti-mail','Left VM|vm|ti-microphone-2'].map(function(s,i){var p=s.split('|');return '<button class="bf-ws-type'+(i===0?' sel':'')+'" data-logtype="'+p[1]+'" type="button"><i class="ti '+p[2]+'" aria-hidden="true"></i>'+p[0]+'</button>';}).join('')+'</div><div class="bf-ws-composer" style="margin-top:10px;"><input class="bf-ws-loginput" placeholder="What happened? (optional)"></div><button class="bf-ws-btn primary" data-act="log" type="button" style="margin-top:10px;"><i class="ti ti-check" aria-hidden="true"></i>Log touch</button><p class="bf-ws-micro">Posts the touch to the <b>Timeline</b> and resets the follow-up clock.</p></section>';
+    var pSH='<section class="bf-ws-panel" data-panel="schedule"><div class="bf-ws-soonbox"><i class="ti ti-calendar" aria-hidden="true"></i><div><b>Schedule</b><span>Book the buy appointment, stamp the time, move the deal to Scheduled, and copy the day-before confirmation — coming in the next build pass.</span></div></div></section>';
+    var pTK='<section class="bf-ws-panel" data-panel="tasks"><div class="bf-ws-soonbox"><i class="ti ti-bell" aria-hidden="true"></i><div><b>Tasks</b><span>Per-deal reminders that surface on your call list — coming in the next build pass.</span></div></div></section>';
+    return '<div class="bf-ws-head"><span class="bf-ws-h">Workspace</span><span class="bf-ws-ctx">tabs adapt to the deal stage</span></div>'+tabs+'<div class="bf-ws-panels">'+pTL+pAI+pSC+pLG+pSH+pTK+'</div>';
+  }
+  function bfWsActivate(ws, tab){ ws.querySelectorAll('.bf-ws-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab')===tab); }); ws.querySelectorAll('.bf-ws-panel').forEach(function(p){ p.classList.toggle('on', p.getAttribute('data-panel')===tab); }); }
+  function bfWsCopy(btn){ var box=btn.closest('.bf-ws-track')||btn.closest('.bf-ws-suggest'); var el=box?box.querySelector('.bf-ws-track-txt, .bf-ws-suggest-txt'):null; var txt=el?el.textContent:''; try{ navigator.clipboard.writeText(txt); }catch(e){} var o=btn.innerHTML; btn.innerHTML='<i class="ti ti-check" aria-hidden="true"></i>Copied'; setTimeout(function(){ btn.innerHTML=o; },1200); }
+  function bfWsAction(ws, uuid, act){
+    var actor=bfCurUser(); var nowI=new Date().toISOString();
+    if(act==='note'){ var inp=ws.querySelector('.bf-ws-noteinput'); var t=(inp&&inp.value||'').trim(); if(!t) return; bfPostEvent({uuid:uuid,type:'note',actor:actor,text:t}); bfPost({uuid:uuid,lastComment:t,lastCommentAt:nowI}); bfWsPrepend(ws,{type:'note',actor:actor,text:t,createdAt:nowI}); inp.value=''; bfToast('Note posted'); return; }
+    if(act==='log'){ var sel=ws.querySelector('.bf-ws-type.sel[data-logtype]'); var ty=sel?sel.getAttribute('data-logtype'):'message'; var ln=ws.querySelector('.bf-ws-loginput'); var note=(ln&&ln.value||'').trim(); var lbl=BF_LOGLBL[ty]||'Logged'; var txt=lbl+(note?' — '+note:''); bfPostEvent({uuid:uuid,type:ty,actor:actor,text:txt}); bfPost({uuid:uuid,lastFollowUpAt:nowI}); bfWsPrepend(ws,{type:ty,actor:actor,text:txt,createdAt:nowI}); if(ln) ln.value=''; bfToast('Logged · clock reset'); return; }
+    if(act==='aiforce'){ bfToast('AIForce activates once your Claude API key is added in n8n'); return; }
+  }
+  function bfWorkspace(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    var ws=document.querySelector('.bf-ws');
+    if(ws && ws.getAttribute('data-uuid')===uuid) return;
+    var main=document.querySelector('.bf-main'); if(!main) return;
+    var host=main.querySelector(':scope > .max-w-6xl')||main;
+    if(ws) ws.remove();
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
+    var F=card?bfReadF(card):{}; var stg=card?stageOf(card):'';
+    ws=document.createElement('div'); ws.className='bf-ws'; ws.setAttribute('data-uuid',uuid);
+    ws.innerHTML=bfWsHtml(stg,F);
+    host.insertBefore(ws, host.firstChild);
+    var def=bfWsTabMem[uuid]||BF_WSDEF[stg]||'timeline';
+    bfWsActivate(ws, def);
+    ws.addEventListener('click', function(e){
+      var tg=e.target;
+      var tab=tg.closest&&tg.closest('.bf-ws-tab'); if(tab){ var n=tab.getAttribute('data-tab'); bfWsTabMem[uuid]=n; bfWsActivate(ws,n); return; }
+      var ty=tg.closest&&tg.closest('.bf-ws-type[data-logtype]'); if(ty){ ws.querySelectorAll('.bf-ws-type[data-logtype]').forEach(function(x){x.classList.toggle('sel',x===ty);}); return; }
+      var cp=tg.closest&&tg.closest('.bf-ws-copy'); if(cp){ e.preventDefault(); bfWsCopy(cp); return; }
+      var ac=tg.closest&&tg.closest('[data-act]'); if(ac){ e.preventDefault(); bfWsAction(ws, uuid, ac.getAttribute('data-act')); return; }
+    });
+    ws.querySelectorAll('.bf-ws-noteinput,.bf-ws-loginput').forEach(function(inp){ inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); bfWsAction(ws, uuid, inp.classList.contains('bf-ws-noteinput')?'note':'log'); } }); });
+    bfWsLoad(ws, uuid);
+  }
+
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
