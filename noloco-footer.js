@@ -938,7 +938,7 @@
       var chip=h.querySelector(':scope > .bf-rschip');
       if(status==='current'){ if(!chip){ chip=document.createElement('span'); chip.className='bf-rschip'; chip.textContent='Current step'; h.appendChild(chip); } chip.style.display=''; }
       else if(chip){ chip.style.display='none'; }
-      if(/competing offers/i.test(t)){ var form=sec.querySelector('form'); if(form && !sec.querySelector(':scope .bf-secblurb')){ var bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; form.parentNode.insertBefore(bl, form); } }
+      if(/competing offers/i.test(t) && !sec.querySelector('.bf-secblurb')){ var hw=h.parentElement; var bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; if(hw&&hw.parentNode) hw.parentNode.insertBefore(bl, hw.nextSibling); }
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
