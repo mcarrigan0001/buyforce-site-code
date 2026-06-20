@@ -807,7 +807,7 @@ div:has(> div > [data-testid="record-view"]) {
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
   .bf-main { grid-column: 2 !important; grid-row: 2 !important; }
-  .bf-sidebar { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important; min-height: 100% !important;
+  .bf-sidebar { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 0 !important; max-height: 100vh !important; overflow-y: auto !important; padding: 8px !important;
         box-shadow: 16px 0 34px -8px rgba(87,200,34,0.175), 3px 0 0 0 rgba(87,200,34,0.19) !important; }
   .bf-sidebar [class*="section-comments"] { display: none !important; }
   .bf-sidebar { font-size: 11px !important; }
@@ -1342,3 +1342,13 @@ div:has(> div > [data-testid="record-view"]) {
    only ever on cards >600px from viewport, so in-view cards are never affected).
    contain-intrinsic-size:auto remembers each card's real height -> jitter-free collapse/expand. ---- */
 .bf-vhidden { content-visibility: hidden !important; contain-intrinsic-size: auto 320px !important; }
+
+/* ---- Mobile: swipe-left to collapse sidebar + restore tab ---- */
+.bf-sbrestore { display: none; }
+@media (max-width: 900px) {
+  body.bf-sbcollapsed [data-testid="record-view-body"] { grid-template-columns: 1fr !important; }
+  body.bf-sbcollapsed .bf-sidebar { display: none !important; }
+  body.bf-sbcollapsed .bf-main, body.bf-sbcollapsed .bf-rectop { grid-column: 1 / -1 !important; }
+  body.bf-sbcollapsed .bf-sbrestore { display: flex !important; align-items: center; justify-content: center; position: fixed; left: 0; top: 50%; transform: translateY(-50%); z-index: 10000; width: 22px; height: 58px; background: #0e100d; color: #fff; border-radius: 0 10px 10px 0; box-shadow: 2px 0 10px rgba(0,0,0,0.32); cursor: pointer; }
+  body.bf-sbcollapsed .bf-sbrestore i { font-size: 18px; }
+}

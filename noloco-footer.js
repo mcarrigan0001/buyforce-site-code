@@ -791,9 +791,11 @@
       if(location.pathname.indexOf('/preview/')<0) return;
       if(!e.touches||e.touches.length!==1) return;
       var tgt=e.target;
-      if(tgt&&tgt.closest&&tgt.closest('input,textarea,[contenteditable],select,button,a,[role="button"],[data-testid="action-button"],.bf-flip')) return;
-      panel=getPanel(); if(!panel) return;
-      var t=e.touches[0]; sx=t.clientX; sy=t.clientY; w=(panel.getBoundingClientRect().width)||window.innerWidth;
+      if(tgt&&tgt.closest&&tgt.closest('input,textarea,[contenteditable],select,button,a,[role="button"],[data-testid="action-button"],.bf-flip,.bf-rectop,.bf-sidebar')) return;
+      var p=getPanel(); if(!p) return;
+      var t=e.touches[0]; var pr=p.getBoundingClientRect();
+      if((t.clientY - pr.top) < 100) return;
+      panel=p; sx=t.clientX; sy=t.clientY; w=(pr.width)||window.innerWidth;
     }, {passive:true});
     document.addEventListener('touchmove', function(e){
       if(!panel||!e.touches||!e.touches.length) return;
@@ -829,6 +831,31 @@
         setTimeout(function(){ clearStyles(p); }, 210);
       }
     }, {passive:true});
+  }
+  var bfSbBound=false;
+  function bfSidebarSwipe(){
+    if(bfSbBound) return; bfSbBound=true;
+    var sx=0, sy=0, on=false;
+    document.addEventListener('touchstart', function(e){
+      on=false;
+      if(window.innerWidth>900) return;
+      if(location.pathname.indexOf('/preview/')<0) return;
+      var t=e.target; if(!(t&&t.closest&&t.closest('.bf-sidebar'))) return;
+      if(!e.touches||e.touches.length!==1) return;
+      sx=e.touches[0].clientX; sy=e.touches[0].clientY; on=true;
+    }, {passive:true});
+    document.addEventListener('touchend', function(e){
+      if(!on) return; on=false;
+      var t=e.changedTouches&&e.changedTouches[0]; if(!t) return;
+      var dx=t.clientX-sx, dy=t.clientY-sy;
+      if(dx < -45 && Math.abs(dx) > Math.abs(dy)*1.3){ document.body.classList.add('bf-sbcollapsed'); }
+    }, {passive:true});
+  }
+  function bfEnsureSbRestore(){
+    if(document.querySelector('.bf-sbrestore')) return;
+    var h=document.createElement('div'); h.className='bf-sbrestore'; h.setAttribute('aria-label','Show sidebar'); h.innerHTML='<i class="ti ti-chevron-right" aria-hidden="true"></i>';
+    h.addEventListener('click', function(){ document.body.classList.remove('bf-sbcollapsed'); });
+    document.body.appendChild(h);
   }
   function bfFlipGo(u){
     var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]');
@@ -1717,7 +1744,7 @@
       else if(sx.querySelector('[class*="section-details"]')){ if(!sx.classList.contains('bf-main')) sx.classList.add('bf-main'); }
     });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
