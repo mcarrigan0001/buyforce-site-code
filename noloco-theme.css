@@ -1467,3 +1467,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-ws-eta:empty{display:none;}
 .bf-ws-eta i{color:#1a73e8;font-size:15px;margin-top:1px;flex:0 0 auto;}
 .bf-ws-eta b{color:#161616;font-weight:600;}
+
+/* Schedule booked-state summary */
+.bf-ws-bkrow{display:flex;align-items:center;gap:8px;font-size:14px;color:#161616;margin-top:8px;}
+.bf-ws-bkrow i{color:#2b6012;font-size:16px;flex:0 0 auto;}
