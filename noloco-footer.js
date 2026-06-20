@@ -727,7 +727,7 @@
     bfCollapsedFor=key;
   }
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
-  var bfFlipL=null, bfFlipR=null;
+  var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0;
   function bfMkFlip(side){
     var b=document.createElement('button'); b.type='button'; b.className='bf-flip';
     b.style.cssText='position:fixed;'+(side==='r'?'right':'left')+':12px;top:50%;transform:translateY(-50%);z-index:10050;display:none;cursor:pointer;';
@@ -737,11 +737,17 @@
   function bfRecFlip(){
     if(location.pathname.indexOf('/preview/')<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
-    var order=[];
-    document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
-      var lab=g.querySelector('[data-testid="collection-group-header-label"]'); var cn=lab?norm(lab.textContent):'';
-      g.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){ var h=c.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); if(mm) order.push({u:mm[1], col:cn}); });
-    });
+    var cards=document.querySelectorAll('[data-testid="collection-record"]'); var cnt=cards.length;
+    var order=bfFlipOrder;
+    var stale=!order||cnt!==bfFlipCount||!order.some(function(o){return o.u===uuid;});
+    if(stale){
+      order=[];
+      document.querySelectorAll('[data-testid="collection-group"]:not(.w-12)').forEach(function(g){
+        var lab=g.querySelector('[data-testid="collection-group-header-label"]'); var cn=lab?norm(lab.textContent):'';
+        g.querySelectorAll('[data-testid="collection-record"]').forEach(function(c){ var h=c.getAttribute('href')||''; var mm=h.match(/(rec[0-9a-z]+)/i); if(mm) order.push({u:mm[1], col:cn}); });
+      });
+      bfFlipOrder=order; bfFlipCount=cnt;
+    }
     if(!order.length) return;
     var idx=-1; for(var i=0;i<order.length;i++){ if(order[i].u===uuid){ idx=i; break; } }
     if(idx<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
