@@ -711,6 +711,7 @@
   var bfArrowR, bfArrowL, bfBusy=false, bfArrowResize=false;
   var bfBackdrop;
   var bfCloseBtn;
+  function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
   var bfFlipL=null, bfFlipR=null;
   function bfMkFlip(side){
     var b=document.createElement('button'); b.type='button'; b.className='bf-flip';
@@ -930,7 +931,7 @@
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
     var grid=sb.querySelector('[class*="section-highlights"] [class*="grid"]'); if(!grid) return;
-    if(!bfMoResizeBound){ bfMoResizeBound=true; window.addEventListener('resize', function(){ try{ bfRecMobileOffers(); }catch(e){} }, {passive:true}); }
+    if(!bfMoResizeBound){ bfMoResizeBound=true; window.addEventListener('resize', bfDeb(function(){ try{ bfRecMobileOffers(); }catch(e){} },180), {passive:true}); }
     var cmH=null, cvH=null;
     grid.querySelectorAll('[data-testid="highlight-item"]').forEach(function(it){ var l=it.querySelector('[data-testid="highlight-label"]'); var t=l?(l.textContent||''):''; if(/carmax/i.test(t)) cmH=it; else if(/carvana/i.test(t)) cvH=it; });
     var lbl=grid.querySelector(':scope > .bf-otb-m');
@@ -1117,7 +1118,7 @@
     if(!sc.getAttribute('data-bfscroll')){
       sc.addEventListener('scroll',function(){ if(!bfBusy) updateArrows(); },{passive:true});
       sc.setAttribute('data-bfscroll','1');
-      if(!bfArrowResize){ bfArrowResize=true; window.addEventListener('resize',function(){ updateArrows(); },{passive:true}); }
+      if(!bfArrowResize){ bfArrowResize=true; window.addEventListener('resize', bfDeb(function(){ updateArrows(); },180), {passive:true}); }
       updateArrows();
     }
   }
@@ -1547,5 +1548,5 @@
   }
   new MutationObserver(bfScheduleRun).observe(document.body, { childList: true, subtree: true });
   setInterval(function(){ addCards(true); }, 60000);
-  window.addEventListener('resize', updateArrows);
+  window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
