@@ -946,6 +946,49 @@
       [].forEach.call(sec.querySelectorAll('form > div'),function(cell){ var lb=cell.querySelector('label'); if(!lb) return; var lt=lb.textContent.trim(); var vEl=cell.querySelector('[id="field-cell"]'); if(!vEl) return; var vt=(vEl.textContent||'').trim(); function setp(c){ vEl.classList.add('bf-pillval'); vEl.classList.remove('bf-pg','bf-pa','bf-pr'); vEl.classList.add(c); } if(/accident history/i.test(lt)){ if(/clean/i.test(vt)) setp('bf-pg'); else if(/accident/i.test(vt)) setp('bf-pa'); } else if(/offer sheet status/i.test(lt)){ if(/not generated/i.test(vt)) setp('bf-pr'); else if(/generated/i.test(vt)) setp('bf-pg'); } });
     });
   }
+  function bfPortBlock(stages, skip, skipUrl, F, uuid){
+    var inner='', seen={};
+    stages.forEach(function(sk){
+      var ui=STAGE_UI[sk]; if(!ui) return;
+      var items = ui.layout ? ui.layout.slice() : [];
+      if(!ui.layout){ (ui.tracks||[]).forEach(function(wt){items.push({k:'track',wt:wt});}); (ui.fields||[]).forEach(function(fd){items.push({k:'field',f:fd});}); (ui.buttons||[]).forEach(function(b){items.push({k:'btn',b:b});}); }
+      items.forEach(function(it){
+        if(skip.indexOf(it.k)>-1) return;
+        if(it.k==='btn'){ if(skipUrl && it.b.a==='url') return; var key=it.b.l+'|'+(it.b.to||''); if(seen[key]) return; seen[key]=1; if(it.b.showEmpty&&(F[it.b.showEmpty]||'').trim())return; inner+=bfButton(it.b,uuid); }
+        else if(it.k==='field'){ inner+=bfFieldHtml(it.f,F,uuid); }
+        else if(it.k==='track'){ var tk='trk|'+it.wt.l; if(seen[tk])return; seen[tk]=1; inner+=bfTrack(it.wt,F); }
+        else if(it.k==='notes'){ inner+=bfNotesPreview(F); }
+        else if(it.k==='info'){ inner+='<div class="bf-info">'+esc(it.text)+'</div>'; }
+        else if(it.k==='apptin'){ inner+=bfApptIn(F); }
+      });
+    });
+    return inner;
+  }
+  function bfRecPort(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var mm=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=mm?mm[1]:''; if(!uuid) return;
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); var F=card?bfReadF(card):{};
+    var CFG=[
+      {re:/vin\b|vin &/i, stages:['Fresh Leads','Engaged - Awaiting VIN'], skip:['decode','field'], skipUrl:false},
+      {re:/competing offers/i, stages:['VIN Received - Appraisal Needed'], skip:['field','info'], skipUrl:true},
+      {re:/make the offer/i, stages:['Appraisal Complete - Enter Offer Sheet Values'], skip:['field','info'], skipUrl:false},
+      {re:/send offer/i, stages:['Offer Sheet Generated','Nurturing (Follow Up and Re-engage)'], skip:['field'], skipUrl:false},
+      {re:/schedule/i, stages:['Verbal Yes - Schedule Appt','Scheduled'], skip:['field'], skipUrl:false}
+    ];
+    [].forEach.call(document.querySelectorAll('[data-testid="details-section"]'),function(sec){
+      var h=sec.querySelector('h2'); if(!h) return; var t=h.textContent.replace(/\s+/g,' ').trim();
+      var cfg=null; for(var i=0;i<CFG.length;i++){ if(CFG[i].re.test(t)){ cfg=CFG[i]; break; } }
+      if(!cfg) return;
+      var raw=cfg.stages.join('|')+'#'+(F['Vehicle Title']||'')+'#'+(F['Offer Sheet Image URL']||'')+'#'+(F['Notes for Appraisal']||F['Condition Notes']||'')+'#'+(F['Seller Name']||'')+'#'+(F['Appointment Date/Time']||F['Appointment']||'');
+      var ex=sec.querySelector(':scope > .bf-secport');
+      if(ex && ex.getAttribute('data-raw')===raw) return;
+      var html=bfPortBlock(cfg.stages, cfg.skip, cfg.skipUrl, F, uuid);
+      if(!html){ if(ex) ex.remove(); return; }
+      if(!ex){ ex=document.createElement('div'); ex.className='bf-secport'; sec.appendChild(ex); }
+      ex.setAttribute('data-raw', raw);
+      ex.innerHTML='<div class="bf-secdiv"></div><div class="bf-stack">'+html+'</div>';
+    });
+  }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }
   function bfPos(sc, el){ return el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft; }
   function bfExpanded(sc){ return sc.querySelectorAll('[data-testid="collection-group"]:not(.w-12)'); }
@@ -1238,8 +1281,8 @@
   }
 
   function bfHandleBtn(btn){
-    var card=btn.closest('[data-testid="collection-record"]'); if(!card) return;
     var uuid=btn.getAttribute('data-bfuuid')||'';
+    var card=btn.closest('[data-testid="collection-record"]')||(uuid?document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'):null);
     var a=btn.getAttribute('data-bfaction');
     if(a==='url'){ bfOpen(btn.getAttribute('data-bfurl')); return; }
     if(a==='choice'){ var cw=btn.closest('.bf-choicewrap'); if(cw) cw.classList.toggle('bf-open'); return; }
@@ -1249,6 +1292,7 @@
       bfMoveCard(card, uuid, btn.getAttribute('data-bfto'));
       return;
     }
+    if(!card) return;
     if(a==='viewsheet'){
       var F=bfReadF(card); var img=F['Offer Sheet Image URL']||''; var nm=F['Vehicle Title']||'';
       if(!img){ bfToast('No offer sheet yet'); return; }
@@ -1409,7 +1453,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); manageBackdrop(); bfLoadUsers(); if(!onRec){ addCards(false); if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }

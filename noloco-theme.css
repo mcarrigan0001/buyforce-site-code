@@ -1270,3 +1270,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Release field cells from the old grid-cols-12 full-width rule so they sit side-by-side ---- */
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:not(:has(textarea)) { grid-column: auto !important; }
 [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:has(textarea), [data-testid="record-view-body"] [data-testid="details-section"] form > div.bf-secblurb, [data-testid="record-view-body"] [data-testid="details-section"] .bf-secblurb { grid-column: 1 / -1 !important; }
+
+/* ---- Ported card stage-UI inside record sections ---- */
+.bf-secport { margin-top: 14px !important; grid-column: 1 / -1 !important; }
+.bf-secport .bf-secdiv { border-top: 1px solid #e3e1d8 !important; margin: 0 0 12px 0 !important; }
