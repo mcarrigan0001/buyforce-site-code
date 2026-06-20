@@ -685,11 +685,11 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] { display: flex !important; flex-wrap: wrap !important; align-items: flex-start !important; justify-content: space-between !important; gap: 16px 0 !important; }
 [data-testid="record-view-body"] > * { flex: 0 0 100% !important; }
 /* Sidebar = the container that holds Comments */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+.bf-sidebar {
   flex: 0 0 35% !important; position: sticky !important; top: 12px !important; align-self: flex-start !important;
 }
 /* Main = the container that holds the detail sections (and not comments) */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) {
+.bf-main {
   flex: 0 0 63% !important;
 }
 @media (max-width: 900px) {
@@ -703,16 +703,16 @@ div:has(> div > [data-testid="record-view"]) {
 [data-testid="record-view-body"] { background: #ffffff !important; }
 
 /* ---- Record sidebar highlights: fit values in the narrow column (2-up cards, smaller numbers, no mid-number breaks). Scoped to the highlights container only. ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="grid-cols"] {
+.bf-sidebar [class*="grid-cols"] {
   grid-template-columns: repeat(2, minmax(0,1fr)) !important;
 }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-4xl"],
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"],
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"],
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] {
+.bf-sidebar [class*="text-4xl"],
+.bf-sidebar [class*="text-3xl"],
+.bf-sidebar [class*="text-2xl"],
+.bf-sidebar [class*="text-xl"] {
   font-size: 17px !important; line-height: 1.2 !important;
 }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) * {
+.bf-sidebar * {
   overflow-wrap: normal !important; word-break: keep-all !important;
 }
 
@@ -740,10 +740,10 @@ div:has(> div > [data-testid="record-view"]) {
 @media (max-width: 640px) { .bf-rtlabel { font-size: 9px; } .bf-rtcirc { width: 18px; height: 18px; } }
 
 /* ---- Record cockpit: main-column sections fill the column (override old centered-narrow Details rule) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="record-view-section"].section-details {
+.bf-main [data-testid="record-view-section"].section-details {
   margin-left: 0 !important; margin-right: 0 !important; max-width: none !important; width: 100% !important;
 }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="max-w-"] {
+.bf-main [class*="max-w-"] {
   max-width: none !important;
 }
 /* clickable progress steps */
@@ -752,7 +752,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rtclick:hover .bf-rtlabel { color: #3b6d11; }
 
 /* ---- Record sidebar: distinct panel background (sits behind the white summary/comments cards) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+.bf-sidebar {
   background: #0e100d !important; border-radius: 0 14px 14px 0 !important; padding: 12px !important; box-shadow: 16px 0 40px -8px rgba(87,200,34,0.35), 3px 0 0 0 rgba(87,200,34,0.385) !important;
 }
 
@@ -781,39 +781,39 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rtstatl { font-size: 9px; font-weight: 600; letter-spacing: .6px; color: #9aa0a6; }
 
 /* ---- Sidebar dark theme: light headings, white-glow highlight cards ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { color: #e7ece2 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { background: #ffffff !important; box-shadow: 0 0 8px rgba(90,90,90,0.35) !important; }
+.bf-sidebar h2, .bf-sidebar [class*="section-title"] { color: #e7ece2 !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] { background: #ffffff !important; box-shadow: 0 0 8px rgba(90,90,90,0.35) !important; }
 
 /* ---- Record cockpit -> CSS grid so the sidebar spans full height (up to the header) ---- */
 [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 35% 63% !important; grid-template-rows: auto 1fr !important; gap: 14px 2% !important; align-items: start !important; }
 [data-testid="record-view-body"] > * { grid-column: 1 / -1 !important; }
 [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 12px !important; }
+.bf-main { grid-column: 2 !important; grid-row: 2 !important; }
+.bf-sidebar { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: start !important; position: sticky !important; top: 12px !important; }
 /* VIN & Vehicle + all main sections full width in the left column */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="grid-cols-12"] > div { grid-column: 1 / -1 !important; }
+.bf-main [class*="grid-cols-12"] > div { grid-column: 1 / -1 !important; }
 @media (max-width: 900px) { [data-testid="record-view-body"] { display: block !important; } }
 
 /* ---- Highlight cards: center title + value (h & v) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] {
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] {
   display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; min-height: 86px !important;
 }
 /* ---- CarMax/Carvana (all) notices full width in the sidebar ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { grid-column: 1 / -1 !important; width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
+.bf-sidebar [class*="section-notice"] { grid-column: 1 / -1 !important; width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important; }
 
 /* ---- Mobile: keep the sidebar effect, on the LEFT at ~32%, comments hidden, smaller text ---- */
 @media (max-width: 900px) {
   [data-testid="record-view-body"] { display: grid !important; grid-template-columns: 27% 73% !important; gap: 10px 2% !important; align-items: start !important; }
   [data-testid="record-view-body"] > * { grid-column: 2 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important; min-height: 100% !important;
+  .bf-main { grid-column: 2 !important; grid-row: 2 !important; }
+  .bf-sidebar { grid-column: 1 !important; grid-row: 1 / span 2 !important; align-self: stretch !important; position: static !important; padding: 8px !important; min-height: 100% !important;
         box-shadow: 16px 0 34px -8px rgba(87,200,34,0.175), 3px 0 0 0 rgba(87,200,34,0.19) !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { display: none !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 11px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 58px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] { font-size: 15px !important; }
+  .bf-sidebar [class*="section-comments"] { display: none !important; }
+  .bf-sidebar { font-size: 11px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] { min-height: 58px !important; }
+  .bf-sidebar [class*="text-3xl"], .bf-sidebar [class*="text-2xl"], .bf-sidebar [class*="text-xl"] { font-size: 15px !important; }
 }
 
 /* ---- Header stat cluster (flame/distance/drive/days) + Visit Listing, injected into native header ---- */
@@ -823,148 +823,148 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: shrink sidebar further for the ~20% width ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 10px !important; padding: 6px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"] { font-size: 13px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { min-height: 46px !important; padding: 4px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"] { font-size: 11px !important; }
+  .bf-sidebar { font-size: 10px !important; padding: 6px !important; }
+  .bf-sidebar [class*="text-3xl"], .bf-sidebar [class*="text-2xl"], .bf-sidebar [class*="text-xl"] { font-size: 13px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] { min-height: 46px !important; padding: 4px !important; }
+  .bf-sidebar h2, .bf-sidebar [class*="section-title"] { font-size: 11px !important; }
 }
 
 /* ---- Card-style meta injected into the record header (under the title) ---- */
 .bf-hdrmeta { margin-top: 5px; }
 
 /* ---- Highlight cards: fixed squares (do not reshape on resize) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { display: grid !important; grid-template-columns: repeat(auto-fill, 128px) !important; justify-content: center !important; gap: 10px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: 128px !important; height: 128px !important; min-height: 128px !important; max-width: 128px !important; flex: 0 0 128px !important; }
+.bf-sidebar [class*="section-highlights"] [class*="grid-cols"] { display: grid !important; grid-template-columns: repeat(auto-fill, 128px) !important; justify-content: center !important; gap: 10px !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] { width: 128px !important; height: 128px !important; min-height: 128px !important; max-width: 128px !important; flex: 0 0 128px !important; }
 
 /* ---- Notices (Est Equity / CarMax / Carvana / Beats): true full width ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"],
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) :has(> [class*="section-notice"]) { display: block !important; width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important; grid-column: 1 / -1 !important; box-sizing: border-box !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="max-w-"] { max-width: none !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] > * { width: 100% !important; box-sizing: border-box !important; }
+.bf-sidebar [class*="section-notice"],
+.bf-sidebar :has(> [class*="section-notice"]) { display: block !important; width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important; grid-column: 1 / -1 !important; box-sizing: border-box !important; }
+.bf-sidebar [class*="section-notice"] [class*="max-w-"] { max-width: none !important; }
+.bf-sidebar [class*="section-notice"] > * { width: 100% !important; box-sizing: border-box !important; }
 
 /* ---- Mobile: highlights flex to fit the narrow sidebar (override fixed squares) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: 100% !important; max-width: 100% !important; height: auto !important; min-height: 46px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] { width: 100% !important; max-width: 100% !important; height: auto !important; min-height: 46px !important; }
 }
 
 /* ---- Mobile: keep main clamped to its column (no bleed under the sidebar) ---- */
 @media (max-width: 900px) {
   [data-testid="record-view-body"] > * { min-width: 0 !important; overflow-x: hidden !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) { grid-column: 2 !important; grid-row: 2 !important; min-width: 0 !important; }
+  .bf-main { grid-column: 2 !important; grid-row: 2 !important; min-width: 0 !important; }
   [data-testid="record-view-body"] > .bf-rectop { grid-column: 2 !important; grid-row: 1 !important; min-width: 0 !important; }
 }
 
 /* ---- Mobile sidebar: contain everything inside the narrow column (no bleed), stack notice label/value, shrink text ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { overflow: hidden !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) * { min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="justify-between"],
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="flex"]:not([class*="flex-col"]) { flex-wrap: wrap !important; row-gap: 1px !important; justify-content: flex-start !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { font-size: 10px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-4xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-3xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-2xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-xl"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="text-lg"] { font-size: 13px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { padding: 5px 4px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { white-space: normal !important; overflow-wrap: normal !important; }
+  .bf-sidebar { overflow: hidden !important; }
+  .bf-sidebar * { min-width: 0 !important; max-width: 100% !important; box-sizing: border-box !important; }
+  .bf-sidebar [class*="section-notice"] [class*="justify-between"],
+  .bf-sidebar [class*="section-notice"] [class*="flex"]:not([class*="flex-col"]) { flex-wrap: wrap !important; row-gap: 1px !important; justify-content: flex-start !important; }
+  .bf-sidebar { font-size: 10px !important; }
+  .bf-sidebar [class*="text-4xl"], .bf-sidebar [class*="text-3xl"], .bf-sidebar [class*="text-2xl"], .bf-sidebar [class*="text-xl"], .bf-sidebar [class*="text-lg"] { font-size: 13px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] { padding: 5px 4px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] * { white-space: normal !important; overflow-wrap: normal !important; }
 }
 
 /* ---- Mobile sidebar: minimal L/R padding + smaller icons ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { padding: 8px 2px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { padding: 4px 2px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding-left: 6px !important; padding-right: 6px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) svg { font-size: 12px !important; width: 13px !important; height: 13px !important; flex: none !important; }
+  .bf-sidebar { padding: 8px 2px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] { padding: 4px 2px !important; }
+  .bf-sidebar [class*="section-notice"] { padding-left: 6px !important; padding-right: 6px !important; }
+  .bf-sidebar i, .bf-sidebar svg { font-size: 12px !important; width: 13px !important; height: 13px !important; flex: none !important; }
 }
 
 /* ---- Mobile notices: stack label over value (was side-by-side and overflowing), tighten padding ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding: 8px 6px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="w-full"][class*="gap-4"] { flex-direction: column !important; gap: 0 !important; align-items: flex-start !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5 { font-size: 11px !important; line-height: 1.2 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 600 !important; margin: 0 !important; }
+  .bf-sidebar [class*="section-notice"] { padding: 8px 6px !important; }
+  .bf-sidebar [class*="section-notice"] [class*="w-full"][class*="gap-4"] { flex-direction: column !important; gap: 0 !important; align-items: flex-start !important; }
+  .bf-sidebar [class*="section-notice"] h5 { font-size: 11px !important; line-height: 1.2 !important; }
+  .bf-sidebar [class*="section-notice"] p { font-size: 13px !important; font-weight: 600 !important; margin: 0 !important; }
 }
 
 /* ---- Mobile sidebar: uniform square tiles (highlights + notices), icon/label/value stacked centered ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"],
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] {
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"],
+  .bf-sidebar [class*="section-notice"] {
     width: 100% !important; max-width: 100% !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important;
     display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
     text-align: center !important; padding: 6px 4px !important; gap: 1px !important; overflow: hidden !important; box-sizing: border-box !important;
   }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] > * { width: 100% !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="flex"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 0 !important; width: 100% !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="grow"] { flex: none !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5,
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"],
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label { font-size: 10px !important; line-height: 1.1 !important; font-weight: 500 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.15 !important; margin: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) svg { font-size: 13px !important; width: 14px !important; height: 14px !important; flex: none !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] * { white-space: normal !important; overflow-wrap: break-word !important; }
+  .bf-sidebar [class*="section-notice"] > * { width: 100% !important; }
+  .bf-sidebar [class*="section-notice"] [class*="flex"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 0 !important; width: 100% !important; }
+  .bf-sidebar [class*="section-notice"] [class*="grow"] { flex: none !important; }
+  .bf-sidebar [class*="section-notice"] h5,
+  .bf-sidebar [class*="section-highlights"] [class*="text-stone"],
+  .bf-sidebar [class*="section-highlights"] label { font-size: 10px !important; line-height: 1.1 !important; font-weight: 500 !important; }
+  .bf-sidebar [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.15 !important; margin: 0 !important; }
+  .bf-sidebar i, .bf-sidebar svg { font-size: 13px !important; width: 14px !important; height: 14px !important; flex: none !important; }
+  .bf-sidebar [class*="section-notice"] *, .bf-sidebar [class*="section-highlights"] * { white-space: normal !important; overflow-wrap: break-word !important; }
 }
 
 /* ---- "Offers to beat" (and any sidebar section title) -> white (desktop + mobile) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-title"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h2, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h3, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h4 { color: #ffffff !important; }
+.bf-sidebar [class*="section-title"], .bf-sidebar h2, .bf-sidebar h3, .bf-sidebar h4 { color: #ffffff !important; }
 
 /* ---- Mobile notices: force the inner label/value row to stack + center ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="gap-4"] { flex-direction: column !important; align-items: center !important; gap: 0 !important; width: 100% !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="gap-4"] > * { width: 100% !important; text-align: center !important; flex: none !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
+  .bf-sidebar [class*="section-notice"] [class*="gap-4"] { flex-direction: column !important; align-items: center !important; gap: 0 !important; width: 100% !important; }
+  .bf-sidebar [class*="section-notice"] [class*="gap-4"] > * { width: 100% !important; text-align: center !important; flex: none !important; }
+  .bf-sidebar [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
 }
 
 /* ---- Mobile: extend sidebar flush to the record's left edge ---- */
 @media (max-width: 900px) {
   [data-testid="record-view-body"] { padding-left: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: -6px !important; padding-left: 6px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .bf-sidebar { margin-left: -6px !important; padding-left: 6px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
 }
 
 /* ---- Mobile notices: stack icon/label/value via block flow (bulletproof) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class~="gap-2"],
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class~="gap-4"] { display: block !important; text-align: center !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class~="gap-2"] > *,
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class~="gap-4"] > * { width: 100% !important; text-align: center !important; margin: 0 auto !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
+  .bf-sidebar [class*="section-notice"] [class~="gap-2"],
+  .bf-sidebar [class*="section-notice"] [class~="gap-4"] { display: block !important; text-align: center !important; }
+  .bf-sidebar [class*="section-notice"] [class~="gap-2"] > *,
+  .bf-sidebar [class*="section-notice"] [class~="gap-4"] > * { width: 100% !important; text-align: center !important; margin: 0 auto !important; }
+  .bf-sidebar [class*="section-notice"] p { font-size: 12px !important; line-height: 1.15 !important; }
 }
 
 /* ---- "Offers to beat" is an H1 in the sidebar -> white ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) h1 { color: #ffffff !important; }
+.bf-sidebar h1 { color: #ffffff !important; }
 
 /* ---- Mobile tile internals: consistent icon / label / value sizing ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] i, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] i { font-size: 14px !important; margin: 0 0 2px !important; opacity: .85 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] h5, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 9.5px !important; font-weight: 500 !important; line-height: 1.12 !important; letter-spacing: .2px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.18 !important; white-space: normal !important; overflow-wrap: break-word !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 14px !important; font-weight: 700 !important; }
+  .bf-sidebar [class*="section-notice"] i, .bf-sidebar [class*="section-highlights"] i { font-size: 14px !important; margin: 0 0 2px !important; opacity: .85 !important; }
+  .bf-sidebar [class*="section-notice"] h5, .bf-sidebar [class*="section-highlights"] label, .bf-sidebar [class*="section-highlights"] [class*="text-stone"] { font-size: 9.5px !important; font-weight: 500 !important; line-height: 1.12 !important; letter-spacing: .2px !important; }
+  .bf-sidebar [class*="section-notice"] p { font-size: 13px !important; font-weight: 700 !important; line-height: 1.18 !important; white-space: normal !important; overflow-wrap: break-word !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 14px !important; font-weight: 700 !important; }
 }
 
 /* ---- Mobile: force notice label/value row to stack (direct $SB selector, no section-notice middle) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] { display: flex !important; flex-direction: column !important; flex-wrap: wrap !important; align-items: center !important; gap: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-4"] > * { flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; text-align: center !important; }
+  .bf-sidebar [class~="gap-4"] { display: flex !important; flex-direction: column !important; flex-wrap: wrap !important; align-items: center !important; gap: 0 !important; }
+  .bf-sidebar [class~="gap-4"] > * { flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; text-align: center !important; }
 }
 
 /* ---- THE FIX: mobile notice label/value stack (override base .section-notice .grow flex-row) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 1px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > h5 { text-align: center !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > div { white-space: normal !important; text-align: center !important; font-size: 13px !important; line-height: 1.15 !important; }
+  .bf-sidebar .section-notice .grow { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 1px !important; }
+  .bf-sidebar .section-notice .grow > h5 { text-align: center !important; }
+  .bf-sidebar .section-notice .grow > div { white-space: normal !important; text-align: center !important; font-size: 13px !important; line-height: 1.15 !important; }
 }
 
 /* ---- Mobile sidebar refinement pass ---- */
 @media (max-width: 900px) {
   /* center all highlight card text (centers "ACV: $..." too) */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
   /* labels -1px */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice h5 { font-size: 8.5px !important; }
+  .bf-sidebar [class*="section-highlights"] label, .bf-sidebar [class*="section-highlights"] [class*="text-stone"], .bf-sidebar .section-notice h5 { font-size: 8.5px !important; }
   /* highlight values +1px */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 15px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 15px !important; }
   /* notice values (Est Equity / CarMax / Carvana): smaller + space below the label */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice .grow > div { font-size: 12px !important; margin-top: 4px !important; }
+  .bf-sidebar .section-notice .grow > div { font-size: 12px !important; margin-top: 4px !important; }
   /* uniform square size for ALL notices (Est Equity, CarMax, Carvana, Beats Both) */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .section-notice { aspect-ratio: 1 / 1 !important; padding: 6px 4px !important; }
+  .bf-sidebar .section-notice { aspect-ratio: 1 / 1 !important; padding: 6px 4px !important; }
   /* standardize spacing between objects to match the highlights grid gap */
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class~="gap-3"] { gap: 10px !important; }
+  .bf-sidebar [class~="gap-3"] { gap: 10px !important; }
 }
 
 /* ---- Cockpit: hide Noloco's native header bar (only when our header band is present = safe fallback) ---- */
@@ -982,13 +982,13 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile: force-center highlight card content (ACV, -- included) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"], .bf-sidebar [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
 }
 
 /* ---- Mobile sidebar: sticky on scroll ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { position: sticky !important; top: 0 !important; align-self: start !important; max-height: 100vh !important; overflow-y: auto !important; }
+  .bf-sidebar { position: sticky !important; top: 0 !important; align-self: start !important; max-height: 100vh !important; overflow-y: auto !important; }
 }
 
 /* ---- Stat tiles (SCORE / DISTANCE / DRIVE TIME): uniform, icon stacked over value ---- */
@@ -1016,88 +1016,88 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 /* ---- Highlight cards: fill column, center h+v, full values (no "..."); 2-up desktop, 1-up mobile ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr 1fr !important; justify-content: stretch !important; gap: 8px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { width: auto !important; max-width: none !important; flex: none !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; padding: 8px 6px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; white-space: normal !important; overflow-wrap: break-word !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 16px !important; font-weight: 700 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; }
-@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; } }
+.bf-sidebar [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr 1fr !important; justify-content: stretch !important; gap: 8px !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] { width: auto !important; max-width: none !important; flex: none !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; padding: 8px 6px !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; white-space: normal !important; overflow-wrap: break-word !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 16px !important; font-weight: 700 !important; }
+.bf-sidebar [class*="section-highlights"] label, .bf-sidebar [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; }
+@media (max-width: 900px) { .bf-sidebar [class*="section-highlights"] [class*="grid-cols"] { grid-template-columns: 1fr !important; } }
 
 /* ---- Desktop: pull sidebar flush to the record's right edge (remove pink-marked padding) ---- */
 @media (min-width: 901px) {
   [data-testid="record-view-body"] { padding-left: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: 0 !important; padding: 12px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] > *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding-left: 0 !important; padding-right: 0 !important; }
+  .bf-sidebar { margin-left: 0 !important; padding: 12px !important; }
+  .bf-sidebar [class*="section-highlights"], .bf-sidebar [class*="section-highlights"] > *, .bf-sidebar [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+  .bf-sidebar [class*="section-notice"] { padding-left: 0 !important; padding-right: 0 !important; }
 }
 
 /* ---- Highlight labels: match the card DEAL PROGRESS label style ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; text-transform: uppercase !important; }
+.bf-sidebar [class*="section-highlights"] label, .bf-sidebar [class*="section-highlights"] [class*="text-stone"] { font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; text-transform: uppercase !important; }
 /* ---- Desktop: bump highlight value font +7px ---- */
 @media (min-width: 901px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 23px !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { font-size: 23px !important; }
 }
 
 /* ---- Highlight values: default black (override gray); Offer Amount recolored by JS per Competition ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { color: #161616 !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { color: #161616 !important; }
 
 /* ---- Highlight values: keep whole (no mid-number break) when the card narrows ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { white-space: nowrap !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="font-medium"]:not(label) { white-space: nowrap !important; }
 
 /* ---- Sidebar: cancel inner negative margins (-mx-3 etc.) so all objects respect the uniform sidebar padding on every side ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mt-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-top: 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-mb-"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="-my-"] { margin-bottom: 0 !important; }
+.bf-sidebar [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
+.bf-sidebar [class*="-mt-"], .bf-sidebar [class*="-my-"] { margin-top: 0 !important; }
+.bf-sidebar [class*="-mb-"], .bf-sidebar [class*="-my-"] { margin-bottom: 0 !important; }
 
 /* ---- Highlight cards: center label/value/ACV at ALL widths ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] * { text-align: center !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="flex"] { justify-content: center !important; align-items: center !important; }
 /* ---- Highlight labels -> uppercase DEAL PROGRESS format (broadened selector) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] label, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-stone"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-muted"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] label, .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="text-stone"], .bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="text-muted"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; }
 /* ---- Comments object: fill to the same edges as other objects ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] { padding-left: 0 !important; padding-right: 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-comments"] [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
+.bf-sidebar [class*="section-comments"] { padding-left: 0 !important; padding-right: 0 !important; }
+.bf-sidebar [class*="section-comments"] [class*="-mx-"] { margin-left: 0 !important; margin-right: 0 !important; }
 
 /* ---- Highlight LABEL is span.text-black -> uppercase DEAL PROGRESS format ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-black"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="text-black"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
 /* ---- Center: neutralize mr-auto that left-aligns the card content ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="mr-auto"] { margin-left: auto !important; margin-right: auto !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="mr-auto"] { margin-left: auto !important; margin-right: auto !important; }
 
 /* ---- All highlight labels uppercase (target every non-value text in the card; value classes excluded) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] *:not([class*="font-medium"]):not([class*="text-lg"]):not([class*="text-2xl"]):not([class*="break-words"]) { text-transform: uppercase !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] *:not([class*="font-medium"]):not([class*="text-lg"]):not([class*="text-2xl"]):not([class*="break-words"]) { text-transform: uppercase !important; }
 
 /* ---- Asking Price / Est Payoff labels use text-white-400 -> same DEAL PROGRESS format ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="rounded"] [class*="text-white-400"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
+.bf-sidebar [class*="section-highlights"] [class*="rounded"] [class*="text-white-400"] { text-transform: uppercase !important; font-size: 10px !important; font-weight: 600 !important; letter-spacing: 1px !important; color: #6b6b64 !important; white-space: normal !important; }
 
 /* ---- Sidebar: uniform 8px gap between ALL objects (flex column + zero per-component margins) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { display: flex !important; flex-direction: column !important; gap: 8px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * { margin-top: 0 !important; margin-bottom: 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) > * > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+.bf-sidebar { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+.bf-sidebar > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+.bf-sidebar > * > * { margin-top: 0 !important; margin-bottom: 0 !important; }
 
 /* ---- Mobile: notices match highlight square size + 8px grid gap ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { aspect-ratio: auto !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] [class*="rounded-lg"] { aspect-ratio: 1 / 1 !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="grid-cols-12"] { gap: 8px !important; }
+  .bf-sidebar [class*="section-notice"] { aspect-ratio: auto !important; }
+  .bf-sidebar [class*="section-notice"] [class*="rounded-lg"] { aspect-ratio: 1 / 1 !important; width: 100% !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; }
+  .bf-sidebar [class*="grid-cols-12"] { gap: 8px !important; }
 }
 
 /* ---- Mobile: even L/R sidebar padding + objects fill content area uniformly ---- */
 @media (max-width: 900px) {
   [data-testid="record-view-body"] { padding-left: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) { margin-left: 0 !important; padding: 8px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] > *, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] { padding-left: 0 !important; padding-right: 0 !important; }
+  .bf-sidebar { margin-left: 0 !important; padding: 8px !important; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
+  .bf-sidebar [class*="section-highlights"], .bf-sidebar [class*="section-highlights"] > *, .bf-sidebar [class*="section-highlights"] [class*="max-w-"] { max-width: none !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+  .bf-sidebar [class*="section-notice"] { padding-left: 0 !important; padding-right: 0 !important; }
 }
 
 /* ---- Mobile: half-height for Est Equity + Beats notices ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { aspect-ratio: 2 / 1 !important; }
+  .bf-sidebar .bf-noti-eq [class*="rounded-lg"], .bf-sidebar .bf-noti-beats [class*="rounded-lg"] { aspect-ratio: 2 / 1 !important; }
 }
 
 /* ---- Desktop: remove white gap above the sidebar (align its top with main) ---- */
 @media (min-width: 901px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+  .bf-sidebar {
     margin-top: 0 !important; top: 0 !important;
   }
 }
@@ -1111,54 +1111,54 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Desktop: full-height sticky sidebar rail + 50px breathing room above Main (header + sections) ---- */
 @media (min-width: 901px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) {
+  .bf-sidebar {
     min-height: calc(100vh - 80px) !important; align-self: stretch !important;
   }
   [data-testid="record-view-body"] > .bf-rectop { margin-top: 50px !important; }
 }
 
 /* ---- Notice content fixes: eq vertical-center, beats stacked+centered, "Offers to beat" fit ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"] { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq .grow { text-align: center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 3px !important; text-align: center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats .grow { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; width: 100% !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb { display: block !important; white-space: nowrap !important; overflow: visible !important; text-overflow: clip !important; font-size: 12px !important; letter-spacing: .3px !important; }
+.bf-sidebar .bf-noti-eq [class*="rounded-lg"] { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; }
+.bf-sidebar .bf-noti-eq .grow { text-align: center !important; }
+.bf-sidebar .bf-noti-beats [class*="rounded-lg"] { flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 3px !important; text-align: center !important; }
+.bf-sidebar .bf-noti-beats .grow { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; width: 100% !important; }
+.bf-sidebar .bf-otb { display: block !important; white-space: nowrap !important; overflow: visible !important; text-overflow: clip !important; font-size: 12px !important; letter-spacing: .3px !important; }
 
 /* ---- CarMax/Carvana notices: match ASKING PRICE label (10px) + value (16px, medium) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cm h5, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cv h5 { font-size: 14px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cm .grow p, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cv .grow p,
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cm .grow [class*="text-["], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-cv .grow [class*="text-["] { font-size: 16px !important; font-weight: 500 !important; }
+.bf-sidebar .bf-noti-cm h5, .bf-sidebar .bf-noti-cv h5 { font-size: 14px !important; }
+.bf-sidebar .bf-noti-cm .grow p, .bf-sidebar .bf-noti-cv .grow p,
+.bf-sidebar .bf-noti-cm .grow [class*="text-["], .bf-sidebar .bf-noti-cv .grow [class*="text-["] { font-size: 16px !important; font-weight: 500 !important; }
 
 /* ---- v2 stronger fixes: eq center, beats text width, otb fit ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"] { display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"] > * { width:100% !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq .grow { width:100% !important; text-align:center !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] { flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; gap:2px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"] > * { width:100% !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats .grow { width:100% !important; flex:1 1 auto !important; text-align:center !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats h5 { width:100% !important; text-align:center !important; font-size:13px !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb * { white-space:nowrap !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb { font-size:11px !important; text-align:center !important; overflow:visible !important; padding-left:4px !important; padding-right:4px !important; }
+.bf-sidebar .bf-noti-eq [class*="rounded-lg"] { display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; }
+.bf-sidebar .bf-noti-eq [class*="rounded-lg"] > * { width:100% !important; }
+.bf-sidebar .bf-noti-eq .grow { width:100% !important; text-align:center !important; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:center !important; }
+.bf-sidebar .bf-noti-beats [class*="rounded-lg"] { flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; gap:2px !important; }
+.bf-sidebar .bf-noti-beats [class*="rounded-lg"] > * { width:100% !important; }
+.bf-sidebar .bf-noti-beats .grow { width:100% !important; flex:1 1 auto !important; text-align:center !important; }
+.bf-sidebar .bf-noti-beats h5 { width:100% !important; text-align:center !important; font-size:13px !important; }
+.bf-sidebar .bf-otb, .bf-sidebar .bf-otb * { white-space:nowrap !important; }
+.bf-sidebar .bf-otb { font-size:11px !important; text-align:center !important; overflow:visible !important; padding-left:4px !important; padding-right:4px !important; }
 
 /* ---- Equity + Beats rendered as card-style pills (override the half-height/centering notice rules) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [class*="rounded-lg"][data-bfpill], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [class*="rounded-lg"][data-bfpill] { aspect-ratio: auto !important; min-height: 0 !important; height: auto !important; flex-direction: row !important; gap: 6px !important; }
+.bf-sidebar .bf-noti-beats [class*="rounded-lg"][data-bfpill], .bf-sidebar .bf-noti-eq [class*="rounded-lg"][data-bfpill] { aspect-ratio: auto !important; min-height: 0 !important; height: auto !important; flex-direction: row !important; gap: 6px !important; }
 
 /* ---- Pill refinements: center text (shrink span to content), fit long Beats labels on mobile, center Offers-to-beat on mobile ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] > span, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] > span { width: auto !important; max-width: 100% !important; justify-content: center !important; white-space: nowrap !important; }
+.bf-sidebar .bf-noti-beats [data-bfpill] > span, .bf-sidebar .bf-noti-eq [data-bfpill] > span { width: auto !important; max-width: 100% !important; justify-content: center !important; white-space: nowrap !important; }
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] { padding: 6px 8px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] > span, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-eq [data-bfpill] > span { font-size: 10px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats [data-bfpill] i { font-size: 11px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb * { justify-content: center !important; }
+  .bf-sidebar .bf-noti-beats [data-bfpill], .bf-sidebar .bf-noti-eq [data-bfpill] { padding: 6px 8px !important; }
+  .bf-sidebar .bf-noti-beats [data-bfpill] > span, .bf-sidebar .bf-noti-eq [data-bfpill] > span { font-size: 10px !important; }
+  .bf-sidebar .bf-noti-beats [data-bfpill] i { font-size: 11px !important; }
+  .bf-sidebar .bf-otb, .bf-sidebar .bf-otb * { justify-content: center !important; }
 }
 
 /* ---- Highlight card icons (centered above label) ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { display: block !important; width: 100% !important; text-align: center !important; font-size: 17px !important; line-height: 1 !important; color: #6b6b64 !important; margin: 0 0 5px 0 !important; }
+.bf-sidebar [data-testid="highlight-item"] .bf-hicon { display: block !important; width: 100% !important; text-align: center !important; font-size: 17px !important; line-height: 1 !important; color: #6b6b64 !important; margin: 0 0 5px 0 !important; }
 
 /* ---- Desktop only: hide CarMax/Carvana highlight cards (they show as notices on desktop); mobile keeps them as the 3rd/4th highlights ---- */
 @media (min-width: 901px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(3),
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(4) { display: none !important; }
+  .bf-sidebar [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(3),
+  .bf-sidebar [class*="section-highlights"] [class*="grid"] > [data-testid="highlight-item"]:nth-child(4) { display: none !important; }
 }
 
 /* ---- Header: Visit Listing as a compact external-link icon in the top-right corner ---- */
@@ -1168,22 +1168,22 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Desktop: nudge header band + main sections right (start ~where pink line is), slightly narrower ---- */
 @media (min-width: 901px) {
   [data-testid="record-view-body"] > .bf-rectop,
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) {
+  .bf-main {
     margin-left: 36px !important; width: calc(100% - 36px) !important; box-sizing: border-box !important;
   }
 }
 
 /* ---- Dollar-badge icon sizing (CarMax/Carvana) ---- */
 .bf-dbadge { width: 17px; height: 17px; display: inline-block; vertical-align: middle; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [class*="section-notice"] .bf-dbadge { width: 18px; height: 18px; }
+.bf-sidebar [class*="section-notice"] .bf-dbadge { width: 18px; height: 18px; }
 /* ---- Mobile: nudge ACV sub-line up so it centers in the Offer Amount card ---- */
-@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] [class*="text-stone-600"] { margin-top: -5px !important; } }
+@media (max-width: 900px) { .bf-sidebar [data-testid="highlight-item"] [class*="text-stone-600"] { margin-top: -5px !important; } }
 
 /* ---- Mobile offers-to-beat group injected into highlights grid ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb-m { grid-column: 1 / -1 !important; color: #fff !important; font-size: 12px !important; font-weight: 500 !important; text-align: center !important; letter-spacing: .3px !important; margin: 2px 0 0 0 !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats { grid-column: 1 / -1 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 999px !important; padding: 6px 9px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important; box-sizing: border-box !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-mbeats span { display: inline-flex !important; align-items: center !important; gap: 4px !important; font-size: 9px !important; font-weight: 700 !important; white-space: nowrap !important; }
-@media (max-width: 900px) { [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-otb, [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-noti-beats { display: none !important; } }
+.bf-sidebar .bf-otb-m { grid-column: 1 / -1 !important; color: #fff !important; font-size: 12px !important; font-weight: 500 !important; text-align: center !important; letter-spacing: .3px !important; margin: 2px 0 0 0 !important; }
+.bf-sidebar .bf-mbeats { grid-column: 1 / -1 !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 999px !important; padding: 6px 9px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.18) !important; box-sizing: border-box !important; }
+.bf-sidebar .bf-mbeats span { display: inline-flex !important; align-items: center !important; gap: 4px !important; font-size: 9px !important; font-weight: 700 !important; white-space: nowrap !important; }
+@media (max-width: 900px) { .bf-sidebar .bf-otb, .bf-sidebar .bf-noti-beats { display: none !important; } }
 
 /* ---- Header redesign: title + accident pill, meta & stats side-by-side (compact) ---- */
 .bf-rechdr-titlewrap { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; flex-wrap: wrap; }
@@ -1268,8 +1268,8 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-pillval.bf-pr { background: #fbe3e3 !important; color: #a32d2d !important; }
 
 /* ---- Release field cells from the old grid-cols-12 full-width rule so they sit side-by-side ---- */
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:not(:has(textarea)) { grid-column: auto !important; }
-[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [data-testid="details-section"] form > div:has(textarea), [data-testid="record-view-body"] [data-testid="details-section"] form > div.bf-secblurb, [data-testid="record-view-body"] [data-testid="details-section"] .bf-secblurb { grid-column: 1 / -1 !important; }
+.bf-main [data-testid="details-section"] form > div:not(:has(textarea)) { grid-column: auto !important; }
+.bf-main [data-testid="details-section"] form > div:has(textarea), [data-testid="record-view-body"] [data-testid="details-section"] form > div.bf-secblurb, [data-testid="record-view-body"] [data-testid="details-section"] .bf-secblurb { grid-column: 1 / -1 !important; }
 
 /* ---- Ported card stage-UI inside record sections ---- */
 .bf-secport { margin-top: 14px !important; grid-column: 1 / -1 !important; }
@@ -1309,15 +1309,15 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile sidebar polish (Offer/ACV, hide flip arrows + collapse-all on record) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { margin-bottom: 4px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"] * { color: #141414 !important; }
+  .bf-sidebar [data-testid="highlight-item"] .bf-hicon { margin-bottom: 4px !important; }
+  .bf-sidebar .bf-edit[data-bffmt="acv"], .bf-sidebar .bf-edit[data-bffmt="acv"] * { color: #141414 !important; }
   .bf-flip { display: none !important; }
   body.bf-rec-open .bf-allcollapse { display: none !important; }
 }
 
 /* ---- Mobile: align body sections' left edge with header (remove grid-cell px-3 inset) ---- */
 @media (max-width: 900px) {
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="grid-cols-12"][class*="-mx-3"] > [class*="col-span"] { padding-left: 0 !important; padding-right: 0 !important; }
+  .bf-main [class*="grid-cols-12"][class*="-mx-3"] > [class*="col-span"] { padding-left: 0 !important; padding-right: 0 !important; }
 }
 
 /* ---- Mobile: Previous / Next Record nav buttons in sidebar ---- */

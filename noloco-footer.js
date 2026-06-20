@@ -1696,7 +1696,14 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function bfTagContainers(){
+    var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
+    body.querySelectorAll(':scope > [data-testid="record-view-section"][class*="section-container"]').forEach(function(sx){
+      if(sx.querySelector('[class*="section-highlights"]')){ if(!sx.classList.contains('bf-sidebar')) sx.classList.add('bf-sidebar'); }
+      else if(sx.querySelector('[class*="section-details"]')){ if(!sx.classList.contains('bf-main')) sx.classList.add('bf-main'); }
+    });
+  }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
@@ -1709,7 +1716,7 @@
     var since=Date.now()-bfLast;
     if(since>=700){ if(bfTimer){ clearTimeout(bfTimer); bfTimer=null; } bfFire(); return; } /* maxWait */
     if(bfTimer) clearTimeout(bfTimer);
-    bfTimer=setTimeout(bfFire, 200); /* debounce */
+    bfTimer=setTimeout(bfFire, 250); /* debounce */
   }
   bfStartObs();
   function bfTickClocks(){
