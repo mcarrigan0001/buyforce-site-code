@@ -1279,3 +1279,13 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-edit { cursor: pointer; }
 .bf-edit:hover { outline: 1px dashed rgba(87,200,34,0.55); outline-offset: 2px; border-radius: 4px; }
 .bf-edit-input { width: 100% !important; box-sizing: border-box !important; font: inherit !important; text-align: center !important; border: 1px solid #57C822 !important; border-radius: 6px !important; padding: 2px 4px !important; background: #fff !important; color: #161616 !important; }
+
+/* ===== Design pass: ported stage blocks 2-up (text left / buttons right), tidy header ===== */
+.bf-portgrid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 16px !important; align-items: start !important; }
+.bf-port-text { display: flex !important; flex-direction: column !important; gap: 10px !important; min-width: 0 !important; }
+.bf-port-btns { display: flex !important; flex-direction: column !important; gap: 8px !important; align-self: start !important; }
+.bf-port-btns .bf-btn { width: 100% !important; justify-content: center !important; }
+@media (max-width: 900px) { .bf-portgrid { grid-template-columns: 1fr !important; } }
+/* title shouldn't wrap awkwardly in the header */
+[data-testid="details-section"] h2 { flex-wrap: nowrap !important; min-width: 0 !important; }
+[data-testid="details-section"] h2 .bf-rschip { flex: none !important; }

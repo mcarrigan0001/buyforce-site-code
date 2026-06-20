@@ -943,26 +943,28 @@
         var cmLbl=null; [].forEach.call(sec.querySelectorAll('label'),function(l){ if(/carmax offer/i.test(l.textContent)) cmLbl=l; });
         if(cmLbl){ var cc2=cmLbl; while(cc2&&cc2.parentElement&&cc2.parentElement.tagName!=='FORM') cc2=cc2.parentElement; var bl=sec.querySelector('.bf-secblurb'); if(!bl){ bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; } if(cc2&&cc2.parentNode&&cc2.previousElementSibling!==bl) cc2.parentNode.insertBefore(bl,cc2); }
       }
+      var _coll=!sec.querySelector('form'); [].forEach.call(sec.querySelectorAll('[data-testid="action-button"]'),function(b){ b.style.display=_coll?'none':''; });
       [].forEach.call(sec.querySelectorAll('form > div'),function(cell){ var lb=cell.querySelector('label'); if(!lb) return; var lt=lb.textContent.trim(); var vEl=cell.querySelector('[id="field-cell"]'); if(!vEl) return; var vt=(vEl.textContent||'').trim(); function setp(c){ vEl.classList.add('bf-pillval'); vEl.classList.remove('bf-pg','bf-pa','bf-pr'); vEl.classList.add(c); } if(/accident history/i.test(lt)){ if(/clean/i.test(vt)) setp('bf-pg'); else if(/accident/i.test(vt)) setp('bf-pa'); } else if(/offer sheet status/i.test(lt)){ if(/not generated/i.test(vt)) setp('bf-pr'); else if(/generated/i.test(vt)) setp('bf-pg'); } });
     });
   }
   function bfPortBlock(stages, skip, skipUrl, F, uuid){
-    var inner='', seen={};
+    var textHtml='', btnHtml='', seen={};
     stages.forEach(function(sk){
       var ui=STAGE_UI[sk]; if(!ui) return;
       var items = ui.layout ? ui.layout.slice() : [];
       if(!ui.layout){ (ui.tracks||[]).forEach(function(wt){items.push({k:'track',wt:wt});}); (ui.fields||[]).forEach(function(fd){items.push({k:'field',f:fd});}); (ui.buttons||[]).forEach(function(b){items.push({k:'btn',b:b});}); }
       items.forEach(function(it){
         if(skip.indexOf(it.k)>-1) return;
-        if(it.k==='btn'){ if(skipUrl && it.b.a==='url') return; var key=it.b.l+'|'+(it.b.to||''); if(seen[key]) return; seen[key]=1; if(it.b.showEmpty&&(F[it.b.showEmpty]||'').trim())return; inner+=bfButton(it.b,uuid); }
-        else if(it.k==='field'){ inner+=bfFieldHtml(it.f,F,uuid); }
-        else if(it.k==='track'){ var tk='trk|'+it.wt.l; if(seen[tk])return; seen[tk]=1; inner+=bfTrack(it.wt,F); }
-        else if(it.k==='notes'){ inner+=bfNotesPreview(F); }
-        else if(it.k==='info'){ inner+='<div class="bf-info">'+esc(it.text)+'</div>'; }
-        else if(it.k==='apptin'){ inner+=bfApptIn(F); }
+        if(it.k==='btn'){ if(skipUrl && it.b.a==='url') return; var key=it.b.l+'|'+(it.b.to||''); if(seen[key]) return; seen[key]=1; if(it.b.showEmpty&&(F[it.b.showEmpty]||'').trim())return; btnHtml+=bfButton(it.b,uuid); }
+        else if(it.k==='field'){ textHtml+=bfFieldHtml(it.f,F,uuid); }
+        else if(it.k==='track'){ var tk='trk|'+it.wt.l; if(seen[tk])return; seen[tk]=1; textHtml+=bfTrack(it.wt,F); }
+        else if(it.k==='notes'){ textHtml+=bfNotesPreview(F); }
+        else if(it.k==='info'){ textHtml+='<div class="bf-info">'+esc(it.text)+'</div>'; }
+        else if(it.k==='apptin'){ textHtml+=bfApptIn(F); }
       });
     });
-    return inner;
+    if(!textHtml && !btnHtml) return '';
+    return '<div class="bf-portgrid">'+(textHtml?'<div class="bf-port-text">'+textHtml+'</div>':'')+(btnHtml?'<div class="bf-port-btns">'+btnHtml+'</div>':'')+'</div>';
   }
   function bfRecPort(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
@@ -979,14 +981,17 @@
       var h=sec.querySelector('h2'); if(!h) return; var t=h.textContent.replace(/\s+/g,' ').trim();
       var cfg=null; for(var i=0;i<CFG.length;i++){ if(CFG[i].re.test(t)){ cfg=CFG[i]; break; } }
       if(!cfg) return;
-      var raw=cfg.stages.join('|')+'#'+(F['Vehicle Title']||'')+'#'+(F['Offer Sheet Image URL']||'')+'#'+(F['Notes for Appraisal']||F['Condition Notes']||'')+'#'+(F['Seller Name']||'')+'#'+(F['Appointment Date/Time']||F['Appointment']||'');
       var ex=sec.querySelector(':scope > .bf-secport');
+      var collapsed=!sec.querySelector('form');
+      if(collapsed){ if(ex) ex.style.display='none'; return; }
+      if(ex) ex.style.display='';
+      var raw=cfg.stages.join('|')+'#'+(F['Vehicle Title']||'')+'#'+(F['Offer Sheet Image URL']||'')+'#'+(F['Notes for Appraisal']||F['Condition Notes']||'')+'#'+(F['Seller Name']||'')+'#'+(F['Appointment Date/Time']||F['Appointment']||'');
       if(ex && ex.getAttribute('data-raw')===raw) return;
       var html=bfPortBlock(cfg.stages, cfg.skip, cfg.skipUrl, F, uuid);
       if(!html){ if(ex) ex.remove(); return; }
       if(!ex){ ex=document.createElement('div'); ex.className='bf-secport'; sec.appendChild(ex); }
       ex.setAttribute('data-raw', raw);
-      ex.innerHTML='<div class="bf-secdiv"></div><div class="bf-stack">'+html+'</div>';
+      ex.innerHTML='<div class="bf-secdiv"></div>'+html;
     });
   }
   function bfRecEditableHl(){
