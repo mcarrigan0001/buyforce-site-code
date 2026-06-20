@@ -938,7 +938,12 @@
       var chip=h.querySelector(':scope > .bf-rschip');
       if(status==='current'){ if(!chip){ chip=document.createElement('span'); chip.className='bf-rschip'; chip.textContent='Current step'; h.appendChild(chip); } chip.style.display=''; }
       else if(chip){ chip.style.display='none'; }
-      if(/competing offers/i.test(t) && !sec.querySelector('.bf-secblurb')){ var hw=h.parentElement; var bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; if(hw&&hw.parentNode) hw.parentNode.insertBefore(bl, hw.nextSibling); }
+      if(/competing offers/i.test(t)){
+        [].forEach.call(sec.querySelectorAll('p,div,span'),function(el){ if(el.children.length===0 && !el.classList.contains('bf-secblurb') && /in this section, notate/i.test(el.textContent||'')) el.style.display='none'; });
+        var cmLbl=null; [].forEach.call(sec.querySelectorAll('label'),function(l){ if(/carmax offer/i.test(l.textContent)) cmLbl=l; });
+        if(cmLbl){ var cc2=cmLbl; while(cc2&&cc2.parentElement&&cc2.parentElement.tagName!=='FORM') cc2=cc2.parentElement; var bl=sec.querySelector('.bf-secblurb'); if(!bl){ bl=document.createElement('div'); bl.className='bf-secblurb'; bl.textContent='In this section, notate anything noteworthy about the condition. Also, enter the values from CarMax and Carvana so the appraiser knows where the competition is on the vehicle.'; } if(cc2&&cc2.parentNode&&cc2.previousElementSibling!==bl) cc2.parentNode.insertBefore(bl,cc2); }
+      }
+      [].forEach.call(sec.querySelectorAll('form > div'),function(cell){ var lb=cell.querySelector('label'); if(!lb) return; var lt=lb.textContent.trim(); var vEl=cell.querySelector('[id="field-cell"]'); if(!vEl) return; var vt=(vEl.textContent||'').trim(); function setp(c){ vEl.classList.add('bf-pillval'); vEl.classList.remove('bf-pg','bf-pa','bf-pr'); vEl.classList.add(c); } if(/accident history/i.test(lt)){ if(/clean/i.test(vt)) setp('bf-pg'); else if(/accident/i.test(vt)) setp('bf-pa'); } else if(/offer sheet status/i.test(lt)){ if(/not generated/i.test(vt)) setp('bf-pr'); else if(/generated/i.test(vt)) setp('bf-pg'); } });
     });
   }
   function bfSC(){ var g=document.querySelector('[data-testid="collection-group"]'); return g?g.parentElement:null; }

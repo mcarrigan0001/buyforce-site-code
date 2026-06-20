@@ -1256,3 +1256,13 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Top section spacing: desktop -50%, mobile +10px ---- */
 @media (min-width: 901px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: 24px !important; } }
 @media (max-width: 900px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: 10px !important; } }
+
+/* ---- Blurb full-width in body; fields side-by-side; header shadow; status pills ---- */
+.bf-secblurb { grid-column: 1 / -1 !important; }
+[data-testid="details-section"] form > div { grid-column: auto !important; }
+[data-testid="details-section"] form > div:has(textarea) { grid-column: 1 / -1 !important; }
+.bf-rectop { box-shadow: 0 2px 16px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.04) !important; }
+.bf-pillval { display: inline-block !important; padding: 2px 9px !important; border-radius: 6px !important; font-size: 12px !important; font-weight: 500 !important; width: auto !important; }
+.bf-pillval.bf-pg { background: #e3f5cf !important; color: #27500a !important; }
+.bf-pillval.bf-pa { background: #fbeecd !important; color: #7a4d13 !important; }
+.bf-pillval.bf-pr { background: #fbe3e3 !important; color: #a32d2d !important; }
