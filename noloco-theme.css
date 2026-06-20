@@ -1309,7 +1309,7 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Mobile sidebar polish (Offer/ACV, hide flip arrows + collapse-all on record) ---- */
 @media (max-width: 900px) {
-  .bf-sidebar [data-testid="highlight-item"] .bf-hicon { margin-bottom: 4px !important; }
+  .bf-sidebar [data-testid="highlight-item"] .bf-hicon { margin-bottom: 3.5px !important; }
   .bf-sidebar .bf-edit[data-bffmt="acv"], .bf-sidebar .bf-edit[data-bffmt="acv"] * { color: #141414 !important; }
   .bf-flip { display: none !important; }
   body.bf-rec-open .bf-allcollapse { display: none !important; }
@@ -1328,9 +1328,9 @@ div:has(> div > [data-testid="record-view"]) {
   .bf-mobnav-btn .ti { font-size: 17px !important; flex: none !important; }
   .bf-mobnav-btn .bf-mn-main { font-size: 11px !important; }
   .bf-mobnav-btn.bf-mn-boundary { gap: 5px !important; background: linear-gradient(135deg,#5a8f1e,#3b6d11) !important; border-color: rgba(255,255,255,0.22) !important; }
-  .bf-mn-stack { display: flex !important; flex-direction: column !important; line-height: 1.1 !important; }
-  .bf-mobnav-btn[data-dir="prev"].bf-mn-boundary .bf-mn-stack { align-items: flex-start !important; }
-  .bf-mobnav-btn[data-dir="next"].bf-mn-boundary .bf-mn-stack { align-items: flex-end !important; }
+  .bf-mn-stack { display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; line-height: 1.1 !important; }
+  .bf-mobnav-btn[data-dir="prev"].bf-mn-boundary .bf-mn-stack { align-items: center !important; }
+  .bf-mobnav-btn[data-dir="next"].bf-mn-boundary .bf-mn-stack { align-items: center !important; }
   .bf-mn-cap { font-size: 8px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: .5px !important; opacity: .9 !important; }
   .bf-mn-col { font-size: 9.5px !important; font-weight: 700 !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
   .bf-mobnav-btn[disabled] { opacity: .3 !important; pointer-events: none !important; }

@@ -835,6 +835,13 @@
     if(tc){ tc.click(); }
     else { try{ history.pushState({},'','/opportunities-1/preview/'+u+'/overview'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/opportunities-1/preview/'+u+'/overview'; } }
   }
+  function bfShortStage(name){
+    var n=name||'';
+    if(/appraisal complete/i.test(n)) return 'Offer Sheet Values';
+    if(/vin received/i.test(n)) return 'Appraisal Needed';
+    if(/nurturing/i.test(n)) return 'Nurturing';
+    return n;
+  }
   function bfRecMobNav(){
     var nav=document.querySelector('.bf-mobnav');
     if(location.pathname.indexOf('/preview/')<0 || window.innerWidth>900){ if(nav) nav.remove(); return; }
@@ -851,7 +858,7 @@
       var chevD= dir==='prev'?'ti-chevrons-left':'ti-chevrons-right';
       if(ni<0||ni>=order.length){ return '<button class="bf-mobnav-btn" data-dir="'+dir+'" disabled>'+(dir==='prev'?'<i class="ti '+chevS+'"></i><span class="bf-mn-main">Start</span>':'<span class="bf-mn-main">End</span><i class="ti '+chevS+'"></i>')+'</button>'; }
       var t=order[ni]; var cross=(t.col!==cur.col);
-      if(cross){ var cap=dir==='prev'?'Prev stage':'Next stage'; var stack='<span class="bf-mn-stack"><span class="bf-mn-cap">'+cap+'</span><span class="bf-mn-col">'+esc(t.col)+'</span></span>'; var inner= dir==='prev'? ('<i class="ti '+chevD+'"></i>'+stack) : (stack+'<i class="ti '+chevD+'"></i>'); return '<button class="bf-mobnav-btn bf-mn-boundary" data-dir="'+dir+'" data-bfgo="'+t.u+'">'+inner+'</button>'; }
+      if(cross){ var cap=dir==='prev'?'Prev stage':'Next stage'; var stack='<span class="bf-mn-stack"><span class="bf-mn-cap">'+cap+'</span><span class="bf-mn-col">'+esc(bfShortStage(t.col))+'</span></span>'; var inner= dir==='prev'? ('<i class="ti '+chevD+'"></i>'+stack) : (stack+'<i class="ti '+chevD+'"></i>'); return '<button class="bf-mobnav-btn bf-mn-boundary" data-dir="'+dir+'" data-bfgo="'+t.u+'">'+inner+'</button>'; }
       var main= dir==='prev'? ('<i class="ti '+chevS+'"></i><span class="bf-mn-main">Previous Record</span>') : ('<span class="bf-mn-main">Next Record</span><i class="ti '+chevS+'"></i>');
       return '<button class="bf-mobnav-btn" data-dir="'+dir+'" data-bfgo="'+t.u+'">'+main+'</button>';
     }
@@ -1195,7 +1202,7 @@
       var vl=it.querySelector('[data-testid="highlight-value"]');
       if(/offer amount/i.test(t)){
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','offerAmount'); vl.setAttribute('data-bflabel','Offer Amount'); vl.setAttribute('data-bffmt','money'); }
-        var acv=it.querySelector('[class*="text-stone-600"]'); if(acv){ if(!acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); } if(window.innerWidth<=900){ acv.style.setProperty('color','#141414','important'); } else { acv.style.removeProperty('color'); } }
+        var acv=it.querySelector('[class*="text-stone-600"]'); if(acv){ if(!acv.classList.contains('bf-edit')){ acv.classList.add('bf-edit'); acv.setAttribute('data-bfkey','acv'); acv.setAttribute('data-bflabel','ACV'); acv.setAttribute('data-bffmt','acv'); } if(window.innerWidth<=900){ acv.style.setProperty('color','#141414','important'); } else { acv.style.removeProperty('color'); } var _at=acv.textContent||''; if(_at.indexOf('ACV:')>-1){ acv.textContent=_at.replace('ACV:','ACV'); } }
       } else if(/payoff/i.test(t)){
         if(/estimated payoff/i.test(t) && lb.textContent.trim().toUpperCase()!=='EST PAYOFF AMOUNT'){ lb.textContent='Est Payoff Amount'; }
         if(vl && !vl.classList.contains('bf-edit')){ vl.classList.add('bf-edit'); vl.setAttribute('data-bfkey','estimatedPayoffAmount'); vl.setAttribute('data-bflabel','Est Payoff'); vl.setAttribute('data-bffmt','money'); }
@@ -1221,7 +1228,7 @@
       var raw=(sv||'').replace(/[^0-9.]/g,''); var n=raw!==''?Number(raw):'';
       var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
       var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload);
-      el.textContent = n===''?'-':(fmt==='acv'?('ACV: $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
+      el.textContent = n===''?'-':(fmt==='acv'?('ACV $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
       try{ var _d=el.textContent; document.querySelectorAll('.bf-edit[data-bfkey="'+key+'"]').forEach(function(o){ if(o!==el && o.getAttribute('data-editing')!=='1'){ o.textContent=_d; } }); }catch(_2){}
       bfToast(lbl+' saved');
       if(key==='offerAmount'){ try{ bfRecTop(); }catch(_){} }
