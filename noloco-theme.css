@@ -1335,3 +1335,8 @@ div:has(> div > [data-testid="record-view"]) {
   .bf-mn-col { font-size: 9.5px !important; font-weight: 700 !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
   .bf-mobnav-btn[disabled] { opacity: .3 !important; pointer-events: none !important; }
 }
+
+/* ---- Experiment: virtualization-lite. Browser skips layout/paint of off-screen
+   board cards until they scroll near; renders visible ones fully. No visual change;
+   intrinsic-size is a self-correcting placeholder (auto = remember real height after first render). ---- */
+[data-testid="collection-record"] { content-visibility: auto; contain-intrinsic-size: auto 260px; }
