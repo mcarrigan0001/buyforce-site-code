@@ -1254,5 +1254,5 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-rsec-upcoming .bf-rscc { border: 2px solid #d3d1c7 !important; background: transparent !important; }
 .bf-secblurb { font-size: 13px !important; color: #6b6b64 !important; line-height: 1.5 !important; margin: 0 0 12px 0 !important; }
 /* ---- Top section spacing: desktop -50%, mobile +10px ---- */
-@media (min-width: 901px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: -8px !important; } }
+@media (min-width: 901px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: 24px !important; } }
 @media (max-width: 900px) { [data-testid="record-view-body"] > .bf-rectop { margin-top: 10px !important; } }
