@@ -1337,3 +1337,8 @@ div:has(> div > [data-testid="record-view"]) {
 }
 
 
+
+/* ---- Manual virtualization: far off-screen board cards skip rendering (JS toggles .bf-vhidden,
+   only ever on cards >600px from viewport, so in-view cards are never affected).
+   contain-intrinsic-size:auto remembers each card's real height -> jitter-free collapse/expand. ---- */
+.bf-vhidden { content-visibility: hidden !important; contain-intrinsic-size: auto 320px !important; }

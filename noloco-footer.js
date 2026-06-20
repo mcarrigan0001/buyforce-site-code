@@ -715,11 +715,18 @@
   var bfIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
     entries.forEach(function(en){ if(en.isIntersecting){ bfIO.unobserve(en.target); bfDecorateCard(en.target, false); } });
   }, { root: null, rootMargin: '900px 900px', threshold: 0 }) : null;
+  var bfVirtIO = ('IntersectionObserver' in window) ? new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){ en.target.classList.remove('bf-vhidden'); }
+      else { en.target.classList.add('bf-vhidden'); }
+    });
+  }, { root: null, rootMargin: '600px 600px', threshold: 0 }) : null;
   function addCards(force){
     if(bfEditing) return;
     var onR=/\/(preview|view)\//.test(location.pathname);
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
       if(card.getAttribute('data-bfmoved')) return;
+      if(bfVirtIO && !onR) bfVirtIO.observe(card);
       if(card.querySelector('.bf-body')){ bfDecorateCard(card, force); return; }
       if(bfIO && !force && !onR){ bfIO.observe(card); }
       else { bfDecorateCard(card, force); }
@@ -1732,7 +1739,7 @@
     if(bfEditing) return;
     document.querySelectorAll('[data-testid="collection-record"]').forEach(function(card){
       if(card.getAttribute('data-bfmoved')) return;
-      if(!card.querySelector('.bf-body')) bfDecorateCard(card, false);
+      if(!card.classList.contains('bf-vhidden') && !card.querySelector('.bf-body')) bfDecorateCard(card, false);
     });
   }
   setInterval(function(){
