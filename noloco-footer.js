@@ -711,6 +711,21 @@
   var bfArrowR, bfArrowL, bfBusy=false, bfArrowResize=false;
   var bfBackdrop;
   var bfCloseBtn;
+  var bfCollapsedFor=null;
+  function bfRecCollapseDefault(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var key=location.pathname; if(bfCollapsedFor===key) return;
+    var secs=document.querySelectorAll('[data-testid="details-section"]');
+    if(secs.length<3) return;
+    var raw=''; try{ raw=localStorage.getItem('noloco.recordDetailSectionExpanded')||''; }catch(e){}
+    var json={}; try{ json=raw?JSON.parse(raw):{}; }catch(e){}
+    [].forEach.call(secs,function(sec){
+      var node=sec,id=null; for(var i=0;i<8&&node;i++){ if(node.id&&/^(elm|sec)/.test(node.id)){id=node.id;break;} node=node.parentElement; }
+      var expanded=!!sec.querySelector('form')||(id&&json[id]===true);
+      if(expanded){ var h=sec.querySelector('h2'); if(h){ var hdr=h.closest('[role="button"]')||h.parentElement; if(hdr) hdr.click(); } }
+    });
+    bfCollapsedFor=key;
+  }
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
   var bfFlipL=null, bfFlipR=null;
   function bfMkFlip(side){
@@ -1536,7 +1551,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); addCards(false); bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null;
   function bfFire(){ bfTimer=null; bfLast=Date.now(); run(); }
