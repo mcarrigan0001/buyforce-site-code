@@ -1314,3 +1314,24 @@ div:has(> div > [data-testid="record-view"]) {
   .bf-flip { display: none !important; }
   body.bf-rec-open .bf-allcollapse { display: none !important; }
 }
+
+/* ---- Mobile: align body sections' left edge with header (remove grid-cell px-3 inset) ---- */
+@media (max-width: 900px) {
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-details"]):not(:has([class*="section-highlights"])) [class*="grid-cols-12"][class*="-mx-3"] > [class*="col-span"] { padding-left: 0 !important; padding-right: 0 !important; }
+}
+
+/* ---- Mobile: Previous / Next Record nav buttons in sidebar ---- */
+@media (max-width: 900px) {
+  .bf-mobnav { grid-column: 1 / -1 !important; display: flex !important; gap: 8px !important; margin-top: 10px !important; }
+  .bf-mobnav-btn { flex: 1 1 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 6px !important; min-height: 46px !important; padding: 8px 6px !important; border-radius: 11px !important; border: 1px solid rgba(255,255,255,0.16) !important; background: rgba(255,255,255,0.08) !important; color: #fff !important; font-family: inherit !important; font-size: 11px !important; font-weight: 600 !important; line-height: 1.15 !important; text-align: center !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent; transition: background .12s, transform .08s; }
+  .bf-mobnav-btn:active { transform: scale(0.97) !important; background: rgba(255,255,255,0.15) !important; }
+  .bf-mobnav-btn .ti { font-size: 17px !important; flex: none !important; }
+  .bf-mobnav-btn .bf-mn-main { font-size: 11px !important; }
+  .bf-mobnav-btn.bf-mn-boundary { gap: 5px !important; background: linear-gradient(135deg,#5a8f1e,#3b6d11) !important; border-color: rgba(255,255,255,0.22) !important; }
+  .bf-mn-stack { display: flex !important; flex-direction: column !important; line-height: 1.1 !important; }
+  .bf-mobnav-btn[data-dir="prev"].bf-mn-boundary .bf-mn-stack { align-items: flex-start !important; }
+  .bf-mobnav-btn[data-dir="next"].bf-mn-boundary .bf-mn-stack { align-items: flex-end !important; }
+  .bf-mn-cap { font-size: 8px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: .5px !important; opacity: .9 !important; }
+  .bf-mn-col { font-size: 9.5px !important; font-weight: 700 !important; }
+  .bf-mobnav-btn[disabled] { opacity: .3 !important; pointer-events: none !important; }
+}
