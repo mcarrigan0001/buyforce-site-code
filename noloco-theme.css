@@ -1310,7 +1310,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* ---- Mobile sidebar polish (Offer/ACV, hide flip arrows + collapse-all on record) ---- */
 @media (max-width: 900px) {
   [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) [data-testid="highlight-item"] .bf-hicon { margin-bottom: 4px !important; }
-  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"] { color: #141414 !important; }
+  [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"], [data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"]) .bf-edit[data-bffmt="acv"] * { color: #141414 !important; }
   .bf-flip { display: none !important; }
   body.bf-rec-open .bf-allcollapse { display: none !important; }
 }
@@ -1332,6 +1332,6 @@ div:has(> div > [data-testid="record-view"]) {
   .bf-mobnav-btn[data-dir="prev"].bf-mn-boundary .bf-mn-stack { align-items: flex-start !important; }
   .bf-mobnav-btn[data-dir="next"].bf-mn-boundary .bf-mn-stack { align-items: flex-end !important; }
   .bf-mn-cap { font-size: 8px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: .5px !important; opacity: .9 !important; }
-  .bf-mn-col { font-size: 9.5px !important; font-weight: 700 !important; }
+  .bf-mn-col { font-size: 9.5px !important; font-weight: 700 !important; display: -webkit-box !important; -webkit-line-clamp: 2 !important; -webkit-box-orient: vertical !important; overflow: hidden !important; }
   .bf-mobnav-btn[disabled] { opacity: .3 !important; pointer-events: none !important; }
 }
