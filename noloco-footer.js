@@ -755,6 +755,28 @@
     Object.keys(byStatus).forEach(function(st){ byStatus[st].forEach(function(u){ if(!seen[u]){ seen[u]=1; order.push({u:u,col:''}); } }); });
     return order.length?order:null;
   }
+  var bfSwipeBound=false;
+  function bfRecSwipe(){
+    if(bfSwipeBound) return; bfSwipeBound=true;
+    var sx=0, sy=0, st=0, active=false;
+    document.addEventListener('touchstart', function(e){
+      if(location.pathname.indexOf('/preview/')<0){ active=false; return; }
+      if(!e.touches||e.touches.length!==1){ active=false; return; }
+      var t=e.touches[0]; sx=t.clientX; sy=t.clientY; st=Date.now(); active=true;
+    }, {passive:true});
+    document.addEventListener('touchend', function(e){
+      if(!active) return; active=false;
+      var t=e.changedTouches&&e.changedTouches[0]; if(!t) return;
+      var dx=t.clientX-sx, dy=t.clientY-sy, dt=Date.now()-st;
+      if(Math.abs(dx)<90) return;                 /* deliberate distance, less twitchy than board */
+      if(Math.abs(dx)<Math.abs(dy)*1.8) return;   /* mostly horizontal */
+      if(dt>1200) return;                          /* ignore slow holds */
+      var go=null;
+      if(dx<0){ if(bfFlipR&&bfFlipR.style.display!=='none') go=bfFlipR.getAttribute('data-bfgo'); }
+      else { if(bfFlipL&&bfFlipL.style.display!=='none') go=bfFlipL.getAttribute('data-bfgo'); }
+      if(go) bfFlipGo(go);
+    }, {passive:true});
+  }
   function bfFlipGo(u){
     var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]');
     if(tc){ tc.click(); }
@@ -1585,7 +1607,7 @@
     if(grp.firstChild!==proxy) grp.insertBefore(proxy, grp.firstChild);
     document.body.classList.add('bf-search-relocated');
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
