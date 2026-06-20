@@ -1436,3 +1436,22 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-ws-strat { font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:#3b6d11; display:inline-flex; align-items:center; gap:6px; }
 .bf-ws-rec { background:#e3f5cf; color:#2b6012; border-radius:6px; padding:1px 6px; font-size:9px; text-transform:none; letter-spacing:0; font-weight:700; }
 .bf-ws-suggest-txt { font-size:12.5px; color:#2b2b29; line-height:1.45; }
+
+/* Workspace schedule + tasks */
+.bf-ws-sublbl { font-size:10px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:#9aa0a6; margin:12px 0 6px; }
+.bf-ws-loc { display:flex; align-items:center; gap:10px; border:1px solid #e3e1d8; border-radius:10px; padding:10px 12px; background:#faf9f5; margin-top:6px; }
+.bf-ws-loc i { font-size:18px; color:#2b6012; flex:none; }
+.bf-ws-locname { font-size:13px; font-weight:500; color:#161616; }
+.bf-ws-locaddr { font-size:11px; color:#6b6b64; }
+.bf-ws-confirm { }
+.bf-ws-task { display:flex; align-items:flex-start; gap:10px; padding:11px 0; border-top:1px solid #ececec; }
+.bf-ws-tasklist .bf-ws-task:first-of-type { border-top:none; }
+.bf-ws-check { flex:none; width:18px; height:18px; border-radius:5px; border:1.5px solid #d3d1c7; margin-top:1px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.bf-ws-check i { font-size:12px; color:#fff; }
+.bf-ws-check.done { background:#3b6d11; border-color:#3b6d11; }
+.bf-ws-taskb { min-width:0; flex:1; }
+.bf-ws-taskt { font-size:13px; color:#161616; }
+.bf-ws-task.done .bf-ws-taskt { color:#9aa0a6; text-decoration:line-through; }
+.bf-ws-due { font-size:10px; font-weight:600; letter-spacing:.3px; border-radius:6px; padding:2px 7px; display:inline-block; margin-top:3px; }
+.bf-ws-due.soon { background:#fbeecd; color:#7a4d13; }
+.bf-ws-due.later { background:#f1f1ee; color:#6b6b64; }
