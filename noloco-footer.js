@@ -2035,6 +2035,6 @@
     try{ bfTickClocks(); bfCatchUpCards(); }catch(e){}
     if(bfObs){ try{ bfStartObs(); }catch(e){} }
   }, 60000);
-  try{ if(!window.__bfAuthChk){ window.__bfAuthChk=1; setTimeout(function(){ var u=window.BF_USER||null; var t=(u&&u.token)||''; if(t && /^bft_/.test(String(t))){ try{ bfToast('BF auth: token detected \u2713'); }catch(e){} console.log('BF_AUTH ok id='+(u.id)+' token='+String(t).slice(0,8)+'...'); } else { try{ bfToast('BF auth: token NOT detected'); }catch(e){} console.log('BF_AUTH missing -> window.BF_USER =', u); } }, 3000); } }catch(e){}
+  try{ if(!window.__bfProbe){ window.__bfProbe=1; setTimeout(function(){ var o={bfUser:(window.BF_USER||null)}; try{ var lk=[]; for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(/token|user|auth|noloco|jwt|session|viewer|me|account|project/i.test(k)) lk.push(k); } o.lsKeys=lk; }catch(e){ o.lsErr=String(e); } try{ var sk=[]; for(var j=0;j<sessionStorage.length;j++){ var k2=sessionStorage.key(j); if(/token|user|auth|noloco|jwt|session/i.test(k2)) sk.push(k2); } o.ssKeys=sk; }catch(e){} try{ o.globals=Object.keys(window).filter(function(k){return /noloco|apollo|viewer|currentUser|__NEXT/i.test(k);}); }catch(e){} console.log('BF_PROBE '+JSON.stringify(o)); }, 3500); } }catch(e){}
   window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
