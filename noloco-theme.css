@@ -1521,3 +1521,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-li-create{width:100%;justify-content:center;}
 .bf-li-ok{margin-top:12px;color:#2b6012;font-size:13px;font-weight:600;}
 .bf-li-err{margin-top:12px;color:#b3261e;font-size:13px;font-weight:600;}
+
+/* Get CarMax/Carvana value buttons above fields + appraisal centering + confirm headline */
+.bf-getval-wrap{grid-column:1 / -1;margin:0 0 4px 0;}
+.bf-getval-wrap button{width:100%;justify-content:center;}
+.bf-port-center .bf-port-btns{display:flex;flex-direction:column;justify-content:center;min-height:96px;}
+.bf-confirm-head{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#3b3b38;margin:0 0 8px 0;}

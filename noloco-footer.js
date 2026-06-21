@@ -424,7 +424,7 @@
   function bfApptRaw(F){ return bfGet(F,['Appt Date and Time','Appointment Date/Time','Appointment Time','Scheduled Appt Time','Appt Date/Time','Appointment Date','Scheduled At','Appt Time','Appointment']); }
   function bfDateShort(iso){ var d=iso?new Date(iso):new Date(); if(isNaN(d.getTime())) d=new Date(); return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear(); }
   function bfApptTimeStr(F){ var raw=bfApptRaw(F); if(!raw) return '[time]'; var d=new Date(raw); if(isNaN(d.getTime())) return '[time]'; var h=d.getHours(), m=d.getMinutes(), ap=h>=12?'PM':'AM', h12=h%12; if(h12===0)h12=12; return h12+(m?':'+(m<10?'0'+m:m):'')+' '+ap; }
-  function bfApptIn(F){ var raw=bfApptRaw(F); if(!raw) return '<div class="bf-info">Add an Appointment Date/Time field on the opportunity to show the countdown.</div>'; var d=new Date(raw); if(isNaN(d.getTime())) return ''; var ms=d.getTime()-Date.now(); var col,lbl; if(ms<=0){ col='#c93535'; lbl='Appt time has passed'; } else { col='#2b6012'; lbl='Appt in: '+fmtDuration(Math.floor(ms/60000)); } return '<div class="bf-apptin" style="border-color:'+col+';color:'+col+';"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+esc(lbl)+'</div>'; }
+  function bfApptIn(F){ var _CH='<div class="bf-confirm-head">Confirm Appointment</div>'; var raw=bfApptRaw(F); if(!raw) return _CH+'<div class="bf-info">Add an Appointment Date/Time field on the opportunity to show the countdown.</div>'; var d=new Date(raw); if(isNaN(d.getTime())) return ''; var ms=d.getTime()-Date.now(); var col,lbl; if(ms<=0){ col='#c93535'; lbl='Appt time has passed'; } else { col='#2b6012'; lbl='Appt in: '+fmtDuration(Math.floor(ms/60000)); } return _CH+'<div class="bf-apptin" style="border-color:'+col+';color:'+col+';"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+esc(lbl)+'</div>'; }
   function bfFillTrack(t, F){
     var first=bfSellerFirst(F)||'there';
     var model=F['Model']||F['Vehicle Model']||'vehicle';
@@ -1949,7 +1949,28 @@
     res.innerHTML='<div class="bf-ws-empty">Creating…</div>';
     bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ res.innerHTML='<div class="bf-li-ok">Lead created'+(d.vehicle?(': '+esc(d.vehicle)):'')+'. Refresh the board to see it.</div>'; bfToast('Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Field mapping may need a tweak.</div>'; } });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function bfRecApprBtns(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var mm=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=mm?mm[1]:'';
+    document.querySelectorAll('[data-testid="details-section"]').forEach(function(sec){
+      var h=sec.querySelector('h2'); if(!h) return; if(!/competing/i.test(h.textContent||'')) return;
+      var port=sec.querySelector('.bf-secport'); if(port) port.classList.add('bf-port-center');
+      var form=sec.querySelector('form'); if(!form) return;
+      [].forEach.call(form.querySelectorAll(':scope > div'), function(cell){
+        var lab=cell.querySelector('label'); if(!lab) return; var lt=(lab.textContent||'').toLowerCase();
+        var url='', label='';
+        if(lt.indexOf('carmax')>-1){ url='https://www.carmax.com/sell-my-car'; label='Get CarMax Value'; }
+        else if(lt.indexOf('carvana')>-1){ url='https://www.carvana.com/sell-my-car'; label='Get Carvana Value'; }
+        if(!url) return;
+        var prev=cell.previousElementSibling;
+        if(prev && prev.classList && prev.classList.contains('bf-getval-wrap')) return;
+        var wrap=document.createElement('div'); wrap.className='bf-getval-wrap';
+        wrap.innerHTML=bfButton({l:label, a:'url', url:url, i:'ti-external-link'}, uuid);
+        cell.parentNode.insertBefore(wrap, cell);
+      });
+    });
+  }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
