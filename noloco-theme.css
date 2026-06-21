@@ -1491,3 +1491,11 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-main [data-testid="details-section"] .bf-secport {
   padding: 0 20px 18px !important;
 }
+
+/* Timeline composer attachment icon */
+.bf-ws-attach{background:none;border:none;cursor:pointer;color:#6b6b64;padding:6px;border-radius:8px;font-size:16px;display:inline-flex;align-items:center;}
+.bf-ws-attach:hover{background:#f2f2ee;color:#2b6012;}
+.bf-ws-attachchip{margin-top:8px;}
+.bf-ws-attachchip:empty{display:none;}
+.bf-ws-chip{display:inline-flex;align-items:center;gap:6px;background:#f2fbe9;border:1px solid #cfe8b8;color:#2b6012;border-radius:999px;padding:4px 10px;font-size:12px;}
+.bf-ws-chipx{background:none;border:none;color:#2b6012;cursor:pointer;font-size:14px;line-height:1;padding:0 0 0 2px;}
