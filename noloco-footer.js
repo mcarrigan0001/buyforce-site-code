@@ -1938,16 +1938,17 @@
     var rd=new FileReader(); rd.onload=function(){ bfPostExtract(rd.result).then(function(d){ if(!ov.isConnected) return; bfLiRenderFields(ov,(d&&d.fields)||{}); }); }; rd.readAsDataURL(file);
   }
   function bfLiRenderFields(ov, f){
+    ov._bfFields=f;
     var fld=ov.querySelector('.bf-li-fields');
     function row(k,label,val){ return '<label class="bf-li-lbl">'+label+'</label><input type="text" class="bf-li-f" data-k="'+k+'" value="'+esc(val==null?'':String(val))+'">'; }
     fld.innerHTML=row('vehicleTitle','Vehicle',f.vehicleTitle||'')+row('price','Asking price',f.price)+row('mileage','Mileage',f.mileage)+row('location','Location',f.location)+row('sellerName','Seller',f.sellerName)+row('vin','VIN',f.vin)+'<button class="bf-li-create bf-ws-btn primary" type="button" style="margin-top:12px;"><i class="ti ti-plus" aria-hidden="true"></i>Create lead</button><div class="bf-li-result"></div>';
     fld.querySelector('.bf-li-create').addEventListener('click', function(){ bfLiCreate(ov); });
   }
   function bfLiCreate(ov){
-    var fields={}; ov.querySelectorAll('.bf-li-f').forEach(function(i){ fields[i.getAttribute('data-k')]=i.value; });
+    var fields=Object.assign({}, ov._bfFields||{}); ov.querySelectorAll('.bf-li-f').forEach(function(i){ var v=i.value; if(v!=='') fields[i.getAttribute('data-k')]=v; });
     var url=(ov.querySelector('.bf-li-url')||{}).value||''; var res=ov.querySelector('.bf-li-result');
     res.innerHTML='<div class="bf-ws-empty">Creating…</div>';
-    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ res.innerHTML='<div class="bf-li-ok">Lead created'+(d.vehicle?(': '+esc(d.vehicle)):'')+'. Refresh the board to see it.</div>'; bfToast('Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Field mapping may need a tweak.</div>'; } });
+    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ res.innerHTML='<div class="bf-li-ok">Lead created'+(d.vehicle?(': '+esc(d.vehicle)):'')+'. Refresh the board to see it.</div>'; bfToast('Lead created'); } else if(d&&d.duplicate){ res.innerHTML='<div class="bf-li-err">This listing is already in the pipeline'+(d.vehicle?(': '+esc(d.vehicle)):'')+'.</div>'; bfToast('Already in pipeline'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Please try again.</div>'; } });
   }
   function bfRecApprBtns(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
