@@ -1499,3 +1499,9 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-ws-attachchip:empty{display:none;}
 .bf-ws-chip{display:inline-flex;align-items:center;gap:6px;background:#f2fbe9;border:1px solid #cfe8b8;color:#2b6012;border-radius:999px;padding:4px 10px;font-size:12px;}
 .bf-ws-chipx{background:none;border:none;color:#2b6012;cursor:pointer;font-size:14px;line-height:1;padding:0 0 0 2px;}
+
+/* AIForce screenshot OCR */
+.bf-ws-ocrrow{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.bf-ws-ocr{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #d3d1c7;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:600;color:#3b3b38;cursor:pointer;}
+.bf-ws-ocr:hover{border-color:#57C822;color:#2b6012;}
+.bf-ws-ocrhint{font-size:11px;color:#9aa0a6;}
