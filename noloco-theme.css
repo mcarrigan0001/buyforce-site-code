@@ -1527,3 +1527,7 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-getval-wrap button{width:100%;justify-content:center;}
 .bf-port-center .bf-port-btns{display:flex;flex-direction:column;justify-content:center;min-height:96px;}
 .bf-confirm-head{font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#3b3b38;margin:0 0 8px 0;}
+
+/* Duplicated schedule form inside record section */
+.bf-recsched{margin:4px 0 14px 0;}
+.bf-recsched .bf-ws-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6b6b64;margin-bottom:4px;}

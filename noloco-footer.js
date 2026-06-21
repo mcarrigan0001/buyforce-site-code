@@ -1970,7 +1970,41 @@
       });
     });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function bfSchedFormHtml(F){
+    var _dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], _mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], _days='';
+    for(var _i=0;_i<5;_i++){ var _dt=new Date(); _dt.setDate(_dt.getDate()+_i); var _lbl=_i===0?'Today':(_dn[_dt.getDay()]+' · '+_mn[_dt.getMonth()]+' '+_dt.getDate()); var _iso=_dt.getFullYear()+'-'+('0'+(_dt.getMonth()+1)).slice(-2)+'-'+('0'+_dt.getDate()).slice(-2); _days+='<button class="bf-ws-type'+(_i===0?' sel':'')+'" data-day="'+_iso+'" type="button">'+_lbl+'</button>'; }
+    var _times=['9:00 AM|09:00','10:30 AM|10:30','1:00 PM|13:00','3:30 PM|15:30'].map(function(s2,i2){var p2=s2.split('|');return '<button class="bf-ws-type'+(i2===1?' sel':'')+'" data-time="'+p2[1]+'" type="button">'+p2[0]+'</button>';}).join('');
+    var _addr=bfGet(F,['Dealership Address','dealershipAddress'])||'Add a Dealership Address field on the deal';
+    var _pick=bfGet(F,['Vehicle Location Address','vehicleLocationAddress','Pickup Address','pickupAddress'])||'';
+    var _td=new Date(); var _today=_td.getFullYear()+'-'+('0'+(_td.getMonth()+1)).slice(-2)+'-'+('0'+_td.getDate()).slice(-2);
+    return '<div class="bf-ws-schedform"><div class="bf-ws-lbl">Schedule the appointment</div><div class="bf-ws-sublbl">Date</div><div class="bf-ws-row">'+_days+'</div><input class="bf-ws-dateinput" type="date" min="'+_today+'" value="'+_today+'"><div class="bf-ws-sublbl">Time</div><div class="bf-ws-row">'+_times+'</div><input class="bf-ws-timeinput" type="time" value="10:30"><div class="bf-ws-sublbl">Location</div><div class="bf-ws-row"><button class="bf-ws-type sel" data-loc="dealership" type="button">Dealership</button><button class="bf-ws-type" data-loc="pickup" type="button">Pickup address</button></div><div class="bf-ws-loc bf-ws-loc-deal"><i class="ti ti-map-pin" aria-hidden="true"></i><div><div class="bf-ws-locname">Dealership</div><div class="bf-ws-locaddr">'+esc(_addr)+'</div></div></div><div class="bf-ws-loc-pick" style="display:none;"><input class="bf-ws-pickupinput" placeholder="Enter the seller pickup address" value="'+esc(_pick)+'"></div><div class="bf-ws-eta"></div><button class="bf-ws-btn primary" data-act="book" type="button" style="margin-top:14px;"><i class="ti ti-calendar-check" aria-hidden="true"></i>Book appointment</button></div><div class="bf-ws-schedbooked" style="display:none;"></div>';
+  }
+  function bfRecScheduler(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var mm=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=mm?mm[1]:''; if(!uuid) return;
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); var F=card?bfReadF(card):{}; var stg=card?stageOf(card):'';
+    [].forEach.call(document.querySelectorAll('[data-testid="details-section"]'), function(sec){
+      var h=sec.querySelector('h2'); if(!h) return; var t=(h.textContent||''); if(!/schedule/i.test(t) || !/(confirm|appoint)/i.test(t)) return;
+      if(!sec.querySelector('form')) return;
+      var ex=sec.querySelector(':scope > .bf-recsched');
+      if(ex && ex.getAttribute('data-uuid')===uuid) return;
+      if(ex) ex.remove();
+      var rs=document.createElement('div'); rs.className='bf-recsched'; rs.setAttribute('data-uuid',uuid);
+      rs.innerHTML=bfSchedFormHtml(F);
+      rs._bfDeal={ vehicle:(F['Vehicle Title']||''), stage:stg, sellerFirst:bfSellerFirst(F), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
+      var port=sec.querySelector(':scope > .bf-secport');
+      if(port) sec.insertBefore(rs, port); else sec.appendChild(rs);
+      rs.addEventListener('click', function(e){ var tg=e.target;
+        var ty=tg.closest&&tg.closest('.bf-ws-type'); if(ty){ var row=ty.closest('.bf-ws-row'); if(row){ row.querySelectorAll('.bf-ws-type').forEach(function(x){x.classList.toggle('sel',x===ty);}); } var _dv=ty.getAttribute('data-day'); if(_dv){ var _di2=rs.querySelector('.bf-ws-dateinput'); if(_di2) _di2.value=_dv; } var _tv=ty.getAttribute('data-time'); if(_tv){ var _tin=rs.querySelector('.bf-ws-timeinput'); if(_tin) _tin.value=_tv; } var _lk=ty.getAttribute('data-loc'); if(_lk){ var _dd=rs.querySelector('.bf-ws-loc-deal'); var _pp=rs.querySelector('.bf-ws-loc-pick'); var _ip=(_lk==='pickup'); if(_dd)_dd.style.display=_ip?'none':''; if(_pp)_pp.style.display=_ip?'':'none'; } bfWsDriveEtaSoon(rs, uuid); return; }
+        var ac=tg.closest&&tg.closest('[data-act]'); if(ac){ e.preventDefault(); bfWsAction(rs, uuid, ac.getAttribute('data-act')); return; }
+      });
+      var _dIn=rs.querySelector('.bf-ws-dateinput'); if(_dIn) _dIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-day]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(rs, uuid); });
+      var _tIn=rs.querySelector('.bf-ws-timeinput'); if(_tIn) _tIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-time]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(rs, uuid); });
+      var _pIn=rs.querySelector('.bf-ws-pickupinput'); if(_pIn) _pIn.addEventListener('input', function(){ bfWsDriveEtaSoon(rs, uuid); });
+      bfWsScheduleInit(rs, F);
+    });
+  }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
