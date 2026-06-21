@@ -1948,7 +1948,7 @@
     var fields=Object.assign({}, ov._bfFields||{}); ov.querySelectorAll('.bf-li-f').forEach(function(i){ var v=i.value; if(v!=='') fields[i.getAttribute('data-k')]=v; });
     var url=(ov.querySelector('.bf-li-url')||{}).value||''; var res=ov.querySelector('.bf-li-result');
     res.innerHTML='<div class="bf-ws-empty">Creating…</div>';
-    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ var msg='Lead created'+(d.vehicle?(': '+esc(d.vehicle)):''); if(d.duplicate){ msg+='. Flagged as a possible duplicate'+(d.dupVehicle?(' of '+esc(d.dupVehicle)):'')+'.'; } else { msg+='. Refresh the board to see it.'; } res.innerHTML='<div class="bf-li-ok">'+msg+'</div>'; bfToast(d.duplicate?'Created, duplicate flagged':'Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Please try again.</div>'; } });
+    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ if(d.uuid){ try{ bfPostEvent({uuid:d.uuid, type:'lead_created', actor:bfCurUser(), text:'Lead added to Fresh Leads from a listing screenshot'+(d.duplicate?' (flagged as a possible duplicate)':'')}); }catch(_e){} } var msg='Lead created'+(d.vehicle?(': '+esc(d.vehicle)):''); if(d.duplicate){ msg+='. Flagged as a possible duplicate'+(d.dupVehicle?(' of '+esc(d.dupVehicle)):'')+'.'; } else { msg+='. Refresh the board to see it.'; } res.innerHTML='<div class="bf-li-ok">'+msg+'</div>'; bfToast(d.duplicate?'Created, duplicate flagged':'Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Please try again.</div>'; } });
   }
   function bfRecApprBtns(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
