@@ -2035,5 +2035,6 @@
     try{ bfTickClocks(); bfCatchUpCards(); }catch(e){}
     if(bfObs){ try{ bfStartObs(); }catch(e){} }
   }, 60000);
+  try{ if(!window.__bfAuthChk){ window.__bfAuthChk=1; setTimeout(function(){ var u=window.BF_USER||null; var t=(u&&u.token)||''; if(t && /^bft_/.test(String(t))){ try{ bfToast('BF auth: token detected \u2713'); }catch(e){} console.log('BF_AUTH ok id='+(u.id)+' token='+String(t).slice(0,8)+'...'); } else { try{ bfToast('BF auth: token NOT detected'); }catch(e){} console.log('BF_AUTH missing -> window.BF_USER =', u); } }, 3000); } }catch(e){}
   window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
