@@ -1666,15 +1666,7 @@
 
   var BF_USERS_URL='https://buyforce.app.n8n.cloud/webhook/get-users?key=bf7q2xK9';
   var bfUserMap=null, bfUsersLoading=false, bfPop=null, bfPopTimer=null;
-  function bfLoadUsers(){
-    if(bfUserMap||bfUsersLoading) return;
-    try{ var c=localStorage.getItem('bfusers2'); if(c){ var o=JSON.parse(c); if(o&&o.m&&(Date.now()-o.t<600000)){ bfUserMap=o.m; return; } } }catch(e){}
-    bfUsersLoading=true;
-    fetch(BF_USERS_URL).then(function(r){return r.json();}).then(function(d){
-      var arr=(d&&d.users)||[]; var m={}; arr.forEach(function(u){ if(u&&u.name) m[u.name.toLowerCase()]={role:u.role||'', last:u.lastActiveAt||''}; });
-      bfUserMap=m; try{ localStorage.setItem('bfusers2',JSON.stringify({t:Date.now(),m:m})); }catch(e){}
-    }).catch(function(){}).finally(function(){ bfUsersLoading=false; });
-  }
+  function bfLoadUsers(){ /* multi-tenant: do not download a cross-dealership user list. purge any old cache. */ try{ localStorage.removeItem('bfusers2'); }catch(e){} return; }
   function bfEnsurePop(){ if(!bfPop){ bfPop=document.createElement('div'); bfPop.style.cssText='position:fixed;z-index:10002;background:#fff;border:0.5px solid #d3d1c7;box-shadow:0 4px 16px rgba(0,0,0,0.18);border-radius:10px;padding:10px 12px;display:none;min-width:150px;pointer-events:none;font-family:Inter,-apple-system,sans-serif;'; document.body.appendChild(bfPop); } return bfPop; }
   function bfShowUserPop(el){
     if(!bfUserMap){ bfLoadUsers(); return; }
