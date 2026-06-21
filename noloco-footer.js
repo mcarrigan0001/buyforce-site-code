@@ -1266,7 +1266,7 @@
     function fin(sv){ if(done)return; done=true; el.removeAttribute('data-editing'); el.removeAttribute('data-orig');
       var raw=(sv||'').replace(/[^0-9.]/g,''); var n=raw!==''?Number(raw):'';
       var uuid=(location.pathname.match(/\/(rec[0-9a-z]+)/i)||[])[1]||'';
-      var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload); if(key==='estimatedPayoffAmount'||key==='acv'){ try{ bfRecRecalcEquity(uuid, key, n); }catch(_e){} }
+      var payload={uuid:uuid}; payload[key]=(n===''?null:n); bfPost(payload); if(key==='estimatedPayoffAmount'||key==='acv'||key==='actualPayoff'||key==='actualPayoffAmount'){ try{ bfRecRecalcEquity(uuid, key, n); }catch(_e){} }
       el.textContent = n===''?'-':(fmt==='acv'?('ACV $'+Number(n).toLocaleString('en-US')):('$'+Number(n).toLocaleString('en-US')));
       try{ var _d=el.textContent; document.querySelectorAll('.bf-edit[data-bfkey="'+key+'"]').forEach(function(o){ if(o!==el && o.getAttribute('data-editing')!=='1'){ o.textContent=_d; } }); }catch(_2){}
       bfToast(lbl+' saved');
@@ -1277,8 +1277,12 @@
   }, true);
   function bfRecNumFromEdit(k){ var el=document.querySelector('.bf-edit[data-bfkey="'+k+'"]'); if(!el) return NaN; var s=(el.textContent||'').replace(/[^0-9.]/g,''); return s===''?NaN:Number(s); }
   function bfRecRecalcEquity(uuid, changedKey, changedVal){
-    var acv = changedKey==='acv' ? (changedVal===''?NaN:Number(changedVal)) : bfRecNumFromEdit('acv');
-    var payoff = changedKey==='estimatedPayoffAmount' ? (changedVal===''?NaN:Number(changedVal)) : bfRecNumFromEdit('estimatedPayoffAmount');
+    var cv = changedVal===''?NaN:Number(changedVal);
+    var acv = changedKey==='acv' ? cv : bfRecNumFromEdit('acv');
+    var est = changedKey==='estimatedPayoffAmount' ? cv : bfRecNumFromEdit('estimatedPayoffAmount');
+    var act = (changedKey==='actualPayoff'||changedKey==='actualPayoffAmount') ? cv : bfRecNumFromEdit('actualPayoff');
+    if(isNaN(act)) act=bfRecNumFromEdit('actualPayoffAmount');
+    var payoff = (!isNaN(act)&&act>0) ? act : est;
     if(isNaN(acv)||isNaN(payoff)) return;
     var eq = Math.round(acv - payoff);
     var disp = (eq<0?'-$':'+$')+Math.abs(eq).toLocaleString('en-US');
