@@ -1915,7 +1915,41 @@
     bfWsScheduleInit(ws, F);
   }
 
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function bfPostExtract(dataUrl){ return fetch(BF_WH+'/listing-extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})}).then(function(r){return r.json();}).catch(function(){return null;}); }
+  function bfPostCreate(fields,url){ return fetch(BF_WH+'/listing-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fields,listingUrl:url})}).then(function(r){return r.json();}).catch(function(){return null;}); }
+  function bfLiEnsureFab(){
+    if(/\/(preview|view)\//.test(location.pathname)){ var ex=document.querySelector('.bf-li-fab'); if(ex) ex.style.display='none'; return; }
+    var fab=document.querySelector('.bf-li-fab');
+    if(!fab){ fab=document.createElement('button'); fab.className='bf-li-fab'; fab.type='button'; fab.innerHTML='<i class="ti ti-camera-plus" aria-hidden="true"></i><span>Screenshot lead</span>'; fab.addEventListener('click', bfLiOpen); document.body.appendChild(fab); }
+    fab.style.display='inline-flex';
+  }
+  function bfLiOpen(){
+    var old=document.querySelector('.bf-li-overlay'); if(old) old.remove();
+    var ov=document.createElement('div'); ov.className='bf-li-overlay';
+    ov.innerHTML='<div class="bf-li-modal"><div class="bf-li-head"><span>New lead from screenshot</span><button class="bf-li-x" type="button" aria-label="Close">×</button></div><div class="bf-li-body"><label class="bf-li-lbl">Listing screenshot</label><input type="file" accept="image/*" class="bf-li-file"><label class="bf-li-lbl">Listing URL</label><input type="text" class="bf-li-url" placeholder="Paste the Facebook Marketplace link"><button class="bf-li-extract bf-ws-btn primary" type="button"><i class="ti ti-sparkles" aria-hidden="true"></i>Extract details</button><div class="bf-li-fields"></div></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if(e.target===ov || (e.target.closest && e.target.closest('.bf-li-x'))){ ov.remove(); } });
+    ov.querySelector('.bf-li-extract').addEventListener('click', function(){ bfLiExtract(ov); });
+  }
+  function bfLiExtract(ov){
+    var fi=ov.querySelector('.bf-li-file'); var file=fi&&fi.files&&fi.files[0]; var fld=ov.querySelector('.bf-li-fields');
+    if(!file){ bfToast('Add a screenshot first'); return; }
+    fld.innerHTML='<div class="bf-ws-empty">Reading listing…</div>';
+    var rd=new FileReader(); rd.onload=function(){ bfPostExtract(rd.result).then(function(d){ if(!ov.isConnected) return; bfLiRenderFields(ov,(d&&d.fields)||{}); }); }; rd.readAsDataURL(file);
+  }
+  function bfLiRenderFields(ov, f){
+    var fld=ov.querySelector('.bf-li-fields');
+    function row(k,label,val){ return '<label class="bf-li-lbl">'+label+'</label><input type="text" class="bf-li-f" data-k="'+k+'" value="'+esc(val==null?'':String(val))+'">'; }
+    fld.innerHTML=row('vehicleTitle','Vehicle',f.vehicleTitle||'')+row('price','Asking price',f.price)+row('mileage','Mileage',f.mileage)+row('location','Location',f.location)+row('sellerName','Seller',f.sellerName)+row('vin','VIN',f.vin)+'<button class="bf-li-create bf-ws-btn primary" type="button" style="margin-top:12px;"><i class="ti ti-plus" aria-hidden="true"></i>Create lead</button><div class="bf-li-result"></div>';
+    fld.querySelector('.bf-li-create').addEventListener('click', function(){ bfLiCreate(ov); });
+  }
+  function bfLiCreate(ov){
+    var fields={}; ov.querySelectorAll('.bf-li-f').forEach(function(i){ fields[i.getAttribute('data-k')]=i.value; });
+    var url=(ov.querySelector('.bf-li-url')||{}).value||''; var res=ov.querySelector('.bf-li-result');
+    res.innerHTML='<div class="bf-ws-empty">Creating…</div>';
+    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ res.innerHTML='<div class="bf-li-ok">Lead created'+(d.vehicle?(': '+esc(d.vehicle)):'')+'. Refresh the board to see it.</div>'; bfToast('Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Field mapping may need a tweak.</div>'; } });
+  }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
