@@ -2036,7 +2036,8 @@
     if(bfObs){ try{ bfStartObs(); }catch(e){} }
   }, 60000);
   var bfTokTries=0;
-  function bfGetApiToken(){ try{ return sessionStorage.getItem('bf.apitoken')||''; }catch(e){ return ''; } }
+  function bfGetApiToken(){ try{ return sessionStorage.getItem('bf.apitoken')||localStorage.getItem('bf.apitoken')||''; }catch(e){ return ''; } }
+  try{ if(!window.__bfFetchWrapped && window.fetch){ window.__bfFetchWrapped=true; var _bfOrigFetch=window.fetch; window.fetch=function(input, init){ try{ var url=(typeof input==='string')?input:((input&&input.url)||''); if(url.indexOf('buyforce.app.n8n.cloud')!==-1){ var t=bfGetApiToken(); if(t){ init=init||{}; var h=init.headers; if(h && typeof Headers!=='undefined' && h instanceof Headers){ h.set('X-BF-Token', t); } else { h=Object.assign({}, h||{}); h['X-BF-Token']=t; init.headers=h; } } } }catch(e){} return _bfOrigFetch.apply(this, arguments); }; } }catch(e){}
   function bfCaptureApiToken(){
   try{
     if(bfGetApiToken()){
@@ -2053,6 +2054,7 @@
     var rx=/bft_[A-Za-z0-9]{20,}/;
     var done=function(tok,el){
       try{ sessionStorage.setItem('bf.apitoken', tok); }catch(e){}
+      try{ localStorage.setItem('bf.apitoken', tok); }catch(e){}
       try{ if(el){ if(el.setAttribute) el.setAttribute('data-bftok','1'); if(el.style) el.style.display='none'; } }catch(e){}
       try{ console.log('BF_TOKEN captured ok'); bfToast('BF auth ready ✓'); }catch(e){}
       if(window.__bfTokTimer){ clearInterval(window.__bfTokTimer); window.__bfTokTimer=null; }
