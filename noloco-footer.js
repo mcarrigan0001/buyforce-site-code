@@ -1048,6 +1048,7 @@
     var F, stg;
     if(card){ F=bfReadF(card); stg=stageOf(card); }
     else { var _fb=bfRecFallback(uuid); if(!_fb) return; F=_fb.F; stg=_fb.stg; }
+    if(window.__bfStageOverride && window.__bfStageOverride[uuid]){ stg=window.__bfStageOverride[uuid]; }
     var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
@@ -1465,7 +1466,7 @@
     var uuid=el.getAttribute('data-bfuuid'), to=el.getAttribute('data-bfstage');
     if(!uuid||!to) return;
     var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
-    if(card){ bfMoveCard(card, uuid, to); } else { bfPost({uuid:uuid, status:to}); bfToast('Moving to '+to+'…'); }
+    if(card){ bfMoveCard(card, uuid, to); } else { bfPost({uuid:uuid, status:to}); bfToast('Moving to '+to+'…'); } try{ window.__bfStageOverride=window.__bfStageOverride||{}; window.__bfStageOverride[uuid]=to; var _rt=document.querySelector('[data-testid="record-view-body"] > .bf-rectop'); if(_rt) _rt.removeAttribute('data-raw'); bfRecTop(); }catch(_so){}
   }, true);
   document.addEventListener('click', function(e){
     var t=(e.target&&e.target.closest)?e.target.closest('.bf-rectab'):null;
