@@ -1459,7 +1459,7 @@ div:has(> div > [data-testid="record-view"]) {
 /* Workspace schedule inputs (any date/time + pickup) */
 .bf-ws-dateinput, .bf-ws-timeinput, .bf-ws-pickupinput { width:100%; margin-top:6px; border:1px solid #d3d1c7; border-radius:8px; padding:8px 10px; font:inherit; font-size:13px; color:#161616; background:#faf9f5; outline:none; box-sizing:border-box; }
 .bf-ws-pickupinput::placeholder { color:#9aa0a6; }
-.bf-ws-pickupinput { border-color:#57C822 !important; box-shadow:0 0 0 3px rgba(87,200,34,0.16); background:#f6fcf0; }
+.bf-ws-pickupinput { /* normalized to match date/time inputs; green ring only on focus */ }
 .bf-ws-dateinput:focus-visible, .bf-ws-timeinput:focus-visible, .bf-ws-pickupinput:focus-visible { outline:2px solid #57C822; outline-offset:1px; }
 
 /* Schedule predicted drive-time / leave-by */
