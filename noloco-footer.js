@@ -232,16 +232,33 @@
     if(!isNaN(acv)&&acv>0&&!isNaN(pay)){ var e=Math.round(acv-pay); var amt='$'+Math.abs(e).toLocaleString('en-US'); return e<0?{text:'\u2212'+amt,color:'#c93535'}:{text:'+'+amt,color:'#2b6012'}; }
     return {text:'\u2014', color:'#9aa0a6'};
   }
-  function bfAttentionPill(F, stage){
+  function bfAttentionInfo(F, stage){
     stage=stage||'';
-    if(/acquired|no deal/i.test(stage)) return '';
-    var pill=function(bg,fg,icon,label){ return '<span title="'+label+'" style="display:inline-flex;align-items:center;gap:3px;background:'+bg+';color:'+fg+';font-size:11px;font-weight:600;padding:3px 7px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);white-space:nowrap;"><i class="ti '+icon+'" style="font-size:12px;" aria-hidden="true"></i>'+label+'</span>'; };
-    if(/offer sheet generated/i.test(stage) && (F['Offer Sheet Image URL']||'')) return pill('#e3f5cf','#2b6012','ti-send','Send offer');
-    if(/verbal yes/i.test(stage)) return pill('#e6eefc','#1c4fb0','ti-calendar-plus','Schedule');
+    if(/acquired|no deal/i.test(stage)) return null;
+    if(/offer sheet generated/i.test(stage) && (F['Offer Sheet Image URL']||'')) return {key:'offer',icon:'ti-send',label:'Send offer',bg:'#e3f5cf',fg:'#2b6012'};
+    if(/verbal yes/i.test(stage)) return {key:'schedule',icon:'ti-calendar-plus',label:'Schedule',bg:'#e6eefc',fg:'#1c4fb0'};
     var t=function(x){ var d=x?new Date(x).getTime():NaN; return isNaN(d)?0:d; };
     var last=Math.max(t(F['Last Follow Up At']), t(F['Last Comment At']), t(F['Stage Entered At']));
-    if(last>0){ var days=(Date.now()-last)/86400000; if(days>=3) return pill('#fbe3e3','#c93535','ti-alarm','Follow up'); }
-    return '';
+    if(last>0){ var days=(Date.now()-last)/86400000; if(days>=3) return {key:'followup',icon:'ti-alarm',label:'Follow up',bg:'#fbe3e3',fg:'#c93535'}; }
+    return null;
+  }
+  function bfAttentionPill(F, stage){
+    var a=bfAttentionInfo(F, stage); if(!a) return '';
+    return '<span title="'+a.label+'" style="display:inline-flex;align-items:center;gap:3px;background:'+a.bg+';color:'+a.fg+';font-size:11px;font-weight:600;padding:3px 7px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);white-space:nowrap;"><i class="ti '+a.icon+'" style="font-size:12px;" aria-hidden="true"></i>'+a.label+'</span>';
+  }
+  function bfBoardTriage(){
+    try{
+      if(/\/(preview|view)\//.test(location.pathname)){ var ex0=document.getElementById('bf-triage'); if(ex0) ex0.style.display='none'; return; }
+      var LAB={offer:'to send', followup:'to follow up', schedule:'to schedule'}; var ORD=['offer','followup','schedule'];
+      var counts={}, total=0;
+      document.querySelectorAll('[data-bfattn]').forEach(function(c){ var k=c.getAttribute('data-bfattn'); if(!k) return; counts[k]=(counts[k]||0)+1; total++; });
+      var chip=document.getElementById('bf-triage');
+      if(!total){ if(chip) chip.style.display='none'; return; }
+      if(!chip){ chip=document.createElement('div'); chip.id='bf-triage'; chip.style.cssText='position:fixed;left:16px;bottom:16px;z-index:9000;background:#161616;color:#fff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;box-shadow:0 4px 14px rgba(0,0,0,0.28);display:flex;align-items:center;gap:7px;'; document.body.appendChild(chip); }
+      chip.style.display='flex';
+      var parts=[]; for(var i=0;i<ORD.length;i++){ var k=ORD[i]; if(counts[k]) parts.push(counts[k]+' '+LAB[k]); }
+      chip.innerHTML='<i class="ti ti-bolt" style="font-size:14px;color:#ffd23f;" aria-hidden="true"></i><span>'+total+' need attention</span>'+(parts.length?'<span style="opacity:.62;font-weight:500;">\u00b7 '+parts.join(' \u00b7 ')+'</span>':'');
+    }catch(e){}
   }
 
   function listedAgo(raw){
@@ -652,7 +669,8 @@
         (_dt?'<div style="display:flex;align-items:center;gap:3px;"><i class="ti ti-clock-hour-4" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_dt)+'</div>':'')+
       '</div>';
     }
-    var _attn = bfAttentionPill(F, stageOf(card));
+    var _ai0 = bfAttentionInfo(F, stageOf(card)); var _attn = _ai0 ? bfAttentionPill(F, stageOf(card)) : '';
+    try{ if(card){ if(_ai0) card.setAttribute('data-bfattn', _ai0.key); else card.removeAttribute('data-bfattn'); } }catch(_ae){}
     var _topRight = (_attn||_badge||_listing) ? '<div style="display:flex;align-items:center;gap:6px;flex:none;">'+_attn+_badge+_listing+'</div>' : '';
     var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;">'+_topRight+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
@@ -2034,7 +2052,7 @@
       bfWsScheduleInit(rs, F);
     });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
