@@ -1930,6 +1930,19 @@
   function bfPostDriveEta(p){ return fetch(BF_WH+'/drive-eta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).then(function(r){return r.json();}).catch(function(){return null;}); }
   function bfWsFmtTime(iso){ var d=new Date(iso); if(isNaN(d.getTime())) return ''; return d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
   function bfWsSchedISO(ws){ var di=ws.querySelector('.bf-ws-dateinput'); var ti=ws.querySelector('.bf-ws-timeinput'); var day=(di&&di.value)||''; var tm=(ti&&ti.value)||''; if(!day){ var d2=ws.querySelector('.bf-ws-type.sel[data-day]'); day=d2?d2.getAttribute('data-day'):''; } if(!tm){ var t2=ws.querySelector('.bf-ws-type.sel[data-time]'); tm=t2?t2.getAttribute('data-time'):''; } if(!day||!tm) return ''; var o=new Date(day+'T'+tm+':00'); return isNaN(o.getTime())?'':o.toISOString(); }
+  function bfPlacesFetch(q){ return fetch(BF_WH+'/places-autocomplete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:q})}).then(function(r){return r.json();}).catch(function(){return null;}); }
+  function bfAttachPlacesAuto(inp){
+    if(!inp||inp.getAttribute('data-bfac')==='1') return; inp.setAttribute('data-bfac','1');
+    var box=null, items=[], active=-1, t=null, justPicked=false;
+    function close(){ if(box){ box.remove(); box=null; } items=[]; active=-1; }
+    function pos(){ if(!box) return; var r=inp.getBoundingClientRect(); box.style.left=r.left+'px'; box.style.top=(r.bottom+4)+'px'; box.style.width=r.width+'px'; }
+    function render(){ if(!box){ box=document.createElement('div'); box.className='bf-acbox'; document.body.appendChild(box); } pos(); box.innerHTML=items.map(function(it,i){ return '<div class="bf-acitem'+(i===active?' on':'')+'" data-i="'+i+'">'+esc(it.description)+'</div>'; }).join(''); [].forEach.call(box.querySelectorAll('.bf-acitem'),function(el){ el.addEventListener('mousedown',function(e){ e.preventDefault(); pick(+el.getAttribute('data-i')); }); }); }
+    function pick(i){ var it=items[i]; if(!it) return; justPicked=true; inp.value=it.description; close(); inp.dispatchEvent(new Event('input',{bubbles:true})); }
+    inp.addEventListener('input', function(){ if(justPicked){ justPicked=false; close(); return; } var q=inp.value.trim(); if(t) clearTimeout(t); if(q.length<3){ close(); return; } t=setTimeout(function(){ bfPlacesFetch(q).then(function(d){ if(inp.value.trim()!==q) return; if(!d||!d.suggestions||!d.suggestions.length){ close(); return; } items=d.suggestions; active=-1; render(); }); }, 300); });
+    inp.addEventListener('keydown', function(e){ if(!box||!items.length) return; if(e.key==='ArrowDown'){ e.preventDefault(); active=Math.min(active+1,items.length-1); render(); } else if(e.key==='ArrowUp'){ e.preventDefault(); active=Math.max(active-1,0); render(); } else if(e.key==='Enter'){ if(active>=0){ e.preventDefault(); pick(active); } } else if(e.key==='Escape'){ close(); } });
+    inp.addEventListener('blur', function(){ setTimeout(close, 160); });
+    window.addEventListener('scroll', function(){ pos(); }, true);
+  }
   function bfWsDriveEtaSoon(ws, uuid){ clearTimeout(ws._bfEtaT); ws._bfEtaT=setTimeout(function(){ bfWsDriveEta(ws, uuid); }, 500); }
   function bfWsDriveEta(ws, uuid){
     var box=ws.querySelector('.bf-ws-eta'); if(!box) return;
@@ -1993,7 +2006,7 @@
     ws.querySelectorAll('.bf-ws-noteinput,.bf-ws-loginput').forEach(function(inp){ inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); bfWsAction(ws, uuid, inp.classList.contains('bf-ws-noteinput')?'note':'log'); } }); });
     var _dIn=ws.querySelector('.bf-ws-dateinput'); if(_dIn) _dIn.addEventListener('input', function(){ ws.querySelectorAll('.bf-ws-type[data-day]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(ws, uuid); });
     var _tIn=ws.querySelector('.bf-ws-timeinput'); if(_tIn) _tIn.addEventListener('input', function(){ ws.querySelectorAll('.bf-ws-type[data-time]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(ws, uuid); });
-    var _pIn=ws.querySelector('.bf-ws-pickupinput'); if(_pIn) _pIn.addEventListener('input', function(){ bfWsDriveEtaSoon(ws, uuid); });
+    var _pIn=ws.querySelector('.bf-ws-pickupinput'); if(_pIn) _pIn.addEventListener('input', function(){ bfWsDriveEtaSoon(ws, uuid); }); if(_pIn){ try{bfAttachPlacesAuto(_pIn);}catch(_ac){} }
     var _fIn=ws.querySelector('.bf-ws-fileinput'); if(_fIn) _fIn.addEventListener('change', function(){ var f=_fIn.files&&_fIn.files[0]; var chip=ws.querySelector('.bf-ws-attachchip'); if(!chip) return; chip.innerHTML = f ? ('<span class="bf-ws-chip"><i class="ti ti-photo" aria-hidden="true"></i>'+esc(f.name)+'<button class="bf-ws-chipx" data-act="attachclear" type="button" aria-label="Remove">×</button></span>') : ''; });
     var _oIn=ws.querySelector('.bf-ws-ocrinput'); if(_oIn) _oIn.addEventListener('change', function(){ var f=_oIn.files&&_oIn.files[0]; if(!f) return; var sb=ws.querySelector('.bf-ws-seller'); if(sb){ sb.value=''; sb.setAttribute('placeholder','Reading screenshot…'); } bfToast('Reading screenshot…'); var rd=new FileReader(); rd.onload=function(){ bfPostOcr(rd.result).then(function(d){ _oIn.value=''; if(!ws.isConnected) return; if(d&&d.transcript){ if(sb) sb.value=d.transcript; bfToast('Screenshot read in'); } else { bfToast('Could not read screenshot'); if(sb) sb.setAttribute('placeholder','Paste the seller’s last message here…'); } }); }; rd.readAsDataURL(f); });
     bfWsLoad(ws, uuid);
@@ -2088,7 +2101,7 @@
       });
       var _dIn=rs.querySelector('.bf-ws-dateinput'); if(_dIn) _dIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-day]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(rs, uuid); });
       var _tIn=rs.querySelector('.bf-ws-timeinput'); if(_tIn) _tIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-time]').forEach(function(x){ x.classList.remove('sel'); }); bfWsDriveEtaSoon(rs, uuid); });
-      var _pIn=rs.querySelector('.bf-ws-pickupinput'); if(_pIn) _pIn.addEventListener('input', function(){ bfWsDriveEtaSoon(rs, uuid); });
+      var _pIn=rs.querySelector('.bf-ws-pickupinput'); if(_pIn) _pIn.addEventListener('input', function(){ bfWsDriveEtaSoon(rs, uuid); }); if(_pIn){ try{bfAttachPlacesAuto(_pIn);}catch(_ac){} }
       bfWsScheduleInit(rs, F);
     });
   }

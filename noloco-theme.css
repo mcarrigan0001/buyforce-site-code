@@ -1531,3 +1531,8 @@ div:has(> div > [data-testid="record-view"]) {
 /* Duplicated schedule form inside record section */
 .bf-recsched{margin:4px 0 14px 0;}
 .bf-recsched .bf-ws-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#6b6b64;margin-bottom:4px;}
+
+.bf-acbox{ position:fixed; z-index:100050; background:#fff; border:1px solid #d3d1c7; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.18); max-height:240px; overflow-y:auto; font-family:'Inter',-apple-system,'Segoe UI',sans-serif; font-size:13px; }
+.bf-acitem{ padding:8px 11px; cursor:pointer; color:#161616; border-bottom:1px solid #f1f0ea; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bf-acitem:last-child{ border-bottom:none; }
+.bf-acitem:hover, .bf-acitem.on{ background:#f2fbe9; color:#2b6012; }
