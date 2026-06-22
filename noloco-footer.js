@@ -2038,45 +2038,30 @@
   var bfTokTries=0;
   function bfGetApiToken(){ try{ return sessionStorage.getItem('bf.apitoken')||localStorage.getItem('bf.apitoken')||''; }catch(e){ return ''; } }
   try{ if(!window.__bfFetchWrapped && window.fetch){ window.__bfFetchWrapped=true; var _bfOrigFetch=window.fetch; window.fetch=function(input, init){ try{ var url=(typeof input==='string')?input:((input&&input.url)||''); if(url.indexOf('buyforce.app.n8n.cloud')!==-1){ var t=bfGetApiToken(); if(t){ init=init||{}; var h=init.headers; if(h && typeof Headers!=='undefined' && h instanceof Headers){ h.set('X-BF-Token', t); } else { h=Object.assign({}, h||{}); h['X-BF-Token']=t; init.headers=h; } } } }catch(e){} return _bfOrigFetch.apply(this, arguments); }; } }catch(e){}
-  function bfCaptureApiToken(){
-  try{
-    if(bfGetApiToken()){
-      try{ document.querySelectorAll('[data-bftok]').forEach(function(e){e.style.display='none';}); }catch(e){}
-      if(window.__bfTokTimer){ clearInterval(window.__bfTokTimer); window.__bfTokTimer=null; }
-      return;
-    }
-    if(bfTokTries===0){ try{ console.log('BF_SCAN active (v3)'); }catch(e){} }
-    if(bfTokTries++>60){
-      try{ console.log('BF_SCAN gave up'); }catch(e){}
-      if(window.__bfTokTimer){ clearInterval(window.__bfTokTimer); window.__bfTokTimer=null; }
-      return;
-    }
-    var rx=/bft_[A-Za-z0-9]{20,}/;
-    var done=function(tok,el){
-      try{ sessionStorage.setItem('bf.apitoken', tok); }catch(e){}
-      try{ localStorage.setItem('bf.apitoken', tok); }catch(e){}
-      try{ if(el){ if(el.setAttribute) el.setAttribute('data-bftok','1'); if(el.style) el.style.display='none'; } }catch(e){}
-      try{ console.log('BF_TOKEN captured ok'); bfToast('BF auth ready ✓'); }catch(e){}
-      if(window.__bfTokTimer){ clearInterval(window.__bfTokTimer); window.__bfTokTimer=null; }
-    };
+  function bfHideTokens(){
     try{
+      var rx=/bft_[A-Za-z0-9]{20,}/;
       var tw=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
-      var tn;
-      while(tn=tw.nextNode()){
-        var mm=(tn.nodeValue||'').match(rx);
-        if(mm){ done(mm[0], tn.parentElement); return; }
-      }
-    }catch(e){}
-    try{
+      var tn, hide=[];
+      while(tn=tw.nextNode()){ if(rx.test(tn.nodeValue||'')){ if(tn.parentElement) hide.push(tn.parentElement); } }
+      for(var i=0;i<hide.length;i++){ try{ hide[i].style.display='none'; if(hide[i].setAttribute) hide[i].setAttribute('data-bftok','1'); }catch(e){} }
       var ins=document.querySelectorAll('input,textarea');
-      for(var j=0;j<ins.length;j++){
-        var v=(ins[j].value||'')+'';
-        var m2=v.match(rx);
-        if(m2){ done(m2[0], ins[j]); return; }
-      }
+      for(var k=0;k<ins.length;k++){ try{ if(rx.test((ins[k].value||'')+'')){ ins[k].style.display='none'; if(ins[k].setAttribute) ins[k].setAttribute('data-bftok','1'); } }catch(e){} }
     }catch(e){}
-  }catch(e){}
-}
+  }
+  function bfCaptureApiToken(){
+    try{
+      bfHideTokens();
+      if(bfGetApiToken()) return;
+      if(bfTokTries++>120) return;
+      var rx=/bft_[A-Za-z0-9]{20,}/;
+      var done=function(tok){ try{ sessionStorage.setItem('bf.apitoken', tok); }catch(e){} try{ localStorage.setItem('bf.apitoken', tok); }catch(e){} try{ console.log('BF_TOKEN captured ok'); bfToast('BF auth ready \u2713'); }catch(e){} bfHideTokens(); };
+      var tw=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+      var tn; while(tn=tw.nextNode()){ var mm=(tn.nodeValue||'').match(rx); if(mm){ done(mm[0]); return; } }
+      var ins=document.querySelectorAll('input,textarea');
+      for(var j=0;j<ins.length;j++){ var m2=((ins[j].value||'')+'').match(rx); if(m2){ done(m2[0]); return; } }
+    }catch(e){}
+  }
   try{ if(!window.__bfTokTimer){ bfCaptureApiToken(); window.__bfTokTimer=setInterval(bfCaptureApiToken, 1500); } }catch(e){}
   window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
