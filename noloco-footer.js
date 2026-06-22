@@ -1026,12 +1026,28 @@
     var tier=score>=75?{bg:'#e3f5cf',fg:'#2b6012'}:(score>=50?{bg:'#fbeecd',fg:'#7a4d13'}:{bg:'#eceae3',fg:'#6b6b64'});
     return {score:score,tier:tier};
   }
+  var PIPE_STATUSNAME={FRESH_LEADS:'Fresh Leads',ENGAGED_AWAITING_VIN:'Engaged - Awaiting VIN',VIN_RECEIVED_APPRAISAL_NEEDED:'VIN Received - Appraisal Needed',APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES:'Appraisal Complete - Enter Offer Sheet Values',OFFER_SHEET_GENERATED:'Offer Sheet Generated',OFFER_SENT_0_2_DAYS:'Offer Sent (0-2 Days)',NURTURING_FOLLOW_UP_AND_RE_ENGAGE:'Nurturing (Follow Up and Re-engage)',APPRAISAL_REVIEW_NEEDED:'Appraisal Review Needed',APPRAISAL_REVIEW_COMPLETE:'Appraisal Review Complete',VERBAL_YES_SCHEDULE_APPT:'Verbal Yes - Schedule Appt',SCHEDULED:'Scheduled',APPT_SHOWN_FOLLOW_UP:'Appt Shown - Follow Up',ACQUIRED:'Acquired',NO_DEAL:'No Deal'};
+  function bfRecFallback(uuid){
+    var raw=''; try{ raw=sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||''; }catch(e){}
+    if(!raw) return null;
+    var r; try{ r=JSON.parse(raw); }catch(e){ return null; }
+    if(!r) return null;
+    var stg=PIPE_STATUSNAME[r.status]||'';
+    var sub=r.subtitle||'';
+    if(!sub){ var parts=[]; if(r.mileage!=null&&r.mileage!=='') parts.push(Number(r.mileage).toLocaleString('en-US')+' miles'); if(r.color) parts.push(r.color); sub=parts.join(' \u00b7 '); }
+    if(r.seller && !/\u00b7\s*Seller:/i.test(sub)){ sub=(sub?sub+' \u00b7 ':'')+'Seller: '+r.seller; }
+    var v=function(x){ return (x==null?'':String(x)); };
+    var F={'Vehicle Title':v(r.title),'Vehicle Subtitle':sub,'VIN':v(r.vin),'Mileage':v(r.mileage),'Exterior Color':v(r.color),'Seller Name':v(r.seller),'Competition':v(r.competition),'Distance to Listing':v(r.distance),'Drive Time to Listing':v(r.driveTime),'Listing Location':v(r.location),'Date Listed':v(r.dateListed),'Listing Link':v(r.listingLink),'Offer Sheet Image URL':v(r.offerSheetUrl),'Accident History':v(r.accident),'Stage Entered At':v(r.stageEnteredAt),'Last Follow Up At':v(r.lastActivityAt),'Last Comment At':v(r.lastActivityAt),'ACV':v(r.acv),'Asking Price':v(r.asking),'Offer Amount':v(r.offer),'Est Equity Position':v(r.eq)};
+    return {F:F, stg:stg};
+  }
   function bfRecTop(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
-    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
-    var F=bfReadF(card); var stg=stageOf(card);
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
+    var F, stg;
+    if(card){ F=bfReadF(card); stg=stageOf(card); }
+    else { var _fb=bfRecFallback(uuid); if(!_fb) return; F=_fb.F; stg=_fb.stg; }
     var dist=F['Distance to Listing']||'', drive=F['Drive Time to Listing']||'', loc=F['Listing Location']||'', listed=F['Date Listed']?listedAgo(F['Date Listed']):'';
     var sc=bfRecScore(F);
     var checks=STATUS_CHECKS[stg]||[]; var noDeal=(stg==='No Deal');
@@ -2076,7 +2092,7 @@
     function compCs(c){ c=(c||'').toLowerCase(); if(c.indexOf('both')>-1) return 40; if(c.indexOf('carmax')>-1||c.indexOf('carvana')>-1) return 15; return 0; }
     function calcScore(r){ var acv=Number(r.acv), ask=Number(r.asking); if(!(acv>0)||isNaN(ask)) return null; var cs=compCs(r.competition); var prem=ask-acv; var ds=prem<=2000?30:(prem<=3000?25:(prem<=4000?15:(prem<=5000?7.5:0))); var pct=prem/acv; var ps=pct<=0?20:(pct>=0.20?0:20*(1-pct/0.20)); var eqp=Number(r.eq); var es=isNaN(eqp)?0:(eqp>=2000?10:(eqp<=0?0:10*(eqp/2000))); return Math.round(cs+ds+ps+es); }
     function calcOvp(r){ if(r.asking==null||r.asking===''||r.offer==null||r.offer==='') return null; var ask=Number(r.asking), off=Number(r.offer); if(isNaN(ask)||isNaN(off)) return null; return ask-off; }
-    function decorate(d){ var ap=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ r._score=calcScore(r); r._ovp=calcOvp(r); }); }); }; if(d){ ap(d.stages); ap(d.other); } }
+    function decorate(d){ var ap=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ r._score=calcScore(r); r._ovp=calcOvp(r); try{ var _j=JSON.stringify(r); sessionStorage.setItem('bfrec:'+r.uuid,_j); localStorage.setItem('bfrec:'+r.uuid,_j); }catch(e){} }); }); }; if(d){ ap(d.stages); ap(d.other); } }
     function distinct(getter){ var set={},out=[]; var add=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ var v=getter(r); if(v&&!set[v]){ set[v]=1; out.push(v); } }); }); }; add(st.data&&st.data.stages); add(st.data&&st.data.other); out.sort(); return out; }
     function nIn(v,mn,mx){ if(mn!==''&&mn!=null){ if(v==null||v<Number(mn)) return false; } if(mx!==''&&mx!=null){ if(v==null||v>Number(mx)) return false; } return true; }
     function fOpp(r){ var f=st.f; if(f.comp){ if((r.competition||'').toLowerCase().indexOf(f.comp)<0) return false; } if(f.rep){ if(f.rep==='__none__'){ if(r.rep) return false; } else if(r.rep!==f.rep) return false; } if(f.ostatus){ if((r.offerStatus||'')!==f.ostatus) return false; } if(!nIn(r.daysInStage,f.daysMin,f.daysMax)) return false; if(!nIn(r.mileage,f.mileMin,f.mileMax)) return false; if(!nIn(r._score,f.scoreMin,f.scoreMax)) return false; if(!nIn(r._ovp,f.ovpMin,f.ovpMax)) return false; if((f.driveMin!==''&&f.driveMin!=null)||(f.driveMax!==''&&f.driveMax!=null)){ var dm=dMin(r.driveTime); if(dm<0) return false; if(!nIn(dm,f.driveMin,f.driveMax)) return false; } return true; }
