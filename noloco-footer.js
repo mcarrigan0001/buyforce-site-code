@@ -1513,7 +1513,7 @@
     for(var i=0;i<cells.length;i++){ var lb=cells[i].querySelector('[data-testid="field-cell-label"]'); if(lb && norm(lb.textContent)===norm(label)){ var vn=lb.nextElementSibling; if(vn) vn.textContent=val; } }
   }
   function bfRebuild(card){ var b=card.querySelector('.bf-body'); if(b) b.removeAttribute('data-raw'); addCards(true); }
-  function bfPost(payload){ try{ fetch(BF_HOOK,{method:'POST',body:JSON.stringify(payload)}); }catch(e){} }
+  function bfPost(payload){ try{ if(payload && typeof payload==='object'){ var _ak=['status','lastComment','lastCommentAt','lastFollowUpAt','apptDateAndTime']; var _act=false; for(var _i=0;_i<_ak.length;_i++){ if(_ak[_i] in payload){ _act=true; break; } } if(_act && !('lastActivityAt' in payload)){ payload.lastActivityAt=new Date().toISOString(); } } fetch(BF_HOOK,{method:'POST',body:JSON.stringify(payload)}); }catch(e){} }
   var bfMovedSet={};
   function bfFlashCard(card){ if(!card) return; card.classList.remove('bf-cardflash'); void card.offsetWidth; card.classList.add('bf-cardflash'); clearTimeout(card._bfFl); card._bfFl=setTimeout(function(){ card.classList.remove('bf-cardflash'); }, 1000); }
   function bfFindCard(uuid, stageName){
