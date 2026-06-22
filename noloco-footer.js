@@ -220,6 +220,29 @@
     }
     return equityInfo(disp);
   }
+  function bfCardEquity(F){
+    var esp=(F['Est Equity Position']||'');
+    var hasPay=/[0-9]/.test(F['Estimated Payoff Amount']||F['Estimated Payoff Value']||'')||/[0-9]/.test(F['Actual Payoff']||F['Actual Payoff Amount']||'')||_truthy(F['No Payoff']);
+    if(hasPay && /[0-9]/.test(esp)) return equityInfo2(esp, F['Equity Status'], F['Equity Display']);
+    var num=function(x){var m=(x||'').replace(/[^0-9.]/g,'');return m?parseFloat(m):NaN;};
+    var acv=num(F['ACV']);
+    var act=num(F['Actual Payoff']); if(isNaN(act)) act=num(F['Actual Payoff Amount']);
+    var est=num(F['Estimated Payoff Amount']); if(isNaN(est)) est=num(F['Estimated Payoff Value']);
+    var pay=!isNaN(act)?act:(_truthy(F['No Payoff'])?0:est);
+    if(!isNaN(acv)&&acv>0&&!isNaN(pay)){ var e=Math.round(acv-pay); var amt='$'+Math.abs(e).toLocaleString('en-US'); return e<0?{text:'\u2212'+amt,color:'#c93535'}:{text:'+'+amt,color:'#2b6012'}; }
+    return {text:'\u2014', color:'#9aa0a6'};
+  }
+  function bfAttentionPill(F, stage){
+    stage=stage||'';
+    if(/acquired|no deal/i.test(stage)) return '';
+    var pill=function(bg,fg,icon,label){ return '<span title="'+label+'" style="display:inline-flex;align-items:center;gap:3px;background:'+bg+';color:'+fg+';font-size:11px;font-weight:600;padding:3px 7px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.18);white-space:nowrap;"><i class="ti '+icon+'" style="font-size:12px;" aria-hidden="true"></i>'+label+'</span>'; };
+    if(/offer sheet generated/i.test(stage) && (F['Offer Sheet Image URL']||'')) return pill('#e3f5cf','#2b6012','ti-send','Send offer');
+    if(/verbal yes/i.test(stage)) return pill('#e6eefc','#1c4fb0','ti-calendar-plus','Schedule');
+    var t=function(x){ var d=x?new Date(x).getTime():NaN; return isNaN(d)?0:d; };
+    var last=Math.max(t(F['Last Follow Up At']), t(F['Last Comment At']), t(F['Stage Entered At']));
+    if(last>0){ var days=(Date.now()-last)/86400000; if(days>=3) return pill('#fbe3e3','#c93535','ti-alarm','Follow up'); }
+    return '';
+  }
 
   function listedAgo(raw){
     if(!raw) return '';
@@ -542,9 +565,7 @@
   }
   function buildCard(F, card){
     var comp = compInfo(F['Competition']);
-    var _payoff = F['Estimated Payoff Amount']||F['Estimated Payoff Value']||'';
-    var _hasPayoff = /[0-9]/.test(_payoff) || _truthy(F['No Payoff']);
-    var eq = (_hasPayoff && /[0-9]/.test(F['Est Equity Position']||'')) ? equityInfo2(F['Est Equity Position'], F['Equity Status'], F['Equity Display']) : {text:'—', color:'#9aa0a6'};
+    var eq = bfCardEquity(F);
     var asking = F['Asking Price'];
     var willTake = F['Seller Will Take'];
 
@@ -631,7 +652,8 @@
         (_dt?'<div style="display:flex;align-items:center;gap:3px;"><i class="ti ti-clock-hour-4" style="font-size:12px;color:#9aa0a6;flex:none;" aria-hidden="true"></i>'+esc(_dt)+'</div>':'')+
       '</div>';
     }
-    var _topRight = (_badge||_listing) ? '<div style="display:flex;align-items:center;gap:6px;flex:none;">'+_badge+_listing+'</div>' : '';
+    var _attn = bfAttentionPill(F, stageOf(card));
+    var _topRight = (_attn||_badge||_listing) ? '<div style="display:flex;align-items:center;gap:6px;flex:none;">'+_attn+_badge+_listing+'</div>' : '';
     var _right = (_listing||_badge||_travel) ? '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none;">'+_topRight+_travel+'</div>' : '';
     var _sub=(F['Vehicle Subtitle']||'').replace(/(\d{3,})(\s*miles)/i, function(m,n,suf){ return Number(n).toLocaleString('en-US')+suf; });
     var _subM=_sub, _subSeller=''; var _sm=_sub.split(/\s*·\s*Seller:\s*/i); if(_sm.length>1){ _subM=_sm[0]; _subSeller=_sm[1]; }
@@ -1103,6 +1125,20 @@
   }
   var BF_DBADGE='<svg class="bf-dbadge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 18V6"></path></svg>';
   function bfSetNoticeIcon(n){ var ii=n.querySelector('i.ti'); var sp=ii?ii.parentElement:null; if(sp && sp.getAttribute('data-bficon')!=='1'){ sp.setAttribute('data-bficon','1'); sp.innerHTML=BF_DBADGE; } }
+  function bfRecSectionIcons(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return;
+    var MAP=[[/vehicle|vin|decode/i,'ti-car'],[/payoff|equity|finance/i,'ti-credit-card'],[/apprais/i,'ti-clipboard-check'],[/competition|offers to beat|carmax|carvana/i,'ti-swords'],[/offer|price|valuation/i,'ti-cash'],[/schedul|appoint/i,'ti-calendar'],[/seller|contact/i,'ti-user'],[/listing|location/i,'ti-map-pin'],[/note|condition/i,'ti-notes']];
+    rv.querySelectorAll('[class*="section-title"]').forEach(function(el){
+      if(el.getAttribute('data-bfsicon')) return;
+      var t=(el.textContent||'').replace(/\s+/g,' ').trim(); if(!t) return;
+      var icon=''; for(var i=0;i<MAP.length;i++){ if(MAP[i][0].test(t)){ icon=MAP[i][1]; break; } }
+      if(!icon) return;
+      el.setAttribute('data-bfsicon','1');
+      var ic=document.createElement('i'); ic.className='ti '+icon+' bf-sicon'; ic.setAttribute('aria-hidden','true'); ic.style.cssText='margin-right:7px;font-size:0.95em;color:#9aa0a6;vertical-align:-1px;';
+      el.insertBefore(ic, el.firstChild);
+    });
+  }
   function bfRecHlIcons(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
@@ -1998,7 +2034,7 @@
       bfWsScheduleInit(rs, F);
     });
   }
-  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
