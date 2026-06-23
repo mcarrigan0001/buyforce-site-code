@@ -1011,7 +1011,7 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
-  function bfPipeIsDrawer(){ try{ var pp=new URLSearchParams(location.search).get('_parentPage'); if(!pp) return false; var d=JSON.parse(atob(pp)); return !!(d&&d.elementId===BF_PIPE_EL); }catch(e){ return false; } }
+  function bfPipeIsDrawer(){ try{ if(/^\/pipeline\//.test(location.pathname)) return false; var pp=new URLSearchParams(location.search).get('_parentPage'); if(!pp) return false; var d=JSON.parse(atob(pp)); return !!(d&&d.elementId===BF_PIPE_EL); }catch(e){ return false; } }
   function bfPipeGo(u){ var url='/opportunities-1/view/'+u+'/overview'+location.search; try{ history.pushState({},'',url); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href=url; } }
   function bfPipeClose(){ try{ history.pushState({},'','/pipeline'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/pipeline'; } }
   function bfMkPipeArrow(side){ var b=document.createElement('button'); b.type='button'; b.className='bf-flip bf-pipearrow'; b.style.cssText='position:fixed;top:50%;'+(side==='l'?'left:16px':'right:16px')+';transform:translateY(-50%);z-index:10002;display:none;'; b.innerHTML='<i class="ti ti-chevron-'+(side==='l'?'left':'right')+'" aria-hidden="true"></i>'; b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(u) bfPipeGo(u); }); document.body.appendChild(b); return b; }
@@ -1989,8 +1989,9 @@
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var ws=document.querySelector('.bf-ws');
     if(ws && ws.getAttribute('data-uuid')===uuid) return;
-    var main=document.querySelector('.bf-main'); if(!main) return;
-    var host=main.querySelector(':scope > .max-w-6xl')||main;
+    var main=document.querySelector('.bf-main');
+    var host=main?(main.querySelector(':scope > .max-w-6xl')||main):document.querySelector('[data-testid="record-view-body"]');
+    if(!host) return;
     if(ws) ws.remove();
     var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
     var F=card?bfReadF(card):{}; var stg=card?stageOf(card):'';
@@ -1998,7 +1999,7 @@
     ws.innerHTML=bfWsHtml(stg,F);
     var _sn=(F['Seller Name']||F['Seller']||'').replace(/^seller:\s*/i,'').trim().split(/\s+/)[0]||'';
     ws._bfDeal={ vehicle:(F['Vehicle Title']||''), dealership:(F['Dealership']||F['Dealer']||''), mileage:(bfGet(F,['Mileage','Miles','Odometer'])||''), color:(bfGet(F,['Color','Exterior Color','Ext Color'])||''), trim:(bfGet(F,['Trim','Trim Level'])||''), payoff:(bfGet(F,['Est Payoff Amount','Payoff Amount','Payoff'])||''), equity:(bfGet(F,['Est Equity Position','Equity Position'])||''), retail:(bfGet(F,['Est Private Party Retail Value','Private Party Retail Value'])||''), dealerDays:(bfGet(F,['Est Dealer Days to Sale','Dealer Days to Sale'])||''), stage:stg, sellerFirst:_sn, asking:(F['Asking Price']||''), acv:(F['ACV']||''), offer:(F['Offer Amount']||''), carmax:(F['CarMax Offer']||''), carvana:(F['Carvana Offer']||''), competition:(F['Competition']||''), accident:(F['Accident History']||''), address:(bfGet(F,['Dealership Address','dealershipAddress'])||'') };
-    host.insertBefore(ws, host.firstChild);
+    var _wsAnchor=main?null:host.querySelector(':scope > .bf-rectop'); if(_wsAnchor){ if(_wsAnchor.nextSibling) host.insertBefore(ws, _wsAnchor.nextSibling); else host.appendChild(ws); } else { host.insertBefore(ws, host.firstChild); }
     var def=bfWsTabMem[uuid]||BF_WSDEF[stg]||'timeline';
     bfWsActivate(ws, def);
     ws.addEventListener('click', function(e){
