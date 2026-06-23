@@ -1303,7 +1303,7 @@
     [].forEach.call(body.children, function(c){
       if(c===host) return;
       if(c.classList && c.classList.contains('bf-ws')){ if(slot && c.parentNode!==slot){ slot.appendChild(c); } c.style.removeProperty('display'); return; }
-      if(secwrap && c.querySelector && c.querySelector('[data-testid="details-section"].bf-rsec')){ if(c.parentNode!==secwrap){ secwrap.appendChild(c); } c.style.removeProperty('display'); return; }
+      if(secwrap && c.querySelector){ var _ds=c.querySelector('[data-testid="details-section"]'); var _h2=_ds&&_ds.querySelector('h2'); if(_ds && _h2 && /vin|competing offers|make the offer|send offer|schedule|payoff/i.test(_h2.textContent||'')){ if(c.parentNode!==secwrap){ secwrap.appendChild(c); } c.style.removeProperty('display'); return; } }
       if(c.style.display!=='none') c.style.setProperty('display','none','important');
     });
   }
@@ -1375,8 +1375,9 @@
   function bfRecSectionsUI(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
-    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]'); if(!card) return;
-    var stg=stageOf(card); var checks=STATUS_CHECKS[stg]||[];
+    var card=document.querySelector('[data-testid="collection-record"][href*="'+uuid+'"]');
+    var stg; if(card){ stg=stageOf(card); } else { var _Rs={}; try{ _Rs=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){} stg=_Rs.status||''; if(!stg) return; }
+    var checks=STATUS_CHECKS[stg]||[];
     var MAP=[[/vin\s*&|vin and|vin &amp;|vin\b/i,'ti-car',0],[/competing offers/i,'ti-scale',2],[/make the offer/i,'ti-businessplan',4],[/send offer/i,'ti-send',5],[/schedule/i,'ti-calendar-event',7],[/payoff/i,'ti-receipt',8]];
     var firstNotDone=false;
     [].forEach.call(document.querySelectorAll('[data-testid="details-section"]'),function(sec){
