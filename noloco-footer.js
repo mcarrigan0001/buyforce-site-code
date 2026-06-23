@@ -2369,18 +2369,22 @@
       function reachedOffer(r){ return ord(r.status)>=5; }
       function macroUnits(rs){ return MACRO.map(function(mm){ var rr=rs.filter(function(r){ return mm.statuses.indexOf(r.status)>-1; }); return {status:mm.label,label:mm.label,count:rr.length,records:rr}; }); }
       var actv=repRecs('active').filter(active);
-      var rsa=repRecs('acq'); var Ta=tf(st.tf.acq), acqC=acqIn(rsa,Ta,false), acqP=acqIn(rsa,Ta,true), acqSub;
-      if(Ta.pace){ var pace=Math.round(acqC/Math.max(1,Ta.pace.dp)*Ta.pace.dim); acqSub='Pace '+pace+' '+dhtml(dlt(pace,acqP)); } else { acqSub=dhtml(dlt(acqC,acqP)); }
+      var rsa=repRecs('acq'); var Ta=tf(st.tf.acq), acqC=acqIn(rsa,Ta,false), acqP=acqIn(rsa,Ta,true);
+      var paceVal=Ta.pace?Math.round(acqC/Math.max(1,Ta.pace.dp)*Ta.pace.dim):null;
+      var acqDelta=dhtml(dlt(paceVal!=null?paceVal:acqC,acqP));
       var rsc=repRecs('close'); var Tc=tf(st.tf.close), ldC=leadsIn(rsc,Tc,false), ldP=leadsIn(rsc,Tc,true);
       var crC=ldC?Math.round(cohort(rsc,Tc,false,isAcq)/ldC*100):0, crP=ldP?Math.round(cohort(rsc,Tc,true,isAcq)/ldP*100):0;
       var rso=repRecs('offer'); var To=tf(st.tf.offer), loC=leadsIn(rso,To,false), loP=leadsIn(rso,To,true);
       var ocC=loC?Math.round(cohort(rso,To,false,reachedOffer)/loC*100):0, ocP=loP?Math.round(cohort(rso,To,true,reachedOffer)/loP*100):0;
       var kEl=q('kpis');
+      var acqBody=(paceVal!=null)
+        ? '<div class="bff-kpi-acqrow"><div class="bff-kpi-col"><div class="bff-kpi-v">'+acqC+'</div><div class="bff-kpi-l">Acquired</div></div><div class="bff-kpi-div"></div><div class="bff-kpi-col"><div class="bff-kpi-v">'+paceVal+'</div><div class="bff-kpi-l">Pace</div></div></div><div class="bff-kpi-sub">'+acqDelta+'</div>'
+        : '<div class="bff-kpi-v">'+acqC+'</div><div class="bff-kpi-l">Acquired</div><div class="bff-kpi-sub">'+acqDelta+'</div>';
       if(kEl) kEl.innerHTML=
-        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-flame"></i></div>'+ddRep('active')+'</div><div class="bff-kpi-v">'+actv.length.toLocaleString('en-US')+'</div><div class="bff-kpi-l">Active Deals</div></div>'+
-        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-checks"></i></div><span class="bff-kpi-ctl">'+ddRep('acq')+ddTF('acq')+'</span></div><div class="bff-kpi-v">'+acqC+'</div><div class="bff-kpi-l">Acquired</div><div class="bff-kpi-sub">'+acqSub+'</div></div>'+
-        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-target-arrow"></i></div><span class="bff-kpi-ctl">'+ddRep('close')+ddTF('close')+'</span></div><div class="bff-kpi-v">'+crC+'%</div><div class="bff-kpi-l">Close Rate</div><div class="bff-kpi-sub">'+dhtml(dlt(crC,crP))+'</div></div>'+
-        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-send"></i></div><span class="bff-kpi-ctl">'+ddRep('offer')+ddTF('offer')+'</span></div><div class="bff-kpi-v">'+ocC+'%</div><div class="bff-kpi-l">Offer to Close</div><div class="bff-kpi-sub">'+dhtml(dlt(ocC,ocP))+'</div></div>';
+        '<div class="bff-kpi bff-kpi-tf"><span class="bff-kpi-rep">'+ddRep('active')+'</span><div class="bff-kpi-body"><div class="bff-kpi-ic"><i class="ti ti-flame"></i></div><div class="bff-kpi-main"><div class="bff-kpi-v">'+actv.length.toLocaleString('en-US')+'</div><div class="bff-kpi-l">Active Deals</div></div></div></div>'+
+        '<div class="bff-kpi bff-kpi-tf"><span class="bff-kpi-rep">'+ddRep('acq')+'</span><span class="bff-kpi-time">'+ddTF('acq')+'</span><div class="bff-kpi-body"><div class="bff-kpi-ic"><i class="ti ti-checks"></i></div><div class="bff-kpi-main">'+acqBody+'</div></div></div>'+
+        '<div class="bff-kpi bff-kpi-tf"><span class="bff-kpi-rep">'+ddRep('close')+'</span><span class="bff-kpi-time">'+ddTF('close')+'</span><div class="bff-kpi-body"><div class="bff-kpi-ic"><i class="ti ti-target-arrow"></i></div><div class="bff-kpi-main"><div class="bff-kpi-v">'+crC+'%</div><div class="bff-kpi-l">Close Rate</div><div class="bff-kpi-sub">'+dhtml(dlt(crC,crP))+'</div></div></div></div>'+
+        '<div class="bff-kpi bff-kpi-tf"><span class="bff-kpi-rep">'+ddRep('offer')+'</span><span class="bff-kpi-time">'+ddTF('offer')+'</span><div class="bff-kpi-body"><div class="bff-kpi-ic"><i class="ti ti-send"></i></div><div class="bff-kpi-main"><div class="bff-kpi-v">'+ocC+'%</div><div class="bff-kpi-l">Offer to Close</div><div class="bff-kpi-sub">'+dhtml(dlt(ocC,ocP))+'</div></div></div></div>';
       var rsAc=repRecs('activity'); var Tac=tf(st.tf.activity);
       function actCount(ss,T,p){ return rsAc.filter(function(r){ return ss.indexOf(r.status)>-1 && (p?inP(r.stageEnteredAt,T):inR(r.stageEnteredAt,T)); }).length; }
       var actDefs=[{l:'New Leads',ss:['FRESH_LEADS','ENGAGED_AWAITING_VIN']},{l:'VINs Captured',ss:['VIN_RECEIVED_APPRAISAL_NEEDED']},{l:'Appraisals Needed',ss:['VIN_RECEIVED_APPRAISAL_NEEDED','APPRAISAL_REVIEW_NEEDED']},{l:'Appraisals Completed',ss:['APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES','APPRAISAL_REVIEW_COMPLETE']},{l:'Offers Sent',ss:['OFFER_SHEET_GENERATED','OFFER_SENT_0_2_DAYS']},{l:'Acquired',ss:['ACQUIRED']}];

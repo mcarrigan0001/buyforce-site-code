@@ -1949,3 +1949,29 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-actrow .bff-delta{ margin-left:auto; }
 .bff-lc-h .bff-filter-lc{ margin-left:auto; }
 #bff-wrap .bff-kpis, #bff-wrap .bff-extras, #bff-wrap .bff-kpi, #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ overflow:visible; }
+
+/* ===== batch C: KPI redesign + interactive icons/bars ===== */
+#bff-wrap .bff-kpi.bff-kpi-tf{ position:relative; flex-direction:column; align-items:center; justify-content:center; gap:0; padding:16px 12px; min-height:120px; }
+.bff-kpi-rep{ position:absolute; top:6px; left:8px; z-index:6; }
+.bff-kpi-time{ position:absolute; top:6px; right:8px; z-index:6; }
+.bff-kpi-rep .bff-ddb, .bff-kpi-time .bff-ddb{ padding:3px 4px; gap:2px; border-radius:7px; }
+.bff-kpi-rep .bff-ddb > .ti, .bff-kpi-time .bff-ddb > .ti{ font-size:10px; }
+.bff-kpi-rep .bff-ddcar, .bff-kpi-time .bff-ddcar{ font-size:8px!important; }
+.bff-kpi-rep .bff-ddav, .bff-kpi-time .bff-ddav{ width:14px; height:14px; font-size:7px; }
+.bff-kpi-rep .bff-ddl, .bff-kpi-time .bff-ddl{ font-size:9px; }
+.bff-kpi-body{ display:flex; align-items:center; justify-content:center; gap:12px; width:100%; padding-top:8px; }
+.bff-kpi-main{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+#bff-wrap .bff-kpi-tf .bff-kpi-v{ font-size:30px; }
+.bff-kpi-acqrow{ display:flex; align-items:center; justify-content:center; gap:14px; }
+.bff-kpi-acqrow .bff-kpi-v{ font-size:26px; }
+.bff-kpi-col{ display:flex; flex-direction:column; align-items:center; }
+.bff-kpi-div{ width:1px; align-self:stretch; min-height:44px; background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.2),rgba(255,255,255,0)); }
+.bff-kpi-tf .bff-kpi-sub{ text-align:center; margin-top:6px; }
+/* interactive icons */
+.bff-kpi-ic, .bff-ico, .bff-rfico{ transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease, color .14s ease; cursor:pointer; }
+.bff-kpi-ic:hover, .bff-ico:hover, .bff-rfico:hover{ transform:scale(1.12); box-shadow:0 0 13px 2px rgba(87,200,34,.6); border-color:#57c822; color:#bdf08f; }
+.bff-stage.on .bff-ico, .bff-stage:hover .bff-ico{ box-shadow:0 0 14px 2px rgba(87,200,34,.78); border-color:#57c822; color:#bdf08f; }
+/* interactive chart bars */
+.bff-rfbar, .bff-rfbbar{ transition:box-shadow .14s ease, filter .14s ease; cursor:pointer; }
+.bff-rfbar:hover, .bff-rfbbar:hover, .bff-rfcol:hover .bff-rfbar, .bff-rfbcol:hover .bff-rfbbar{ box-shadow:0 0 12px 1px rgba(87,200,34,.7); filter:brightness(1.3); }
+.bff-rfcol:hover .bff-rfico{ transform:scale(1.12); box-shadow:0 0 13px 2px rgba(87,200,34,.6); border-color:#57c822; }
