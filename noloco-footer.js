@@ -1182,6 +1182,12 @@
     scope.querySelectorAll('[data-testid="highlight-item"]').forEach(function(c){ var lb=c.querySelector('[data-testid="highlight-label"]'); var vl=c.querySelector('[data-testid="highlight-value"]'); if(lb){ var k=norm(lb.textContent); var v=dval(vl?vl.textContent:''); if(v||!(k in F)) F[k]=v; } });
     return F;
   }
+  function bfPipePriceData(scope, uuid){
+    var F=bfPipePriceRead(scope);
+    var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
+    if(R){ if(!F['Competition']&&R.competition) F['Competition']=R.competition; if(!F['Est Equity Position']&&R.eq!=null&&R.eq!=='') F['Est Equity Position']=String(R.eq); if(!F['Asking Price']&&R.asking!=null&&R.asking!=='') F['Asking Price']=String(R.asking); if(!F['Offer Amount']&&R.offer!=null&&R.offer!=='') F['Offer Amount']=String(R.offer); if(!F['ACV']&&R.acv!=null&&R.acv!=='') F['ACV']=String(R.acv); }
+    return F;
+  }
   function bfPipePriceHtml(F){
     function g(keys){ for(var i=0;i<keys.length;i++){ var v=F[keys[i]]; if(v!=null&&v!=='') return v; } return ''; }
     function money(v){ if(v==null||v==='') return '—'; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString('en-US'); }
@@ -1204,11 +1210,11 @@
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var cols=body.querySelector(':scope > .bf-reccols');
-    if(cols && cols.getAttribute('data-uuid')===uuid){ var lf=cols.querySelector('.bf-recleft'); if(lf){ var nf=bfPipePriceHtml(bfPipePriceRead(cols.querySelector('.bf-recright')||body)); if(lf.getAttribute('data-h')!==nf){ lf.innerHTML=nf; lf.setAttribute('data-h',nf); } } return; }
+    if(cols && cols.getAttribute('data-uuid')===uuid){ var lf=cols.querySelector('.bf-recleft'); if(lf){ var nf=bfPipePriceHtml(bfPipePriceData(cols.querySelector('.bf-recright')||body, uuid)); if(lf.getAttribute('data-h')!==nf){ lf.innerHTML=nf; lf.setAttribute('data-h',nf); } } return; }
     var rectop=body.querySelector(':scope > .bf-rectop'); if(!rectop) return;
     var content=[].filter.call(body.children, function(c){ return c!==rectop && !(c.classList&&c.classList.contains('bf-reccols')); });
     if(!content.length) return;
-    var F=bfPipePriceRead(body);
+    var F=bfPipePriceData(body, uuid);
     if(cols) cols.remove();
     cols=document.createElement('div'); cols.className='bf-reccols'; cols.setAttribute('data-uuid',uuid);
     var left=document.createElement('div'); left.className='bf-recleft'; var lh=bfPipePriceHtml(F); left.innerHTML=lh; left.setAttribute('data-h',lh);
