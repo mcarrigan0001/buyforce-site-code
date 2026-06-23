@@ -1226,6 +1226,7 @@
   function bfV2Money(v){ if(v==null||v==='') return '—'; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString('en-US'); }
   function bfV2Html(R,uuid){
     var title=esc(R.title||'Opportunity');
+    var vin=(R.vin||''); var vinLine=vin?('<div class="bf-v2vin" data-bfvin="'+esc(vin)+'" title="Copy VIN">VIN '+esc(vin)+' <i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
     var sub=(R.subtitle||''); var mileage=R.mileage, color=R.color;
     if(!color){ var cm=sub.match(/·\s*([A-Za-z ]+)\s*$/); }
     var asking=R.asking, offer=R.offer, acv=R.acv;
@@ -1252,7 +1253,7 @@
     var head='<div class="bf-v2card bf-v2hero"><div class="bf-v2herotop">'
       +'<div class="bf-v2thumb">'+(R.photo?('<img src="'+esc(R.photo)+'">'):'<i class="ti ti-car" aria-hidden="true"></i>')+'</div>'
       +'<div class="bf-v2htxt"><div class="bf-v2trow"><div class="bf-v2title">'+title+'</div>'+(score!=null?'<div class="bf-v2score"><div class="bf-v2scoren"><i class="ti ti-flame" style="font-size:14px;" aria-hidden="true"></i>'+score+'</div><div class="bf-v2scorel">Seller Score</div></div>':'')+'</div>'
-      +'<div class="bf-v2badges">'+(winning?'<span class="bf-v2win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>':(winLabel?'<span class="bf-v2win" style="background:rgba(240,165,40,.15);color:#f0a528;"><i class="ti ti-swords" aria-hidden="true"></i>'+esc(winLabel)+'</span>':''))+acc+(stagePretty?'<span class="bf-v2pill green"><i class="ti ti-progress" aria-hidden="true"></i>'+esc(stagePretty)+'</span>':'')+'</div></div></div>'
+      +vinLine+'<div class="bf-v2badges">'+(winning?'<span class="bf-v2win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>':(winLabel?'<span class="bf-v2win" style="background:rgba(240,165,40,.15);color:#f0a528;"><i class="ti ti-swords" aria-hidden="true"></i>'+esc(winLabel)+'</span>':''))+acc+(stagePretty?'<span class="bf-v2pill green"><i class="ti ti-progress" aria-hidden="true"></i>'+esc(stagePretty)+'</span>':'')+'</div></div></div>'
       +'<div class="bf-v2meta">'
       +(mileage!=null&&mileage!==''?'<div class="bf-v2mc"><i class="ti ti-gauge" aria-hidden="true"></i><div><b>'+Number(mileage).toLocaleString('en-US')+' mi</b><span>Mileage</span></div></div>':'')
       +(dt?'<div class="bf-v2mc"><i class="ti ti-clock-hour-4" aria-hidden="true"></i><div><b>'+esc(dt)+'</b><span>Travel Time</span></div></div>':'')
@@ -1265,12 +1266,11 @@
     var prog='<div class="bf-v2card"><div class="bf-v2sh"><span class="bf-v2t">DEAL PROGRESS</span><span style="font-size:12px;color:#9aa0a6;font-weight:600;">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-v2prog">'+steps+'</div></div>';
     var feed='<div class="bf-v2card"><div class="bf-v2tabs"><div class="bf-v2tab on" data-vt="act">ACTIVITY</div><div class="bf-v2tab" data-vt="notes">NOTES</div><div class="bf-v2tab" data-vt="tasks">TASKS</div></div><div class="bf-v2feed" data-vp="act"><div class="bf-v2empty">Loading activity…</div></div><div class="bf-v2feed" data-vp="notes" style="display:none;"><div class="bf-v2empty">No notes.</div></div><div class="bf-v2feed" data-vp="tasks" style="display:none;"><div class="bf-v2empty">No tasks.</div></div></div>';
     var acts='<div class="bf-v2acts"><a class="bf-v2act call" data-act="call"><i class="ti ti-phone" aria-hidden="true"></i>Call</a><a class="bf-v2act" data-act="text"><i class="ti ti-message-2" aria-hidden="true"></i>Text</a><a class="bf-v2act" data-act="email"><i class="ti ti-mail" aria-hidden="true"></i>Email</a><a class="bf-v2act" data-act="offer"><i class="ti ti-currency-dollar" aria-hidden="true"></i>Offer</a><a class="bf-v2act" data-act="more"><i class="ti ti-dots" aria-hidden="true"></i>More</a></div>';
-    return '<div class="bf-v2wrap">'+head+'<div class="bf-v2grid"><div class="bf-v2col">'+p3+comp+ai+'</div><div class="bf-v2col">'+prog+feed+'</div></div>'+acts+'</div>';
+    return '<div class="bf-v2wrap">'+head+'<div class="bf-v2grid"><div class="bf-v2col">'+p3+comp+'</div><div class="bf-v2col">'+prog+'</div></div><div class="bf-v2wsslot"></div>'+acts+'</div>';
   }
   function bfV2Wire(host, uuid, R){
-    host.querySelectorAll('.bf-v2tab').forEach(function(t){ t.addEventListener('click',function(){ host.querySelectorAll('.bf-v2tab').forEach(function(x){x.classList.toggle('on',x===t);}); var v=t.getAttribute('data-vt'); host.querySelectorAll('[data-vp]').forEach(function(p){p.style.display=p.getAttribute('data-vp')===v?'':'none';}); }); });
-    host.querySelectorAll('.bf-v2act').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var k=a.getAttribute('data-act'); bfToast(k.charAt(0).toUpperCase()+k.slice(1)+' — (wire to dialer/compose next)'); }); });
-    try{ fetch(BF_WH+'/get-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}).then(function(r){return r.json();}).then(function(d){ var ev=(d&&d.events)||[]; var fe=host.querySelector('[data-vp="act"]'); if(!fe) return; if(!ev.length){ fe.innerHTML='<div class="bf-v2empty">No activity yet.</div>'; return; } fe.innerHTML=ev.slice(0,8).map(function(e2){ var t=(e2.type||'note'); var ic=/text|reply|message/i.test(t)?'ti-message':(/view/i.test(t)?'ti-eye':(/call/i.test(t)?'ti-phone':(/offer|sent/i.test(t)?'ti-send':'ti-point'))); var tm=e2.createdAt?agoShort(e2.createdAt):''; return '<div class="bf-v2fi"><div class="bf-v2fic g"><i class="ti '+ic+'" aria-hidden="true"></i></div><div style="flex:1;min-width:0;"><div class="bf-v2ft">'+esc((e2.title||e2.text||t).slice(0,60))+'</div>'+(e2.text&&e2.title?'<div class="bf-v2fsub">'+esc(e2.text.slice(0,70))+'</div>':'')+'</div><div class="bf-v2ftime">'+esc(tm)+'</div></div>'; }).join(''); }).catch(function(){}); }catch(e){}
+    host.querySelectorAll('.bf-v2act').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var k=a.getAttribute('data-act'); bfToast(k.charAt(0).toUpperCase()+k.slice(1)+' \u2014 (wire next)'); }); });
+    host.querySelectorAll('.bf-v2vin[data-bfvin]').forEach(function(v){ v.addEventListener('click',function(){ try{ navigator.clipboard.writeText(v.getAttribute('data-bfvin')); bfToast('VIN copied'); }catch(e){} }); });
   }
   function bfV2(){
     if(!/^\/opportunities\/view\/rec[0-9a-z]+\/summary/.test(location.pathname)){ if(document.documentElement.getAttribute('data-bfv2')==='1'){ document.documentElement.removeAttribute('data-bfv2'); var old=document.getElementById('bf-v2'); if(old) old.remove(); } return; }
@@ -1286,7 +1286,8 @@
       bfV2Wire(host,uuid,R);
     }
     document.documentElement.setAttribute('data-bfv2','1');
-    [].forEach.call(body.children, function(c){ if(c!==host && c.style.display!=='none') c.style.setProperty('display','none','important'); });
+    var slot=host.querySelector('.bf-v2wsslot');
+    [].forEach.call(body.children, function(c){ if(c===host) return; if(c.classList && c.classList.contains('bf-ws')){ if(slot && c.parentNode!==slot){ slot.appendChild(c); } c.style.removeProperty('display'); return; } if(c.style.display!=='none') c.style.setProperty('display','none','important'); });
   }
   function bfColDefaultSweep(){
     if(!bfFirstDefault || (Date.now()-bfDefaultAt>8000)) return;
