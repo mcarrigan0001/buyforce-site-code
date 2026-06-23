@@ -1627,3 +1627,105 @@ html[data-bfv2="1"] [data-testid="record-view"]{background:#0b0b0d !important;}
 .bf-v2vin:hover{color:#fff;}
 .bf-v2wsslot{margin-top:2px;}
 .bf-v2wsslot .bf-ws{margin:0;}
+
+/* ============================================================
+   v2 record page — DARK THEME for embedded workspace + milestone sections
+   scoped to html[data-bfv2="1"] so kanban / side-panel stay light
+   ============================================================ */
+/* ---- workspace (.bf-ws) ---- */
+html[data-bfv2="1"] .bf-ws{ background:#141619; border:1px solid var(--ln); box-shadow:none; }
+html[data-bfv2="1"] .bf-ws-h,
+html[data-bfv2="1"] .bf-ws-lbl,
+html[data-bfv2="1"] .bf-ws-trn,
+html[data-bfv2="1"] .bf-ws-sublbl,
+html[data-bfv2="1"] .bf-ws-ctx,
+html[data-bfv2="1"] .bf-ws-micro,
+html[data-bfv2="1"] .bf-ws-meta,
+html[data-bfv2="1"] .bf-ws-empty,
+html[data-bfv2="1"] .bf-ws-locaddr,
+html[data-bfv2="1"] .bf-ws-soonbox span,
+html[data-bfv2="1"] .bf-ws-ocrhint{ color:var(--mut); }
+html[data-bfv2="1"] .bf-ws-tabs{ border-bottom-color:var(--ln); }
+html[data-bfv2="1"] .bf-ws-tab{ color:var(--mut); }
+html[data-bfv2="1"] .bf-ws-tab:hover{ color:var(--g); }
+html[data-bfv2="1"] .bf-ws-tab.on{ color:var(--g); border-bottom-color:var(--g); }
+html[data-bfv2="1"] .bf-ws-it,
+html[data-bfv2="1"] .bf-ws-note,
+html[data-bfv2="1"] .bf-ws-track-txt,
+html[data-bfv2="1"] .bf-ws-suggest-txt,
+html[data-bfv2="1"] .bf-ws-taskt,
+html[data-bfv2="1"] .bf-ws-locname,
+html[data-bfv2="1"] .bf-ws-bkrow,
+html[data-bfv2="1"] .bf-ws-eta,
+html[data-bfv2="1"] .bf-ws-eta b,
+html[data-bfv2="1"] .bf-ws-soonbox b,
+html[data-bfv2="1"] .bf-ws-composer input,
+html[data-bfv2="1"] .bf-ws-seller,
+html[data-bfv2="1"] .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-ws-timeinput,
+html[data-bfv2="1"] .bf-ws-pickupinput{ color:#f2f3f5; }
+html[data-bfv2="1"] .bf-ws-composer,
+html[data-bfv2="1"] .bf-ws-track,
+html[data-bfv2="1"] .bf-ws-suggest,
+html[data-bfv2="1"] .bf-ws-loc,
+html[data-bfv2="1"] .bf-ws-soonbox,
+html[data-bfv2="1"] .bf-ws-seller,
+html[data-bfv2="1"] .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-ws-timeinput,
+html[data-bfv2="1"] .bf-ws-pickupinput,
+html[data-bfv2="1"] .bf-ws-type{ background:#0e1012; border-color:var(--ln); }
+html[data-bfv2="1"] .bf-ws-type{ color:var(--mut); }
+html[data-bfv2="1"] .bf-ws-copy,
+html[data-bfv2="1"] .bf-ws-ocr,
+html[data-bfv2="1"] .bf-ws-btn.ghost{ background:#16181c; border-color:var(--ln); color:#e6e7e9; }
+html[data-bfv2="1"] .bf-ws-copy:hover,
+html[data-bfv2="1"] .bf-ws-ocr:hover,
+html[data-bfv2="1"] .bf-ws-btn.ghost:hover{ border-color:var(--g); color:var(--g); }
+html[data-bfv2="1"] .bf-ws-item:not(:last-child)::before{ background:var(--ln); }
+html[data-bfv2="1"] .bf-ws-task{ border-top-color:var(--ln); }
+html[data-bfv2="1"] .bf-ws-tasklist .bf-ws-task:first-of-type{ border-top:none; }
+html[data-bfv2="1"] .bf-ws-dot.gray{ background:#1c1f24; color:var(--mut); }
+html[data-bfv2="1"] .bf-ws-dot.note{ background:rgba(143,224,74,.16); color:var(--g); }
+html[data-bfv2="1"] .bf-ws-check{ border-color:var(--ln); }
+html[data-bfv2="1"] .bf-ws-task.done .bf-ws-taskt{ color:var(--dim); }
+html[data-bfv2="1"] .bf-ws-kind,
+html[data-bfv2="1"] .bf-ws-stage,
+html[data-bfv2="1"] .bf-ws-rec,
+html[data-bfv2="1"] .bf-ws-chip,
+html[data-bfv2="1"] .bf-ws-type.sel{ background:rgba(143,224,74,.13); color:var(--g); border-color:rgba(143,224,74,.32); }
+html[data-bfv2="1"] .bf-ws-strat,
+html[data-bfv2="1"] .bf-ws-micro b{ color:var(--g); }
+html[data-bfv2="1"] .bf-ws-attach{ color:var(--mut); }
+html[data-bfv2="1"] .bf-ws-attach:hover{ background:#1c1f24; color:var(--g); }
+
+/* ---- milestone detail sections (.bf-rsec) reparented onto v2 ---- */
+html[data-bfv2="1"] .bf-v2secs{ margin-top:12px; display:flex; flex-direction:column; gap:0; }
+html[data-bfv2="1"] .bf-v2secs > div{ padding:0 !important; }
+html[data-bfv2="1"] [data-testid="details-section"]{ background:#141619 !important; border:1px solid var(--ln) !important; border-radius:18px !important; color:#f2f3f5 !important; margin-bottom:12px !important; }
+html[data-bfv2="1"] [data-testid="details-section"] .bg-stone-50,
+html[data-bfv2="1"] [data-testid="details-section"] [class*="bg-stone"],
+html[data-bfv2="1"] [data-testid="details-section"] [class*="bg-white"]{ background:transparent !important; }
+html[data-bfv2="1"] [data-testid="details-section"] h2{ color:#fff !important; }
+html[data-bfv2="1"] [data-testid="details-section"] form > div{ background:#0e1012 !important; }
+html[data-bfv2="1"] [data-testid="details-section"] form > div label{ color:var(--mut) !important; }
+html[data-bfv2="1"] [data-testid="details-section"] [id="field-cell"],
+html[data-bfv2="1"] [data-testid="details-section"] [id="field-cell"] *{ color:#f2f3f5 !important; }
+html[data-bfv2="1"] [data-testid="details-section"] input,
+html[data-bfv2="1"] [data-testid="details-section"] textarea{ background:#0b0b0d !important; color:#fff !important; border-color:var(--ln) !important; }
+html[data-bfv2="1"] .bf-secblurb,
+html[data-bfv2="1"] .bf-info{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-rsicon{ color:var(--g) !important; }
+html[data-bfv2="1"] .bf-rsec-current .bf-rscc{ border-color:var(--g) !important; color:var(--g) !important; }
+html[data-bfv2="1"] .bf-rsec-done .bf-rscc{ background:#2b6012 !important; color:#fff !important; }
+html[data-bfv2="1"] .bf-rsec-upcoming .bf-rscc{ border-color:var(--ln) !important; }
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-upcoming{ border-left-color:var(--ln) !important; }
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-current{ border-left-color:var(--g) !important; }
+html[data-bfv2="1"] .bf-rschip{ background:rgba(143,224,74,.14) !important; color:var(--g) !important; }
+/* port scripts + buttons + scheduler inside milestone sections */
+html[data-bfv2="1"] .bf-track,
+html[data-bfv2="1"] .bf-field{ background:#0e1012 !important; border-color:var(--ln) !important; color:#f2f3f5 !important; }
+html[data-bfv2="1"] .bf-track-txt,
+html[data-bfv2="1"] .bf-field-val{ color:#f2f3f5 !important; }
+html[data-bfv2="1"] .bf-trn,
+html[data-bfv2="1"] .bf-field-lbl{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-lbl{ color:var(--mut) !important; }

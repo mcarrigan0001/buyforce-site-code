@@ -1266,7 +1266,7 @@
     var prog='<div class="bf-v2card"><div class="bf-v2sh"><span class="bf-v2t">DEAL PROGRESS</span><span style="font-size:12px;color:#9aa0a6;font-weight:600;">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-v2prog">'+steps+'</div></div>';
     var feed='<div class="bf-v2card"><div class="bf-v2tabs"><div class="bf-v2tab on" data-vt="act">ACTIVITY</div><div class="bf-v2tab" data-vt="notes">NOTES</div><div class="bf-v2tab" data-vt="tasks">TASKS</div></div><div class="bf-v2feed" data-vp="act"><div class="bf-v2empty">Loading activity…</div></div><div class="bf-v2feed" data-vp="notes" style="display:none;"><div class="bf-v2empty">No notes.</div></div><div class="bf-v2feed" data-vp="tasks" style="display:none;"><div class="bf-v2empty">No tasks.</div></div></div>';
     var acts='<div class="bf-v2acts"><a class="bf-v2act call" data-act="call"><i class="ti ti-phone" aria-hidden="true"></i>Call</a><a class="bf-v2act" data-act="text"><i class="ti ti-message-2" aria-hidden="true"></i>Text</a><a class="bf-v2act" data-act="email"><i class="ti ti-mail" aria-hidden="true"></i>Email</a><a class="bf-v2act" data-act="offer"><i class="ti ti-currency-dollar" aria-hidden="true"></i>Offer</a><a class="bf-v2act" data-act="more"><i class="ti ti-dots" aria-hidden="true"></i>More</a></div>';
-    return '<div class="bf-v2wrap">'+head+'<div class="bf-v2grid"><div class="bf-v2col">'+p3+comp+'</div><div class="bf-v2col">'+prog+'</div></div><div class="bf-v2wsslot"></div>'+acts+'</div>';
+    return '<div class="bf-v2wrap">'+head+'<div class="bf-v2grid"><div class="bf-v2col">'+p3+comp+'</div><div class="bf-v2col">'+prog+'</div></div><div class="bf-v2wsslot"></div><div class="bf-v2secs"></div>'+acts+'</div>';
   }
   function bfV2Wire(host, uuid, R){
     host.querySelectorAll('.bf-v2act').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var k=a.getAttribute('data-act'); bfToast(k.charAt(0).toUpperCase()+k.slice(1)+' \u2014 (wire next)'); }); });
@@ -1287,7 +1287,13 @@
     }
     document.documentElement.setAttribute('data-bfv2','1');
     var slot=host.querySelector('.bf-v2wsslot');
-    [].forEach.call(body.children, function(c){ if(c===host) return; if(c.classList && c.classList.contains('bf-ws')){ if(slot && c.parentNode!==slot){ slot.appendChild(c); } c.style.removeProperty('display'); return; } if(c.style.display!=='none') c.style.setProperty('display','none','important'); });
+    var secwrap=host.querySelector('.bf-v2secs');
+    [].forEach.call(body.children, function(c){
+      if(c===host) return;
+      if(c.classList && c.classList.contains('bf-ws')){ if(slot && c.parentNode!==slot){ slot.appendChild(c); } c.style.removeProperty('display'); return; }
+      if(secwrap && c.querySelector && c.querySelector('[data-testid="details-section"].bf-rsec')){ if(c.parentNode!==secwrap){ secwrap.appendChild(c); } c.style.removeProperty('display'); return; }
+      if(c.style.display!=='none') c.style.setProperty('display','none','important');
+    });
   }
   function bfColDefaultSweep(){
     if(!bfFirstDefault || (Date.now()-bfDefaultAt>8000)) return;
