@@ -1912,3 +1912,16 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-rfsum b{ color:#57c822; font-weight:700; }
 .bff-rfcmp{ display:flex; align-items:center; gap:8px; }
 .bff-rfvs{ font-size:11px; color:#6a6c74; }
+
+/* ===== funnel batch A: layout + report detail tweaks ===== */
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel{ width:230px; }
+#bff-wrap .bff-reportpanel{ width:472px; }
+#bff-wrap .bff-funnel{ margin-top:24px; }
+.bff-rdpct{ font-size:23px; }
+.bff-rflbl{ height:26px; min-height:26px; display:flex; align-items:flex-start; justify-content:center; overflow:hidden; }
+.bff-rvbox.bff-rvbox-sm{ flex:0 0 130px; padding:12px; }
+.bff-rvbox-sm .bff-rvbig{ font-size:26px; }
+.bff-rvfn{ flex:1; min-width:0; }
+.bff-rvfn .bff-rfn{ gap:1px; }
+.bff-rvfn .bff-rfico{ width:38px; height:38px; }
+.bff-rvfn .bff-rfconn{ height:38px; margin-bottom:23px; }
