@@ -1291,7 +1291,7 @@
     var nav=document.getElementById('bf-v2nav');
     if(!nav){
       nav=document.createElement('div'); nav.id='bf-v2nav';
-      nav.innerHTML='<button class="bf-v2navbtn bf-v2back" type="button" title="Back to pipeline (Esc)"><i class="ti ti-arrow-left" aria-hidden="true"></i></button><button class="bf-v2navbtn bf-v2prev" type="button" title="Previous deal (left arrow)"><i class="ti ti-chevron-left" aria-hidden="true"></i></button><button class="bf-v2navbtn bf-v2next" type="button" title="Next deal (right arrow)"><i class="ti ti-chevron-right" aria-hidden="true"></i></button><div class="bf-v2pos"></div>';
+      nav.innerHTML='<div class="bf-v2navbtn bf-v2back" role="button" tabindex="0" title="Back to pipeline (Esc)"><i class="ti ti-arrow-left" aria-hidden="true"></i></div><div class="bf-v2navbtn bf-v2prev" role="button" tabindex="0" title="Previous deal (left arrow)"><i class="ti ti-chevron-left" aria-hidden="true"></i></div><div class="bf-v2navbtn bf-v2next" role="button" tabindex="0" title="Next deal (right arrow)"><i class="ti ti-chevron-right" aria-hidden="true"></i></div><div class="bf-v2pos"></div>';
       document.body.appendChild(nav);
       nav.querySelector('.bf-v2back').addEventListener('click', back);
       nav.querySelector('.bf-v2prev').addEventListener('click', function(){ var o=ord(),i=o.indexOf(nav.getAttribute('data-uuid')); if(i>0) go(o[i-1]); });
