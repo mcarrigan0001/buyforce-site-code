@@ -2018,3 +2018,26 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-rtbl th[data-asort]{ cursor:pointer; user-select:none; }
 .bff-rtbl th[data-asort]:hover{ color:#b6b9c0; }
 .bff-rtbl th.on{ color:#57c822; }
+
+/* ===== batch E: section toggles, icon-click info, widths, alignment ===== */
+/* 4 KPI widgets total width == 3-widget row width (4*230+3*12 = 956 = 230+230+472+24) */
+#bff-wrap .bff-kpi{ width:230px; }
+/* align all 4 metric icons vertically (center icon in card) */
+.bff-kpi-body{ align-items:center; }
+/* Activity/Top Performers filter icons inline -> align with title text */
+#bff-wrap .bff-actpanel .bff-phc, #bff-wrap .bff-perfpanel .bff-phc{ position:static; top:auto; right:auto; }
+/* icon-click info line near bottom of KPI card */
+.bff-kpi-info{ position:absolute; bottom:7px; left:0; right:0; text-align:center; font-size:11px; font-weight:600; color:#9fd86a; padding:0 8px; }
+/* section toggle buttons (KPIs / Reports) */
+.bff-sectoggles{ display:inline-flex; align-items:center; gap:6px; }
+.bff-sectg{ display:inline-flex; align-items:center; gap:5px; background:#15161b; border:1px solid #2a2c33; color:#9a9aa2; font-size:12px; font-weight:600; padding:6px 11px; border-radius:9px; cursor:pointer; transition:box-shadow .15s, border-color .15s, color .15s; }
+.bff-sectg > .ti{ font-size:15px; }
+.bff-sectg:hover{ background:#1b1d22; }
+.bff-sectg.on{ color:#bdf08f; border-color:#57c822; box-shadow:0 0 11px 1px rgba(87,200,34,.5); }
+/* selected Milestones/All stages tab glows green */
+#bff-wrap .bff-tab.on{ background:#1d3a10; color:#bdf08f; box-shadow:0 0 10px 1px rgba(87,200,34,.45); }
+/* acquisition velocity: avg-time header above the funnel */
+.bff-rvtop{ display:flex; align-items:baseline; justify-content:center; gap:10px; padding:2px 0 12px; text-align:center; flex-wrap:wrap; }
+.bff-rvtopl{ font-size:12px; color:#9aa0a6; font-weight:600; }
+.bff-rvtopv{ font-size:24px; font-weight:800; color:#fff; letter-spacing:-.3px; }
+.bff-rvfn{ width:100%; }
