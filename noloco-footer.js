@@ -1272,14 +1272,26 @@
     host.querySelectorAll('.bf-v2act').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var k=a.getAttribute('data-act'); bfToast(k.charAt(0).toUpperCase()+k.slice(1)+' \u2014 (wire next)'); }); });
     host.querySelectorAll('.bf-v2vin[data-bfvin]').forEach(function(v){ v.addEventListener('click',function(){ try{ navigator.clipboard.writeText(v.getAttribute('data-bfvin')); bfToast('VIN copied'); }catch(e){} }); });
   }
+  var bfV2Fetching={};
+  function bfV2Fetch(uuid){
+    if(bfV2Fetching[uuid]) return; bfV2Fetching[uuid]=1;
+    var tk=''; try{ tk=bfGetApiToken(); }catch(e){}
+    if(!tk){ bfV2Fetching[uuid]=0; return; }
+    try{
+      fetch(BF_WH+'/pipeline-summary',{method:'POST',headers:{'Content-Type':'application/json','X-BF-Token':tk},body:'{}'})
+        .then(function(r){return r.json();})
+        .then(function(d){ if(d){ var ap=function(arr){ (arr||[]).forEach(function(sg){ (sg.records||[]).forEach(function(r){ if(r&&r.uuid){ try{ var j=JSON.stringify(r); sessionStorage.setItem('bfrec:'+r.uuid,j); localStorage.setItem('bfrec:'+r.uuid,j); }catch(e){} } }); }); }; ap(d.stages); ap(d.other); } bfV2Fetching[uuid]=0; try{ bfV2(); }catch(e){} })
+        .catch(function(){ bfV2Fetching[uuid]=0; });
+    }catch(e){ bfV2Fetching[uuid]=0; }
+  }
   function bfV2(){
     if(!/^\/opportunities\/view\/rec[0-9a-z]+\/summary/.test(location.pathname)){ if(document.documentElement.getAttribute('data-bfv2')==='1'){ document.documentElement.removeAttribute('data-bfv2'); var old=document.getElementById('bf-v2'); if(old) old.remove(); } return; }
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var host=document.getElementById('bf-v2');
     if(!host || host.getAttribute('data-uuid')!==uuid){
-      var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
-      if(!R || Object.keys(R).length<3) return;
+      var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
+      if(!R || Object.keys(R).length<3){ bfV2Fetch(uuid); return; }
       if(!host){ host=document.createElement('div'); host.id='bf-v2'; }
       host.setAttribute('data-uuid',uuid); host.innerHTML=bfV2Html(R,uuid);
       if(host.parentNode!==body) body.insertBefore(host, body.firstChild);
