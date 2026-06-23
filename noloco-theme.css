@@ -2041,3 +2041,26 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-rvtopl{ font-size:12px; color:#9aa0a6; font-weight:600; }
 .bff-rvtopv{ font-size:24px; font-weight:800; color:#fff; letter-spacing:-.3px; }
 .bff-rvfn{ width:100%; }
+
+/* ===== batch F: filter glow, tab glow, flex-fill widgets, mobile ===== */
+/* glow rep/time filter buttons when a filter is applied */
+.bff-dd-act .bff-ddb{ border-color:#57c822; color:#bdf08f; box-shadow:0 0 10px 1px rgba(87,200,34,.5); }
+.bff-dd-act .bff-ddcar{ color:#9fd86a; }
+/* Milestones/All stages selected tab glow matches the buttons to its left */
+#bff-wrap .bff-tab{ border:1px solid transparent; }
+#bff-wrap .bff-tab.on{ background:#15161b; border:1px solid #57c822; color:#bdf08f; box-shadow:0 0 10px 1px rgba(87,200,34,.5); }
+/* widgets flex-fill the panel so they never wrap before the window edge */
+#bff-wrap .bff-kpis{ display:flex; flex-wrap:nowrap; gap:12px; grid-template-columns:none; }
+#bff-wrap .bff-kpi{ flex:1 1 0; width:auto; min-width:0; }
+#bff-wrap .bff-extras{ display:flex; flex-wrap:nowrap; gap:12px; grid-template-columns:none; }
+#bff-wrap .bff-actpanel{ flex:1 1 0; width:auto; min-width:0; }
+#bff-wrap .bff-perfpanel{ flex:1 1 0; width:auto; min-width:0; }
+#bff-wrap .bff-reportpanel{ flex:2 1 0; width:auto; min-width:0; }
+/* mobile: tight fit, 2x2 KPIs, full-width stacked reports */
+@media (max-width:640px){
+  #bff-wrap{ padding:14px 12px 12px; }
+  #bff-wrap .bff-kpis{ flex-wrap:wrap; gap:10px; }
+  #bff-wrap .bff-kpi{ flex:1 1 calc(50% - 5px); min-width:calc(50% - 5px); }
+  #bff-wrap .bff-extras{ flex-wrap:wrap; gap:10px; }
+  #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ flex:1 1 100%; min-width:100%; }
+}
