@@ -2067,3 +2067,6 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
   #bff-wrap .bff-rbody{ overflow-x:auto; }
   #bff-wrap .bff-head{ row-gap:8px; }
 }
+
+/* ===== batch G: lit (active-action) KPI icons stay glowed ===== */
+.bff-kpi-ic.lit{ border-color:#57c822; color:#bdf08f; box-shadow:0 0 13px 2px rgba(87,200,34,.6); }
