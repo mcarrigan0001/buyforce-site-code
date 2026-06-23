@@ -1840,3 +1840,21 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-bigstat{ font-size:30px; font-weight:800; color:#fff; margin-top:10px; line-height:1; }
 .bff-bigunit{ font-size:14px; color:#8a8a92; font-weight:600; }
 .bff-bigsub{ margin-top:8px; }
+
+/* ===== funnel report widget (double width) ===== */
+#bff-wrap .bff-reportpanel{ background:#0c0d10; border:1px solid #1d1f25; border-radius:14px; padding:14px 16px; width:560px; flex:0 0 auto; }
+.bff-reptf{ max-width:172px; }
+.bff-rbody{ margin-top:14px; min-height:160px; }
+.bff-rbars{ display:flex; align-items:flex-end; gap:10px; height:170px; padding-top:18px; }
+.bff-rcol{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; min-width:0; }
+.bff-rbar-v{ font-size:12px; font-weight:700; color:#9fd86a; margin-bottom:5px; }
+.bff-rbar{ width:60%; max-width:36px; background:linear-gradient(180deg,#57c822,#2f7d12); border-radius:4px 4px 0 0; }
+.bff-rbar-l{ font-size:10px; color:#8a8a92; margin-top:7px; text-align:center; line-height:1.2; }
+.bff-rdonut{ font-size:44px; font-weight:800; color:#57c822; text-align:center; margin:28px 0 8px; }
+.bff-rsub{ font-size:12px; color:#8a8a92; text-align:center; margin-top:8px; }
+.bff-rtblwrap{ overflow:auto; max-height:240px; }
+.bff-rtbl{ width:100%; border-collapse:collapse; font-size:12px; }
+.bff-rtbl th{ text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:.3px; color:#7a7c84; padding:6px 6px; border-bottom:1px solid #1f2127; white-space:nowrap; position:sticky; top:0; background:#0c0d10; }
+.bff-rtbl th.n, .bff-rtbl td.n{ text-align:right; }
+.bff-rtbl td{ padding:6px 6px; border-bottom:1px solid #161820; color:#dcdce2; white-space:nowrap; }
+@media(max-width:820px){ #bff-wrap .bff-reportpanel{ width:100%; } }
