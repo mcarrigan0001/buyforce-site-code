@@ -1754,10 +1754,13 @@ html[data-bfv2="1"] .bf-v2secs .bf-ph{ color:var(--dim) !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-confirm-head{ color:#e6e7e9 !important; }
 /* buttons -> v2 green primary + dark ghost secondary */
 html[data-bfv2="1"] .bf-v2secs .bf-btn{ border-radius:10px !important; padding:9px 13px !important; font-size:12.5px !important; font-weight:600 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p{ background:var(--g) !important; color:#0b0b0d !important; border-color:var(--g) !important; font-weight:700 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p:hover{ background:#7ccb3e !important; border-color:#7ccb3e !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s{ background:#16181c !important; color:#e6e7e9 !important; border-color:var(--ln) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s:hover{ background:#1c1f24 !important; border-color:rgba(143,224,74,.45) !important; color:var(--g) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-p{ background:rgba(143,224,74,.14) !important; color:var(--g) !important; border:1px solid rgba(143,224,74,.5) !important; font-weight:700 !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-p:hover{ background:rgba(143,224,74,.22) !important; border-color:var(--g) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-s{ background:#16181c !important; color:#e6e7e9 !important; border:1px solid var(--ln) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-s:hover{ background:#1c1f24 !important; border-color:rgba(143,224,74,.5) !important; color:var(--g) !important; }
+/* belt-and-suspenders: some buttons reject background; ensure readable text+border regardless */
+html[data-bfv2="1"] .bf-v2secs button.bf-btn-p{ color:var(--g) !important; }
+html[data-bfv2="1"] .bf-v2secs button.bf-btn-s{ color:#e6e7e9 !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-btn-g{ background:rgba(143,224,74,.16) !important; color:var(--g) !important; border-color:rgba(143,224,74,.4) !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-btn-g:hover{ background:rgba(143,224,74,.24) !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-choicecaret{ color:var(--mut) !important; }
