@@ -2220,6 +2220,18 @@
     var _td=new Date(); var _today=_td.getFullYear()+'-'+('0'+(_td.getMonth()+1)).slice(-2)+'-'+('0'+_td.getDate()).slice(-2);
     return '<div class="bf-ws-schedform"><div class="bf-ws-lbl">Schedule the appointment</div><div class="bf-ws-sublbl">Date</div><div class="bf-ws-row">'+_days+'</div><input class="bf-ws-dateinput" type="date" min="'+_today+'" value="'+_today+'"><div class="bf-ws-sublbl">Time</div><div class="bf-ws-row">'+_times+'</div><input class="bf-ws-timeinput" type="time" value="10:30"><div class="bf-ws-sublbl">Location</div><div class="bf-ws-row"><button class="bf-ws-type sel" data-loc="dealership" type="button">Dealership</button><button class="bf-ws-type" data-loc="pickup" type="button">Pickup address</button></div><div class="bf-ws-loc bf-ws-loc-deal"><i class="ti ti-map-pin" aria-hidden="true"></i><div><div class="bf-ws-locname">Dealership</div><div class="bf-ws-locaddr">'+esc(_addr)+'</div></div></div><div class="bf-ws-loc-pick" style="display:none;"><input class="bf-ws-pickupinput" placeholder="Enter the seller pickup address" value="'+esc(_pick)+'"></div><div class="bf-ws-eta"></div><button class="bf-ws-btn primary" data-act="book" type="button" style="margin-top:14px;"><i class="ti ti-calendar-check" aria-hidden="true"></i>Book appointment</button></div><div class="bf-ws-schedbooked" style="display:none;"></div>';
   }
+  function bfRecDedupBtns(){
+    if(!/\/(preview|view)\//.test(location.pathname)) return;
+    document.querySelectorAll('[data-testid="details-section"]').forEach(function(sec){
+      var seen={};
+      [].forEach.call(sec.querySelectorAll('.bf-btn'),function(b){
+        var key=(b.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+        if(!key) return;
+        if(seen[key]){ var w=b.closest('.bf-getval-wrap'); (w||b).remove(); }
+        else { seen[key]=1; }
+      });
+    });
+  }
   function bfRecScheduler(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
     var mm=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=mm?mm[1]:''; if(!uuid) return;
@@ -2314,7 +2326,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }

@@ -1764,3 +1764,13 @@ html[data-bfv2="1"] .bf-v2secs button.bf-btn-s{ color:#e6e7e9 !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-btn-g{ background:rgba(143,224,74,.16) !important; color:var(--g) !important; border-color:rgba(143,224,74,.4) !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-btn-g:hover{ background:rgba(143,224,74,.24) !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-choicecaret{ color:var(--mut) !important; }
+
+/* ===== v2 milestone sections — uniform spacing ===== */
+html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form{ gap:10px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-secport{ margin-top:14px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-portgrid{ gap:16px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-port-text{ gap:10px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-port-btns{ gap:8px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-f.bf-fcol{ gap:5px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-getval-wrap{ margin:0 0 6px 0 !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
