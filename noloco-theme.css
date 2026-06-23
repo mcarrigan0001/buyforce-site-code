@@ -2070,3 +2070,44 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 
 /* ===== batch G: lit (active-action) KPI icons stay glowed ===== */
 .bff-kpi-ic.lit{ border-color:#57c822; color:#bdf08f; box-shadow:0 0 13px 2px rgba(87,200,34,.6); }
+
+/* ===== batch H: header, scroll, mobile funnel, role filter, polish ===== */
+/* remove the gray rounded-rectangle panel border */
+#bff-wrap{ border:none !important; border-radius:0 !important; }
+/* centered title above the controls (desktop + mobile) */
+#bff-wrap .bff-head{ flex-direction:column; align-items:center; gap:8px; }
+.bff-titlerow{ width:100%; text-align:center; }
+#bff-wrap .bff-title{ font-size:22px; letter-spacing:2.5px; text-transform:uppercase; text-align:center; }
+#bff-wrap .bff-title.bff-glow{ text-shadow:0 0 6px rgba(87,200,34,.5); }
+#bff-wrap .bff-scope{ text-align:center; width:100%; }
+#bff-wrap .bff-rt{ margin-left:0; flex-wrap:wrap; justify-content:center; row-gap:8px; }
+/* section toggle buttons equal height */
+.bff-sectg{ height:32px; }
+/* report stage-icon: lit when clicked + caption below */
+.bff-rfico.lit{ border-color:#57c822; color:#bdf08f; box-shadow:0 0 13px 2px rgba(87,200,34,.6); }
+.bff-rcap{ text-align:center; font-size:12px; font-weight:600; color:#9fd86a; margin-top:10px; }
+/* close/offer info text: 1px smaller, lighter */
+.bff-kpi-info{ font-size:10px; font-weight:500; }
+/* slightly smaller KPI values */
+#bff-wrap .bff-kpi-tf .bff-kpi-v{ font-size:29px; }
+#bff-wrap .bff-kpi-acqrow .bff-kpi-v{ font-size:25px; }
+/* mobile */
+@media (max-width:640px){
+  /* rep+time+dealership centered on their own line; KPIs/Reports + tabs on the next line */
+  #bff-wrap .bff-masterrep{ flex:1 1 100%; justify-content:center; }
+  /* report header/footer + acquisition/velocity stat stay static; only the chart row scrolls */
+  #bff-wrap .bff-rbody{ overflow:visible; }
+  #bff-wrap .bff-rfn, #bff-wrap .bff-rfbig{ overflow-x:auto; overflow-y:visible; }
+  /* main pipeline funnel: 2 x 3 (4 glow dots) instead of 1 x 6 */
+  #bff-wrap .bff-funnel{ flex-wrap:wrap; overflow-x:visible; row-gap:12px; justify-content:center; }
+  #bff-wrap .bff-funnel .bff-stage{ flex:0 0 29%; min-width:0; }
+  #bff-wrap .bff-funnel .bff-conn{ flex:0 0 6%; min-width:0; }
+  #bff-wrap .bff-funnel > div:nth-child(6){ display:none; }
+  /* KPI cards: clear the corner time icon, tighten Acquired|Pace */
+  #bff-wrap .bff-kpi-body{ padding-top:18px; }
+  #bff-wrap .bff-kpi-tf .bff-kpi-v{ font-size:24px; }
+  #bff-wrap .bff-kpi-acqrow .bff-kpi-v{ font-size:22px; }
+  #bff-wrap .bff-kpi-acqrow{ gap:7px; }
+  #bff-wrap .bff-kpi-div{ min-height:34px; }
+  #bff-wrap .bff-kpi-body{ gap:9px; }
+}
