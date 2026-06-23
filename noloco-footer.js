@@ -2178,7 +2178,7 @@
 
   function bfPostAssign(uuid,id){ try{ fetch(BF_WH+'/assign-rep',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid,id:id})}); }catch(e){} }
   function bfPostExtract(dataUrl){ return fetch(BF_WH+'/listing-extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dataUrl})}).then(function(r){return r.json();}).catch(function(){return null;}); }
-  function bfPostCreate(fields,url){ return fetch(BF_WH+'/listing-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fields,listingUrl:url})}).then(function(r){return r.json();}).catch(function(){return null;}); }
+  function bfPostCreate(fields,url,dist){ return fetch(BF_WH+'/listing-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:fields,listingUrl:url,distribution:(dist||null)})}).then(function(r){return r.json();}).catch(function(){return null;}); }
   function bfLiEnsureFab(){
     if(/\/(preview|view)\//.test(location.pathname)){ var ex=document.querySelector('.bf-li-fab'); if(ex) ex.style.display='none'; return; }
     var fab=document.querySelector('.bf-li-fab');
@@ -2188,10 +2188,12 @@
   function bfLiOpen(){
     var old=document.querySelector('.bf-li-overlay'); if(old) old.remove();
     var ov=document.createElement('div'); ov.className='bf-li-overlay';
-    ov.innerHTML='<div class="bf-li-modal"><div class="bf-li-head"><span>New lead from screenshot</span><button class="bf-li-x" type="button" aria-label="Close">×</button></div><div class="bf-li-body"><label class="bf-li-lbl">Listing screenshot</label><input type="file" accept="image/*" class="bf-li-file"><label class="bf-li-lbl">Listing URL</label><input type="text" class="bf-li-url" placeholder="Paste the Facebook Marketplace link"><button class="bf-li-extract bf-ws-btn primary" type="button"><i class="ti ti-sparkles" aria-hidden="true"></i>Extract details</button><div class="bf-li-fields"></div></div></div>';
+    ov.innerHTML='<div class="bf-li-modal"><div class="bf-li-head"><span>New lead from screenshot</span><button class="bf-li-x" type="button" aria-label="Close">×</button></div><div class="bf-li-body"><label class="bf-li-lbl">Listing screenshot</label><input type="file" accept="image/*" class="bf-li-file"><label class="bf-li-lbl">Listing URL</label><input type="text" class="bf-li-url" placeholder="Paste the Facebook Marketplace link"><div class="bf-li-actions"><button class="bf-li-extract bf-ws-btn primary" type="button"><i class="ti ti-sparkles" aria-hidden="true"></i>Extract details</button><button class="bf-li-manual bf-ws-btn ghost" type="button"><i class="ti ti-keyboard" aria-hidden="true"></i>Enter manually</button></div><div class="bf-li-fields"></div></div></div>';
     document.body.appendChild(ov);
+    try{ fetch(BF_WH+'/pipeline-summary',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).then(function(r){return r.json();}).then(function(d){ ov._bfMeta={canFilter:!!(d&&d.canFilter), dealerships:(d&&d.dealerships)||[]}; }).catch(function(){}); }catch(_m){}
     ov.addEventListener('click', function(e){ if(e.target===ov || (e.target.closest && e.target.closest('.bf-li-x'))){ ov.remove(); } });
     ov.querySelector('.bf-li-extract').addEventListener('click', function(){ bfLiExtract(ov); });
+    ov.querySelector('.bf-li-manual').addEventListener('click', function(){ bfLiRenderFields(ov, {}); });
   }
   function bfLiExtract(ov){
     var fi=ov.querySelector('.bf-li-file'); var file=fi&&fi.files&&fi.files[0]; var fld=ov.querySelector('.bf-li-fields');
@@ -2203,14 +2205,16 @@
     ov._bfFields=f;
     var fld=ov.querySelector('.bf-li-fields');
     function row(k,label,val){ return '<label class="bf-li-lbl">'+label+'</label><input type="text" class="bf-li-f" data-k="'+k+'" value="'+esc(val==null?'':String(val))+'">'; }
-    fld.innerHTML=row('vehicleTitle','Vehicle',f.vehicleTitle||'')+row('price','Asking price',f.price)+row('mileage','Mileage',f.mileage)+row('location','Location',f.location)+row('sellerName','Seller',f.sellerName)+row('vin','VIN',f.vin)+'<button class="bf-li-create bf-ws-btn primary" type="button" style="margin-top:12px;"><i class="ti ti-plus" aria-hidden="true"></i>Create lead</button><div class="bf-li-result"></div>';
+    var meta=ov._bfMeta||{}; var distHtml=''; if(meta.canFilter && (meta.dealerships||[]).length){ distHtml='<div class="bf-li-dist"><label class="bf-li-lbl">Distribute to stores <span class="bf-li-disttag">BuyForce</span></label><div class="bf-li-stores">'+meta.dealerships.map(function(d){ return '<label class="bf-li-store"><input type="checkbox" class="bf-li-dchk" value="'+esc(String(d.id))+'"><span>'+esc(d.name||('Store '+d.id))+'</span></label>'; }).join('')+'</div><div class="bf-li-disthint">Pick one or more stores. Leave empty to add to your own store.</div></div>'; }
+    fld.innerHTML=row('vehicleTitle','Vehicle',f.vehicleTitle||'')+row('price','Asking price',f.price)+row('mileage','Mileage',f.mileage)+row('location','Location',f.location)+row('sellerName','Seller',f.sellerName)+row('vin','VIN',f.vin)+distHtml+'<button class="bf-li-create bf-ws-btn primary" type="button" style="margin-top:12px;"><i class="ti ti-plus" aria-hidden="true"></i>Create lead</button><div class="bf-li-result"></div>';
     fld.querySelector('.bf-li-create').addEventListener('click', function(){ bfLiCreate(ov); });
   }
   function bfLiCreate(ov){
     var fields=Object.assign({}, ov._bfFields||{}); ov.querySelectorAll('.bf-li-f').forEach(function(i){ var v=i.value; if(v!=='') fields[i.getAttribute('data-k')]=v; });
     var url=(ov.querySelector('.bf-li-url')||{}).value||''; var res=ov.querySelector('.bf-li-result');
     res.innerHTML='<div class="bf-ws-empty">Creating…</div>';
-    bfPostCreate(fields,url).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ if(d.uuid){ try{ bfPostEvent({uuid:d.uuid, type:'lead_created', actor:bfCurUser(), text:'Lead added to Fresh Leads from a listing screenshot'+(d.duplicate?' (flagged as a possible duplicate)':'')}); }catch(_e){} } var msg='Lead created'+(d.vehicle?(': '+esc(d.vehicle)):''); if(d.duplicate){ msg+='. Flagged as a possible duplicate'+(d.dupVehicle?(' of '+esc(d.dupVehicle)):'')+'.'; } else { msg+='. Refresh the board to see it.'; } res.innerHTML='<div class="bf-li-ok">'+msg+'</div>'; bfToast(d.duplicate?'Created, duplicate flagged':'Lead created'); } else { res.innerHTML='<div class="bf-li-err">Could not create the record. Please try again.</div>'; } });
+    var dist=null; var chks=ov.querySelectorAll('.bf-li-dchk:checked'); if(chks&&chks.length){ var dids=[].map.call(chks,function(c){ var n=Number(c.value); return isNaN(n)?c.value:n; }); dist={dealershipIds:dids}; }
+    bfPostCreate(fields,url,dist).then(function(d){ if(!ov.isConnected) return; if(d&&d.ok){ var n=d.created||1; if(d.uuid){ try{ bfPostEvent({uuid:d.uuid, type:'lead_created', actor:bfCurUser(), text:'Lead added to Fresh Leads'+(d.duplicate?' (flagged as a possible duplicate)':'')}); }catch(_e){} } var msg=(n>1?(n+' leads created'):'Lead created')+(d.vehicle?(': '+esc(d.vehicle)):''); if(d.duplicate){ msg+='. Flagged as a possible duplicate'+(d.dupVehicle?(' of '+esc(d.dupVehicle)):'')+'.'; } else { msg+='. Refresh the board to see it.'; } res.innerHTML='<div class="bf-li-ok">'+msg+'</div>'; bfToast(d.duplicate?'Created, duplicate flagged':(n>1?(n+' leads created'):'Lead created')); } else { res.innerHTML='<div class="bf-li-err">'+esc((d&&d.reason)||'Could not create the record. Please try again.')+'</div>'; } });
   }
   function bfRecApprBtns(){
     if(!/\/(preview|view)\//.test(location.pathname)) return;
