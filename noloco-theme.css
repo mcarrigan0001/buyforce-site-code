@@ -1729,3 +1729,35 @@ html[data-bfv2="1"] .bf-field-val{ color:#f2f3f5 !important; }
 html[data-bfv2="1"] .bf-trn,
 html[data-bfv2="1"] .bf-field-lbl{ color:var(--mut) !important; }
 html[data-bfv2="1"] .bf-recsched .bf-ws-lbl{ color:var(--mut) !important; }
+
+/* ============================================================
+   v2 milestone sections — match the polished v2 card aesthetic
+   (scripts, buttons, field cells, dropdowns) — scoped to .bf-v2secs
+   ============================================================ */
+/* field cells -> v2 meta-card look */
+html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:12px !important; padding:10px 12px !important; }
+html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div label{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
+html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] [id="field-cell"]{ font-size:14px !important; font-weight:600 !important; }
+/* script block labels (Ask for the VIN, Follow up…) */
+html[data-bfv2="1"] .bf-v2secs .bf-fl{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
+/* script copy boxes -> dark inner cards */
+html[data-bfv2="1"] .bf-v2secs .bf-wt{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:10px !important; padding:9px 11px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-wt:hover{ border-color:rgba(143,224,74,.45) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-wttext{ color:#cfd2d6 !important; font-size:12px !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-wtcopy{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-wt:hover .bf-wtcopy{ color:var(--g) !important; }
+/* helper text + divider */
+html[data-bfv2="1"] .bf-v2secs .bf-info,
+html[data-bfv2="1"] .bf-v2secs .bf-secblurb{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-secport .bf-secdiv{ border-top-color:var(--ln) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-ph{ color:var(--dim) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-confirm-head{ color:#e6e7e9 !important; }
+/* buttons -> v2 green primary + dark ghost secondary */
+html[data-bfv2="1"] .bf-v2secs .bf-btn{ border-radius:10px !important; padding:9px 13px !important; font-size:12.5px !important; font-weight:600 !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-p{ background:var(--g) !important; color:#0b0b0d !important; border-color:var(--g) !important; font-weight:700 !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-p:hover{ background:#7ccb3e !important; border-color:#7ccb3e !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-s{ background:#16181c !important; color:#e6e7e9 !important; border-color:var(--ln) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-s:hover{ background:#1c1f24 !important; border-color:rgba(143,224,74,.45) !important; color:var(--g) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-g{ background:rgba(143,224,74,.16) !important; color:var(--g) !important; border-color:rgba(143,224,74,.4) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-btn-g:hover{ background:rgba(143,224,74,.24) !important; }
+html[data-bfv2="1"] .bf-v2secs .bf-choicecaret{ color:var(--mut) !important; }
