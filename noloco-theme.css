@@ -1991,7 +1991,7 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 #bff-wrap .bff-rfblbl{ height:24px; display:flex; align-items:flex-start; justify-content:center; }
 /* funnel-report icons centered on glow dots (raise dots to icon centers) */
 #bff-wrap .bff-rfn .bff-rfconn{ margin-bottom:34px; }
-#bff-wrap .bff-rvfn .bff-rfconn{ margin-bottom:32px; }
+#bff-wrap .bff-rvfn .bff-rfconn{ margin-bottom:34px; }
 /* shrink rep/time filter dropdowns in Activity, Top Performers, Report */
 .bff-actpanel .bff-phc .bff-ddb, .bff-perfpanel .bff-phc .bff-ddb, .bff-rhc-bot .bff-ddb{ padding:3px 4px; gap:2px; }
 .bff-actpanel .bff-phc .bff-ddb > .ti, .bff-perfpanel .bff-phc .bff-ddb > .ti, .bff-rhc-bot .bff-ddb > .ti{ font-size:10px; }
