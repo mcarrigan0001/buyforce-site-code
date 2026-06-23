@@ -1925,3 +1925,27 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-rvfn .bff-rfn{ gap:1px; }
 .bff-rvfn .bff-rfico{ width:38px; height:38px; }
 .bff-rvfn .bff-rfconn{ height:38px; margin-bottom:23px; }
+
+/* ===== funnel batch B: custom dropdowns + rep filters ===== */
+.bff-dd{ position:relative; display:inline-block; }
+.bff-ddb{ display:inline-flex; align-items:center; gap:4px; background:#15161b; border:1px solid #2a2c33; color:#cfd2d6; font-size:11px; font-weight:600; padding:4px 7px; border-radius:8px; cursor:pointer; line-height:1; }
+.bff-ddb:hover{ background:#1b1d22; }
+.bff-ddb > .ti{ font-size:14px; }
+.bff-ddcar{ font-size:11px!important; color:#7a7c84; }
+.bff-ddl{ white-space:nowrap; }
+.bff-ddav{ width:20px; height:20px; border-radius:50%; background:#2f5d1a; color:#cdebb4; font-size:9px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; letter-spacing:.3px; flex:0 0 auto; }
+.bff-ddav.sm{ margin-right:8px; }
+.bff-ddm{ position:absolute; top:calc(100% + 5px); right:0; min-width:150px; background:#101116; border:1px solid #2a2c33; border-radius:10px; padding:4px; z-index:60; display:none; box-shadow:0 10px 28px rgba(0,0,0,.55); max-height:300px; overflow:auto; }
+.bff-dd.open .bff-ddm{ display:block; }
+.bff-ddmr{ min-width:190px; }
+.bff-ddo{ display:flex; align-items:center; font-size:12px; color:#dcdce2; padding:7px 9px; border-radius:7px; cursor:pointer; white-space:nowrap; }
+.bff-ddo:hover{ background:#1b1d22; }
+.bff-ddo.on{ color:#57c822; font-weight:600; }
+.bff-masterrep{ display:inline-flex; align-items:center; gap:7px; }
+.bff-mrl{ font-size:11px; font-weight:700; color:#7a7c84; text-transform:uppercase; letter-spacing:.4px; }
+.bff-kpi-ctl{ display:inline-flex; align-items:center; gap:5px; }
+.bff-phc{ display:inline-flex; align-items:center; gap:5px; }
+.bff-rhc{ display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.bff-actrow .bff-delta{ margin-left:auto; }
+.bff-lc-h .bff-filter-lc{ margin-left:auto; }
+#bff-wrap .bff-kpis, #bff-wrap .bff-extras, #bff-wrap .bff-kpi, #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ overflow:visible; }
