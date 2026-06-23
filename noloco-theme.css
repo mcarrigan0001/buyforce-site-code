@@ -1975,3 +1975,46 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-rfbar, .bff-rfbbar{ transition:box-shadow .14s ease, filter .14s ease; cursor:pointer; }
 .bff-rfbar:hover, .bff-rfbbar:hover, .bff-rfcol:hover .bff-rfbar, .bff-rfbcol:hover .bff-rfbbar{ box-shadow:0 0 12px 1px rgba(87,200,34,.7); filter:brightness(1.3); }
 .bff-rfcol:hover .bff-rfico{ transform:scale(1.12); box-shadow:0 0 13px 2px rgba(87,200,34,.6); border-color:#57c822; }
+
+/* ===== batch D: alignment, donut anim, carets, master time ===== */
+/* selected/hover funnel-step rect extends higher above icon */
+#bff-wrap .bff-stage{ padding-top:13px; }
+/* KPI: labels centered about icon bottom + 50% tighter % change */
+.bff-kpi-body{ align-items:flex-start; }
+#bff-wrap .bff-kpi-tf .bff-kpi-sub{ margin-top:3px; }
+/* donut: -1px font, centered 2-line label, ring load animation + glow */
+.bff-rdpct{ font-size:22px; }
+.bff-rdl{ text-align:center; line-height:1.12; }
+@keyframes bffRing { from { stroke-dashoffset: var(--rdcc); } }
+.bff-rdfg{ animation: bffRing 1.05s cubic-bezier(.22,.61,.36,1) both; filter: drop-shadow(0 0 4px rgba(87,200,34,.75)); }
+/* follow-up: first line of every label aligns */
+#bff-wrap .bff-rfblbl{ height:24px; display:flex; align-items:flex-start; justify-content:center; }
+/* funnel-report icons centered on glow dots (raise dots to icon centers) */
+#bff-wrap .bff-rfn .bff-rfconn{ margin-bottom:34px; }
+#bff-wrap .bff-rvfn .bff-rfconn{ margin-bottom:32px; }
+/* shrink rep/time filter dropdowns in Activity, Top Performers, Report */
+.bff-actpanel .bff-phc .bff-ddb, .bff-perfpanel .bff-phc .bff-ddb, .bff-rhc-bot .bff-ddb{ padding:3px 4px; gap:2px; }
+.bff-actpanel .bff-phc .bff-ddb > .ti, .bff-perfpanel .bff-phc .bff-ddb > .ti, .bff-rhc-bot .bff-ddb > .ti{ font-size:10px; }
+.bff-actpanel .bff-phc .bff-ddcar, .bff-perfpanel .bff-phc .bff-ddcar, .bff-rhc-bot .bff-ddcar{ font-size:8px!important; }
+.bff-actpanel .bff-phc .bff-ddav, .bff-perfpanel .bff-phc .bff-ddav, .bff-rhc-bot .bff-ddav{ width:14px; height:14px; font-size:7px; }
+.bff-actpanel .bff-phc .bff-ddl, .bff-perfpanel .bff-phc .bff-ddl, .bff-rhc-bot .bff-ddl{ font-size:9px; }
+/* Activity + Top Performers controls pinned top-right (match top-4 spacing) */
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel{ position:relative; }
+.bff-actpanel .bff-phc, .bff-perfpanel .bff-phc{ position:absolute; top:7px; right:9px; z-index:5; }
+/* Report header: report-type select on top, rep+time below right-aligned */
+.bff-rhc{ flex-direction:column; align-items:flex-end; gap:6px; }
+.bff-rhc-bot{ display:flex; align-items:center; gap:5px; }
+/* master time filter spacing */
+.bff-masterrep{ gap:6px; }
+.bff-masterrep .bff-mrl{ margin-left:4px; }
+/* row collapse/expand carets */
+.bff-rowcaret{ display:flex; align-items:center; justify-content:center; gap:8px; margin:3px auto 10px; padding:3px 12px; cursor:pointer; color:#6a6c74; border-radius:8px; width:max-content; }
+.bff-rowcaret:hover{ color:#57c822; background:#141519; }
+.bff-rcl{ font-size:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:#5e6068; }
+.bff-rowcaret:hover .bff-rcl{ color:#57c822; }
+.bff-rcc{ font-size:15px; transition:transform .15s ease; }
+.bff-rowcaret.collapsed .bff-rcc{ transform:rotate(180deg); }
+/* appraiser sortable headers */
+.bff-rtbl th[data-asort]{ cursor:pointer; user-select:none; }
+.bff-rtbl th[data-asort]:hover{ color:#b6b9c0; }
+.bff-rtbl th.on{ color:#57c822; }
