@@ -1176,6 +1176,47 @@
     var eq=sb.querySelector('.bf-noti-eq');
     if(eq){ var ec=eq.querySelector('[class*="rounded-lg"]'); if(ec){ var val=(eq.textContent||'').replace(/est\.?\s*equity position/i,'').trim(); var m=val.match(/[\d,]+(\.\d+)?/); var bg,fg,label; if(!m||/unknown/i.test(val)){ bg='#eceee9'; fg='#6b6b64'; label='Equity Unknown'; } else { var neg=/negative/i.test(val)||/^\s*[\-\(\u2212]/.test(val); fg=neg?'#c93535':'#2b6012'; bg=neg?'#fbe3e3':'#e3f5cf'; label='Equity '+(neg?'\u2212':'+')+'$'+m[0]; } setPill(ec,bg,fg,'',label,'e|'+label); } }
   }
+  function bfPipePriceRead(scope){
+    var F={};
+    scope.querySelectorAll('[data-testid="field-cell"]').forEach(function(c){ var lb=c.querySelector('[data-testid="field-cell-label"]'); if(!lb) return; var vn=lb.nextElementSibling; var k=norm(lb.textContent); var v=dval(vn?vn.textContent:''); if(v||!(k in F)) F[k]=v; });
+    scope.querySelectorAll('[data-testid="highlight-item"]').forEach(function(c){ var lb=c.querySelector('[data-testid="highlight-label"]'); var vl=c.querySelector('[data-testid="highlight-value"]'); if(lb){ var k=norm(lb.textContent); var v=dval(vl?vl.textContent:''); if(v||!(k in F)) F[k]=v; } });
+    return F;
+  }
+  function bfPipePriceHtml(F){
+    function g(keys){ for(var i=0;i<keys.length;i++){ var v=F[keys[i]]; if(v!=null&&v!=='') return v; } return ''; }
+    function money(v){ if(v==null||v==='') return '—'; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString('en-US'); }
+    var asking=g(['Asking Price']), offer=g(['Offer Amount']), acv=g(['ACV']);
+    var payoff=g(['Est Payoff Amount','Estimated Payoff Amount','Actual Payoff Amount']);
+    var eq=g(['Est Equity Position']), eqDisp=g(['Equity Display']), eqStatus=g(['Equity Status']);
+    var carmax=g(['CarMax Offer']), carvana=g(['Carvana Offer']), comp=g(['Competition']);
+    function card(label,val,sub,green){ return '<div class="bf-pc"><div class="bf-pc-l">'+esc(label)+(sub?'<div class="bf-pc-sub">'+esc(sub)+'</div>':'')+'</div><div class="bf-pc-v'+(green?' bf-pc-green':'')+'">'+esc(val)+'</div></div>'; }
+    var cards='<div class="bf-pcgrid">'+card('Asking Price',money(asking))+card('Offer Amount',money(offer),(acv?'ACV '+money(acv):''),true)+card('Est Payoff Amount',money(payoff))+card('Est Equity Position',(eqDisp&&/[0-9]/.test(eqDisp))?eqDisp:money(eq))+'</div>';
+    var ei=equityInfo2(eq,eqStatus,eqDisp);
+    var eqPill='<div class="bf-pcequity" style="color:'+ei.color+';">'+(ei.text==='—'?'Equity Unknown':('Equity '+ei.text))+'</div>';
+    var ci=compInfo(comp);
+    var beats=ci?('<div class="bf-pcbeats bf-pcbeats-'+ci.color+'"><i class="ti '+ci.icon+'" aria-hidden="true"></i>'+esc(ci.label)+'</div>'):'';
+    var rows=(carmax?('<div class="bf-pcrow"><span><i class="ti ti-businessplan" aria-hidden="true"></i>CarMax</span><b>'+money(carmax)+'</b></div>'):'')+(carvana?('<div class="bf-pcrow"><span><i class="ti ti-businessplan" aria-hidden="true"></i>Carvana</span><b>'+money(carvana)+'</b></div>'):'');
+    var otb=(rows||beats)?('<div class="bf-pcotb"><div class="bf-pcotb-h"><i class="ti ti-swords" aria-hidden="true"></i>Offers to beat</div>'+rows+beats+'</div>'):'';
+    return cards+eqPill+otb;
+  }
+  function bfPipePrice(){
+    if(!/^\/pipeline\/preview\//.test(location.pathname)) return;
+    var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
+    var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    var cols=body.querySelector(':scope > .bf-reccols');
+    if(cols && cols.getAttribute('data-uuid')===uuid){ var lf=cols.querySelector('.bf-recleft'); if(lf){ var nf=bfPipePriceHtml(bfPipePriceRead(cols.querySelector('.bf-recright')||body)); if(lf.getAttribute('data-h')!==nf){ lf.innerHTML=nf; lf.setAttribute('data-h',nf); } } return; }
+    var rectop=body.querySelector(':scope > .bf-rectop'); if(!rectop) return;
+    var content=[].filter.call(body.children, function(c){ return c!==rectop && !(c.classList&&c.classList.contains('bf-reccols')); });
+    if(!content.length) return;
+    var F=bfPipePriceRead(body);
+    if(cols) cols.remove();
+    cols=document.createElement('div'); cols.className='bf-reccols'; cols.setAttribute('data-uuid',uuid);
+    var left=document.createElement('div'); left.className='bf-recleft'; var lh=bfPipePriceHtml(F); left.innerHTML=lh; left.setAttribute('data-h',lh);
+    var right=document.createElement('div'); right.className='bf-recright';
+    content.forEach(function(n){ right.appendChild(n); });
+    cols.appendChild(left); cols.appendChild(right);
+    if(rectop.nextSibling) body.insertBefore(cols, rectop.nextSibling); else body.appendChild(cols);
+  }
   function bfColDefaultSweep(){
     if(!bfFirstDefault || (Date.now()-bfDefaultAt>8000)) return;
     if(/\/(preview|view)\//.test(location.pathname)) return;
@@ -2181,7 +2222,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }

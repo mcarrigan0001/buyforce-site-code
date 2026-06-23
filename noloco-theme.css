@@ -1536,3 +1536,24 @@ div:has(> div > [data-testid="record-view"]) {
 .bf-acitem{ padding:8px 11px; cursor:pointer; color:#161616; border-bottom:1px solid #f1f0ea; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .bf-acitem:last-child{ border-bottom:none; }
 .bf-acitem:hover, .bf-acitem.on{ background:#f2fbe9; color:#2b6012; }
+
+.bf-reccols{ display:flex; gap:14px; align-items:flex-start; width:100%; box-sizing:border-box; }
+.bf-recleft{ flex:0 0 320px; max-width:320px; background:#0c0c0e; border-radius:16px; padding:14px; box-sizing:border-box; }
+.bf-recright{ flex:1 1 auto; min-width:0; }
+.bf-recleft .bf-pcgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.bf-recleft .bf-pc{ background:#fff; border-radius:12px; padding:12px 12px 14px; }
+.bf-recleft .bf-pc-l{ font-size:9px; font-weight:700; letter-spacing:.4px; color:#8a8a92; text-transform:uppercase; line-height:1.3; min-height:24px; }
+.bf-recleft .bf-pc-sub{ color:#9aa0a6; font-weight:600; }
+.bf-recleft .bf-pc-v{ font-size:21px; font-weight:800; margin-top:6px; color:#161616; }
+.bf-recleft .bf-pc-green{ color:#2b9e2b; }
+.bf-recleft .bf-pcequity{ background:#e9ebe6; border-radius:10px; text-align:center; padding:10px; font-weight:700; font-size:13px; margin-top:12px; color:#6b6b64; }
+.bf-recleft .bf-pcotb{ margin-top:14px; }
+.bf-recleft .bf-pcotb-h{ display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:700; color:#cfd2d6; margin-bottom:10px; }
+.bf-recleft .bf-pcrow{ display:flex; justify-content:space-between; align-items:center; background:#fff; border-radius:10px; padding:13px 14px; margin-bottom:9px; font-weight:600; color:#161616; }
+.bf-recleft .bf-pcrow span{ display:inline-flex; align-items:center; gap:7px; color:#374151; }
+.bf-recleft .bf-pcrow b{ font-weight:800; }
+.bf-recleft .bf-pcbeats{ display:flex; align-items:center; justify-content:center; gap:6px; border-radius:10px; padding:11px; font-weight:700; font-size:13px; }
+.bf-recleft .bf-pcbeats-g{ background:#e3f5cf; color:#2b6012; }
+.bf-recleft .bf-pcbeats-y{ background:#fbeecd; color:#7a4d13; }
+.bf-recleft .bf-pcbeats-r{ background:#fbe3e3; color:#c93535; }
+@media(max-width:860px){ .bf-reccols{ flex-direction:column; } .bf-recleft{ flex:none; max-width:none; width:100%; } }
