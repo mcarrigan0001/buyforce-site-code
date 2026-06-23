@@ -2291,7 +2291,7 @@
     var MACRO=[{label:'Fresh Leads',statuses:['FRESH_LEADS']},{label:'Capturing VIN',statuses:['ENGAGED_AWAITING_VIN']},{label:'Appraising',statuses:['VIN_RECEIVED_APPRAISAL_NEEDED','APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES','APPRAISAL_REVIEW_NEEDED','APPRAISAL_REVIEW_COMPLETE']},{label:'Fresh Offer Sent',statuses:['OFFER_SHEET_GENERATED','OFFER_SENT_0_2_DAYS']},{label:'Follow Up',statuses:['NURTURING_FOLLOW_UP_AND_RE_ENGAGE','VERBAL_YES_SCHEDULE_APPT','SCHEDULED','APPT_SHOWN_FOLLOW_UP']},{label:'Acquired',statuses:['ACQUIRED']}];
     var COLS=[{k:'title',t:'Vehicle'},{k:'listingLink',t:'Listing'},{k:'seller',t:'Seller'},{k:'_score',t:'Opportunity<br>Score',num:true,center:true},{k:'daysInStage',t:'Days In<br>Stage',num:true,center:true},{k:'asking',t:'Asking',num:true,money:true},{k:'offer',t:'Offer',num:true,money:true},{k:'_ovp',t:'Offer<br>Vs Price',num:true,money:true,hcenter:true},{k:'acv',t:'ACV',num:true,money:true},{k:'competition',t:'Competition'},{k:'rep',t:'Assigned Rep'},{k:'mileage',t:'Mileage',num:true},{k:'driveTime',t:'Drive Time',num:true,drive:true},{k:'offerStatus',t:'Offer Status'},{k:'offerSheetUrl',t:'Offer Sheet'}];
     var st={view:'macro',data:null,open:null,sortK:'daysInStage',sortDir:-1,dealId:null,f:{}};
-    R.innerHTML='<div id="bff-wrap"><div class="bff-head"><span class="bff-title bff-glow">Pipeline Summary</span><span class="bff-scope" data-r="scope"></span><div class="bff-rt"><button class="bff-filter" data-r="fbtn"><i class="ti ti-plus" style="color:#57c822;font-size:15px;" aria-hidden="true"></i>Filter</button><div class="bff-tabs"><button class="bff-tab on" data-view="macro">Milestones</button><button class="bff-tab" data-view="stages">All stages</button></div></div></div><div class="bff-kpis" data-r="kpis"></div><div class="bff-fpanel" data-r="fpanel" style="display:none;"></div><div class="bff-extras"><div class="bff-actpanel" data-r="actpanel"></div><div class="bff-perfpanel" data-r="perf"></div></div><div class="bff-funnel" data-r="funnel"><div class="bff-load">Loading pipeline…</div></div><div class="bff-caret" data-r="caret" style="display:none;" title="Show all opportunities"><i class="ti ti-chevron-down" aria-hidden="true"></i></div></div><div class="bff-listcard" data-r="lc"></div>';
+    R.innerHTML='<div id="bff-wrap"><div class="bff-head"><span class="bff-title bff-glow">Pipeline Summary</span><span class="bff-scope" data-r="scope"></span><div class="bff-rt"><button class="bff-filter" data-r="fbtn"><i class="ti ti-plus" style="color:#57c822;font-size:15px;" aria-hidden="true"></i>Filter</button><div class="bff-tabs"><button class="bff-tab on" data-view="macro">Milestones</button><button class="bff-tab" data-view="stages">All stages</button></div></div></div><div class="bff-kpis" data-r="kpis"></div><div class="bff-fpanel" data-r="fpanel" style="display:none;"></div><div class="bff-extras"><div class="bff-actpanel" data-r="actpanel"></div><div class="bff-perfpanel" data-r="perf"></div><div class="bff-avgpanel" data-r="avgdays"></div></div><div class="bff-funnel" data-r="funnel"><div class="bff-load">Loading pipeline…</div></div><div class="bff-caret" data-r="caret" style="display:none;" title="Show all opportunities"><i class="ti ti-chevron-down" aria-hidden="true"></i></div></div><div class="bff-listcard" data-r="lc"></div>';
     function q(n){ return R.querySelector('[data-r="'+n+'"]'); }
     function esc2(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
     function usd(n){ if(n==null||n==='') return '—'; var x=Number(n); if(isNaN(x)) return '—'; var neg=x<0; return (neg?'-$':'$')+Math.round(Math.abs(x)).toLocaleString('en-US'); }
@@ -2328,23 +2328,54 @@
     function updateCaret(){ var c=q('caret'); if(!c) return; var sh=(st.data&&(st.open===null||st.open==='__all__')); c.style.display=sh?'flex':'none'; var ic=c.querySelector('i'); if(ic) ic.className='ti '+(st.open==='__all__'?'ti-chevron-up':'ti-chevron-down'); }
     function bfPipeKPI(){
       if(!st.data) return;
+      if(!st.tf) st.tf={};
       var recs=[]; var addr=function(a){(a||[]).forEach(function(z){recs=recs.concat(z.records||[]);});}; addr(st.data.stages); addr(st.data.other);
       function n2(x){ var n=Number(x); return isNaN(n)?0:n; }
       function active(r){ return r.status!=='ACQUIRED' && r.status!=='NO_DEAL'; }
-      var act=recs.filter(active), acq=recs.filter(function(r){return r.status==='ACQUIRED';}), nd=recs.filter(function(r){return r.status==='NO_DEAL';});
-      var pipeVal=act.reduce(function(a,r){return a+n2(r.acv);},0);
-      var gross=act.reduce(function(a,r){var e=n2(r.eq); return a+(e>0?e:0);},0);
-      var cr=recs.length?Math.round(acq.length/recs.length*100):0;
-      function money(v){ if(!v) return '$0'; if(v>=1e6) return '$'+(v/1e6).toFixed(1)+'M'; if(v>=1e3) return '$'+Math.round(v/1e3)+'k'; return '$'+Math.round(v); }
-      var kpis=[{l:'Active Deals',v:act.length.toLocaleString('en-US'),i:'ti-flame'},{l:'Acquired',v:acq.length.toLocaleString('en-US'),i:'ti-checks'},{l:'Close Rate',v:cr+'%',i:'ti-target-arrow'}];
-      var kEl=q('kpis'); if(kEl) kEl.innerHTML=kpis.map(function(k){ return '<div class="bff-kpi"><div class="bff-kpi-ic"><i class="ti '+k.i+'" aria-hidden="true"></i></div><div><div class="bff-kpi-v">'+k.v+'</div><div class="bff-kpi-l">'+k.l+'</div></div></div>'; }).join('');
+      var act=recs.filter(active);
+      function tf(key){
+        var now=new Date(), y=now.getFullYear(), m=now.getMonth(), day=now.getDate();
+        function D(yy,mm,dd){ return new Date(yy,mm,dd,0,0,0,0).getTime(); }
+        function sod(t){ var x=new Date(t); return new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(); }
+        var nowT=now.getTime(), MS=864e5, s2,e2,ps,pe,pace=null;
+        if(key==='last7'){ e2=nowT; s2=nowT-7*MS; pe=s2; ps=s2-7*MS; }
+        else if(key==='thisweek'){ var dow=(now.getDay()+6)%7; s2=sod(nowT-dow*MS); e2=nowT; ps=s2-7*MS; pe=s2; }
+        else if(key==='last30'){ e2=nowT; s2=nowT-30*MS; pe=s2; ps=s2-30*MS; }
+        else if(key==='qtd'){ var q=Math.floor(m/3); s2=D(y,q*3,1); e2=nowT; var pq=q-1,py=y; if(pq<0){pq=3;py=y-1;} ps=D(py,pq*3,1); pe=D(py,pq*3+3,1); }
+        else if(key==='lastq'){ var q2=Math.floor(m/3),lq=q2-1,ly=y; if(lq<0){lq=3;ly=y-1;} s2=D(ly,lq*3,1); e2=D(ly,lq*3+3,1); var pp=lq-1,ppy=ly; if(pp<0){pp=3;ppy=ly-1;} ps=D(ppy,pp*3,1); pe=D(ppy,pp*3+3,1); }
+        else if(key==='ytd'){ s2=D(y,0,1); e2=nowT; ps=D(y-1,0,1); pe=D(y-1,m,day+1); }
+        else if(key==='prioryear'){ s2=D(y-1,0,1); e2=D(y,0,1); ps=D(y-2,0,1); pe=D(y-1,0,1); }
+        else { key='mtd'; s2=D(y,m,1); e2=nowT; ps=D(y,m-1,1); pe=D(y,m,1); pace={dp:day, dim:new Date(y,m+1,0).getDate()}; }
+        return {key:key,start:s2,end:e2,prevStart:ps,prevEnd:pe,pace:pace};
+      }
+      var TFL={mtd:'Month to date',last7:'Last 7 days',thisweek:'This week',last30:'Last 30 days',qtd:'Quarter to date',lastq:'Last quarter',ytd:'Year to date',prioryear:'Prior year'};
+      function tfSel(w){ var k=st.tf[w]||'mtd'; return '<select class="bff-tf" data-tf="'+w+'">'+Object.keys(TFL).map(function(x){return '<option value="'+x+'"'+(x===k?' selected':'')+'>'+TFL[x]+'</option>';}).join('')+'</select>'; }
+      function inR(ts,T){ var t=Date.parse(ts); return !isNaN(t)&&t>=T.start&&t<T.end; }
+      function inP(ts,T){ var t=Date.parse(ts); return !isNaN(t)&&t>=T.prevStart&&t<T.prevEnd; }
+      function acqIn(T,p){ return recs.filter(function(r){return r.status==='ACQUIRED'&&(p?inP(r.stageEnteredAt,T):inR(r.stageEnteredAt,T));}).length; }
+      function leadsIn(T,p){ return recs.filter(function(r){var d=r.dateListed||r.stageEnteredAt; return p?inP(d,T):inR(d,T);}).length; }
+      function dlt(c,pv){ if(pv==null||pv===0) return null; return Math.round((c-pv)/pv*1000)/10; }
+      function dhtml(d){ if(d==null) return '<span class="bff-delta flat">\u2014</span>'; var up=d>=0; return '<span class="bff-delta '+(up?'up':'down')+'">'+(up?'\u25B2':'\u25BC')+Math.abs(d)+'%</span>'; }
+      var Ta=tf(st.tf.acq), acqC=acqIn(Ta,false), acqP=acqIn(Ta,true), acqSub;
+      if(Ta.pace){ var pace=Math.round(acqC/Math.max(1,Ta.pace.dp)*Ta.pace.dim); acqSub='Pace '+pace+' '+dhtml(dlt(pace,acqP)); } else { acqSub=dhtml(dlt(acqC,acqP)); }
+      var Tc=tf(st.tf.close), aC=acqIn(Tc,false), lC=leadsIn(Tc,false), crC=lC?Math.round(aC/lC*100):0, aP=acqIn(Tc,true), lP=leadsIn(Tc,true), crP=lP?Math.round(aP/lP*100):0;
+      var kEl=q('kpis');
+      if(kEl) kEl.innerHTML=
+        '<div class="bff-kpi"><div class="bff-kpi-ic"><i class="ti ti-flame"></i></div><div><div class="bff-kpi-v">'+act.length.toLocaleString('en-US')+'</div><div class="bff-kpi-l">Active Deals</div></div></div>'+
+        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-checks"></i></div>'+tfSel('acq')+'</div><div class="bff-kpi-v">'+acqC+'</div><div class="bff-kpi-l">Acquired</div><div class="bff-kpi-sub">'+acqSub+'</div></div>'+
+        '<div class="bff-kpi bff-kpi-tf"><div class="bff-kpi-top"><div class="bff-kpi-ic"><i class="ti ti-target-arrow"></i></div>'+tfSel('close')+'</div><div class="bff-kpi-v">'+crC+'%</div><div class="bff-kpi-l">Close Rate</div><div class="bff-kpi-sub">'+dhtml(dlt(crC,crP))+'</div></div>';
       function isToday(d){ if(!d) return false; var dt=new Date(d); if(isNaN(dt.getTime())) return false; var t=new Date(); return dt.getFullYear()===t.getFullYear()&&dt.getMonth()===t.getMonth()&&dt.getDate()===t.getDate(); }
       function todayIn(ss){ return recs.filter(function(r){ return ss.indexOf(r.status)>-1 && isToday(r.stageEnteredAt); }).length; }
       var acts=[{l:'New Leads',v:todayIn(['FRESH_LEADS','ENGAGED_AWAITING_VIN'])},{l:'VINs Captured',v:todayIn(['VIN_RECEIVED_APPRAISAL_NEEDED'])},{l:'Appraisals',v:todayIn(['APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES','OFFER_SHEET_GENERATED'])},{l:'Offers Sent',v:todayIn(['OFFER_SENT_0_2_DAYS'])},{l:'Acquired',v:todayIn(['ACQUIRED'])}];
-      var aEl=q('actpanel'); if(aEl) aEl.innerHTML='<div class="bff-ph">Activity Today</div>'+acts.map(function(a){ return '<div class="bff-actrow"><span class="bff-actn">'+a.v+'</span><span class="bff-actl">'+a.l+'</span></div>'; }).join('');
-      var byRep={}; acq.forEach(function(r){ var rp=(r.rep||'').trim(); if(!rp) return; byRep[rp]=(byRep[rp]||0)+1; });
+      var aEl=q('actpanel'); if(aEl) aEl.innerHTML='<div class="bff-ph"><span>Activity Today</span></div>'+acts.map(function(a){ return '<div class="bff-actrow"><span class="bff-actn">'+a.v+'</span><span class="bff-actl">'+a.l+'</span></div>'; }).join('');
+      var Tp=tf(st.tf.perf); var byRep={}; recs.forEach(function(r){ if(r.status!=='ACQUIRED'||!inR(r.stageEnteredAt,Tp)) return; var rp=(r.rep||'').trim(); if(!rp) return; byRep[rp]=(byRep[rp]||0)+1; });
       var perf=Object.keys(byRep).map(function(k){return {name:k,n:byRep[k]};}).sort(function(a,b){return b.n-a.n;}).slice(0,5);
-      var pEl=q('perf'); if(pEl) pEl.innerHTML='<div class="bff-ph">Top Performers</div>'+(perf.length?perf.map(function(p,i){ var ini=p.name.split(/\s+/).map(function(x){return x[0]||'';}).join('').slice(0,2).toUpperCase(); return '<div class="bff-perfrow"><span class="bff-perfrank">'+(i+1)+'</span><span class="bff-perfav">'+esc2(ini)+'</span><span class="bff-perfn">'+esc2(p.name)+'</span><span class="bff-perfc">'+p.n+'</span></div>'; }).join(''):'<div class="bff-empty">No acquisitions yet.</div>');
+      var pEl=q('perf'); if(pEl) pEl.innerHTML='<div class="bff-ph"><span>Top Performers</span>'+tfSel('perf')+'</div>'+(perf.length?perf.map(function(p,i){ var ini=p.name.split(/\s+/).map(function(x){return x[0]||'';}).join('').slice(0,2).toUpperCase(); return '<div class="bff-perfrow"><span class="bff-perfrank">'+(i+1)+'</span><span class="bff-perfav">'+esc2(ini)+'</span><span class="bff-perfn">'+esc2(p.name)+'</span><span class="bff-perfc">'+p.n+'</span></div>'; }).join(''):'<div class="bff-empty">No acquisitions in this period.</div>');
+      var Td=tf(st.tf.avgdays);
+      function avgDays(p){ var f=recs.filter(function(r){return active(r)&&(p?inP(r.stageEnteredAt,Td):inR(r.stageEnteredAt,Td))&&r.daysInStage!=null;}); if(!f.length) return null; return Math.round(f.reduce(function(a,r){return a+n2(r.daysInStage);},0)/f.length*10)/10; }
+      var adC=avgDays(false), adP=avgDays(true);
+      var dEl=q('avgdays'); if(dEl) dEl.innerHTML='<div class="bff-ph"><span>Avg Days in Stage</span>'+tfSel('avgdays')+'</div><div class="bff-bigstat">'+(adC==null?'\u2014':adC)+'<span class="bff-bigunit"> days</span></div><div class="bff-bigsub">'+(adC!=null?dhtml(dlt(adC,adP)):'')+'</div>';
+      [].forEach.call(document.querySelectorAll('#bff-wrap .bff-tf'),function(sel){ if(sel.__bfw) return; sel.__bfw=1; sel.addEventListener('change',function(){ st.tf[sel.getAttribute('data-tf')]=sel.value; bfPipeKPI(); }); });
     }
     function refresh(){ render(); renderList(); updateCaret(); try{bfPipeKPI();}catch(_k){} }
     function ctlRange(lbl,key){ return '<div class="bff-fc"><label>'+lbl+'</label><div class="bff-frange"><input type="number" data-f="'+key+'Min" placeholder="min" value="'+esc2(st.f[key+'Min']||'')+'"><span>–</span><input type="number" data-f="'+key+'Max" placeholder="max" value="'+esc2(st.f[key+'Max']||'')+'"></div></div>'; }
