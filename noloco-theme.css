@@ -1797,3 +1797,24 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bf-li-store:hover{ background:#f2fbe9; }
 .bf-li-store input{ margin:0; flex:none; }
 .bf-li-disthint{ font-size:11px; color:#9aa0a6; margin-top:6px; }
+
+/* ===== funnel KPI bar + activity + top performers ===== */
+.bff-kpis{ display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:8px 0 14px; }
+.bff-kpi{ display:flex; align-items:center; gap:11px; background:#101116; border:1px solid #21232a; border-radius:12px; padding:12px 14px; }
+.bff-kpi-ic{ width:36px; height:36px; border-radius:9px; background:#15161b; border:1px solid #2a2c33; display:flex; align-items:center; justify-content:center; color:#57c822; font-size:18px; flex:none; }
+.bff-kpi-v{ font-size:21px; font-weight:800; color:#fff; letter-spacing:-.3px; line-height:1.05; }
+.bff-kpi-l{ font-size:11px; color:#8a8a92; margin-top:3px; }
+.bff-extras{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.bff-actpanel,.bff-perfpanel{ background:#0c0d10; border:1px solid #1d1f25; border-radius:14px; padding:14px 16px; }
+.bff-ph{ font-size:13px; font-weight:700; color:#fff; margin-bottom:8px; }
+.bff-actrow{ display:flex; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid #161820; }
+.bff-actrow:last-child{ border-bottom:none; }
+.bff-actn{ font-size:18px; font-weight:800; color:#57c822; min-width:30px; text-align:right; }
+.bff-actl{ font-size:13px; color:#cfd2d6; }
+.bff-perfrow{ display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #161820; }
+.bff-perfrow:last-child{ border-bottom:none; }
+.bff-perfrank{ font-size:12px; font-weight:700; color:#7a7c84; width:14px; }
+.bff-perfav{ width:28px; height:28px; border-radius:50%; background:#15161b; border:1px solid #2a2c33; color:#9fd86a; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:none; }
+.bff-perfn{ font-size:13px; color:#e8e8ea; flex:1; }
+.bff-perfc{ font-size:13px; font-weight:700; color:#fff; }
+@media(max-width:760px){ .bff-kpis{ grid-template-columns:repeat(2,1fr); } .bff-extras{ grid-template-columns:1fr; } }
