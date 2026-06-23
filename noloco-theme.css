@@ -2063,4 +2063,7 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
   #bff-wrap .bff-kpi{ flex:1 1 calc(50% - 5px); min-width:calc(50% - 5px); }
   #bff-wrap .bff-extras{ flex-wrap:wrap; gap:10px; }
   #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ flex:1 1 100%; min-width:100%; }
+  #bff-wrap .bff-rt{ flex-wrap:wrap; justify-content:flex-end; row-gap:6px; }
+  #bff-wrap .bff-rbody{ overflow-x:auto; }
+  #bff-wrap .bff-head{ row-gap:8px; }
 }
