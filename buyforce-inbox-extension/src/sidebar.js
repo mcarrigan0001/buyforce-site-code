@@ -1,68 +1,38 @@
 /* BuyForce Sidebar shell - shared collapsible right-edge panel.
  * Loaded before content.js/listing.js. Other scripts render into it via
- * window.BFSidebar. The panel overlays Facebook (no layout reflow) and shows
- * only on Marketplace listing + inbox routes. Open/closed state is remembered.
- * While open, it nudges FB's bottom-right chat dock aside so nothing is covered.
- * Assist-only: nothing here clicks, sends, or alters Facebook.
+ * window.BFSidebar. Pure overlay: it ONLY ever touches its own DOM (#bf-sb) -
+ * it never moves, restyles, clicks, or reads-to-act-on any Facebook element.
+ * Shows only on Marketplace listing + inbox routes. Open/closed state is
+ * remembered PER surface; defaults: listing = open, inbox = collapsed (so it
+ * never covers a conversation). Assist-only.
  */
 (function () {
-  var KEY = 'bf_sb_open';
-  var PANEL_W = 348;
-  var root, bodyEl, ctxEl, dotEl, built = false, openState = true;
+  var DEFAULTS = { listing: true, inbox: false };
+  var states = null;     // { listing: bool, inbox: bool } - loaded once, cached
+  var root, bodyEl, ctxEl, dotEl, built = false, openState = false;
 
-  function applies() {
+  function routeKind() {
     var p = location.pathname;
-    return /\/marketplace\/item\/\d+/.test(p) ||
-           /\/marketplace\/inbox/.test(p) ||
-           /\/marketplace\/t\//.test(p);
+    if (/\/marketplace\/item\/\d+/.test(p)) return 'listing';
+    if (/\/marketplace\/inbox/.test(p) || /\/marketplace\/t\//.test(p)) return 'inbox';
+    return null;
   }
 
-  function persist(v) { try { chrome.storage.local.set({ bf_sb_open: !!v }); } catch (e) {} }
-
-  // Move FB's bottom-right fixed chat dock/popups aside while the panel is open.
-  function dockCandidates() {
-    var out = [], kids = document.body ? document.body.children : [];
-    for (var i = 0; i < kids.length; i++) {
-      var k = kids[i]; if (!k || k === root) continue;
-      out.push(k);
-      var gk = k.children;
-      for (var j = 0; j < gk.length && j < 6; j++) out.push(gk[j]);
-    }
-    return out;
-  }
-  function shiftDock(on) {
+  function loadStates(cb) {
+    if (states) { cb(); return; }
     try {
-      if (!document.body) return;
-      if (!on) {
-        var prev = document.querySelectorAll('[data-bf-shift]');
-        for (var p = 0; p < prev.length; p++) { prev[p].style.removeProperty('transform'); prev[p].removeAttribute('data-bf-shift'); }
-        return;
-      }
-      var W = window.innerWidth, H = window.innerHeight, list = dockCandidates();
-      for (var i = 0; i < list.length; i++) {
-        var el = list[i];
-        if (!el || el === root || (el.getAttribute && el.getAttribute('data-bf'))) continue;
-        var cs = window.getComputedStyle(el);
-        if (cs.position !== 'fixed' || cs.display === 'none') continue;
-        var r = el.getBoundingClientRect();
-        if (!r.width || !r.height) continue;
-        var anchoredRight = (W - r.right) < 14 && r.width < W * 0.6;
-        var anchoredBottom = (H - r.bottom) < 14;
-        var notFullHeight = r.height < H * 0.85;
-        if (anchoredRight && anchoredBottom && notFullHeight) {
-          el.style.setProperty('transition', 'transform .2s ease');
-          el.style.setProperty('transform', 'translateX(-' + PANEL_W + 'px)', 'important');
-          el.setAttribute('data-bf-shift', '1');
-        }
-      }
-    } catch (e) {}
+      chrome.storage.local.get(['bf_sb_open_listing', 'bf_sb_open_inbox'], function (o) {
+        o = o || {};
+        states = {
+          listing: ('bf_sb_open_listing' in o) ? !!o.bf_sb_open_listing : DEFAULTS.listing,
+          inbox: ('bf_sb_open_inbox' in o) ? !!o.bf_sb_open_inbox : DEFAULTS.inbox
+        };
+        cb();
+      });
+    } catch (e) { states = { listing: DEFAULTS.listing, inbox: DEFAULTS.inbox }; cb(); }
   }
-
-  function applyOpen(v) {
-    openState = !!v;
-    if (root) root.classList.toggle('bf-sb-open', openState);
-    shiftDock(openState && applies());
-  }
+  function persist(kind, v) { try { var o = {}; o['bf_sb_open_' + kind] = !!v; chrome.storage.local.set(o); } catch (e) {} }
+  function paint() { if (root) root.classList.toggle('bf-sb-open', openState); }
 
   function build() {
     if (built) return; built = true;
@@ -88,13 +58,7 @@
     ctxEl = root.querySelector('[data-r="ctx"]');
     dotEl = root.querySelector('[data-r="dot"]');
     root.querySelector('#bf-sb-tab').addEventListener('click', toggle);
-    root.querySelector('[data-r="close"]').addEventListener('click', close);
-    try {
-      chrome.storage.local.get(KEY, function (o) {
-        var v = (o && Object.prototype.hasOwnProperty.call(o, KEY)) ? o[KEY] : true;
-        applyOpen(v);
-      });
-    } catch (e) { applyOpen(true); }
+    root.querySelector('[data-r="close"]').addEventListener('click', collapse);
   }
 
   function ensure() {
@@ -102,40 +66,54 @@
     if (!document.documentElement.contains(root)) document.documentElement.appendChild(root);
     return root;
   }
-  function open() { ensure(); applyOpen(true); persist(true); }
-  function close() { ensure(); applyOpen(false); persist(false); }
-  function toggle() { ensure(); applyOpen(!openState); persist(openState); }
+
+  // Apply the remembered state for whichever surface we're on (or hide off-route).
+  function apply() {
+    var kind = routeKind();
+    if (!kind) { if (root) root.style.display = 'none'; return; }
+    ensure(); root.style.display = '';
+    loadStates(function () { openState = !!states[kind]; paint(); });
+  }
+
+  function toggle() {
+    var kind = routeKind(); if (!kind) return;
+    ensure();
+    loadStates(function () {
+      openState = !states[kind]; states[kind] = openState; paint(); persist(kind, openState);
+    });
+  }
+  function collapse() {
+    var kind = routeKind(); if (!kind) return;
+    ensure();
+    loadStates(function () { openState = false; states[kind] = false; paint(); persist(kind, false); });
+  }
+  function expand() {
+    var kind = routeKind(); if (!kind) return;
+    ensure();
+    loadStates(function () { openState = true; states[kind] = true; paint(); persist(kind, true); });
+  }
+
   function setContext(s) { ensure(); if (ctxEl) ctxEl.textContent = s || ''; }
   function setHTML(html) { ensure(); if (bodyEl) bodyEl.innerHTML = html || ''; }
   function setDot(show) { ensure(); if (dotEl) dotEl.style.display = show ? 'block' : 'none'; }
 
-  function sync() {
-    if (applies()) {
-      ensure(); root.style.display = '';
-      if (openState) shiftDock(true);
-    } else if (root) {
-      shiftDock(false);
-      root.style.display = 'none';
-    }
-  }
-
   window.BFSidebar = {
-    ensure: ensure, open: open, close: close, toggle: toggle,
+    ensure: ensure, open: expand, close: collapse, toggle: toggle,
     setContext: setContext, setHTML: setHTML, setDot: setDot,
     isOpen: function () { return openState; },
-    applies: applies,
+    applies: function () { return !!routeKind(); },
     get body() { ensure(); return bodyEl; }
   };
 
   function hook() {
     try {
       var push = history.pushState, rep = history.replaceState;
-      history.pushState = function () { var r = push.apply(this, arguments); setTimeout(sync, 50); return r; };
-      history.replaceState = function () { var r = rep.apply(this, arguments); setTimeout(sync, 50); return r; };
-      window.addEventListener('popstate', function () { setTimeout(sync, 50); });
+      history.pushState = function () { var r = push.apply(this, arguments); setTimeout(apply, 50); return r; };
+      history.replaceState = function () { var r = rep.apply(this, arguments); setTimeout(apply, 50); return r; };
+      window.addEventListener('popstate', function () { setTimeout(apply, 50); });
     } catch (e) {}
-    setInterval(sync, 1000);
-    sync();
+    setInterval(apply, 1000);
+    apply();
   }
   if (document.documentElement) hook(); else document.addEventListener('DOMContentLoaded', hook);
 })();
