@@ -1820,12 +1820,12 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 @media(max-width:760px){ .bff-kpis{ grid-template-columns:repeat(2,1fr); } .bff-extras{ grid-template-columns:1fr; } }
 
 /* ===== funnel page: 75% width centered, smaller centered widgets, funnel below ===== */
-#bf-pipe-host{ max-width:75% !important; width:100% !important; margin-left:auto !important; margin-right:auto !important; }
+#bf-pipe-host{ max-width:min(1500px, 98vw) !important; width:100% !important; margin-left:auto !important; margin-right:auto !important; }
 #bff-wrap .bff-kpis{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; grid-template-columns:none; }
 #bff-wrap .bff-kpi{ flex:0 0 auto; width:200px; }
 #bff-wrap .bff-extras{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; grid-template-columns:none; }
 #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel{ flex:0 0 auto; width:280px; }
-@media (max-width:1100px){ #bf-pipe-host{ max-width:92% !important; } }
+/* host width is fluid (98vw) — no breakpoint override needed */
 
 /* ===== funnel timeframe controls + avg-days widget ===== */
 #bff-wrap .bff-kpi.bff-kpi-tf{ flex-direction:column; align-items:stretch; gap:0; }
