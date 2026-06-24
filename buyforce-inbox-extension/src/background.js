@@ -64,6 +64,22 @@ async function bfDecodeVin(vinRaw) {
   } catch (e) { return { ok: false, reason: 'Could not reach NHTSA.' }; }
 }
 
+
+let bfOffscreenReady = null;
+async function bfEnsureOffscreen() {
+  try {
+    if (chrome.offscreen.hasDocument && (await chrome.offscreen.hasDocument())) return;
+  } catch (e) {}
+  if (!bfOffscreenReady) {
+    bfOffscreenReady = chrome.offscreen.createDocument({
+      url: 'offscreen.html',
+      reasons: ['WORKERS'],
+      justification: 'Run on-device OCR (Tesseract) for VIN/plate images. The image never leaves the device.'
+    }).catch(function () {}).finally(function () { bfOffscreenReady = null; });
+  }
+  await bfOffscreenReady;
+}
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.type === 'BF_GET_INDEX') {
     (async () => {
@@ -109,6 +125,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const data = await res.json().catch(function () { return { ok: false, reason: 'bad_response' }; });
         sendResponse(data);
       } catch (e) { sendResponse({ ok: false, reason: 'network' }); }
+    })();
+    return true;
+  }
+  if (msg && msg.type === 'BF_OCR' && msg.image) {
+    (async () => {
+      try {
+        await bfEnsureOffscreen();
+        chrome.runtime.sendMessage({ type: 'BF_OCR_RUN', image: msg.image, hint: msg.hint || '' }, function (resp) {
+          if (chrome.runtime.lastError || !resp) { sendResponse({ ok: false, reason: 'ocr_unavailable' }); return; }
+          sendResponse(resp);
+        });
+      } catch (e) { sendResponse({ ok: false, reason: 'ocr_init' }); }
     })();
     return true;
   }

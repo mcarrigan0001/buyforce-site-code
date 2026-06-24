@@ -4,7 +4,8 @@
   "version": "0.2.0",
   "description": "BuyForce sidebar for Facebook Marketplace: capture listings as leads, badge inbox conversations, and surface each deal's pipeline data (stage, time-in-stage, next action). Assist-only.",
   "permissions": [
-    "storage"
+    "storage",
+    "offscreen"
   ],
   "host_permissions": [
     "https://buyforce.app.n8n.cloud/*",
@@ -45,5 +46,8 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }

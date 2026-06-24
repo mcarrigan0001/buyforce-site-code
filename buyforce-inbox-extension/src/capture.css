@@ -33,3 +33,5 @@
 
 .bfc-src { margin-top: 10px; font-size: 10.5px; color: #6d717a; word-break: break-all; }
 .bfc-src span { color: #8a8f98; }
+
+/* OCR scan buttons share the .bfc-tool look; widen the card a touch for the extra tools */

@@ -129,6 +129,8 @@
       '<div class="bfc-tools">' +
         '<button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button>' +
         '<button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button>' +
+        '<button class="bfc-tool" data-r="scanVin" type="button">Scan VIN</button>' +
+        '<button class="bfc-tool" data-r="scanPlate" type="button">Scan plate</button>' +
       '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
@@ -234,6 +236,71 @@
   function autosize(ta) { if (!ta) return; ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 2) + 'px'; }
   function autosizeAll() { var body = bodyEl(); if (!body) return; [].forEach.call(body.querySelectorAll('textarea[data-k]'), autosize); }
 
+  // ---- On-device OCR (snip/upload a VIN or plate image) ----
+  var ocrTarget = 'vin';
+  var ocrInput = null;
+  function ensureOcrInput() {
+    if (ocrInput) return ocrInput;
+    ocrInput = document.createElement('input');
+    ocrInput.type = 'file'; ocrInput.accept = 'image/*'; ocrInput.style.display = 'none';
+    ocrInput.setAttribute('data-bf', '1');
+    ocrInput.addEventListener('change', function () {
+      var f = ocrInput.files && ocrInput.files[0]; ocrInput.value = '';
+      if (f) readImage(f, function (durl) { runOcr(durl, ocrTarget); });
+    });
+    document.documentElement.appendChild(ocrInput);
+    return ocrInput;
+  }
+  function readImage(blob, cb) { var r = new FileReader(); r.onload = function () { cb(r.result); }; r.onerror = function () { setPreview('<div class="bfc-pv-msg bfc-err">Could not read that image.</div>'); }; r.readAsDataURL(blob); }
+  function scanVin() { ocrTarget = 'vin'; ensureOcrInput().click(); }
+  function scanPlate() { ocrTarget = 'plate'; ensureOcrInput().click(); }
+  function cleanVinText(s) {
+    var up = (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    up = up.replace(/[IOQ]/g, function (c) { return c === 'I' ? '1' : '0'; });
+    var m = up.match(/[A-HJ-NPR-Z0-9]{17}/);
+    return m ? m[0] : up;
+  }
+  function cleanPlateText(s) {
+    var toks = (s || '').toUpperCase().replace(/[^A-Z0-9\s-]/g, ' ').split(/\s+/).filter(Boolean);
+    var best = '';
+    toks.forEach(function (tk) { var v = tk.replace(/-/g, ''); if (v.length >= 4 && v.length <= 8 && v.length > best.length) best = v; });
+    return best || (toks.join('')).slice(0, 8);
+  }
+  function runOcr(dataUrl, target) {
+    setPreview('<div class="bfc-pv-msg">Reading ' + (target === 'plate' ? 'plate' : 'VIN') + ' image on your device\u2026</div>');
+    try {
+      chrome.runtime.sendMessage({ type: 'BF_OCR', image: dataUrl, hint: target }, function (resp) {
+        if (chrome.runtime.lastError || !resp) { setPreview('<div class="bfc-pv-msg bfc-err">OCR unavailable \u2014 reload the extension and retry.</div>'); return; }
+        if (resp.ok === false) { setPreview('<div class="bfc-pv-msg bfc-err">Could not read the image' + (resp.reason ? ' (' + esc(resp.reason) + ')' : '') + '.</div>'); return; }
+        var body = bodyEl(); if (!body) return;
+        if (target === 'plate') {
+          var pl = cleanPlateText(resp.text); var el = body.querySelector('input[data-k="plateNumber"]'); if (el) el.value = pl;
+          setPreview('<div class="bfc-pv-msg bfc-ok">Plate read: <b>' + esc(pl || '(nothing)') + '</b> \u2014 verify it, set the state, then Find VIN.</div>');
+        } else {
+          var vn = cleanVinText(resp.text); var el2 = body.querySelector('input[data-k="vin"]'); if (el2) el2.value = vn;
+          var okLen = /^[A-HJ-NPR-Z0-9]{17}$/.test(vn);
+          setPreview('<div class="bfc-pv-msg ' + (okLen ? 'bfc-ok' : 'bfc-warn') + '">VIN read: <b>' + esc(vn || '(nothing)') + '</b>' + (okLen ? ' \u2014 looks valid, click Decode VIN.' : ' \u2014 verify the characters (not a clean 17).') + '</div>');
+        }
+      });
+    } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
+  }
+  function onPaste(e) {
+    if (!isListing() || !window.BFSidebar || !window.BFSidebar.isOpen()) return;
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type && items[i].type.indexOf('image') === 0) {
+        var blob = items[i].getAsFile();
+        if (blob) {
+          var ae = document.activeElement;
+          var tgt = (ae && ae.getAttribute && ae.getAttribute('data-k') === 'plateNumber') ? 'plate' : ocrTarget;
+          e.preventDefault();
+          readImage(blob, function (durl) { runOcr(durl, tgt); });
+        }
+        return;
+      }
+    }
+  }
+
   function wire() {
     var body = bodyEl(); if (!body || body.__bfWired) return; body.__bfWired = true;
     body.addEventListener('click', function (e) {
@@ -245,6 +312,8 @@
       else if (r === 'findVin') findVin();
       else if (r === 'pvApply') applyDecode();
       else if (r === 'pvDismiss') dismissDecode();
+      else if (r === 'scanVin') scanVin();
+      else if (r === 'scanPlate') scanPlate();
     });
     body.addEventListener('input', function (e) {
       if (e.target && e.target.tagName === 'TEXTAREA' && e.target.getAttribute('data-k')) autosize(e.target);
@@ -276,6 +345,7 @@
   function schedule() { if (pend) return; pend = setTimeout(function () { pend = null; tick(); }, 400); }
   function boot() {
     tick();
+    document.addEventListener('paste', onPaste, true);
     new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
     setInterval(tick, 1200);
   }
