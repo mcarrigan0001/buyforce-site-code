@@ -14,3 +14,10 @@
 .bfc-msg{ min-height:0; font-size:12px; margin:8px 0 0; color:#9aa0a6; }
 .bfc-ok{ color:#9fd86a; } .bfc-warn{ color:#f1c152; } .bfc-err{ color:#f08a7a; }
 .bfc-act{ margin-top:1
+/* Full-width field (description) + select + textarea styling */
+.bfc-grid { align-items: start; }
+.bfc-f-full { grid-column: 1 / -1; }
+.bfc-f select { background: #0d1016; border: 1px solid #2a2f3a; color: #eef; border-radius: 7px; padding: 6px 8px; font-size: 12.5px; outline: none; }
+.bfc-f select:focus { border-color: #57c822; }
+.bfc-f textarea { background: #0d1016; border: 1px solid #2a2f3a; color: #eef; border-radius: 7px; padding: 6px 8px; font-size: 12.5px; outline: none; resize: vertical; font-family: inherit; line-height: 1.45; }
+.bfc-f textarea:focus { border-color: #57c822; }

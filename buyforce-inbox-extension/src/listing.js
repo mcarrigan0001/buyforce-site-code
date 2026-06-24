@@ -14,6 +14,14 @@
   function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function tc(s) { if (!s) return ''; if (/^[A-Z0-9]{2,4}$/.test(s)) return s; return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
 
+  function agoToDays(s) {
+    var m = (s || '').match(/(\d+|a|an)\s*(minute|hour|day|week|month|year)/i);
+    if (!m) return '';
+    var n = (/^a/i.test(m[1])) ? 1 : parseInt(m[1], 10);
+    var f = { minute: 1 / 1440, hour: 1 / 24, day: 1, week: 7, month: 30, year: 365 }[m[2].toLowerCase()];
+    return f ? String(Math.max(0, Math.round(n * f))) : '';
+  }
+
   function extract() {
     var main = document.querySelector('div[role="main"]') || document.body;
     var h1 = main.querySelector('h1');
@@ -33,6 +41,9 @@
     var locM = x.match(/Listed[\s\S]{0,40}?\bin\s+([A-Z][A-Za-z.'’\- ]+,\s*[A-Z]{2})\b/) ||
                x.match(/\b([A-Z][A-Za-z.'’\- ]+,\s*[A-Z]{2})\b/);
     var loc = locM ? locM[1].trim() : '';
+    var laM = x.match(/Listed\s+(.+?)\s+ago/i);
+    var listedAgo = laM ? (laM[1].trim() + ' ago') : '';
+    var listedDaysAgo = agoToDays(listedAgo);
     var vinM = x.match(/\b([A-HJ-NPR-Z0-9]{17})\b/);
     var vin = vinM ? vinM[1] : '';
 
@@ -57,7 +68,7 @@
     if (!seller) { var sm = x.match(/Seller information\s*(?:Seller details)?\s*([A-Z][a-z’'\-]+(?:\s+[A-Z][a-z’'\-]+){1,2})/); if (sm) seller = sm[1]; }
 
     var desc = (x.match(/Seller.?s description\s*([\s\S]*?)(?:\s*See (?:less|more)|Location is approximate|Seller information|$)/i) || [, ''])[1].trim();
-    if (desc.length > 600) desc = desc.slice(0, 600);
+    if (desc.length > 2000) desc = desc.slice(0, 2000);
 
     var yr = '', mk = '', md = '', tr = '';
     var tm = title.match(/\b(19|20)\d\d\b/);
@@ -68,19 +79,28 @@
     }
     return {
       title: title, year: yr, make: mk, model: md, trim: tr,
-      price: price, mileage: mileage, location: loc, vin: vin, sellerName: seller,
-      color: extC, interiorColor: intC, transmission: trans, fuelType: fuel,
-      owners: owners, titleStatus: titleSt, owed: owed, description: desc,
+      price: price, mileage: mileage, location: loc, listedAgo: listedAgo, listedDaysAgo: listedDaysAgo,
+      vin: vin, plateNumber: '', plateState: '', sellerName: seller,
+      color: extC, transmission: trans, description: desc,
+      interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, owed: owed,
       listingUrl: location.href
     };
   }
 
+  var US_STATES = ['', 'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+
   function field(label, key, val) {
     return '<label class="bfc-f"><span>' + esc(label) + '</span><input data-k="' + key + '" value="' + esc(val) + '"></label>';
   }
+  function selField(label, key, val) {
+    var opts = US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (val || '') ? ' selected' : '') + '>' + (s || '—') + '</option>'; }).join('');
+    return '<label class="bfc-f"><span>' + esc(label) + '</span><select data-k="' + key + '">' + opts + '</select></label>';
+  }
+  function taField(label, key, val) {
+    return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="3">' + esc(val || '') + '</textarea></label>';
+  }
   function detailsStrip(d) {
     var bits = [];
-    if (d.transmission) bits.push(esc(d.transmission));
     if (d.interiorColor) bits.push('Int: ' + esc(d.interiorColor));
     if (d.fuelType) bits.push(esc(d.fuelType));
     if (d.owners) bits.push(esc(d.owners) + '-owner');
@@ -98,9 +118,13 @@
         field('Year', 'year', d.year) + field('Make', 'make', d.make) +
         field('Model', 'model', d.model) + field('Trim', 'trim', d.trim) +
         field('Price', 'price', d.price) + field('Mileage', 'mileage', d.mileage) +
-        field('Ext. color', 'color', d.color) + field('Location', 'location', d.location) +
-        field('VIN', 'vin', d.vin) + field('Seller', 'sellerName', d.sellerName) +
+        field('Ext. color', 'color', d.color) + field('Transmission', 'transmission', d.transmission) +
+        field('Location', 'location', d.location) + field('Listed', 'listedAgo', d.listedAgo) +
+        field('VIN', 'vin', d.vin) +
+        field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
+        field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
+      taField('Description', 'description', d.description) +
       detailsStrip(d) +
       '<div class="bfc-msg" data-r="msg"></div>' +
       '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
@@ -110,8 +134,13 @@
     var body = window.BFSidebar.body; if (!body) return;
     var d = current || {};
     var fields = {};
-    [].forEach.call(body.querySelectorAll('input[data-k]'), function (i) { var v = i.value.trim(); if (v) fields[i.getAttribute('data-k')] = v; });
-    var details = { interiorColor: d.interiorColor, transmission: d.transmission, fuelType: d.fuelType, owners: d.owners, titleStatus: d.titleStatus, loanOwed: !!d.owed, description: d.description };
+    [].forEach.call(body.querySelectorAll('input[data-k], select[data-k], textarea[data-k]'), function (i) {
+      var v = (i.value || '').trim(); if (v) fields[i.getAttribute('data-k')] = v;
+    });
+    var details = {
+      interiorColor: d.interiorColor, fuelType: d.fuelType, owners: d.owners,
+      titleStatus: d.titleStatus, loanOwed: !!d.owed, listedDaysAgo: d.listedDaysAgo
+    };
     var msg = body.querySelector('[data-r="msg"]'); var btn = body.querySelector('[data-r="save"]');
     if (!msg || !btn) return;
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
@@ -138,12 +167,10 @@
   function tick() {
     if (!window.BFSidebar || !isListing()) return;
     var id = itemId();
-    var hasForm = window.BFSidebar.body && window.BFSidebar.body.querySelector('input[data-k]');
-    // (Re)render when the listing changes, or our form isn't mounted, but only
-    // once the page has a real title to avoid capturing an empty shell.
+    var hasForm = window.BFSidebar.body && window.BFSidebar.body.querySelector('[data-k]');
     if (id !== lastId || !hasForm) {
-      var h1 = (document.querySelector('div[role="main"] h1'));
-      if (!h1 || !t(h1)) return; // wait for the detail panel to populate
+      var h1 = document.querySelector('div[role="main"] h1');
+      if (!h1 || !t(h1)) return;
       lastId = id;
       render();
     }
