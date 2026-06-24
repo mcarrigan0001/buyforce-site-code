@@ -1,16 +1,18 @@
 /* BuyForce Sidebar shell - shared collapsible right-edge panel.
  * Loaded before content.js/listing.js. Other scripts render into it via
- * window.BFSidebar. While expanded on a Marketplace route it slides Facebook's
+ * window.BFSidebar. While expanded on the Marketplace INBOX it slides Facebook's
  * floating chat popup(s) left so they sit BESIDE the panel instead of under it.
  * The slide is applied to the popup element directly (keeps it fixed/bottom-
- * pinned) and is RE-ASSERTED on a short timer so FB's re-renders can't snap it
- * back. Purely cosmetic + reversible; performs no actions on Facebook.
+ * pinned) and re-asserted so FB's re-renders can't snap it back. The expensive
+ * hit-test scan only runs until the popup is found; after that each tick just
+ * re-checks one element (near-free), and nothing runs on listing pages.
+ * Purely cosmetic + reversible; performs no actions on Facebook.
  * Open/closed state is remembered PER surface (listing vs inbox).
  */
 (function () {
   var DEFAULTS = { listing: true, inbox: true };
   var PANEL_W = 348, SHIFT = 372;     // panel width + gap
-  var states = null, tracked = [];
+  var states = null, tracked = [], scanTick = 0;
   var root, bodyEl, ctxEl, dotEl, built = false, openState = false;
 
   function routeKind() {
@@ -35,17 +37,15 @@
   }
   function persist(kind, v) { try { var o = {}; o['bf_sb_open_' + kind] = !!v; chrome.storage.local.set(o); } catch (e) {} }
 
-  // ---- Slide FB's floating chat popups aside ----
-  // A popup is a fixed, bottom-pinned, narrow box whose right edge reaches into
-  // the panel strip. (The left Marketplace rail is left:0 and is never matched.)
+  // ---- Slide FB's floating chat popups aside (inbox only) ----
   function isPopup(el) {
     if (!el || el === root || (root && root.contains(el))) return false;
     var cs; try { cs = window.getComputedStyle(el); } catch (e) { return false; }
     if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return false;
     var r = el.getBoundingClientRect();
-    if (r.width < 150 || r.width > window.innerWidth * 0.55) return false;     // not a full-width bar
-    if (r.bottom < window.innerHeight - 60) return false;                      // bottom-pinned
-    if (r.right < window.innerWidth - PANEL_W - 50) return false;              // intrudes into the panel strip
+    if (r.width < 150 || r.width > window.innerWidth * 0.55) return false;   // not a full-width bar
+    if (r.bottom < window.innerHeight - 60) return false;                    // bottom-pinned
+    if (r.right < window.innerWidth - PANEL_W - 50) return false;            // intrudes into the panel strip
     return true;
   }
   function popupAncestor(el) {
@@ -56,7 +56,7 @@
     }
     return null;
   }
-  function detect() {
+  function detect() {                 // the only "scan"; cheap but runs rarely
     var W = window.innerWidth, H = window.innerHeight;
     var xs = [W - PANEL_W - 24, W - 200, W - 60];
     var ys = [H - 60, H - 180, H - 320, H - 440];
@@ -71,7 +71,7 @@
       }
     }
   }
-  function assert() {
+  function assert() {                 // near-free: touches only tracked popups
     var want = 'translateX(-' + SHIFT + 'px)';
     for (var i = tracked.length - 1; i >= 0; i--) {
       var el = tracked[i];
@@ -83,19 +83,25 @@
     }
   }
   function clearShift() {
-    for (var i = 0; i < tracked.length; i++) {
-      try { tracked[i].style.removeProperty('transform'); } catch (e) {}
-    }
+    for (var i = 0; i < tracked.length; i++) { try { tracked[i].style.removeProperty('transform'); } catch (e) {} }
     tracked = [];
   }
+  function shiftRun() {
+    // prune closed popups, then scan only if we have none (or a slow sweep)
+    for (var i = tracked.length - 1; i >= 0; i--) { if (!tracked[i] || !tracked[i].isConnected) tracked.splice(i, 1); }
+    scanTick++;
+    if (tracked.length === 0 || (scanTick % 5) === 0) detect();
+    assert();
+  }
   function tickShift() {
-    if (openState && routeKind()) { detect(); assert(); }
-    else if (tracked.length) { clearShift(); }
+    if (openState && routeKind() === 'inbox') shiftRun();
+    else if (tracked.length) clearShift();
   }
 
   function paint() {
     if (root) root.classList.toggle('bf-sb-open', openState);
-    if (openState && routeKind()) { detect(); assert(); } else { clearShift(); }
+    if (openState && routeKind() === 'inbox') shiftRun();
+    else clearShift();
   }
 
   function build() {
@@ -172,7 +178,7 @@
     } catch (e) {}
     window.addEventListener('beforeunload', clearShift);
     setInterval(apply, 1000);       // state + route
-    setInterval(tickShift, 300);    // keep popups slid aside, re-assert vs FB re-renders
+    setInterval(tickShift, 400);    // keep popups aside; near-free once one is found
     apply();
   }
   if (document.documentElement) hook(); else document.addEventListener('DOMContentLoaded', hook);
