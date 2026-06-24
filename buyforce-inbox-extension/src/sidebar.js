@@ -95,11 +95,11 @@
     if (root) root.classList.toggle('bf-sb-open', openState);
     // LISTING: reserve space (shrink page). INBOX: slide chat popups.
     try { document.documentElement.classList.toggle('bf-sb-pushwide', openState && kind === 'listing'); } catch (e) {}
-    if (openState && kind === 'inbox') shiftRun(); else clearShift();
+    if (openState && kind) shiftRun(); else clearShift();
     updateAuto();
   }
   function tickShift() {
-    if (openState && routeKind() === 'inbox') shiftRun();
+    if (openState && routeKind()) shiftRun();
     else if (tracked.length) clearShift();
   }
   function updateAuto() { if (autoEl) autoEl.classList.toggle('on', autoExpand); }
