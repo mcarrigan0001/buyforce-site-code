@@ -8,6 +8,9 @@
   var current = null;
   var lastId = null;
   var pendingDecode = null;
+  var distOptions = null;
+  var distSel = { d: {}, g: {}, m: {}, radius: 0 };
+  var listingGeo = null, listingGeoKey = '';
 
   function isListing() { return /\/marketplace\/item\/\d+/.test(location.pathname); }
   function itemId() { var m = location.pathname.match(/\/marketplace\/item\/(\d+)/); return m ? m[1] : ''; }
@@ -169,6 +172,7 @@
       taField('Description', 'description', d.description) +
       detailsStrip(d) +
       (d.listingUrl ? '<div class="bfc-src">Source: <span>' + esc(d.listingUrl) + '</span></div>' : '') +
+      '<div class="bfc-dist" data-r="dist"></div>' +
       '<div class="bfc-msg" data-r="msg"></div>' +
       '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
   }
@@ -266,9 +270,15 @@
     if (d._decode) details.decode = d._decode;
     var msg = body.querySelector('[data-r="msg"]'); var btn = body.querySelector('[data-r="save"]');
     if (!msg || !btn) return;
+    var distribution = null;
+    if (distOptions && distOptions.isAllAccess) {
+      var tg = resolveTargets();
+      if (!tg.length) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Choose at least one distribution target before saving.'; return; }
+      distribution = { dealershipIds: tg.map(function (t) { return t.id; }) };
+    }
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
     try {
-      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || cleanUrl(), mainPhotoUrl: d.mainPhotoUrl || '' } }, function (resp) {
+      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || cleanUrl(), mainPhotoUrl: d.mainPhotoUrl || '', distribution: distribution } }, function (resp) {
         btn.disabled = false;
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
@@ -387,17 +397,99 @@
       else if (r === 'ocrfile') ensureOcrInput().click();
       else if (r === 'ocrcancel') setOcr(ocrTarget, '');
     });
+    body.addEventListener('change', function (e) {
+      var el = e.target; if (el && el.getAttribute && el.getAttribute('data-dist')) onDistChange(el);
+    });
     body.addEventListener('input', function (e) {
       if (e.target && e.target.tagName === 'TEXTAREA' && e.target.getAttribute('data-k')) autosize(e.target);
+      else if (e.target && e.target.getAttribute && e.target.getAttribute('data-dist') === 'radius') onDistChange(e.target);
     });
   }
 
+  function distBox() { var b = bodyEl(); return b ? b.querySelector('[data-r="dist"]') : null; }
+  function loadDist() {
+    if (distOptions) { renderDist(); return; }
+    try {
+      chrome.runtime.sendMessage({ type: 'BF_GET_DIST_OPTIONS' }, function (resp) {
+        if (chrome.runtime.lastError || !resp || resp.ok === false) return;
+        distOptions = resp; renderDist();
+      });
+    } catch (e) {}
+  }
+  function renderDist() {
+    var c = distBox(); if (!c || !distOptions || !distOptions.isAllAccess) return;
+    function cb(kind, arr) {
+      if (!arr || !arr.length) return '<div class="bfc-dist-empty">None available</div>';
+      return arr.map(function (o) { return '<label class="bfc-dist-cb"><input type="checkbox" data-dist="' + kind + '" value="' + esc(String(o.id)) + '"><span>' + esc(o.name) + '</span></label>'; }).join('');
+    }
+    var loc = (current && current.location) || 'listing';
+    c.innerHTML =
+      '<div class="bfc-dist-h">Distribute lead to</div>' +
+      '<div class="bfc-dist-sec"><div class="bfc-dist-lbl">Dealerships</div><div class="bfc-dist-list">' + cb('d', distOptions.dealerships) + '</div></div>' +
+      '<div class="bfc-dist-sec"><div class="bfc-dist-lbl">Dealer groups</div><div class="bfc-dist-list">' + cb('g', distOptions.groups) + '</div></div>' +
+      '<div class="bfc-dist-sec"><div class="bfc-dist-lbl">Markets</div><div class="bfc-dist-list">' + cb('m', distOptions.markets) + '</div></div>' +
+      '<div class="bfc-dist-sec"><div class="bfc-dist-lbl">Within radius</div><div class="bfc-dist-rrow"><input type="number" min="0" step="5" data-dist="radius" placeholder="0"><span>mi of ' + esc(loc) + '</span></div></div>' +
+      '<div class="bfc-dist-preview" data-r="distPreview"></div>';
+    refreshPreview();
+  }
+  function haversineMi(lat1, lng1, lat2, lng2) {
+    var R = 3958.8, toR = Math.PI / 180;
+    var dLat = (lat2 - lat1) * toR, dLng = (lng2 - lng1) * toR;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * toR) * Math.cos(lat2 * toR) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(a)));
+  }
+  function resolveTargets() {
+    if (!distOptions || !distOptions.dealerships) return [];
+    var pick = {};
+    distOptions.dealerships.forEach(function (o) {
+      var hit = false;
+      if (distSel.d[o.id]) hit = true;
+      if (!hit && o.groupId != null && distSel.g[o.groupId]) hit = true;
+      if (!hit && (o.marketIds || []).some(function (mid) { return distSel.m[mid]; })) hit = true;
+      if (!hit && distSel.radius > 0 && listingGeo && o.lat != null && o.lng != null) {
+        if (haversineMi(listingGeo.lat, listingGeo.lng, o.lat, o.lng) <= distSel.radius) hit = true;
+      }
+      if (hit) pick[o.id] = { id: o.id, name: o.name };
+    });
+    return Object.keys(pick).map(function (k) { return pick[k]; });
+  }
+  function refreshPreview() {
+    var c = distBox(); if (!c) return;
+    var pv = c.querySelector('[data-r="distPreview"]'); if (!pv) return;
+    var targets = resolveTargets();
+    var b = bodyEl(); var saveBtn = b && b.querySelector('[data-r="save"]');
+    if (distSel.radius > 0 && !listingGeo) {
+      pv.innerHTML = '<div class="bfc-dist-msg">Locating ' + esc((current && current.location) || 'listing') + '…</div>';
+    } else if (!targets.length) {
+      pv.innerHTML = '<div class="bfc-dist-msg bfc-warn">No targets selected — pick at least one.</div>';
+    } else {
+      pv.innerHTML = '<div class="bfc-dist-msg bfc-ok">Goes to ' + targets.length + ' dealership' + (targets.length > 1 ? 's' : '') + ':</div><div class="bfc-dist-names">' + targets.map(function (t) { return esc(t.name); }).join(', ') + '</div>';
+    }
+    if (saveBtn && distOptions && distOptions.isAllAccess) saveBtn.disabled = !targets.length;
+  }
+  function onDistChange(el) {
+    var kind = el.getAttribute('data-dist');
+    if (kind === 'radius') {
+      var v = parseFloat(el.value) || 0; if (v < 0) v = 0; distSel.radius = v;
+      if (v > 0 && current && current.location && (listingGeoKey !== current.location || !listingGeo)) {
+        listingGeoKey = current.location; listingGeo = null;
+        try { chrome.runtime.sendMessage({ type: 'BF_GEOCODE', q: current.location }, function (resp) { if (resp && resp.ok && typeof resp.lat === 'number') listingGeo = { lat: resp.lat, lng: resp.lng }; refreshPreview(); }); } catch (e) { refreshPreview(); }
+      }
+      refreshPreview(); return;
+    }
+    var bucket = kind === 'd' ? distSel.d : kind === 'g' ? distSel.g : distSel.m;
+    if (el.checked) bucket[el.value] = 1; else delete bucket[el.value];
+    refreshPreview();
+  }
   function render() {
     pendingDecode = null;
+    distSel = { d: {}, g: {}, m: {}, radius: 0 };
+    listingGeo = null; listingGeoKey = '';
     current = extract();
     window.BFSidebar.setContext('Listing');
     window.BFSidebar.setHTML(formHTML(current));
     wire();
+    loadDist();
     setTimeout(autosizeAll, 0);
   }
 

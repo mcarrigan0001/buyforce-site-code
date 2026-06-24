@@ -155,6 +155,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     })();
     return true;
   }
+  if (msg && msg.type === 'BF_GET_DIST_OPTIONS') {
+    (async () => {
+      const token = await bfGetToken();
+      if (!token) { sendResponse({ ok: false, reason: 'no_token' }); return; }
+      try {
+        const res = await fetch('https://buyforce.app.n8n.cloud/webhook/dist-options', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-bf-token': token }, body: JSON.stringify({}) });
+        const data = await res.json().catch(function () { return { ok: false, reason: 'bad_response' }; });
+        sendResponse(data);
+      } catch (e) { sendResponse({ ok: false, reason: 'network' }); }
+    })();
+    return true;
+  }
+  if (msg && msg.type === 'BF_GEOCODE' && msg.q) {
+    (async () => {
+      const token = await bfGetToken();
+      if (!token) { sendResponse({ ok: false, reason: 'no_token' }); return; }
+      try {
+        const res = await fetch('https://buyforce.app.n8n.cloud/webhook/geocode', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-bf-token': token }, body: JSON.stringify({ q: String(msg.q) }) });
+        const data = await res.json().catch(function () { return { ok: false, reason: 'bad_response' }; });
+        sendResponse(data);
+      } catch (e) { sendResponse({ ok: false, reason: 'network' }); }
+    })();
+    return true;
+  }
   if (msg && msg.type === 'BF_REFRESH') {
     (async () => { sendResponse(await bfRefresh()); })();
     return true;
