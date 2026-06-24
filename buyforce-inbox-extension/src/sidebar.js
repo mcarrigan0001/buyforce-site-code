@@ -1,16 +1,16 @@
 /* BuyForce Sidebar shell - shared collapsible right-edge panel.
  * Loaded before content.js/listing.js. Other scripts render into it via
- * window.BFSidebar. The panel lives on <html> and overlays the right edge.
- * While expanded on a Marketplace route it slides Facebook's floating chat
- * popup(s) left so they sit BESIDE the panel instead of under it - done by
- * translating those elements directly (keeps them fixed/pinned to the bottom).
- * Purely cosmetic + reversible; it performs no actions on Facebook.
+ * window.BFSidebar. While expanded on a Marketplace route it slides Facebook's
+ * floating chat popup(s) left so they sit BESIDE the panel instead of under it.
+ * The slide is applied to the popup element directly (keeps it fixed/bottom-
+ * pinned) and is RE-ASSERTED on a short timer so FB's re-renders can't snap it
+ * back. Purely cosmetic + reversible; performs no actions on Facebook.
  * Open/closed state is remembered PER surface (listing vs inbox).
  */
 (function () {
   var DEFAULTS = { listing: true, inbox: true };
-  var PANEL_W = 348, SHIFT = 360;     // panel width + small gap
-  var states = null;
+  var PANEL_W = 348, SHIFT = 372;     // panel width + gap
+  var states = null, tracked = [];
   var root, bodyEl, ctxEl, dotEl, built = false, openState = false;
 
   function routeKind() {
@@ -35,55 +35,67 @@
   }
   function persist(kind, v) { try { var o = {}; o['bf_sb_open_' + kind] = !!v; chrome.storage.local.set(o); } catch (e) {} }
 
-  // ---- Slide FB's floating chat popups aside (element-level translate; stays fixed) ----
-  function topFixed(el) {
-    var best = null, n = el;
-    while (n && n !== document.body && n !== document.documentElement) {
-      try { if (window.getComputedStyle(n).position === 'fixed') best = n; } catch (e) {}
-      n = n.parentElement;
-    }
-    return best;
-  }
-  function qualifies(el) {
+  // ---- Slide FB's floating chat popups aside ----
+  // A popup is a fixed, bottom-pinned, narrow box whose right edge reaches into
+  // the panel strip. (The left Marketplace rail is left:0 and is never matched.)
+  function isPopup(el) {
     if (!el || el === root || (root && root.contains(el))) return false;
     var cs; try { cs = window.getComputedStyle(el); } catch (e) { return false; }
-    if (cs.position !== 'fixed' || cs.display === 'none') return false;
+    if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') return false;
     var r = el.getBoundingClientRect();
-    if (r.width < 120 || r.width > window.innerWidth * 0.6) return false;  // skip full-width bars
-    if (r.right < window.innerWidth - PANEL_W - 6) return false;           // only if it intrudes into the panel strip
+    if (r.width < 150 || r.width > window.innerWidth * 0.55) return false;     // not a full-width bar
+    if (r.bottom < window.innerHeight - 60) return false;                      // bottom-pinned
+    if (r.right < window.innerWidth - PANEL_W - 50) return false;              // intrudes into the panel strip
     return true;
   }
-  function unshiftAll() {
-    var prev = document.querySelectorAll('[data-bf-shift]');
-    for (var i = 0; i < prev.length; i++) { prev[i].style.removeProperty('transform'); prev[i].removeAttribute('data-bf-shift'); }
+  function popupAncestor(el) {
+    var n = el;
+    while (n && n !== document.body && n !== document.documentElement) {
+      if (isPopup(n)) return n;
+      n = n.parentElement;
+    }
+    return null;
   }
-  function shiftDock(on) {
-    try {
-      if (!on) { unshiftAll(); return; }
-      var W = window.innerWidth, H = window.innerHeight;
-      var pts = [[W - 388, H - 80], [W - 388, H - 240], [W - 200, H - 80], [W - 60, H - 90], [W - 60, H - 260]];
-      var seen = [];
-      for (var p = 0; p < pts.length; p++) {
-        if (pts[p][0] < 0 || pts[p][1] < 0) continue;
-        var els = document.elementsFromPoint(pts[p][0], pts[p][1]) || [];
+  function detect() {
+    var W = window.innerWidth, H = window.innerHeight;
+    var xs = [W - PANEL_W - 24, W - 200, W - 60];
+    var ys = [H - 60, H - 180, H - 320, H - 440];
+    for (var a = 0; a < xs.length; a++) {
+      for (var b = 0; b < ys.length; b++) {
+        if (xs[a] < 0 || ys[b] < 0) continue;
+        var els = document.elementsFromPoint(xs[a], ys[b]) || [];
         for (var k = 0; k < els.length; k++) {
-          var fx = topFixed(els[k]);
-          if (fx && seen.indexOf(fx) < 0 && qualifies(fx)) seen.push(fx);
+          var pop = popupAncestor(els[k]);
+          if (pop && tracked.indexOf(pop) < 0) tracked.push(pop);
         }
       }
-      for (var s = 0; s < seen.length; s++) {
-        var el = seen[s];
-        if (el.getAttribute('data-bf-shift') === '1') continue;
-        el.style.setProperty('transition', 'transform .2s ease');
-        el.style.setProperty('transform', 'translateX(-' + SHIFT + 'px)', 'important');
-        el.setAttribute('data-bf-shift', '1');
+    }
+  }
+  function assert() {
+    var want = 'translateX(-' + SHIFT + 'px)';
+    for (var i = tracked.length - 1; i >= 0; i--) {
+      var el = tracked[i];
+      if (!el || !el.isConnected) { tracked.splice(i, 1); continue; }
+      if ((el.style.transform || '').indexOf('translateX(-' + SHIFT) < 0) {
+        el.style.setProperty('transition', 'transform .15s ease');
+        el.style.setProperty('transform', want, 'important');
       }
-    } catch (e) {}
+    }
+  }
+  function clearShift() {
+    for (var i = 0; i < tracked.length; i++) {
+      try { tracked[i].style.removeProperty('transform'); } catch (e) {}
+    }
+    tracked = [];
+  }
+  function tickShift() {
+    if (openState && routeKind()) { detect(); assert(); }
+    else if (tracked.length) { clearShift(); }
   }
 
   function paint() {
     if (root) root.classList.toggle('bf-sb-open', openState);
-    shiftDock(openState && !!routeKind());
+    if (openState && routeKind()) { detect(); assert(); } else { clearShift(); }
   }
 
   function build() {
@@ -121,7 +133,7 @@
 
   function apply() {
     var kind = routeKind();
-    if (!kind) { if (root) root.style.display = 'none'; unshiftAll(); return; }
+    if (!kind) { if (root) root.style.display = 'none'; clearShift(); return; }
     ensure(); root.style.display = '';
     loadStates(function () { openState = !!states[kind]; paint(); });
   }
@@ -158,8 +170,9 @@
       history.replaceState = function () { var r = rep.apply(this, arguments); setTimeout(apply, 50); return r; };
       window.addEventListener('popstate', function () { setTimeout(apply, 50); });
     } catch (e) {}
-    window.addEventListener('beforeunload', unshiftAll);
-    setInterval(apply, 1000);   // re-applies state + catches popups opened later
+    window.addEventListener('beforeunload', clearShift);
+    setInterval(apply, 1000);       // state + route
+    setInterval(tickShift, 300);    // keep popups slid aside, re-assert vs FB re-renders
     apply();
   }
   if (document.documentElement) hook(); else document.addEventListener('DOMContentLoaded', hook);
