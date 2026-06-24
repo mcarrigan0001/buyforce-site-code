@@ -139,16 +139,18 @@
       '</div>' +
       '<div class="bfc-block">' +
         '<div class="bfc-row">' +
-          '<label class="bfc-f bfc-grow"><span>VIN<button class="bfc-scan" data-r="scanVin" type="button" title="Scan VIN from a photo">Scan</button></span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
+          '<label class="bfc-f bfc-grow"><span>VIN<button class="bfc-scan" data-r="scanVin" type="button" title="Scan VIN from a photo">Scan photo for VIN</button></span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
           '<button class="bfc-tool bfc-tool-inline" data-r="decodeVin" type="button">Decode VIN</button>' +
         '</div>' +
+        '<div class="bfc-preview" data-r="ocr-vin"></div>' +
       '</div>' +
       '<div class="bfc-block">' +
         '<div class="bfc-row">' +
-          '<label class="bfc-f bfc-grow"><span>Plate #<button class="bfc-scan" data-r="scanPlate" type="button" title="Scan plate from a photo">Scan</button></span><input data-k="plateNumber" value="' + esc(d.plateNumber) + '"></label>' +
+          '<label class="bfc-f bfc-grow"><span>Plate #<button class="bfc-scan" data-r="scanPlate" type="button" title="Scan plate from a photo">Scan photo for Plate #</button></span><input data-k="plateNumber" value="' + esc(d.plateNumber) + '"></label>' +
           '<label class="bfc-f bfc-state"><span>State</span><select data-k="plateState">' + US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (d.plateState || '') ? ' selected' : '') + '>' + (s || '\u2014') + '</option>'; }).join('') + '</select></label>' +
           '<button class="bfc-tool bfc-tool-inline" data-r="findVin" type="button">Plate to VIN</button>' +
         '</div>' +
+        '<div class="bfc-preview" data-r="ocr-plate"></div>' +
       '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
@@ -161,6 +163,8 @@
   function bodyEl() { return window.BFSidebar ? window.BFSidebar.body : null; }
   function val(key) { var body = bodyEl(); if (!body) return ''; var el = body.querySelector('[data-k="' + key + '"]'); return el ? (el.value || '').trim() : ''; }
   function setPreview(html) { var body = bodyEl(); if (!body) return; var p = body.querySelector('[data-r="preview"]'); if (p) p.innerHTML = html; }
+  function ocrSlotEl(target) { var body = bodyEl(); if (!body) return null; return body.querySelector('[data-r="ocr-' + (target === 'plate' ? 'plate' : 'vin') + '"]'); }
+  function setOcr(target, html) { var s = ocrSlotEl(target); if (s) s.innerHTML = html; var o = ocrSlotEl(target === 'plate' ? 'vin' : 'plate'); if (o) o.innerHTML = ''; }
 
   function decodeVin() {
     var vin = val('vin').toUpperCase();
@@ -274,7 +278,8 @@
   function scanPlate() { openOcrPanel('plate'); }
   function openOcrPanel(target) {
     ocrTarget = target;
-    setPreview('<div class="bfc-ocr"><div class="bfc-ocr-h">Scan ' + (target === 'plate' ? 'plate' : 'VIN') + '</div>' +
+    setPreview('');
+    setOcr(target, '<div class="bfc-ocr"><div class="bfc-ocr-h">Scan ' + (target === 'plate' ? 'plate' : 'VIN') + '</div>' +
       '<div class="bfc-ocr-drop" data-r="ocrdrop" contenteditable="true" data-ph="Paste a screenshot (Ctrl+V) or drag an image here"></div>' +
       '<div class="bfc-ocr-act"><button class="bfc-tool" data-r="ocrfile" type="button">Choose file\u2026</button>' +
       '<button class="bfc-pv-no" data-r="ocrcancel" type="button">Cancel</button></div></div>');
@@ -308,22 +313,22 @@
     return best || (toks.join('')).slice(0, 8);
   }
   function runOcr(dataUrl, target) {
-    setPreview('<div class="bfc-pv-msg">Reading ' + (target === 'plate' ? 'plate' : 'VIN') + ' image on your device\u2026</div>');
+    setOcr(target, '<div class="bfc-pv-msg">Reading ' + (target === 'plate' ? 'plate' : 'VIN') + ' image on your device\u2026</div>');
     try {
       chrome.runtime.sendMessage({ type: 'BF_OCR', image: dataUrl, hint: target }, function (resp) {
-        if (chrome.runtime.lastError || !resp) { setPreview('<div class="bfc-pv-msg bfc-err">OCR unavailable \u2014 reload the extension and retry.</div>'); return; }
-        if (resp.ok === false) { setPreview('<div class="bfc-pv-msg bfc-err">Could not read the image' + (resp.reason ? ' (' + esc(resp.reason) + ')' : '') + '.</div>'); return; }
+        if (chrome.runtime.lastError || !resp) { setOcr(target, '<div class="bfc-pv-msg bfc-err">OCR unavailable \u2014 reload the extension and retry.</div>'); return; }
+        if (resp.ok === false) { setOcr(target, '<div class="bfc-pv-msg bfc-err">Could not read the image' + (resp.reason ? ' (' + esc(resp.reason) + ')' : '') + '.</div>'); return; }
         var body = bodyEl(); if (!body) return;
         if (target === 'plate') {
           var pl = cleanPlateText(resp.text); var el = body.querySelector('input[data-k="plateNumber"]'); if (el) el.value = pl;
-          setPreview('<div class="bfc-pv-msg bfc-ok">Plate read: <b>' + esc(pl || '(nothing)') + '</b> \u2014 verify it, set the state, then Find VIN.</div>');
+          setOcr('plate', '<div class="bfc-pv-msg bfc-ok">Plate read: <b>' + esc(pl || '(nothing)') + '</b> \u2014 verify it, set the state, then Plate to VIN.</div>');
         } else {
           var vn = cleanVinText(resp.text); var el2 = body.querySelector('input[data-k="vin"]'); if (el2) el2.value = vn;
           var okLen = /^[A-HJ-NPR-Z0-9]{17}$/.test(vn);
-          setPreview('<div class="bfc-pv-msg ' + (okLen ? 'bfc-ok' : 'bfc-warn') + '">VIN read: <b>' + esc(vn || '(nothing)') + '</b>' + (okLen ? ' \u2014 looks valid, click Decode VIN.' : ' \u2014 verify the characters (not a clean 17).') + '</div>');
+          setOcr('vin', '<div class="bfc-pv-msg ' + (okLen ? 'bfc-ok' : 'bfc-warn') + '">VIN read: <b>' + esc(vn || '(nothing)') + '</b>' + (okLen ? ' \u2014 looks valid, click Decode VIN.' : ' \u2014 verify the characters (not a clean 17).') + '</div>');
         }
       });
-    } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
+    } catch (e) { setOcr(target, '<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
   }
   function onPaste(e) {
     if (!isListing() || !window.BFSidebar || !window.BFSidebar.isOpen()) return;
@@ -356,7 +361,7 @@
       else if (r === 'scanVin') scanVin();
       else if (r === 'scanPlate') scanPlate();
       else if (r === 'ocrfile') ensureOcrInput().click();
-      else if (r === 'ocrcancel') setPreview('');
+      else if (r === 'ocrcancel') setOcr(ocrTarget, '');
     });
     body.addEventListener('input', function (e) {
       if (e.target && e.target.tagName === 'TEXTAREA' && e.target.getAttribute('data-k')) autosize(e.target);
