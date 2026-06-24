@@ -1,0 +1,8 @@
+.bf-badge { display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 0 8px; vertical-align: middle;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; line-height: 1; white-space: nowrap; }
+.bf-badge .bf-stage { color: #fff; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+.bf-badge .bf-time { color: #6b7280; font-weight: 600; }
+.bf-badge .bf-time-stale { color: #dc2626; font-weight: 700; }
+.bf-badge .bf-next { color: #374151; background: #f3f4f6; padding: 2px 7px; border-radius: 6px; font-weight: 600; }
+.bf-badge.bf-stale .bf-stage { box-shadow: 0 0 0 2px #fecaca; }
+.bf-badge.bf-fuzzy { opacity: 0.9; }
