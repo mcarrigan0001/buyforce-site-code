@@ -78,3 +78,9 @@
 .bfc-dist-msg.bfc-ok { color: #9fd86a; font-weight: 700; }
 .bfc-dist-msg.bfc-warn { color: #f1c152; }
 .bfc-dist-names { margin-top: 3px; font-size: 11.5px; color: #c4c8cf; line-height: 1.5; }
+
+/* Card header + Re-Sync */
+.bfc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.bfc-head .bf-sb-veh { flex: 1 1 auto; min-width: 0; }
+.bfc-resync { flex: 0 0 auto; background: #161922; color: #9fd86a; border: 1px solid #2f5d1a; border-radius: 7px; padding: 4px 9px; font-size: 10.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.bfc-resync:hover { border-color: #57c822; background: #1b2230; }

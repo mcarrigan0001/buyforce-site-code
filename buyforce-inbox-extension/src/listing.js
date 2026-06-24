@@ -28,12 +28,21 @@
   }
 
   function mainPhoto(main) {
-    // Largest real image in the listing = the hero photo. Avatars/thumbnails are small, so a min-dimension filter excludes them.
-    var best = '', bestArea = 0;
-    [].forEach.call((main || document).querySelectorAll('img'), function (im) {
-      var src = im.currentSrc || im.src || ''; if (!/^https?:/.test(src)) return;
-      var w = im.naturalWidth || im.width || 0, h = im.naturalHeight || im.height || 0;
-      if (Math.min(w, h) >= 180 && (w * h) > bestArea) { bestArea = w * h; best = src; }
+    // Hero photo = largest real image. Use RENDERED size (FB lazy-loads, so naturalWidth is often 0),
+    // and also scan background-image divs (FB sometimes paints the hero that way).
+    var scope = main || document; var best = '', bestArea = 0;
+    function consider(url, w, h) {
+      if (!url || !/^https?:/.test(url)) return;
+      var area = (w || 0) * (h || 0);
+      if (Math.min(w || 0, h || 0) >= 140 && area > bestArea) { bestArea = area; best = url; }
+    }
+    [].forEach.call(scope.querySelectorAll('img'), function (im) {
+      var r = im.getBoundingClientRect();
+      consider(im.currentSrc || im.src || '', Math.max(im.naturalWidth || 0, r.width || 0), Math.max(im.naturalHeight || 0, r.height || 0));
+    });
+    [].forEach.call(scope.querySelectorAll('[style*="background-image"]'), function (el) {
+      var m = ((el.style && el.style.backgroundImage) || '').match(/url\((['"]?)(https?:[^'")]+)\1\)/);
+      if (m) { var r = el.getBoundingClientRect(); consider(m[2], r.width, r.height); }
     });
     if (best) return best;
     var og = document.querySelector('meta[property="og:image"]');
@@ -141,7 +150,7 @@
   }
 
   function formHTML(d) {
-    var head = d.title ? '<div class="bf-sb-veh">' + esc(d.title) + '</div>' : '<div class="bf-sb-veh">New listing</div>';
+    var head = '<div class="bfc-head"><div class="bf-sb-veh">' + esc(d.title || 'New listing') + '</div><button class="bfc-resync" data-r="resync" type="button" title="Re-pull the listing you are viewing now">Re-Sync Listing</button></div>';
     return head +
       '<div class="bf-sb-sub">Review &amp; save as a Fresh Lead</div>' +
       (d.mainPhotoUrl ? '<div class="bfc-photo"><img src="' + esc(d.mainPhotoUrl) + '" alt="Listing photo" referrerpolicy="no-referrer"></div>' : '') +
@@ -388,6 +397,7 @@
       if (!b || !body.contains(b)) return;
       var r = b.getAttribute('data-r');
       if (r === 'save') submit();
+      else if (r === 'resync') render();
       else if (r === 'decodeVin') decodeVin();
       else if (r === 'findVin') findVin();
       else if (r === 'pvApply') applyDecode();
