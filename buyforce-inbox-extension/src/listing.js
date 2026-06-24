@@ -51,7 +51,8 @@
 
     var extC = (x.match(/Exterior color:\s*([A-Za-z][A-Za-z ]*?)(?:\s*·|\s*Interior|\n|$)/i) || [, ''])[1].trim();
     var intC = (x.match(/Interior color:\s*([A-Za-z][A-Za-z ]*?)(?:\s*·|\n|$)/i) || [, ''])[1].trim();
-    var trans = (x.match(/\b(Manual|Automatic|CVT)\b\s*transmission/i) || [, ''])[1];
+    var transRaw = (x.match(/\b(Manual|Automatic|CVT)\b\s*transmission/i) || [, ''])[1];
+    var transmissionType = /cvt/i.test(transRaw) ? 'CVT' : (/manual/i.test(transRaw) ? 'Manual' : (/automatic/i.test(transRaw) ? 'Automatic' : ''));
     var fuel = (x.match(/Fuel type:\s*([A-Za-z]+)/i) || [, ''])[1];
     var owners = (x.match(/(\d+)\s+owners?\b/i) || [, ''])[1];
     var titleSt = (x.match(/\b(Clean title|Salvage title|Rebuilt title)\b/i) || [, ''])[1];
@@ -83,7 +84,7 @@
       title: title, year: yr, make: mk, model: md, trim: tr,
       price: price, mileage: mileage, location: loc, listedAgo: listedAgo, listedDaysAgo: listedDaysAgo,
       vin: vin, plateNumber: '', plateState: '', sellerName: seller, sellerProfileId: sellerProfileId,
-      color: extC, transmission: trans, description: desc,
+      color: extC, transmissionType: transmissionType, description: desc,
       interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, owed: owed,
       _decode: null, listingUrl: cleanUrl()
     };
@@ -92,8 +93,10 @@
   var US_STATES = ['', 'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 
   function field(label, key, val) { return '<label class="bfc-f"><span>' + esc(label) + '</span><input data-k="' + key + '" value="' + esc(val) + '"></label>'; }
-  function selField(label, key, val) {
-    var opts = US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (val || '') ? ' selected' : '') + '>' + (s || '—') + '</option>'; }).join('');
+  var TRANS_TYPES = ['', 'Automatic', 'Manual', 'CVT', 'DCT', 'Other'];
+  function selField(label, key, val, options) {
+    var list = options || US_STATES;
+    var opts = list.map(function (s) { return '<option value="' + s + '"' + (s === (val || '') ? ' selected' : '') + '>' + (s || '—') + '</option>'; }).join('');
     return '<label class="bfc-f"><span>' + esc(label) + '</span><select data-k="' + key + '">' + opts + '</select></label>';
   }
   function taField(label, key, val) { return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="2">' + esc(val || '') + '</textarea></label>'; }
@@ -116,7 +119,7 @@
         field('Year', 'year', d.year) + field('Make', 'make', d.make) +
         field('Model', 'model', d.model) + field('Trim', 'trim', d.trim) +
         field('Price', 'price', d.price) + field('Mileage', 'mileage', d.mileage) +
-        field('Ext. color', 'color', d.color) + field('Transmission', 'transmission', d.transmission) +
+        field('Ext. color', 'color', d.color) + selField('Transmission', 'transmissionType', d.transmissionType, TRANS_TYPES) +
         field('Location', 'location', d.location) + field('Listed', 'listedAgo', d.listedAgo) +
         field('VIN', 'vin', d.vin) +
         field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
@@ -176,7 +179,7 @@
   function showPreview(r, sourceLabel) {
     pendingDecode = r;
     var line = [r.year, r.make, r.model, r.trim].filter(Boolean).join(' ') || '(no fields returned)';
-    var extra = []; if (r.engine) extra.push(r.engine); if (r.fuel) extra.push(r.fuel); if (r.drive) extra.push(r.drive); if (r.body) extra.push(r.body);
+    var extra = []; if (r.engine) extra.push(r.engine); if (r.fuel) extra.push(r.fuel); if (r.drive) extra.push(r.drive); if (r.body) extra.push(r.body); if (r.transmissionDetails) extra.push(r.transmissionDetails);
     setPreview(
       '<div class="bfc-pv">' +
         '<div class="bfc-pv-h">' + esc(sourceLabel || 'Decoded') + ' — confirm</div>' +
@@ -192,8 +195,9 @@
     var body = bodyEl(); if (!body) return;
     function setv(k, v) { if (v == null || v === '') return; var el = body.querySelector('[data-k="' + k + '"]'); if (el) el.value = v; }
     setv('year', r.year); setv('make', r.make); setv('model', r.model); setv('trim', r.trim);
+    if (r.transmissionType) setv('transmissionType', r.transmissionType);
     if (r.vin) setv('vin', r.vin);
-    if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmission: r.transmission };
+    if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmissionDetails: r.transmissionDetails };
     setPreview('<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>');
   }
   function dismissDecode() { pendingDecode = null; setPreview(''); }

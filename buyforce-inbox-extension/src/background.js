@@ -36,6 +36,7 @@ async function bfRefresh() {
 }
 
 function tcase(s) { s = (s == null ? '' : String(s)); if (/^[A-Z0-9]{2,4}$/.test(s)) return s; return s.replace(/\w\S*/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); }); }
+function transType(s) { s = (s || '') + ''; var l = s.toLowerCase(); if (/cvt|continuously variable/.test(l)) return 'CVT'; if (/dual.?clutch|dct/.test(l)) return 'DCT'; if (/automated manual|amt/.test(l)) return 'Other'; if (/automatic/.test(l)) return 'Automatic'; if (/manual/.test(l)) return 'Manual'; return s ? 'Other' : ''; }
 
 // Free NHTSA vPIC VIN decode. Returns proposed YMMT + a few specs. No n8n cost.
 async function bfDecodeVin(vinRaw) {
@@ -56,7 +57,9 @@ async function bfDecodeVin(vinRaw) {
       ok: true, vin: vin,
       year: year, make: tcase(r.Make || ''), model: r.Model || '', trim: trim,
       engine: engine, fuel: r.FuelTypePrimary || '', drive: r.DriveType || '', body: r.BodyClass || '',
-      cylinders: r.EngineCylinders || '', displacement: r.DisplacementL || '', transmission: r.TransmissionStyle || ''
+      cylinders: r.EngineCylinders || '', displacement: r.DisplacementL || '',
+      transmissionType: transType(r.TransmissionStyle || ''),
+      transmissionDetails: [(r.TransmissionSpeeds ? String(r.TransmissionSpeeds).replace(/[^0-9]/g, '') + '-speed' : ''), (r.TransmissionStyle || '')].filter(Boolean).join(' ')
     };
   } catch (e) { return { ok: false, reason: 'Could not reach NHTSA.' }; }
 }
