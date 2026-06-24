@@ -1,15 +1,16 @@
 /* BuyForce Sidebar shell - shared collapsible right-edge panel.
  * Loaded before content.js/listing.js. Other scripts render into it via
- * window.BFSidebar. The panel lives on <html> (outside <body>). When expanded on
- * a Marketplace route it adds class "bf-sb-push" to <html>; the CSS shrinks
- * <body> by the panel width and gives it a transform so Facebook's fixed panes
- * reflow into the narrower space instead of being covered. Collapsing removes it
- * instantly. CSS-only, fully reversible - it performs no actions on Facebook.
+ * window.BFSidebar. The panel lives on <html> and overlays the right edge.
+ * While expanded on a Marketplace route it slides Facebook's floating chat
+ * popup(s) left so they sit BESIDE the panel instead of under it - done by
+ * translating those elements directly (keeps them fixed/pinned to the bottom).
+ * Purely cosmetic + reversible; it performs no actions on Facebook.
  * Open/closed state is remembered PER surface (listing vs inbox).
  */
 (function () {
   var DEFAULTS = { listing: true, inbox: true };
-  var states = null;     // { listing: bool, inbox: bool } - loaded once, cached
+  var PANEL_W = 348, SHIFT = 360;     // panel width + small gap
+  var states = null;
   var root, bodyEl, ctxEl, dotEl, built = false, openState = false;
 
   function routeKind() {
@@ -34,12 +35,56 @@
   }
   function persist(kind, v) { try { var o = {}; o['bf_sb_open_' + kind] = !!v; chrome.storage.local.set(o); } catch (e) {} }
 
+  // ---- Slide FB's floating chat popups aside (element-level translate; stays fixed) ----
+  function topFixed(el) {
+    var best = null, n = el;
+    while (n && n !== document.body && n !== document.documentElement) {
+      try { if (window.getComputedStyle(n).position === 'fixed') best = n; } catch (e) {}
+      n = n.parentElement;
+    }
+    return best;
+  }
+  function qualifies(el) {
+    if (!el || el === root || (root && root.contains(el))) return false;
+    var cs; try { cs = window.getComputedStyle(el); } catch (e) { return false; }
+    if (cs.position !== 'fixed' || cs.display === 'none') return false;
+    var r = el.getBoundingClientRect();
+    if (r.width < 120 || r.width > window.innerWidth * 0.6) return false;  // skip full-width bars
+    if (r.right < window.innerWidth - PANEL_W - 6) return false;           // only if it intrudes into the panel strip
+    return true;
+  }
+  function unshiftAll() {
+    var prev = document.querySelectorAll('[data-bf-shift]');
+    for (var i = 0; i < prev.length; i++) { prev[i].style.removeProperty('transform'); prev[i].removeAttribute('data-bf-shift'); }
+  }
+  function shiftDock(on) {
+    try {
+      if (!on) { unshiftAll(); return; }
+      var W = window.innerWidth, H = window.innerHeight;
+      var pts = [[W - 388, H - 80], [W - 388, H - 240], [W - 200, H - 80], [W - 60, H - 90], [W - 60, H - 260]];
+      var seen = [];
+      for (var p = 0; p < pts.length; p++) {
+        if (pts[p][0] < 0 || pts[p][1] < 0) continue;
+        var els = document.elementsFromPoint(pts[p][0], pts[p][1]) || [];
+        for (var k = 0; k < els.length; k++) {
+          var fx = topFixed(els[k]);
+          if (fx && seen.indexOf(fx) < 0 && qualifies(fx)) seen.push(fx);
+        }
+      }
+      for (var s = 0; s < seen.length; s++) {
+        var el = seen[s];
+        if (el.getAttribute('data-bf-shift') === '1') continue;
+        el.style.setProperty('transition', 'transform .2s ease');
+        el.style.setProperty('transform', 'translateX(-' + SHIFT + 'px)', 'important');
+        el.setAttribute('data-bf-shift', '1');
+      }
+    } catch (e) {}
+  }
+
   function paint() {
     if (root) root.classList.toggle('bf-sb-open', openState);
-    var pushing = openState && !!routeKind();
-    try { document.documentElement.classList.toggle('bf-sb-push', pushing); } catch (e) {}
+    shiftDock(openState && !!routeKind());
   }
-  function clearPush() { try { document.documentElement.classList.remove('bf-sb-push'); } catch (e) {} }
 
   function build() {
     if (built) return; built = true;
@@ -76,7 +121,7 @@
 
   function apply() {
     var kind = routeKind();
-    if (!kind) { if (root) root.style.display = 'none'; clearPush(); return; }
+    if (!kind) { if (root) root.style.display = 'none'; unshiftAll(); return; }
     ensure(); root.style.display = '';
     loadStates(function () { openState = !!states[kind]; paint(); });
   }
@@ -113,8 +158,8 @@
       history.replaceState = function () { var r = rep.apply(this, arguments); setTimeout(apply, 50); return r; };
       window.addEventListener('popstate', function () { setTimeout(apply, 50); });
     } catch (e) {}
-    window.addEventListener('beforeunload', clearPush);
-    setInterval(apply, 1000);
+    window.addEventListener('beforeunload', unshiftAll);
+    setInterval(apply, 1000);   // re-applies state + catches popups opened later
     apply();
   }
   if (document.documentElement) hook(); else document.addEventListener('DOMContentLoaded', hook);

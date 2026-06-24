@@ -51,16 +51,3 @@
 .bf-sb-flag { display: block; margin-top: 8px; color: #f1c152; font-weight: 700; font-size: 12px; }
 .bf-sb-link { display: inline-block; margin-top: 12px; color: #9fd86a; font-size: 12.5px; font-weight: 600; text-decoration: none; }
 .bf-sb-link:hover { text-decoration: underline; }
-
-/* Push layout: while the panel is expanded on a Marketplace route, reserve the
- * right strip for it. Transform on <body> re-anchors FB's fixed panes to the
- * body box so they shrink with it instead of being covered. CSS-only/reversible.
- * Our panel is attached to <html> (outside <body>), so it is unaffected. */
-html.bf-sb-push { overflow-x: hidden !important; }
-html.bf-sb-push body {
-  width: calc(100vw - 348px) !important;
-  min-width: 0 !important;
-  transform: translateZ(0) !important;
-  transform-origin: top left !important;
-  transition: width .24s ease !important;
-}
