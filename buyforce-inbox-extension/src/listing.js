@@ -1,24 +1,23 @@
 /* BuyForce Listing Capture - Facebook Marketplace listing content script.
- * On a /marketplace/item/ page, injects an "Add to BuyForce" button. On click it
- * extracts the vehicle fields, shows an EDITABLE confirm card, and creates a Fresh
- * Lead via the listing-create proxy. Assist-only: it never acts on Facebook - it
- * only writes to your BuyForce pipeline, and only when you click Save.
+ * On a /marketplace/item/ page, renders an EDITABLE capture form into the
+ * BuyForce sidebar. On Save it creates a Fresh Lead via the listing-create
+ * proxy. Assist-only: it never acts on Facebook - it only writes to your
+ * BuyForce pipeline, and only when you click Save.
  */
 (function () {
-  var CFG = globalThis.BF_CONFIG || {};
+  var current = null;     // last extracted listing object
+  var lastId = null;      // last item id we rendered
+
   function isListing() { return /\/marketplace\/item\/\d+/.test(location.pathname); }
+  function itemId() { var m = location.pathname.match(/\/marketplace\/item\/(\d+)/); return m ? m[1] : ''; }
   function t(el) { return el ? (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
   function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-
   function tc(s) { if (!s) return ''; if (/^[A-Z0-9]{2,4}$/.test(s)) return s; return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
 
   function extract() {
     var main = document.querySelector('div[role="main"]') || document.body;
     var h1 = main.querySelector('h1');
     var title = t(h1);
-    // Scope to the listing-detail container: nearest ancestor of the title that also
-    // holds "About this vehicle" + seller sections. Avoids grabbing prices/locations
-    // from the "Today's picks" grid below the listing.
     var scope = main, node = h1;
     while (node && node !== main) {
       var it = node.innerText || '';
@@ -37,7 +36,6 @@
     var vinM = x.match(/\b([A-HJ-NPR-Z0-9]{17})\b/);
     var vin = vinM ? vinM[1] : '';
 
-    // Rich "About this vehicle" fields
     var extC = (x.match(/Exterior color:\s*([A-Za-z][A-Za-z ]*?)(?:\s*·|\s*Interior|\n|$)/i) || [, ''])[1].trim();
     var intC = (x.match(/Interior color:\s*([A-Za-z][A-Za-z ]*?)(?:\s*·|\n|$)/i) || [, ''])[1].trim();
     var trans = (x.match(/\b(Manual|Automatic|CVT)\b\s*transmission/i) || [, ''])[1];
@@ -46,7 +44,6 @@
     var titleSt = (x.match(/\b(Clean title|Salvage title|Rebuilt title)\b/i) || [, ''])[1];
     var owed = /Money is still owed on this vehicle/i.test(x);
 
-    // Seller name from the "Seller information" block
     var seller = '';
     var hdrs = [].slice.call(main.querySelectorAll('span, h2, h3'));
     for (var i = 0; i < hdrs.length; i++) {
@@ -62,7 +59,6 @@
     var desc = (x.match(/Seller.?s description\s*([\s\S]*?)(?:\s*See (?:less|more)|Location is approximate|Seller information|$)/i) || [, ''])[1].trim();
     if (desc.length > 600) desc = desc.slice(0, 600);
 
-    // Title parse: YEAR MAKE MODEL TRIM...
     var yr = '', mk = '', md = '', tr = '';
     var tm = title.match(/\b(19|20)\d\d\b/);
     if (tm) {
@@ -94,12 +90,10 @@
     return '<div class="bfc-meta">' + bits.join(' · ') + (bits.length && owed ? '<br>' : '') + owed + '</div>';
   }
 
-  function openCard(d) {
-    closeCard();
-    var card = document.createElement('div');
-    card.className = 'bfc-card'; card.id = 'bfc-card'; card.setAttribute('data-bf', '1');
-    card.innerHTML =
-      '<div class="bfc-head"><b>Add to BuyForce</b><span class="bfc-x" title="Close">×</span></div>' +
+  function formHTML(d) {
+    var head = d.title ? '<div class="bf-sb-veh">' + esc(d.title) + '</div>' : '<div class="bf-sb-veh">New listing</div>';
+    return head +
+      '<div class="bf-sb-sub">Review &amp; save as a Fresh Lead</div>' +
       '<div class="bfc-grid">' +
         field('Year', 'year', d.year) + field('Make', 'make', d.make) +
         field('Model', 'model', d.model) + field('Trim', 'trim', d.trim) +
@@ -109,21 +103,20 @@
       '</div>' +
       detailsStrip(d) +
       '<div class="bfc-msg" data-r="msg"></div>' +
-      '<div class="bfc-act"><button class="bfc-save" data-r="save">Save lead</button></div>';
-    document.body.appendChild(card);
-    card.querySelector('.bfc-x').addEventListener('click', closeCard);
-    card.querySelector('[data-r="save"]').addEventListener('click', function () { submit(card, d); });
+      '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
   }
-  function closeCard() { var c = document.getElementById('bfc-card'); if (c) c.remove(); }
 
-  function submit(card, d) {
+  function submit() {
+    var body = window.BFSidebar.body; if (!body) return;
+    var d = current || {};
     var fields = {};
-    [].forEach.call(card.querySelectorAll('input[data-k]'), function (i) { var v = i.value.trim(); if (v) fields[i.getAttribute('data-k')] = v; });
+    [].forEach.call(body.querySelectorAll('input[data-k]'), function (i) { var v = i.value.trim(); if (v) fields[i.getAttribute('data-k')] = v; });
     var details = { interiorColor: d.interiorColor, transmission: d.transmission, fuelType: d.fuelType, owners: d.owners, titleStatus: d.titleStatus, loanOwed: !!d.owed, description: d.description };
-    var msg = card.querySelector('[data-r="msg"]'); var btn = card.querySelector('[data-r="save"]');
+    var msg = body.querySelector('[data-r="msg"]'); var btn = body.querySelector('[data-r="save"]');
+    if (!msg || !btn) return;
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
     try {
-      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl } }, function (resp) {
+      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || location.href } }, function (resp) {
         btn.disabled = false;
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
@@ -134,18 +127,34 @@
     } catch (e) { btn.disabled = false; msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Something went wrong.'; }
   }
 
-  function mountButton() {
-    if (!isListing()) { var b = document.getElementById('bfc-fab'); if (b) b.remove(); return; }
-    if (document.getElementById('bfc-fab')) return;
-    var fab = document.createElement('button');
-    fab.id = 'bfc-fab'; fab.className = 'bfc-fab'; fab.type = 'button'; fab.setAttribute('data-bf', '1');
-    fab.innerHTML = '<span class="bfc-logo">B</span> Add to BuyForce';
-    fab.addEventListener('click', function () { openCard(extract()); });
-    document.body.appendChild(fab);
+  function render() {
+    current = extract();
+    window.BFSidebar.setContext('Listing');
+    window.BFSidebar.setHTML(formHTML(current));
+    var save = window.BFSidebar.body.querySelector('[data-r="save"]');
+    if (save) save.addEventListener('click', submit);
+  }
+
+  function tick() {
+    if (!window.BFSidebar || !isListing()) return;
+    var id = itemId();
+    var hasForm = window.BFSidebar.body && window.BFSidebar.body.querySelector('input[data-k]');
+    // (Re)render when the listing changes, or our form isn't mounted, but only
+    // once the page has a real title to avoid capturing an empty shell.
+    if (id !== lastId || !hasForm) {
+      var h1 = (document.querySelector('div[role="main"] h1'));
+      if (!h1 || !t(h1)) return; // wait for the detail panel to populate
+      lastId = id;
+      render();
+    }
   }
 
   var pend = null;
-  function schedule() { if (pend) return; pend = setTimeout(function () { pend = null; mountButton(); }, 400); }
-  function boot() { mountButton(); new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true }); }
+  function schedule() { if (pend) return; pend = setTimeout(function () { pend = null; tick(); }, 400); }
+  function boot() {
+    tick();
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    setInterval(tick, 1200);
+  }
   if (document.body) boot(); else document.addEventListener('DOMContentLoaded', boot);
 })();

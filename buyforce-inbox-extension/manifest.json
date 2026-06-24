@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "BuyForce Inbox Overlay",
-  "version": "0.1.0",
-  "description": "Decorates the Facebook Marketplace Buying inbox with each deal's BuyForce pipeline data (stage, time-in-stage, next action). Read-only.",
+  "version": "0.2.0",
+  "description": "BuyForce sidebar for Facebook Marketplace: capture listings as leads, badge inbox conversations, and surface each deal's pipeline data (stage, time-in-stage, next action). Assist-only.",
   "permissions": [
     "storage"
   ],
@@ -24,12 +24,14 @@
       "js": [
         "src/config.js",
         "src/match.js",
+        "src/sidebar.js",
         "src/content.js",
         "src/listing.js"
       ],
       "css": [
         "src/badges.css",
-        "src/capture.css"
+        "src/capture.css",
+        "src/sidebar.css"
       ],
       "run_at": "document_idle"
     },
