@@ -35,3 +35,11 @@
 .bfc-src span { color: #8a8f98; }
 
 /* OCR scan buttons share the .bfc-tool look; widen the card a touch for the extra tools */
+.bfc-block { margin-top: 11px; }
+.bfc-block .bfc-tools { margin-top: 7px; }
+.bfc-preview + .bfc-f-full { margin-top: 12px; }
+.bfc-ocr { margin-top: 9px; padding: 10px; background: #0e1622; border: 1px solid #244a1c; border-radius: 9px; }
+.bfc-ocr-h { font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: #7fae5e; margin-bottom: 7px; }
+.bfc-ocr-drop { border: 1px dashed #3a5d2a; border-radius: 8px; padding: 16px 10px; text-align: center; font-size: 12px; color: #aeb2ba; outline: none; cursor: text; }
+.bfc-ocr-drop:focus, .bfc-ocr-over { border-color: #57c822; background: #0d1016; color: #cfe9c0; }
+.bfc-ocr-act { display: flex; gap: 8px; margin-top: 9px; }

@@ -63,13 +63,22 @@
     var hdrs = [].slice.call(main.querySelectorAll('span, h2, h3'));
     for (var i = 0; i < hdrs.length; i++) {
       if (/^seller information$/i.test(t(hdrs[i]))) {
-        var blk = hdrs[i].closest('div'), a = null, hops = 0;
-        while (blk && hops++ < 4 && !a) { a = blk.querySelector('a[href*="/marketplace/profile/"]'); blk = blk.parentElement; }
-        if (a) { seller = t(a); var pm = (a.getAttribute('href') || '').match(/\/marketplace\/profile\/([^/?]+)/); if (pm) sellerProfileId = pm[1]; }
+        var box = hdrs[i].closest('div'), hops = 0;
+        while (box && hops++ < 6 && !seller) {
+          var links = box.querySelectorAll('a[href*="/marketplace/profile/"]');
+          for (var k = 0; k < links.length; k++) {
+            var lt = t(links[k]);
+            if (lt && lt.length > 2 && !/seller details|see details|^details$|view profile/i.test(lt)) {
+              seller = lt; var pm = (links[k].getAttribute('href') || '').match(/\/marketplace\/profile\/([^/?]+)/); if (pm) sellerProfileId = pm[1]; break;
+            }
+          }
+          box = box.parentElement;
+        }
         break;
       }
     }
     if (!seller) { var sm = x.match(/Seller information\s*(?:Seller details)?\s*([A-Z][a-z’'\-]+(?:\s+[A-Z][a-z’'\-]+){1,2})/); if (sm) seller = sm[1]; }
+    seller = (seller || '').replace(/\s*\bSeller details\b\s*/i, '').trim();
 
     var desc = (x.match(/Seller.?s description\s*([\s\S]*?)(?:\s*See (?:less|more)|Location is approximate|Seller information|$)/i) || [, ''])[1].trim();
     if (desc.length > 2000) desc = desc.slice(0, 2000);
@@ -122,15 +131,23 @@
         field('Price', 'price', d.price) + field('Mileage', 'mileage', d.mileage) +
         field('Ext. color', 'color', d.color) + selField('Transmission', 'transmissionType', d.transmissionType, TRANS_TYPES) +
         field('Location', 'location', d.location) + field('Listed', 'listedAgo', d.listedAgo) +
-        field('VIN', 'vin', d.vin) +
-        field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
         field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
-      '<div class="bfc-tools">' +
-        '<button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button>' +
-        '<button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button>' +
-        '<button class="bfc-tool" data-r="scanVin" type="button">Scan VIN</button>' +
-        '<button class="bfc-tool" data-r="scanPlate" type="button">Scan plate</button>' +
+      '<div class="bfc-block">' +
+        '<label class="bfc-f bfc-f-full"><span>VIN</span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
+        '<div class="bfc-tools">' +
+          '<button class="bfc-tool" data-r="scanVin" type="button">Scan VIN</button>' +
+          '<button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="bfc-block">' +
+        '<div class="bfc-grid">' +
+          field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
+        '</div>' +
+        '<div class="bfc-tools">' +
+          '<button class="bfc-tool" data-r="scanPlate" type="button">Scan plate</button>' +
+          '<button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button>' +
+        '</div>' +
       '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
@@ -252,8 +269,23 @@
     return ocrInput;
   }
   function readImage(blob, cb) { var r = new FileReader(); r.onload = function () { cb(r.result); }; r.onerror = function () { setPreview('<div class="bfc-pv-msg bfc-err">Could not read that image.</div>'); }; r.readAsDataURL(blob); }
-  function scanVin() { ocrTarget = 'vin'; ensureOcrInput().click(); }
-  function scanPlate() { ocrTarget = 'plate'; ensureOcrInput().click(); }
+  function scanVin() { openOcrPanel('vin'); }
+  function scanPlate() { openOcrPanel('plate'); }
+  function openOcrPanel(target) {
+    ocrTarget = target;
+    setPreview('<div class="bfc-ocr"><div class="bfc-ocr-h">Scan ' + (target === 'plate' ? 'plate' : 'VIN') + '</div>' +
+      '<div class="bfc-ocr-drop" data-r="ocrdrop" tabindex="0">Paste a screenshot (Ctrl+V) or drag an image here</div>' +
+      '<div class="bfc-ocr-act"><button class="bfc-tool" data-r="ocrfile" type="button">Choose file\u2026</button>' +
+      '<button class="bfc-pv-no" data-r="ocrcancel" type="button">Cancel</button></div></div>');
+    var body = bodyEl(); var dz = body && body.querySelector('[data-r="ocrdrop"]');
+    if (dz) {
+      dz.addEventListener('paste', function (e) { var its = (e.clipboardData && e.clipboardData.items) || []; for (var i = 0; i < its.length; i++) { if (its[i].type && its[i].type.indexOf('image') === 0) { var b = its[i].getAsFile(); if (b) { e.preventDefault(); e.stopPropagation(); readImage(b, function (u) { runOcr(u, target); }); } return; } } });
+      dz.addEventListener('dragover', function (e) { e.preventDefault(); dz.classList.add('bfc-ocr-over'); });
+      dz.addEventListener('dragleave', function () { dz.classList.remove('bfc-ocr-over'); });
+      dz.addEventListener('drop', function (e) { e.preventDefault(); dz.classList.remove('bfc-ocr-over'); var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) readImage(f, function (u) { runOcr(u, target); }); });
+      try { dz.focus(); } catch (e) {}
+    }
+  }
   function cleanVinText(s) {
     var up = (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
     up = up.replace(/[IOQ]/g, function (c) { return c === 'I' ? '1' : '0'; });
@@ -293,7 +325,7 @@
         if (blob) {
           var ae = document.activeElement;
           var tgt = (ae && ae.getAttribute && ae.getAttribute('data-k') === 'plateNumber') ? 'plate' : ocrTarget;
-          e.preventDefault();
+          e.preventDefault(); e.stopPropagation();
           readImage(blob, function (durl) { runOcr(durl, tgt); });
         }
         return;
@@ -314,6 +346,8 @@
       else if (r === 'pvDismiss') dismissDecode();
       else if (r === 'scanVin') scanVin();
       else if (r === 'scanPlate') scanPlate();
+      else if (r === 'ocrfile') ensureOcrInput().click();
+      else if (r === 'ocrcancel') setPreview('');
     });
     body.addEventListener('input', function (e) {
       if (e.target && e.target.tagName === 'TEXTAREA' && e.target.getAttribute('data-k')) autosize(e.target);
