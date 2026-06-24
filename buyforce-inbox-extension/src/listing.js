@@ -174,7 +174,7 @@
       (d.listingUrl ? '<div class="bfc-src">Source: <span>' + esc(d.listingUrl) + '</span></div>' : '') +
       '<div class="bfc-dist" data-r="dist"></div>' +
       '<div class="bfc-msg" data-r="msg"></div>' +
-      '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
+      '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Push to BuyForce</button></div>';
   }
 
   function bodyEl() { return window.BFSidebar ? window.BFSidebar.body : null; }
@@ -283,8 +283,8 @@
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
         if (resp.duplicate) { msg.className = 'bfc-msg bfc-warn'; msg.innerHTML = 'Saved — but this looks like a <b>duplicate</b> of ' + esc(resp.dupVehicle || 'an existing deal') + '.'; }
-        else { msg.className = 'bfc-msg bfc-ok'; var nC = resp.created || 1; msg.innerHTML = '✓ ' + (nC > 1 ? (nC + ' leads created') : 'Lead created') + (resp.vehicle ? (' — ' + esc(resp.vehicle)) : '') + '.'; }
-        btn.textContent = 'Saved';
+        else { msg.className = 'bfc-msg bfc-ok'; var allAcc = !!(distOptions && distOptions.isAllAccess); var nC = resp.created || 1; var leadTxt = (allAcc && nC > 1) ? (nC + ' leads created') : 'Lead created'; var html = '\u2713 ' + leadTxt + (resp.vehicle ? (' \u2014 ' + esc(resp.vehicle)) : '') + '.'; if (allAcc) { if (resp.createdNames && resp.createdNames.length) html += '<div class="bfc-dist-names">To: ' + esc(resp.createdNames.join(', ')) + '</div>'; if (resp.skipped) html += '<div class="bfc-dist-msg bfc-warn">' + resp.skipped + ' skipped \u2014 already in BuyForce: ' + esc((resp.skippedNames || []).join(', ')) + '</div>'; } msg.innerHTML = html; }
+        btn.textContent = 'Pushed';
       });
     } catch (e) { btn.disabled = false; msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Something went wrong.'; }
   }
