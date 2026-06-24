@@ -241,7 +241,7 @@
     if (r.transmissionType) setv('transmissionType', r.transmissionType);
     if (r.vin) setv('vin', r.vin);
     if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmissionDetails: r.transmissionDetails };
-    markConfirmed((r.__src) || 'vin');
+    markConfirmed('vin'); markConfirmed('plate');
     setPreview('<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>');
   }
   function markConfirmed(field) {
