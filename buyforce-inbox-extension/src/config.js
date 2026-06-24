@@ -33,6 +33,10 @@ globalThis.BF_CONFIG = {
   // A conversation row in the Marketplace "Buying" inbox. Anchor to stable URL/role
   // patterns. These are starting points; tune after inspecting the live DOM.
   selectors: {
-    rowCandidates: 'a[role="link"][href*="/marketplace/t/"], div[role="row"], div[role="gridcell"] a[role="link"]'
+    // Verified on /marketplace/inbox: each conversation is a role=button tabindex=0 div inside <main>
+    // (~one per conversation). Row text reads "Seller · Vehicle · trim · last message".
+    // No href/thread-id in the list, so matching is seller+vehicle fuzzy; the matcher only badges
+    // rows that resolve to a real active deal, so an over-broad selector is harmless.
+    rowCandidates: '[role="main"] div[role="button"][tabindex="0"]'
   }
 };
