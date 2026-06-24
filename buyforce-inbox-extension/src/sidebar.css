@@ -61,4 +61,4 @@
  * remaining width (no need to widen the browser window). Listing pages have no
  * bottom-pinned chat popup, so shrinking the page here is safe. Our panel is a
  * fixed child of <html> and is anchored to the viewport, so it is unaffected. */
-html.bf-sb-pushwide { width: calc(100vw - 348px) !important; min-width: 0 !important; overflow-x: hidden !important; }
+html.bf-sb-pushwide { width: max(1040px, calc(100vw - 348px)) !important; min-width: 0 !important; overflow-x: hidden !important; }
