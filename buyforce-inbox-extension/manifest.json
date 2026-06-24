@@ -3,24 +3,43 @@
   "name": "BuyForce Inbox Overlay",
   "version": "0.1.0",
   "description": "Decorates the Facebook Marketplace Buying inbox with each deal's BuyForce pipeline data (stage, time-in-stage, next action). Read-only.",
-  "permissions": ["storage"],
+  "permissions": [
+    "storage"
+  ],
   "host_permissions": [
     "https://buyforce.app.n8n.cloud/*",
     "https://www.facebook.com/*",
     "https://web.facebook.com/*",
     "https://buyforce.noloco.co/*"
   ],
-  "background": { "service_worker": "src/background.js" },
+  "background": {
+    "service_worker": "src/background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://www.facebook.com/*", "https://web.facebook.com/*"],
-      "js": ["src/config.js", "src/match.js", "src/content.js"],
-      "css": ["src/badges.css"],
+      "matches": [
+        "https://www.facebook.com/*",
+        "https://web.facebook.com/*"
+      ],
+      "js": [
+        "src/config.js",
+        "src/match.js",
+        "src/content.js",
+        "src/listing.js"
+      ],
+      "css": [
+        "src/badges.css",
+        "src/capture.css"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://buyforce.noloco.co/*"],
-      "js": ["src/token-bridge.js"],
+      "matches": [
+        "https://buyforce.noloco.co/*"
+      ],
+      "js": [
+        "src/token-bridge.js"
+      ],
       "run_at": "document_idle"
     }
   ]
