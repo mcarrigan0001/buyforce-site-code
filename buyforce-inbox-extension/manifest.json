@@ -8,6 +8,7 @@
   ],
   "host_permissions": [
     "https://buyforce.app.n8n.cloud/*",
+    "https://vpic.nhtsa.dot.gov/*",
     "https://www.facebook.com/*",
     "https://web.facebook.com/*",
     "https://buyforce.noloco.co/*"

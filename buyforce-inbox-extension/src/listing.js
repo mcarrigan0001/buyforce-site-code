@@ -1,12 +1,13 @@
 /* BuyForce Listing Capture - Facebook Marketplace listing content script.
  * On a /marketplace/item/ page, renders an EDITABLE capture form into the
- * BuyForce sidebar. On Save it creates a Fresh Lead via the listing-create
- * proxy. Assist-only: it never acts on Facebook - it only writes to your
- * BuyForce pipeline, and only when you click Save.
+ * BuyForce sidebar. Includes free NHTSA VIN decode with a confirm-before-apply
+ * preview of Year/Make/Model/Trim. On Save it creates a Fresh Lead via the
+ * listing-create proxy. Assist-only: it never acts on Facebook.
  */
 (function () {
-  var current = null;     // last extracted listing object
-  var lastId = null;      // last item id we rendered
+  var current = null;       // last extracted listing object
+  var lastId = null;        // last item id we rendered
+  var pendingDecode = null; // proposed decode awaiting Apply/Dismiss
 
   function isListing() { return /\/marketplace\/item\/\d+/.test(location.pathname); }
   function itemId() { var m = location.pathname.match(/\/marketplace\/item\/(\d+)/); return m ? m[1] : ''; }
@@ -83,22 +84,18 @@
       vin: vin, plateNumber: '', plateState: '', sellerName: seller,
       color: extC, transmission: trans, description: desc,
       interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, owed: owed,
-      listingUrl: location.href
+      _decode: null, listingUrl: location.href
     };
   }
 
   var US_STATES = ['', 'AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 
-  function field(label, key, val) {
-    return '<label class="bfc-f"><span>' + esc(label) + '</span><input data-k="' + key + '" value="' + esc(val) + '"></label>';
-  }
+  function field(label, key, val) { return '<label class="bfc-f"><span>' + esc(label) + '</span><input data-k="' + key + '" value="' + esc(val) + '"></label>'; }
   function selField(label, key, val) {
     var opts = US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (val || '') ? ' selected' : '') + '>' + (s || '—') + '</option>'; }).join('');
     return '<label class="bfc-f"><span>' + esc(label) + '</span><select data-k="' + key + '">' + opts + '</select></label>';
   }
-  function taField(label, key, val) {
-    return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="3">' + esc(val || '') + '</textarea></label>';
-  }
+  function taField(label, key, val) { return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="3">' + esc(val || '') + '</textarea></label>'; }
   function detailsStrip(d) {
     var bits = [];
     if (d.interiorColor) bits.push('Int: ' + esc(d.interiorColor));
@@ -124,14 +121,62 @@
         field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
         field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
+      '<div class="bfc-tools"><button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button></div>' +
+      '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
       detailsStrip(d) +
       '<div class="bfc-msg" data-r="msg"></div>' +
       '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
   }
 
+  function bodyEl() { return window.BFSidebar ? window.BFSidebar.body : null; }
+
+  function decodeVin() {
+    var body = bodyEl(); if (!body) return;
+    var vinEl = body.querySelector('input[data-k="vin"]');
+    var vin = ((vinEl && vinEl.value) || '').trim().toUpperCase();
+    var prev = body.querySelector('[data-r="preview"]');
+    if (vin.length < 11) { prev.innerHTML = '<div class="bfc-pv-msg bfc-warn">Enter a full VIN (17 chars) to decode.</div>'; return; }
+    prev.innerHTML = '<div class="bfc-pv-msg">Decoding…</div>';
+    try {
+      chrome.runtime.sendMessage({ type: 'BF_VIN_DECODE', vin: vin }, function (resp) {
+        if (chrome.runtime.lastError || !resp) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">Could not reach the decoder.</div>'; return; }
+        if (resp.ok === false) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">' + esc(resp.reason || 'Decode failed.') + '</div>'; return; }
+        showPreview(resp, 'VIN');
+      });
+    } catch (e) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'; }
+  }
+
+  function showPreview(r, sourceLabel) {
+    pendingDecode = r;
+    var body = bodyEl(); if (!body) return;
+    var prev = body.querySelector('[data-r="preview"]');
+    var line = [r.year, r.make, r.model, r.trim].filter(Boolean).join(' ') || '(no fields returned)';
+    var extra = []; if (r.engine) extra.push(r.engine); if (r.fuel) extra.push(r.fuel); if (r.drive) extra.push(r.drive); if (r.body) extra.push(r.body);
+    prev.innerHTML =
+      '<div class="bfc-pv">' +
+        '<div class="bfc-pv-h">' + esc(sourceLabel || 'Decoded') + ' result — confirm</div>' +
+        '<div class="bfc-pv-veh">' + esc(line) + '</div>' +
+        (extra.length ? '<div class="bfc-pv-x">' + esc(extra.join(' · ')) + '</div>' : '') +
+        '<div class="bfc-pv-act"><button class="bfc-pv-apply" data-r="pvApply" type="button">Apply</button>' +
+        '<button class="bfc-pv-no" data-r="pvDismiss" type="button">Dismiss</button></div>' +
+      '</div>';
+  }
+
+  function applyDecode() {
+    var r = pendingDecode; if (!r) return;
+    var body = bodyEl(); if (!body) return;
+    function setv(k, v) { if (v == null || v === '') return; var el = body.querySelector('[data-k="' + k + '"]'); if (el) el.value = v; }
+    setv('year', r.year); setv('make', r.make); setv('model', r.model); setv('trim', r.trim);
+    if (r.vin) setv('vin', r.vin);
+    if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmission: r.transmission, source: r._source || 'VIN' };
+    var prev = body.querySelector('[data-r="preview"]');
+    if (prev) prev.innerHTML = '<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>';
+  }
+  function dismissDecode() { pendingDecode = null; var body = bodyEl(); if (body) { var p = body.querySelector('[data-r="preview"]'); if (p) p.innerHTML = ''; } }
+
   function submit() {
-    var body = window.BFSidebar.body; if (!body) return;
+    var body = bodyEl(); if (!body) return;
     var d = current || {};
     var fields = {};
     [].forEach.call(body.querySelectorAll('input[data-k], select[data-k], textarea[data-k]'), function (i) {
@@ -141,6 +186,7 @@
       interiorColor: d.interiorColor, fuelType: d.fuelType, owners: d.owners,
       titleStatus: d.titleStatus, loanOwed: !!d.owed, listedDaysAgo: d.listedDaysAgo
     };
+    if (d._decode) details.decode = d._decode;
     var msg = body.querySelector('[data-r="msg"]'); var btn = body.querySelector('[data-r="save"]');
     if (!msg || !btn) return;
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
@@ -156,12 +202,25 @@
     } catch (e) { btn.disabled = false; msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Something went wrong.'; }
   }
 
+  function wire() {
+    var body = bodyEl(); if (!body || body.__bfWired) return; body.__bfWired = true;
+    body.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-r]') : null;
+      if (!b || !body.contains(b)) return;
+      var r = b.getAttribute('data-r');
+      if (r === 'save') submit();
+      else if (r === 'decodeVin') decodeVin();
+      else if (r === 'pvApply') applyDecode();
+      else if (r === 'pvDismiss') dismissDecode();
+    });
+  }
+
   function render() {
+    pendingDecode = null;
     current = extract();
     window.BFSidebar.setContext('Listing');
     window.BFSidebar.setHTML(formHTML(current));
-    var save = window.BFSidebar.body.querySelector('[data-r="save"]');
-    if (save) save.addEventListener('click', submit);
+    wire();
   }
 
   function tick() {
