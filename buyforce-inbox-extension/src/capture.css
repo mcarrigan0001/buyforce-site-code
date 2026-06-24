@@ -50,7 +50,7 @@
 .bfc-scan:hover { border-color: #57c822; background: #1b2230; }
 .bfc-row { display: flex; gap: 8px; align-items: flex-end; }
 .bfc-grow { flex: 1 1 auto; min-width: 0; }
-.bfc-state { flex: 0 0 50px; }
+.bfc-state { flex: 0 0 47.5px; }
 .bfc-tool-inline { white-space: nowrap; flex: 0 0 auto; padding-left: 10px; padding-right: 10px; }
 
 /* Captured listing photo (main image) */
