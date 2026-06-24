@@ -283,7 +283,7 @@
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
         if (resp.duplicate) { msg.className = 'bfc-msg bfc-warn'; msg.innerHTML = 'Saved — but this looks like a <b>duplicate</b> of ' + esc(resp.dupVehicle || 'an existing deal') + '.'; }
-        else { msg.className = 'bfc-msg bfc-ok'; msg.innerHTML = '✓ Lead created' + (resp.vehicle ? (' — ' + esc(resp.vehicle)) : '') + '.'; }
+        else { msg.className = 'bfc-msg bfc-ok'; var nC = resp.created || 1; msg.innerHTML = '✓ ' + (nC > 1 ? (nC + ' leads created') : 'Lead created') + (resp.vehicle ? (' — ' + esc(resp.vehicle)) : '') + '.'; }
         btn.textContent = 'Saved';
       });
     } catch (e) { btn.disabled = false; msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Something went wrong.'; }
