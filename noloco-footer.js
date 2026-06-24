@@ -2504,7 +2504,7 @@
   }, 60000);
   var bfTokTries=0;
   function bfGetApiToken(){ try{ return sessionStorage.getItem('bf.apitoken')||localStorage.getItem('bf.apitoken')||''; }catch(e){ return ''; } }
-  function bfPushExtToken(){ try{ var t=bfGetApiToken(); if(t && window.__bfExtTok!==t){ window.__bfExtTok=t; window.postMessage({source:'buyforce-noloco',type:'BF_TOKEN_SYNC',token:String(t)}, window.location.origin); } }catch(e){} }
+  function bfPushExtToken(){ try{ var t=bfGetApiToken(); if(!t) return; var now=Date.now(); if(window.__bfExtTok===t && window.__bfExtTokAt && (now-window.__bfExtTokAt)<4000) return; window.__bfExtTok=t; window.__bfExtTokAt=now; window.postMessage({source:'buyforce-noloco',type:'BF_TOKEN_SYNC',token:String(t)}, window.location.origin); }catch(e){} }
   try{ if(!window.__bfFetchWrapped && window.fetch){ window.__bfFetchWrapped=true; var _bfOrigFetch=window.fetch; window.fetch=function(input, init){ try{ var url=(typeof input==='string')?input:((input&&input.url)||''); if(url.indexOf('buyforce.app.n8n.cloud')!==-1){ var t=bfGetApiToken(); if(t){ init=init||{}; var h=init.headers; if(h && typeof Headers!=='undefined' && h instanceof Headers){ h.set('X-BF-Token', t); } else { h=Object.assign({}, h||{}); h['X-BF-Token']=t; init.headers=h; } } } if(/\/(update-stage|assign-rep|offer-sheet|card-confirm|card-decode|listing-create)/.test(url)||url.indexOf('ee9245fa')!==-1){ try{ localStorage.setItem('bf.lastWriteAt', String(Date.now())); }catch(_w){} } }catch(e){} return _bfOrigFetch.apply(this, arguments); }; } }catch(e){}
   function bfHideTokens(){
     try{
