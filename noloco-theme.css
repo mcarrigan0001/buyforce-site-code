@@ -2136,3 +2136,26 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
   #bff-wrap .bff-funnel-grid .bff-conn{ flex:0 0 5%; }
   #bff-wrap .bff-funnel-grid > div:nth-child(6n){ display:none; }
 }
+
+/* ===== batch J: HUD frame, left-edge widget glow, funnel section ===== */
+#bff-wrap{ background: radial-gradient(52% 26% at 50% -2%, rgba(87,200,34,.26), rgba(87,200,34,0) 72%), #000 !important; position:relative; padding:26px 28px 24px; }
+#bff-wrap > *{ position:relative; z-index:1; }
+/* HUD corner brackets (fade away from each corner) */
+#bff-wrap::before{ content:''; position:absolute; inset:12px; pointer-events:none; z-index:0; background-repeat:no-repeat; background-image:
+  linear-gradient(90deg,#6fbf1a,transparent), linear-gradient(180deg,#6fbf1a,transparent),
+  linear-gradient(270deg,#6fbf1a,transparent), linear-gradient(180deg,#6fbf1a,transparent),
+  linear-gradient(90deg,#6fbf1a,transparent), linear-gradient(0deg,#6fbf1a,transparent),
+  linear-gradient(270deg,#6fbf1a,transparent), linear-gradient(0deg,#6fbf1a,transparent);
+  background-size: 66px 2px,2px 66px, 66px 2px,2px 66px, 66px 2px,2px 66px, 66px 2px,2px 66px;
+  background-position: left top,left top, right top,right top, left bottom,left bottom, right bottom,right bottom; opacity:.6; }
+/* faint dotted tech texture */
+#bff-wrap::after{ content:''; position:absolute; inset:0; pointer-events:none; z-index:0; background-image: radial-gradient(rgba(150,185,45,.15) 1px, transparent 1.6px); background-size:17px 17px; opacity:.5; }
+/* TOP 4 KPI WIDGETS: green glow on the left edge, fading right */
+#bff-wrap .bff-kpi{ background: radial-gradient(135% 120% at 0% 50%, rgba(87,200,34,.19) 0%, rgba(87,200,34,.055) 30%, rgba(16,17,22,0) 60%), #101116; box-shadow: inset 2px 0 18px -7px rgba(87,200,34,.6); border-color:#202b16; }
+/* sectionized funnel ("Pipeline Milestones") */
+.bff-funsec{ border:1px solid #1f2c15; border-radius:16px; padding:14px 18px 14px; margin-top:18px; background: radial-gradient(120% 130% at 0% 0%, rgba(87,200,34,.10), rgba(87,200,34,0) 45%), rgba(10,13,7,.45); box-shadow: inset 2px 0 18px -7px rgba(87,200,34,.5); }
+.bff-sechead{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px; }
+.bff-sectitle{ font-size:14px; font-weight:700; color:#fff; letter-spacing:.2px; }
+#bff-wrap .bff-funsec .bff-tabs-funnel{ margin:0; width:auto; }
+#bff-wrap .bff-funsec .bff-funnel{ margin-top:8px; }
+@media (max-width:640px){ #bff-wrap{ padding-left:8px; padding-right:8px; } #bff-wrap::before{ inset:6px; background-size:42px 2px,2px 42px,42px 2px,2px 42px,42px 2px,2px 42px,42px 2px,2px 42px; } .bff-sechead{ flex-wrap:wrap; row-gap:8px; } }
