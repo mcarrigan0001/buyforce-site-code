@@ -24,6 +24,18 @@
     return f ? String(Math.max(0, Math.round(n * f))) : '';
   }
 
+  function mainPhoto(main) {
+    // Largest real image in the listing = the hero photo. Avatars/thumbnails are small, so a min-dimension filter excludes them.
+    var best = '', bestArea = 0;
+    [].forEach.call((main || document).querySelectorAll('img'), function (im) {
+      var src = im.currentSrc || im.src || ''; if (!/^https?:/.test(src)) return;
+      var w = im.naturalWidth || im.width || 0, h = im.naturalHeight || im.height || 0;
+      if (Math.min(w, h) >= 180 && (w * h) > bestArea) { bestArea = w * h; best = src; }
+    });
+    if (best) return best;
+    var og = document.querySelector('meta[property="og:image"]');
+    return og ? (og.getAttribute('content') || '') : '';
+  }
   function extract() {
     var main = document.querySelector('div[role="main"]') || document.body;
     var h1 = main.querySelector('h1');
@@ -100,7 +112,7 @@
       vin: vin, plateNumber: '', plateState: '', sellerName: seller, sellerProfileId: sellerProfileId,
       color: extC, transmissionType: transmissionType, description: desc,
       interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, paidOff: paidOff, stillOwed: stillOwed,
-      _decode: null, listingUrl: cleanUrl()
+      _decode: null, listingUrl: cleanUrl(), mainPhotoUrl: mainPhoto(main)
     };
   }
 
@@ -129,6 +141,7 @@
     var head = d.title ? '<div class="bf-sb-veh">' + esc(d.title) + '</div>' : '<div class="bf-sb-veh">New listing</div>';
     return head +
       '<div class="bf-sb-sub">Review &amp; save as a Fresh Lead</div>' +
+      (d.mainPhotoUrl ? '<div class="bfc-photo"><img src="' + esc(d.mainPhotoUrl) + '" alt="Listing photo" referrerpolicy="no-referrer"></div>' : '') +
       '<div class="bfc-grid">' +
         field('Year', 'year', d.year) + field('Make', 'make', d.make) +
         field('Model', 'model', d.model) + field('Trim', 'trim', d.trim) +
@@ -244,7 +257,7 @@
     if (!msg || !btn) return;
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
     try {
-      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || cleanUrl() } }, function (resp) {
+      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || cleanUrl(), mainPhotoUrl: d.mainPhotoUrl || '' } }, function (resp) {
         btn.disabled = false;
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
