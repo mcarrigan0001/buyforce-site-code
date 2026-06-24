@@ -138,15 +138,17 @@
         field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
       '<div class="bfc-block">' +
-        '<label class="bfc-f bfc-f-full"><span>VIN<button class="bfc-scan" data-r="scanVin" type="button" title="Scan VIN from a photo">Scan</button></span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
-        '<div class="bfc-tools"><button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button></div>' +
+        '<div class="bfc-row">' +
+          '<label class="bfc-f bfc-grow"><span>VIN<button class="bfc-scan" data-r="scanVin" type="button" title="Scan VIN from a photo">Scan</button></span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
+          '<button class="bfc-tool bfc-tool-inline" data-r="decodeVin" type="button">Decode VIN</button>' +
+        '</div>' +
       '</div>' +
       '<div class="bfc-block">' +
-        '<div class="bfc-grid">' +
-          '<label class="bfc-f"><span>Plate #<button class="bfc-scan" data-r="scanPlate" type="button" title="Scan plate from a photo">Scan</button></span><input data-k="plateNumber" value="' + esc(d.plateNumber) + '"></label>' +
-          selField('Plate state', 'plateState', d.plateState) +
+        '<div class="bfc-row">' +
+          '<label class="bfc-f bfc-grow"><span>Plate #<button class="bfc-scan" data-r="scanPlate" type="button" title="Scan plate from a photo">Scan</button></span><input data-k="plateNumber" value="' + esc(d.plateNumber) + '"></label>' +
+          '<label class="bfc-f bfc-state"><span>State</span><select data-k="plateState">' + US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (d.plateState || '') ? ' selected' : '') + '>' + (s || '\u2014') + '</option>'; }).join('') + '</select></label>' +
+          '<button class="bfc-tool bfc-tool-inline" data-r="findVin" type="button">Plate to VIN</button>' +
         '</div>' +
-        '<div class="bfc-tools"><button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button></div>' +
       '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +

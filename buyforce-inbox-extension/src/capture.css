@@ -48,3 +48,7 @@
 .bfc-f span { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .bfc-scan { background: #161922; color: #9fd86a; border: 1px solid #2f5d1a; border-radius: 6px; padding: 1px 8px; font-size: 9px; font-weight: 700; text-transform: none; letter-spacing: 0; cursor: pointer; line-height: 1.7; }
 .bfc-scan:hover { border-color: #57c822; background: #1b2230; }
+.bfc-row { display: flex; gap: 8px; align-items: flex-end; }
+.bfc-grow { flex: 1 1 auto; min-width: 0; }
+.bfc-state { flex: 0 0 64px; }
+.bfc-tool-inline { white-space: nowrap; flex: 0 0 auto; }
