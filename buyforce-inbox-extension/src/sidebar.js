@@ -1,13 +1,14 @@
 /* BuyForce Sidebar shell - shared collapsible right-edge panel.
  * Loaded before content.js/listing.js. Other scripts render into it via
- * window.BFSidebar. Pure overlay: it ONLY ever touches its own DOM (#bf-sb) -
- * it never moves, restyles, clicks, or reads-to-act-on any Facebook element.
- * Shows only on Marketplace listing + inbox routes. Open/closed state is
- * remembered PER surface; defaults: listing = open, inbox = collapsed (so it
- * never covers a conversation). Assist-only.
+ * window.BFSidebar. The panel lives on <html> (outside <body>). When expanded on
+ * a Marketplace route it adds class "bf-sb-push" to <html>; the CSS shrinks
+ * <body> by the panel width and gives it a transform so Facebook's fixed panes
+ * reflow into the narrower space instead of being covered. Collapsing removes it
+ * instantly. CSS-only, fully reversible - it performs no actions on Facebook.
+ * Open/closed state is remembered PER surface (listing vs inbox).
  */
 (function () {
-  var DEFAULTS = { listing: true, inbox: false };
+  var DEFAULTS = { listing: true, inbox: true };
   var states = null;     // { listing: bool, inbox: bool } - loaded once, cached
   var root, bodyEl, ctxEl, dotEl, built = false, openState = false;
 
@@ -32,7 +33,13 @@
     } catch (e) { states = { listing: DEFAULTS.listing, inbox: DEFAULTS.inbox }; cb(); }
   }
   function persist(kind, v) { try { var o = {}; o['bf_sb_open_' + kind] = !!v; chrome.storage.local.set(o); } catch (e) {} }
-  function paint() { if (root) root.classList.toggle('bf-sb-open', openState); }
+
+  function paint() {
+    if (root) root.classList.toggle('bf-sb-open', openState);
+    var pushing = openState && !!routeKind();
+    try { document.documentElement.classList.toggle('bf-sb-push', pushing); } catch (e) {}
+  }
+  function clearPush() { try { document.documentElement.classList.remove('bf-sb-push'); } catch (e) {} }
 
   function build() {
     if (built) return; built = true;
@@ -67,29 +74,23 @@
     return root;
   }
 
-  // Apply the remembered state for whichever surface we're on (or hide off-route).
   function apply() {
     var kind = routeKind();
-    if (!kind) { if (root) root.style.display = 'none'; return; }
+    if (!kind) { if (root) root.style.display = 'none'; clearPush(); return; }
     ensure(); root.style.display = '';
     loadStates(function () { openState = !!states[kind]; paint(); });
   }
 
   function toggle() {
-    var kind = routeKind(); if (!kind) return;
-    ensure();
-    loadStates(function () {
-      openState = !states[kind]; states[kind] = openState; paint(); persist(kind, openState);
-    });
+    var kind = routeKind(); if (!kind) return; ensure();
+    loadStates(function () { openState = !states[kind]; states[kind] = openState; paint(); persist(kind, openState); });
   }
   function collapse() {
-    var kind = routeKind(); if (!kind) return;
-    ensure();
+    var kind = routeKind(); if (!kind) return; ensure();
     loadStates(function () { openState = false; states[kind] = false; paint(); persist(kind, false); });
   }
   function expand() {
-    var kind = routeKind(); if (!kind) return;
-    ensure();
+    var kind = routeKind(); if (!kind) return; ensure();
     loadStates(function () { openState = true; states[kind] = true; paint(); persist(kind, true); });
   }
 
@@ -112,6 +113,7 @@
       history.replaceState = function () { var r = rep.apply(this, arguments); setTimeout(apply, 50); return r; };
       window.addEventListener('popstate', function () { setTimeout(apply, 50); });
     } catch (e) {}
+    window.addEventListener('beforeunload', clearPush);
     setInterval(apply, 1000);
     apply();
   }
