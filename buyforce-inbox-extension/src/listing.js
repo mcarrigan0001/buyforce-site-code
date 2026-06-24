@@ -187,7 +187,7 @@
       chrome.runtime.sendMessage({ type: 'BF_VIN_DECODE', vin: vin }, function (resp) {
         if (chrome.runtime.lastError || !resp) { setPreview('<div class="bfc-pv-msg bfc-err">Could not reach the decoder.</div>'); return; }
         if (resp.ok === false) { setPreview('<div class="bfc-pv-msg bfc-err">' + esc(resp.reason || 'Decode failed.') + '</div>'); return; }
-        showPreview(resp, 'VIN decode');
+        showPreview(resp, 'VIN decode', 'vin');
       });
     } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
   }
@@ -205,17 +205,18 @@
         setPreview('<div class="bfc-pv-msg">VIN ' + esc(vin) + ' found — decoding…</div>');
         chrome.runtime.sendMessage({ type: 'BF_VIN_DECODE', vin: vin }, function (dec) {
           if (chrome.runtime.lastError || !dec || dec.ok === false) {
-            showPreview({ ok: true, vin: vin, year: resp.year || '', make: resp.make || '', model: resp.model || '', trim: resp.trim || '' }, 'Plate → VIN');
+            showPreview({ ok: true, vin: vin, year: resp.year || '', make: resp.make || '', model: resp.model || '', trim: resp.trim || '' }, 'Plate → VIN', 'plate');
             return;
           }
-          showPreview(dec, 'Plate → VIN');
+          showPreview(dec, 'Plate → VIN', 'plate');
         });
       });
     } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
   }
 
-  function showPreview(r, sourceLabel) {
+  function showPreview(r, sourceLabel, srcField) {
     pendingDecode = r;
+    if (pendingDecode) pendingDecode.__src = srcField || 'vin';
     var line = [r.year, r.make, r.model, r.trim].filter(Boolean).join(' ') || '(no fields returned)';
     var extra = []; if (r.engine) extra.push(r.engine); if (r.fuel) extra.push(r.fuel); if (r.drive) extra.push(r.drive); if (r.body) extra.push(r.body); if (r.transmissionDetails) extra.push(r.transmissionDetails);
     setPreview(
@@ -236,7 +237,17 @@
     if (r.transmissionType) setv('transmissionType', r.transmissionType);
     if (r.vin) setv('vin', r.vin);
     if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmissionDetails: r.transmissionDetails };
+    markConfirmed((r.__src) || 'vin');
     setPreview('<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>');
+  }
+  function markConfirmed(field) {
+    var body = bodyEl(); if (!body) return;
+    var key = (field === 'plate') ? 'plateNumber' : 'vin';
+    var input = body.querySelector('input[data-k="' + key + '"]');
+    var row = input && input.closest('.bfc-row');
+    if (!row || row.querySelector('.bfc-confirm')) return;
+    var c = document.createElement('span'); c.className = 'bfc-confirm'; c.title = 'Vehicle confirmed'; c.textContent = '\u2713';
+    row.insertBefore(c, row.firstChild);
   }
   function dismissDecode() { pendingDecode = null; setPreview(''); }
 

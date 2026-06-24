@@ -50,9 +50,10 @@
 .bfc-scan:hover { border-color: #57c822; background: #1b2230; }
 .bfc-row { display: flex; gap: 8px; align-items: flex-end; }
 .bfc-grow { flex: 1 1 auto; min-width: 0; }
-.bfc-state { flex: 0 0 47.5px; }
+.bfc-state { flex: 0 0 45px; }
 .bfc-tool-inline { white-space: nowrap; flex: 0 0 auto; padding-left: 10px; padding-right: 10px; }
 
 /* Captured listing photo (main image) */
 .bfc-photo { margin: 8px 0 2px; }
 .bfc-photo img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 9px; border: 1px solid #232833; display: block; background: #0d1016; }
+.bfc-confirm { color: #57c822; font-weight: 800; font-size: 15px; line-height: 1; flex: 0 0 auto; align-self: flex-end; margin-bottom: 8px; }
