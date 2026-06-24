@@ -130,6 +130,20 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg && msg.type === 'BF_OCR' && msg.image) {
     (async () => {
+      // VIN: try server-side Azure OCR first (much better on photos), fall back to on-device Tesseract.
+      if (msg.hint === 'vin') {
+        try {
+          const token = await bfGetToken();
+          if (token) {
+            const res = await fetch('https://buyforce.app.n8n.cloud/webhook/vin-ocr', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-bf-token': token }, body: JSON.stringify({ image: msg.image }) });
+            if (res.ok) {
+              const data = await res.json().catch(function () { return null; });
+              if (data && data.ok !== false && data.text) { sendResponse({ ok: true, text: data.text }); return; }
+            }
+          }
+        } catch (e) {}
+      }
+      // Fallback (and plates): on-device Tesseract via offscreen.
       try {
         await bfEnsureOffscreen();
         chrome.runtime.sendMessage({ type: 'BF_OCR_RUN', image: msg.image, hint: msg.hint || '' }, function (resp) {
