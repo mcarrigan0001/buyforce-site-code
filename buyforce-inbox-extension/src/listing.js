@@ -1,16 +1,17 @@
 /* BuyForce Listing Capture - Facebook Marketplace listing content script.
- * On a /marketplace/item/ page, renders an EDITABLE capture form into the
- * BuyForce sidebar. Includes free NHTSA VIN decode with a confirm-before-apply
+ * Renders an EDITABLE capture form into the BuyForce sidebar. Free NHTSA VIN
+ * decode and (paid) plate->VIN lookup both surface a confirm-before-apply
  * preview of Year/Make/Model/Trim. On Save it creates a Fresh Lead via the
  * listing-create proxy. Assist-only: it never acts on Facebook.
  */
 (function () {
-  var current = null;       // last extracted listing object
-  var lastId = null;        // last item id we rendered
-  var pendingDecode = null; // proposed decode awaiting Apply/Dismiss
+  var current = null;
+  var lastId = null;
+  var pendingDecode = null;
 
   function isListing() { return /\/marketplace\/item\/\d+/.test(location.pathname); }
   function itemId() { var m = location.pathname.match(/\/marketplace\/item\/(\d+)/); return m ? m[1] : ''; }
+  function cleanUrl() { var id = itemId(); return id ? (location.origin + '/marketplace/item/' + id) : (location.origin + location.pathname).replace(/\/$/, ''); }
   function t(el) { return el ? (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim() : ''; }
   function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function tc(s) { if (!s) return ''; if (/^[A-Z0-9]{2,4}$/.test(s)) return s; return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
@@ -56,13 +57,13 @@
     var titleSt = (x.match(/\b(Clean title|Salvage title|Rebuilt title)\b/i) || [, ''])[1];
     var owed = /Money is still owed on this vehicle/i.test(x);
 
-    var seller = '';
+    var seller = '', sellerProfileId = '';
     var hdrs = [].slice.call(main.querySelectorAll('span, h2, h3'));
     for (var i = 0; i < hdrs.length; i++) {
       if (/^seller information$/i.test(t(hdrs[i]))) {
         var blk = hdrs[i].closest('div'), a = null, hops = 0;
         while (blk && hops++ < 4 && !a) { a = blk.querySelector('a[href*="/marketplace/profile/"]'); blk = blk.parentElement; }
-        if (a) seller = t(a);
+        if (a) { seller = t(a); var pm = (a.getAttribute('href') || '').match(/\/marketplace\/profile\/([^/?]+)/); if (pm) sellerProfileId = pm[1]; }
         break;
       }
     }
@@ -81,10 +82,10 @@
     return {
       title: title, year: yr, make: mk, model: md, trim: tr,
       price: price, mileage: mileage, location: loc, listedAgo: listedAgo, listedDaysAgo: listedDaysAgo,
-      vin: vin, plateNumber: '', plateState: '', sellerName: seller,
+      vin: vin, plateNumber: '', plateState: '', sellerName: seller, sellerProfileId: sellerProfileId,
       color: extC, transmission: trans, description: desc,
       interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, owed: owed,
-      _decode: null, listingUrl: location.href
+      _decode: null, listingUrl: cleanUrl()
     };
   }
 
@@ -95,7 +96,7 @@
     var opts = US_STATES.map(function (s) { return '<option value="' + s + '"' + (s === (val || '') ? ' selected' : '') + '>' + (s || '—') + '</option>'; }).join('');
     return '<label class="bfc-f"><span>' + esc(label) + '</span><select data-k="' + key + '">' + opts + '</select></label>';
   }
-  function taField(label, key, val) { return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="3">' + esc(val || '') + '</textarea></label>'; }
+  function taField(label, key, val) { return '<label class="bfc-f bfc-f-full"><span>' + esc(label) + '</span><textarea data-k="' + key + '" rows="2">' + esc(val || '') + '</textarea></label>'; }
   function detailsStrip(d) {
     var bits = [];
     if (d.interiorColor) bits.push('Int: ' + esc(d.interiorColor));
@@ -121,46 +122,69 @@
         field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
         field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
-      '<div class="bfc-tools"><button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button></div>' +
+      '<div class="bfc-tools">' +
+        '<button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button>' +
+        '<button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button>' +
+      '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
       detailsStrip(d) +
+      (d.listingUrl ? '<div class="bfc-src">Source: <span>' + esc(d.listingUrl) + '</span></div>' : '') +
       '<div class="bfc-msg" data-r="msg"></div>' +
       '<div class="bfc-act"><button class="bfc-save" data-r="save" type="button">Save lead</button></div>';
   }
 
   function bodyEl() { return window.BFSidebar ? window.BFSidebar.body : null; }
+  function val(key) { var body = bodyEl(); if (!body) return ''; var el = body.querySelector('[data-k="' + key + '"]'); return el ? (el.value || '').trim() : ''; }
+  function setPreview(html) { var body = bodyEl(); if (!body) return; var p = body.querySelector('[data-r="preview"]'); if (p) p.innerHTML = html; }
 
   function decodeVin() {
-    var body = bodyEl(); if (!body) return;
-    var vinEl = body.querySelector('input[data-k="vin"]');
-    var vin = ((vinEl && vinEl.value) || '').trim().toUpperCase();
-    var prev = body.querySelector('[data-r="preview"]');
-    if (vin.length < 11) { prev.innerHTML = '<div class="bfc-pv-msg bfc-warn">Enter a full VIN (17 chars) to decode.</div>'; return; }
-    prev.innerHTML = '<div class="bfc-pv-msg">Decoding…</div>';
+    var vin = val('vin').toUpperCase();
+    if (vin.length < 11) { setPreview('<div class="bfc-pv-msg bfc-warn">Enter a full VIN (17 chars) to decode.</div>'); return; }
+    setPreview('<div class="bfc-pv-msg">Decoding…</div>');
     try {
       chrome.runtime.sendMessage({ type: 'BF_VIN_DECODE', vin: vin }, function (resp) {
-        if (chrome.runtime.lastError || !resp) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">Could not reach the decoder.</div>'; return; }
-        if (resp.ok === false) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">' + esc(resp.reason || 'Decode failed.') + '</div>'; return; }
-        showPreview(resp, 'VIN');
+        if (chrome.runtime.lastError || !resp) { setPreview('<div class="bfc-pv-msg bfc-err">Could not reach the decoder.</div>'); return; }
+        if (resp.ok === false) { setPreview('<div class="bfc-pv-msg bfc-err">' + esc(resp.reason || 'Decode failed.') + '</div>'); return; }
+        showPreview(resp, 'VIN decode');
       });
-    } catch (e) { prev.innerHTML = '<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'; }
+    } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
+  }
+
+  function findVin() {
+    var plate = val('plateNumber'), state = val('plateState');
+    if (!plate || !state) { setPreview('<div class="bfc-pv-msg bfc-warn">Enter a plate number and state first.</div>'); return; }
+    setPreview('<div class="bfc-pv-msg">Looking up VIN (uses a paid lookup)…</div>');
+    try {
+      chrome.runtime.sendMessage({ type: 'BF_PLATE_TO_VIN', plate: plate, state: state }, function (resp) {
+        if (chrome.runtime.lastError || !resp) { setPreview('<div class="bfc-pv-msg bfc-err">Could not reach the lookup.</div>'); return; }
+        if (resp.ok === false) { setPreview('<div class="bfc-pv-msg bfc-err">' + esc(resp.reason || 'No VIN found for that plate.') + '</div>'); return; }
+        var vin = (resp.vin || '').toUpperCase();
+        var body = bodyEl(); var vinEl = body && body.querySelector('input[data-k="vin"]'); if (vinEl) vinEl.value = vin;
+        setPreview('<div class="bfc-pv-msg">VIN ' + esc(vin) + ' found — decoding…</div>');
+        chrome.runtime.sendMessage({ type: 'BF_VIN_DECODE', vin: vin }, function (dec) {
+          if (chrome.runtime.lastError || !dec || dec.ok === false) {
+            showPreview({ ok: true, vin: vin, year: resp.year || '', make: resp.make || '', model: resp.model || '', trim: resp.trim || '' }, 'Plate → VIN');
+            return;
+          }
+          showPreview(dec, 'Plate → VIN');
+        });
+      });
+    } catch (e) { setPreview('<div class="bfc-pv-msg bfc-err">Something went wrong.</div>'); }
   }
 
   function showPreview(r, sourceLabel) {
     pendingDecode = r;
-    var body = bodyEl(); if (!body) return;
-    var prev = body.querySelector('[data-r="preview"]');
     var line = [r.year, r.make, r.model, r.trim].filter(Boolean).join(' ') || '(no fields returned)';
     var extra = []; if (r.engine) extra.push(r.engine); if (r.fuel) extra.push(r.fuel); if (r.drive) extra.push(r.drive); if (r.body) extra.push(r.body);
-    prev.innerHTML =
+    setPreview(
       '<div class="bfc-pv">' +
-        '<div class="bfc-pv-h">' + esc(sourceLabel || 'Decoded') + ' result — confirm</div>' +
+        '<div class="bfc-pv-h">' + esc(sourceLabel || 'Decoded') + ' — confirm</div>' +
         '<div class="bfc-pv-veh">' + esc(line) + '</div>' +
         (extra.length ? '<div class="bfc-pv-x">' + esc(extra.join(' · ')) + '</div>' : '') +
         '<div class="bfc-pv-act"><button class="bfc-pv-apply" data-r="pvApply" type="button">Apply</button>' +
         '<button class="bfc-pv-no" data-r="pvDismiss" type="button">Dismiss</button></div>' +
-      '</div>';
+      '</div>');
   }
 
   function applyDecode() {
@@ -169,11 +193,10 @@
     function setv(k, v) { if (v == null || v === '') return; var el = body.querySelector('[data-k="' + k + '"]'); if (el) el.value = v; }
     setv('year', r.year); setv('make', r.make); setv('model', r.model); setv('trim', r.trim);
     if (r.vin) setv('vin', r.vin);
-    if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmission: r.transmission, source: r._source || 'VIN' };
-    var prev = body.querySelector('[data-r="preview"]');
-    if (prev) prev.innerHTML = '<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>';
+    if (current) current._decode = { engine: r.engine, fuel: r.fuel, drive: r.drive, body: r.body, cylinders: r.cylinders, displacement: r.displacement, transmission: r.transmission };
+    setPreview('<div class="bfc-pv-msg bfc-ok">✓ Applied to Year/Make/Model/Trim. Review and Save.</div>');
   }
-  function dismissDecode() { pendingDecode = null; var body = bodyEl(); if (body) { var p = body.querySelector('[data-r="preview"]'); if (p) p.innerHTML = ''; } }
+  function dismissDecode() { pendingDecode = null; setPreview(''); }
 
   function submit() {
     var body = bodyEl(); if (!body) return;
@@ -182,6 +205,7 @@
     [].forEach.call(body.querySelectorAll('input[data-k], select[data-k], textarea[data-k]'), function (i) {
       var v = (i.value || '').trim(); if (v) fields[i.getAttribute('data-k')] = v;
     });
+    if (d.sellerProfileId) fields.sellerProfileId = d.sellerProfileId;
     var details = {
       interiorColor: d.interiorColor, fuelType: d.fuelType, owners: d.owners,
       titleStatus: d.titleStatus, loanOwed: !!d.owed, listedDaysAgo: d.listedDaysAgo
@@ -191,7 +215,7 @@
     if (!msg || !btn) return;
     btn.disabled = true; msg.className = 'bfc-msg'; msg.textContent = 'Saving…';
     try {
-      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || location.href } }, function (resp) {
+      chrome.runtime.sendMessage({ type: 'BF_CREATE_LISTING', payload: { fields: fields, details: details, listingUrl: d.listingUrl || cleanUrl() } }, function (resp) {
         btn.disabled = false;
         if (chrome.runtime.lastError || !resp) { msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Could not reach BuyForce. Open the app to sync your login, then retry.'; return; }
         if (resp.ok === false) { msg.className = 'bfc-msg bfc-err'; msg.textContent = resp.reason || 'Could not create the lead.'; return; }
@@ -202,6 +226,9 @@
     } catch (e) { btn.disabled = false; msg.className = 'bfc-msg bfc-err'; msg.textContent = 'Something went wrong.'; }
   }
 
+  function autosize(ta) { if (!ta) return; ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 2) + 'px'; }
+  function autosizeAll() { var body = bodyEl(); if (!body) return; [].forEach.call(body.querySelectorAll('textarea[data-k]'), autosize); }
+
   function wire() {
     var body = bodyEl(); if (!body || body.__bfWired) return; body.__bfWired = true;
     body.addEventListener('click', function (e) {
@@ -210,8 +237,12 @@
       var r = b.getAttribute('data-r');
       if (r === 'save') submit();
       else if (r === 'decodeVin') decodeVin();
+      else if (r === 'findVin') findVin();
       else if (r === 'pvApply') applyDecode();
       else if (r === 'pvDismiss') dismissDecode();
+    });
+    body.addEventListener('input', function (e) {
+      if (e.target && e.target.tagName === 'TEXTAREA' && e.target.getAttribute('data-k')) autosize(e.target);
     });
   }
 
@@ -221,6 +252,7 @@
     window.BFSidebar.setContext('Listing');
     window.BFSidebar.setHTML(formHTML(current));
     wire();
+    setTimeout(autosizeAll, 0);
   }
 
   function tick() {

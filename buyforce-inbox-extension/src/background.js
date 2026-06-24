@@ -97,6 +97,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     (async () => { sendResponse(await bfDecodeVin(msg.vin)); })();
     return true;
   }
+  if (msg && msg.type === 'BF_PLATE_TO_VIN' && msg.plate && msg.state) {
+    (async () => {
+      const token = await bfGetToken();
+      if (!token) { sendResponse({ ok: false, reason: 'no_token' }); return; }
+      try {
+        const res = await fetch('https://buyforce.app.n8n.cloud/webhook/plate-vin-lookup', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-bf-token': token }, body: JSON.stringify({ plate: String(msg.plate), state: String(msg.state) }) });
+        const data = await res.json().catch(function () { return { ok: false, reason: 'bad_response' }; });
+        sendResponse(data);
+      } catch (e) { sendResponse({ ok: false, reason: 'network' }); }
+    })();
+    return true;
+  }
   if (msg && msg.type === 'BF_REFRESH') {
     (async () => { sendResponse(await bfRefresh()); })();
     return true;

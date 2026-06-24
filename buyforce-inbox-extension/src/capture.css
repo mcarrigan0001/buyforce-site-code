@@ -30,3 +30,6 @@
 .bfc-pv-no { background: transparent; color: #9aa0a6; border: 1px solid #2a2f3a; border-radius: 7px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
 .bfc-pv-no:hover { color: #e8e8ea; }
 .bfc-pv-msg { margin-top: 9px; font-size: 12px; color: #9aa0a6; }
+
+.bfc-src { margin-top: 10px; font-size: 10.5px; color: #6d717a; word-break: break-all; }
+.bfc-src span { color: #8a8f98; }
