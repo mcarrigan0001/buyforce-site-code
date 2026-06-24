@@ -2159,3 +2159,31 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 #bff-wrap .bff-funsec .bff-tabs-funnel{ margin:0; width:auto; }
 #bff-wrap .bff-funsec .bff-funnel{ margin-top:8px; }
 @media (max-width:640px){ #bff-wrap{ padding-left:8px; padding-right:8px; } #bff-wrap::before{ inset:6px; background-size:42px 2px,2px 42px,42px 2px,2px 42px,42px 2px,2px 42px,42px 2px,2px 42px; } .bff-sechead{ flex-wrap:wrap; row-gap:8px; } }
+
+/* ===== batch K: premium SaaS restyle — neutral charcoal + green accent light only ===== */
+/* page: mostly black, faint ambient glow behind the title; remove green HUD brackets */
+#bff-wrap{ background: radial-gradient(circle at 50% 0%, rgba(86,255,35,.08), transparent 45%), #0a0b0e !important; }
+#bff-wrap::before{ display:none !important; }
+#bff-wrap::after{ opacity:.14 !important; }
+/* neutral charcoal surfaces for all cards/panels (no green tint, no green border) */
+#bff-wrap .bff-kpi,
+#bff-wrap .bff-actpanel,
+#bff-wrap .bff-perfpanel,
+#bff-wrap .bff-reportpanel{
+  background: linear-gradient(180deg,#161922 0%,#11141B 100%) !important;
+  border:1px solid #1c2029 !important;
+  box-shadow: 0 8px 24px -16px rgba(0,0,0,.85) !important;
+}
+/* KPI cards: dark charcoal illuminated by green light entering from the LEFT edge */
+#bff-wrap .bff-kpi{ position:relative; }
+#bff-wrap .bff-kpi::after{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0;
+  background: radial-gradient(circle at left center, rgba(86,255,35,.18) 0%, rgba(86,255,35,.08) 20%, rgba(86,255,35,.03) 35%, transparent 60%); }
+#bff-wrap .bff-kpi-body{ position:relative; z-index:1; }
+/* funnel section: same charcoal language, subtle border + shadow, no green glow */
+.bff-funsec{ background: linear-gradient(180deg,#161922 0%,#11141B 100%) !important; border:1px solid #1c2029 !important; box-shadow: 0 8px 28px -18px rgba(0,0,0,.85) !important; }
+/* tables: charcoal surface + subtle alternating rows */
+.bff-listcard{ background:#11141B !important; border-color:#1c2029 !important; }
+.bff-tbl th{ background:#11141B !important; }
+.bff-tbl tbody tr{ background:#11141B; }
+.bff-tbl tbody tr:nth-child(even){ background:#141922; }
+.bff-tbl tbody tr:hover{ background:#1b212b !important; }
