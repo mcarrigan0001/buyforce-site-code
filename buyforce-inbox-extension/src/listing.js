@@ -288,10 +288,18 @@
     }
   }
   function cleanVinText(s) {
-    var up = (s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    up = up.replace(/[IOQ]/g, function (c) { return c === 'I' ? '1' : '0'; });
-    var m = up.match(/[A-HJ-NPR-Z0-9]{17}/);
-    return m ? m[0] : up;
+    var raw = (s || '').toUpperCase();
+    // OCR confusables are illegal in a real VIN (no I/O/Q), so mapping them is safe.
+    function fix(t) { return t.replace(/[^A-Z0-9]/g, '').replace(/[IOQ]/g, function (c) { return c === 'I' ? '1' : '0'; }); }
+    function find17(t) { var m = fix(t).match(/[A-HJ-NPR-Z0-9]{17}/); return m ? m[0] : ''; }
+    // 1) Label-aware: prefer the string right after a "VIN" label (window stickers/door jambs).
+    var lab = raw.match(/VIN\s*[:#.\-]?\s*([A-Z0-9][A-Z0-9 \-]{15,40})/);
+    if (lab) { var v = find17(lab[1]); if (v) return v; }
+    // 2) Otherwise scan each token (a real VIN prints as one 17-char block).
+    var toks = raw.split(/[^A-Z0-9]+/).filter(Boolean).sort(function (a, b) { return b.length - a.length; });
+    for (var i = 0; i < toks.length; i++) { var v2 = find17(toks[i]); if (v2) return v2; }
+    // 3) Last resort: collapse everything and grab the first 17 valid chars.
+    var v3 = find17(raw); return v3 || fix(raw);
   }
   function cleanPlateText(s) {
     var toks = (s || '').toUpperCase().replace(/[^A-Z0-9\s-]/g, ' ').split(/\s+/).filter(Boolean);
