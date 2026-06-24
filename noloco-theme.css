@@ -2111,3 +2111,25 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
   #bff-wrap .bff-kpi-div{ min-height:34px; }
   #bff-wrap .bff-kpi-body{ gap:9px; }
 }
+
+/* ===== batch I: title border, tabs above funnel, left-align toggles, all-stages grid ===== */
+/* COMMAND CENTER: 1.5px black border with green glow behind */
+#bff-wrap .bff-title{ -webkit-text-stroke:1.5px #000; paint-order:stroke; }
+#bff-wrap .bff-title.bff-glow{ text-shadow:0 0 9px rgba(87,200,34,.78),0 0 18px rgba(87,200,34,.5); }
+/* desktop: KPIs/Reports left, master filters right */
+#bff-wrap .bff-rt{ justify-content:space-between; }
+/* Filter button aligned left in the record table header */
+.bff-lc-h .bff-filter-lc{ order:-1; margin-left:0; margin-right:10px; }
+/* Milestones / All stages centered above the funnel */
+#bff-wrap .bff-tabs-funnel{ display:flex; justify-content:center; width:max-content; margin:20px auto 0; }
+#bff-wrap .bff-funnel{ margin-top:8px; }
+/* all-stages view: 3 stages per row, no OTHER */
+#bff-wrap .bff-funnel-grid{ flex-wrap:wrap; overflow-x:visible; row-gap:14px; justify-content:flex-start; }
+#bff-wrap .bff-funnel-grid .bff-stage{ flex:0 0 30%; min-width:0; }
+#bff-wrap .bff-funnel-grid .bff-conn{ flex:0 0 5%; min-width:0; }
+#bff-wrap .bff-funnel-grid > div:nth-child(6n){ display:none; }
+/* mobile: tighter side padding + centered controls */
+@media (max-width:640px){
+  #bff-wrap{ padding-left:5px; padding-right:5px; }
+  #bff-wrap .bff-rt{ justify-content:center; }
+}
