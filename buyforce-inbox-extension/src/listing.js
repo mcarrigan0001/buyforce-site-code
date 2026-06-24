@@ -56,7 +56,8 @@
     var fuel = (x.match(/Fuel type:\s*([A-Za-z]+)/i) || [, ''])[1];
     var owners = (x.match(/(\d+)\s+owners?\b/i) || [, ''])[1];
     var titleSt = (x.match(/\b(Clean title|Salvage title|Rebuilt title)\b/i) || [, ''])[1];
-    var owed = /Money is still owed on this vehicle/i.test(x);
+    var paidOff = /This vehicle is paid off/i.test(x);
+    var stillOwed = /Money is still owed on this vehicle/i.test(x);
 
     var seller = '', sellerProfileId = '';
     var hdrs = [].slice.call(main.querySelectorAll('span, h2, h3'));
@@ -85,7 +86,7 @@
       price: price, mileage: mileage, location: loc, listedAgo: listedAgo, listedDaysAgo: listedDaysAgo,
       vin: vin, plateNumber: '', plateState: '', sellerName: seller, sellerProfileId: sellerProfileId,
       color: extC, transmissionType: transmissionType, description: desc,
-      interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, owed: owed,
+      interiorColor: intC, fuelType: fuel, owners: owners, titleStatus: titleSt, paidOff: paidOff, stillOwed: stillOwed,
       _decode: null, listingUrl: cleanUrl()
     };
   }
@@ -106,9 +107,9 @@
     if (d.fuelType) bits.push(esc(d.fuelType));
     if (d.owners) bits.push(esc(d.owners) + '-owner');
     if (d.titleStatus) bits.push(esc(d.titleStatus));
-    var owed = d.owed ? '<span class="bfc-flag">⚠ Loan still owed — payoff likely</span>' : '';
-    if (!bits.length && !owed) return '';
-    return '<div class="bfc-meta">' + bits.join(' · ') + (bits.length && owed ? '<br>' : '') + owed + '</div>';
+    var flag = d.paidOff ? '<span class="bfc-flag" style="color:#9fd86a">✓ Paid off — no payoff owed</span>' : (d.stillOwed ? '<span class="bfc-flag">⚠ Loan still owed — payoff likely</span>' : '');
+    if (!bits.length && !flag) return '';
+    return '<div class="bfc-meta">' + bits.join(' · ') + (bits.length && flag ? '<br>' : '') + flag + '</div>';
   }
 
   function formHTML(d) {
@@ -212,7 +213,7 @@
     if (d.sellerProfileId) fields.sellerProfileId = d.sellerProfileId;
     var details = {
       interiorColor: d.interiorColor, fuelType: d.fuelType, owners: d.owners,
-      titleStatus: d.titleStatus, loanOwed: !!d.owed, listedDaysAgo: d.listedDaysAgo
+      titleStatus: d.titleStatus, paidOff: !!d.paidOff, stillOwed: !!d.stillOwed, listedDaysAgo: d.listedDaysAgo
     };
     if (d._decode) details.decode = d._decode;
     var msg = body.querySelector('[data-r="msg"]'); var btn = body.querySelector('[data-r="save"]');
