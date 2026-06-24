@@ -40,8 +40,10 @@
     var price = priceM ? '$' + priceM[1] : '';
     var milesM = x.match(/Driven\s+([\d,]{2,})\s*miles/i) || x.match(/([\d,]{3,})\s*miles/i);
     var mileage = milesM ? milesM[1].replace(/,/g, '') : '';
-    var locM = x.match(/Listed[\s\S]{0,40}?\bin\s+([A-Z][A-Za-z.'’\- ]+,\s*[A-Z]{2})\b/) ||
-               x.match(/\b([A-Z][A-Za-z.'’\- ]+,\s*[A-Z]{2})\b/);
+    var CITY = "[A-Z][a-zA-Z.'’\\-]*(?:[ '’\\-][A-Z][a-zA-Z.'’\\-]*){0,3}";
+    var locM = x.match(new RegExp("Listed[^\\n]{0,40}?\\bin\\s+(" + CITY + ",\\s*[A-Z]{2})\\b")) ||
+               x.match(new RegExp("(" + CITY + ",\\s*[A-Z]{2})\\s*\u00B7\\s*Location is approximate", 'i')) ||
+               x.match(new RegExp("\\b(" + CITY + ",\\s*[A-Z]{2})\\b"));
     var loc = locM ? locM[1].trim() : '';
     var laM = x.match(/Listed\s+(.+?)\s+ago/i);
     var listedAgo = laM ? (laM[1].trim() + ' ago') : '';
@@ -274,7 +276,7 @@
   function openOcrPanel(target) {
     ocrTarget = target;
     setPreview('<div class="bfc-ocr"><div class="bfc-ocr-h">Scan ' + (target === 'plate' ? 'plate' : 'VIN') + '</div>' +
-      '<div class="bfc-ocr-drop" data-r="ocrdrop" tabindex="0">Paste a screenshot (Ctrl+V) or drag an image here</div>' +
+      '<div class="bfc-ocr-drop" data-r="ocrdrop" contenteditable="true" data-ph="Paste a screenshot (Ctrl+V) or drag an image here"></div>' +
       '<div class="bfc-ocr-act"><button class="bfc-tool" data-r="ocrfile" type="button">Choose file\u2026</button>' +
       '<button class="bfc-pv-no" data-r="ocrcancel" type="button">Cancel</button></div></div>');
     var body = bodyEl(); var dz = body && body.querySelector('[data-r="ocrdrop"]');

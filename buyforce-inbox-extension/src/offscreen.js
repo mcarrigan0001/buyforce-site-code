@@ -11,6 +11,7 @@
       workerPath: chrome.runtime.getURL('vendor/worker.min.js'),
       corePath: chrome.runtime.getURL('vendor/'),
       langPath: chrome.runtime.getURL('vendor/'),
+      workerBlobURL: false,
       gzip: true
     }).then(function (w) { worker = w; return w; });
     return initing;
