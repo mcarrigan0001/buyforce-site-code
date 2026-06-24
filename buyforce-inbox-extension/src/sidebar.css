@@ -51,3 +51,14 @@
 .bf-sb-flag { display: block; margin-top: 8px; color: #f1c152; font-weight: 700; font-size: 12px; }
 .bf-sb-link { display: inline-block; margin-top: 12px; color: #9fd86a; font-size: 12.5px; font-weight: 600; text-decoration: none; }
 .bf-sb-link:hover { text-decoration: underline; }
+
+/* AUTO toggle pill in the header */
+.bf-sb-auto { font-size: 9.5px; font-weight: 800; letter-spacing: .6px; padding: 3px 7px; border-radius: 999px; cursor: pointer; color: #7a7c84; border: 1px solid #2a2f3a; user-select: none; }
+.bf-sb-auto.on { color: #06210a; background: #57c822; border-color: #57c822; }
+.bf-sb-auto:hover { border-color: #57c822; }
+
+/* LISTING: reserve the panel's strip so Facebook reflows the listing into the
+ * remaining width (no need to widen the browser window). Listing pages have no
+ * bottom-pinned chat popup, so shrinking the page here is safe. Our panel is a
+ * fixed child of <html> and is anchored to the viewport, so it is unaffected. */
+html.bf-sb-pushwide { width: calc(100vw - 348px) !important; min-width: 0 !important; overflow-x: hidden !important; }
