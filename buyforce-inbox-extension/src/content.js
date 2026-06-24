@@ -1,12 +1,14 @@
 /* BuyForce Inbox Overlay - Facebook content script.
- * Reads the cached pipeline index from the background worker, badges matching
- * conversation rows, and renders the open conversation's deal into the BuyForce
- * sidebar. Read-only: it never clicks, sends, or alters Facebook.
+ * On the Marketplace INBOX, fetches the pipeline index ONCE per visit (no
+ * periodic polling), badges matching conversation rows, and renders the open
+ * conversation's deal into the BuyForce sidebar. To refresh the data, reload
+ * the inbox. Read-only: it never clicks, sends, or alters Facebook.
  */
 (function () {
   var CFG = globalThis.BF_CONFIG;
   var idx = null;
-  var linked = {};   // uuids we've already stamped a thread id onto (avoid repeat writes)
+  var linked = {};
+  var fetchedSig = null;   // 'inbox' once we've fetched for the current inbox visit
 
   function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function daysSince(iso) { if (!iso) return null; var t = new Date(iso).getTime(); if (isNaN(t)) return null; return Math.floor((Date.now() - t) / 86400000); }
@@ -131,12 +133,20 @@
     } catch (e) { cb(null); }
   }
 
-  function boot() {
+  // Fetch ONCE per inbox visit. Reset when we leave the inbox so returning re-fetches.
+  function maybeFetch() {
+    if (!inboxRoute()) { fetchedSig = null; return; }
+    if (fetchedSig === 'inbox') return;
+    fetchedSig = 'inbox';
     getIndex(setIndex);
+  }
+
+  function boot() {
+    maybeFetch();
     var mo = new MutationObserver(function () { schedule(); });
     mo.observe(document.body, { childList: true, subtree: true });
-    setInterval(function () { getIndex(function (r) { if (r) setIndex(r); }); }, CFG.refreshMs || 300000);
-    setInterval(renderInbox, 1200);
+    setInterval(maybeFetch, 1500);   // fetch on entering the inbox; NO periodic refresh
+    setInterval(renderInbox, 1500);  // local render only (uses cached index)
   }
 
   if (document.body) boot(); else document.addEventListener('DOMContentLoaded', boot);

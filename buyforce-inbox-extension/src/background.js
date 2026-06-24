@@ -4,7 +4,7 @@
  * Facebook content script. The Noloco API key never touches the extension.
  */
 const N8N_ENDPOINT = 'https://buyforce.app.n8n.cloud/webhook/bf-inbox-index';
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = 60 * 1000;       // short dedupe window only; content script fetches once per inbox visit
 
 async function bfGetToken() {
   const { bfToken } = await chrome.storage.local.get('bfToken');
