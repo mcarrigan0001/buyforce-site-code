@@ -80,7 +80,9 @@
       }
     }
     if (!seller) { var sm = x.match(/Seller information\s*(?:Seller details)?\s*([A-Z][a-z’'\-]+(?:\s+[A-Z][a-z’'\-]+){1,2})/); if (sm) seller = sm[1]; }
-    seller = (seller || '').replace(/\s*\bSeller details\b\s*/i, '').trim();
+    seller = (seller || '').replace(/\s*\bSeller details\b\s*/i, '');
+    seller = seller.split(/\s*(?:Joined Facebook|Joined|Active now|Active|Typically replies|Lives in|·|\|)/i)[0];
+    seller = seller.replace(/\s+/g, ' ').trim();
 
     var desc = (x.match(/Seller.?s description\s*([\s\S]*?)(?:\s*See (?:less|more)|Location is approximate|Seller information|$)/i) || [, ''])[1].trim();
     if (desc.length > 2000) desc = desc.slice(0, 2000);
@@ -136,20 +138,15 @@
         field('Seller', 'sellerName', d.sellerName) +
       '</div>' +
       '<div class="bfc-block">' +
-        '<label class="bfc-f bfc-f-full"><span>VIN</span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
-        '<div class="bfc-tools">' +
-          '<button class="bfc-tool" data-r="scanVin" type="button">Scan VIN</button>' +
-          '<button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button>' +
-        '</div>' +
+        '<label class="bfc-f bfc-f-full"><span>VIN<button class="bfc-scan" data-r="scanVin" type="button" title="Scan VIN from a photo">Scan</button></span><input data-k="vin" value="' + esc(d.vin) + '"></label>' +
+        '<div class="bfc-tools"><button class="bfc-tool" data-r="decodeVin" type="button">Decode VIN</button></div>' +
       '</div>' +
       '<div class="bfc-block">' +
         '<div class="bfc-grid">' +
-          field('Plate #', 'plateNumber', d.plateNumber) + selField('Plate state', 'plateState', d.plateState) +
+          '<label class="bfc-f"><span>Plate #<button class="bfc-scan" data-r="scanPlate" type="button" title="Scan plate from a photo">Scan</button></span><input data-k="plateNumber" value="' + esc(d.plateNumber) + '"></label>' +
+          selField('Plate state', 'plateState', d.plateState) +
         '</div>' +
-        '<div class="bfc-tools">' +
-          '<button class="bfc-tool" data-r="scanPlate" type="button">Scan plate</button>' +
-          '<button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button>' +
-        '</div>' +
+        '<div class="bfc-tools"><button class="bfc-tool" data-r="findVin" type="button">Find VIN from plate</button></div>' +
       '</div>' +
       '<div class="bfc-preview" data-r="preview"></div>' +
       taField('Description', 'description', d.description) +
