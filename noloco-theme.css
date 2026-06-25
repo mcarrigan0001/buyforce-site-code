@@ -2434,3 +2434,20 @@ html:has(#bff-wrap), body:has(#bff-wrap){
     0 30px 62px -22px rgba(0,0,0,.9),
     inset 0 1px 0 rgba(255,255,255,.05) !important;
 }
+
+/* ============================================================================
+   v3 restyle batch 16 — side navigation: near-black + narrower
+   (overrides the legacy white "top bar" rule now that nav is a sidebar)
+   ============================================================================ */
+[data-testid="navigation-sidebar"]{
+  background: linear-gradient(180deg,#0c0d0f 0%,#08090A 100%) !important;
+  border-right: 1px solid rgba(255,255,255,.06) !important;
+  border-bottom: 0 !important;
+  max-width: 208px !important;   /* narrows the expanded rail; collapse still goes smaller */
+}
+/* legible light text + icons on the dark sidebar */
+[data-testid="navigation-sidebar"] a,
+[data-testid="navigation-sidebar"] p,
+[data-testid="navigation-sidebar"] li,
+[data-testid="navigation-sidebar"] button{ color:#cfd2d6 !important; }
+[data-testid="navigation-sidebar"] svg{ color:#cfd2d6 !important; }
