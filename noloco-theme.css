@@ -2295,3 +2295,7 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 /* wrapper + the Noloco containers wrapping it go transparent so the page graphite shows through seamlessly */
 body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; background-image:none !important; }
 #bff-wrap{ background-color:transparent !important; background-image:none !important; }
+
+/* v3 restyle batch 9: kill the inner frame/seam around the dashboard */
+#bff-wrap{ border:0 !important; border-radius:0 !important; box-shadow:none !important; }
+#bff-wrap::after{ display:none !important; }   /* drop edge vignette that drew the visible frame */
