@@ -2250,3 +2250,10 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-tbl tbody tr:nth-child(even){ background:#15171c !important; }
 .bff-tbl tbody tr:hover{ background:rgba(255,255,255,.05) !important; }
 .bff-tbl tbody tr:hover td{ background:transparent !important; }
+
+/* v3 restyle batch 6: dropdowns escape widgets + paint on top; narrower Vehicle column */
+#bff-wrap .bff-kpi{ overflow:visible !important; }
+#bff-wrap, #bff-wrap .bff-kpis, #bff-wrap .bff-extras, #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel, #bff-wrap .bff-funsec, #bff-wrap .bff-kpi-body, #bff-wrap .bff-kpi-main{ overflow:visible !important; }
+.bff-dd.open{ z-index:2000 !important; }
+.bff-ddm{ z-index:2000 !important; }
+.bff-tbl th:first-child, .bff-tbl td:first-child{ width:165px !important; max-width:165px !important; }
