@@ -2299,3 +2299,10 @@ body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; backgro
 /* v3 restyle batch 9: kill the inner frame/seam around the dashboard */
 #bff-wrap{ border:0 !important; border-radius:0 !important; box-shadow:none !important; }
 #bff-wrap::after{ display:none !important; }   /* drop edge vignette that drew the visible frame */
+
+/* v3 restyle batch 10: center single-value KPI cards (icon+text as one centered group);
+   center the %change under the divider in the Acquired/Pace card only */
+#bff-wrap .bff-kpi:not(:has(.bff-kpi-acqrow)) .bff-kpi-body{ justify-content:center !important; }
+#bff-wrap .bff-kpi:not(:has(.bff-kpi-acqrow)) .bff-kpi-main{ align-items:center !important; text-align:center !important; }
+#bff-wrap .bff-kpi:has(.bff-kpi-acqrow) .bff-kpi-main{ align-items:center !important; }
+#bff-wrap .bff-kpi:has(.bff-kpi-acqrow) .bff-kpi-sub{ width:100% !important; text-align:center !important; }
