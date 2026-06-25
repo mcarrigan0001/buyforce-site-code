@@ -2575,3 +2575,16 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 [data-testid="navigation-sidebar"] li,
 [data-testid="navigation-sidebar"] button{ color:#eef0f2 !important; }
 [data-testid="navigation-sidebar"] svg{ color:#eef0f2 !important; }
+
+/* batch 25: background switched to user-provided image URL */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.16) 100%),
+    url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3d87156507a796017df674.png") !important;
+  background-size: 100% 100%, cover !important;
+  background-position: center, center top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal !important;
+  background-color: #25272B !important;
+}
