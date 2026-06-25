@@ -2282,3 +2282,16 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-listcard{ position:relative; z-index:10; }
 .bff-dd.open{ z-index:3000 !important; }
 .bff-ddm{ z-index:3000 !important; }
+
+/* v3 restyle batch 8: extend graphite to the whole page, not just the wrapper */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-color:#303338 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.020) .5px, transparent .5px),
+    linear-gradient(180deg,#45484D 0%,#3F4247 18%,#393C41 40%,#34373C 68%,#303338 100%) !important;
+  background-size:5px 5px, cover !important;
+  background-attachment:fixed, fixed !important;
+}
+/* wrapper + the Noloco containers wrapping it go transparent so the page graphite shows through seamlessly */
+body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; background-image:none !important; }
+#bff-wrap{ background-color:transparent !important; background-image:none !important; }
