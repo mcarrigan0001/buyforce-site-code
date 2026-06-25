@@ -2501,3 +2501,26 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-attachment: fixed, fixed, fixed, fixed, fixed !important;
   background-blend-mode: overlay, screen, normal, normal, normal !important;
 }
+
+/* ============================================================================
+   v3 restyle batch 21 — PAGE BACKGROUND ENVIRONMENT (per spec). Widgets untouched.
+   Layers (top->bottom): subtle grain, center spotlight, green bloom #1 (header),
+   green bloom #2 (KPI row), edge vignette x3, black depth, graphite base.
+   ============================================================================ */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-color:#3E4146 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.2) .5px, transparent .5px),
+    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,.055), transparent 72%),
+    radial-gradient(ellipse at 35% -5%, rgba(115,255,57,.055), transparent 68%),
+    radial-gradient(ellipse 130% 75% at 50% 9%, rgba(115,255,57,.03), transparent 72%),
+    radial-gradient(circle at left center, rgba(0,0,0,.18), transparent 60%),
+    radial-gradient(circle at right center, rgba(0,0,0,.18), transparent 60%),
+    radial-gradient(circle at center bottom, rgba(0,0,0,.12), transparent 70%),
+    linear-gradient(180deg, rgba(0,0,0,.03), rgba(0,0,0,.12)),
+    linear-gradient(180deg, #4B4E53 0%, #45484D 25%, #3E4146 50%, #383B40 75%, #32353A 100%) !important;
+  background-size: 5px 5px, cover, cover, cover, cover, cover, cover, cover, cover !important;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
+  background-attachment: fixed !important;
+  background-blend-mode: overlay, normal, normal, normal, normal, normal, normal, normal, normal !important;
+}
