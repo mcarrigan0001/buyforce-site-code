@@ -2343,3 +2343,6 @@ body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; backgro
 #bff-wrap .bff-tpmet{ padding-left:4px !important; }
 #bff-wrap .bff-tpval{ font-size:20px !important; line-height:1 !important; }
 #bff-wrap .bff-tplbl{ font-size:10px !important; white-space:nowrap !important; }
+
+/* v3 restyle batch 13: record table matches the width of the sections above (inset by the wrapper's 24px side padding) */
+#bff-wrap + .bff-listcard{ margin-left:24px !important; margin-right:24px !important; }
