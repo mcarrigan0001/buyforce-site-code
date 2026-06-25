@@ -2443,7 +2443,6 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background: linear-gradient(180deg,#0c0d0f 0%,#08090A 100%) !important;
   border-right: 1px solid rgba(255,255,255,.06) !important;
   border-bottom: 0 !important;
-  max-width: 208px !important;   /* narrows the expanded rail; collapse still goes smaller */
 }
 /* legible light text + icons on the dark sidebar */
 [data-testid="navigation-sidebar"] a,
@@ -2451,3 +2450,11 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 [data-testid="navigation-sidebar"] li,
 [data-testid="navigation-sidebar"] button{ color:#cfd2d6 !important; }
 [data-testid="navigation-sidebar"] svg{ color:#cfd2d6 !important; }
+
+/* ============================================================================
+   v3 restyle batch 17 — sidebar fixes
+   - removed the max-width force (it was overriding Noloco's collapsed 80px width,
+     so toggle only hid text instead of collapsing) -> collapse works natively now
+   - darken the bottom user bar + any inner nav-background to match the rail
+   ============================================================================ */
+[data-testid="navigation-sidebar"] [class*="bg-project-nav-background"]{ background-color:#08090A !important; }
