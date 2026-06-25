@@ -2257,3 +2257,28 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-dd.open{ z-index:2000 !important; }
 .bff-ddm{ z-index:2000 !important; }
 .bff-tbl th:first-child, .bff-tbl td:first-child{ width:165px !important; max-width:165px !important; }
+
+/* v3 restyle batch 7: graphite page background + dropdown stacking over widgets */
+/* PAGE BACKGROUND (wrapper only; widgets/cards untouched) */
+#bff-wrap{ position:relative !important; isolation:isolate;
+  background-color:#303338 !important;
+  background-image:
+    radial-gradient(rgba(255,255,255,.020) .5px, transparent .5px),
+    linear-gradient(180deg,#45484D 0%,#3F4247 18%,#393C41 40%,#34373C 68%,#303338 100%) !important;
+  background-size:5px 5px, cover !important; }
+#bff-wrap::before{ content:"" !important; position:absolute !important; inset:0 !important; pointer-events:none !important; z-index:-1 !important;
+  background:radial-gradient(ellipse 55% 34% at 50% 0%, rgba(115,255,57,.060) 0%, rgba(115,255,57,.030) 22%, rgba(115,255,57,.010) 42%, transparent 70%) !important; }
+#bff-wrap::after{ content:"" !important; position:absolute !important; inset:0 !important; pointer-events:none !important; z-index:-1 !important;
+  background:
+    radial-gradient(ellipse 95% 70% at 50% -18%, rgba(255,255,255,.055), transparent 68%),
+    radial-gradient(circle at left center, rgba(0,0,0,.18), transparent 58%),
+    radial-gradient(circle at right center, rgba(0,0,0,.18), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,.02) 0%, rgba(0,0,0,.02) 28%, rgba(0,0,0,.05) 55%, rgba(0,0,0,.11) 78%, rgba(0,0,0,.18) 100%) !important; }
+/* DROPDOWN STACKING: upper rows paint above lower rows */
+#bff-wrap .bff-head{ position:relative; z-index:50; }
+#bff-wrap .bff-kpis{ position:relative; z-index:40; }
+#bff-wrap .bff-extras{ position:relative; z-index:30; }
+#bff-wrap .bff-funsec{ position:relative; z-index:20; }
+.bff-listcard{ position:relative; z-index:10; }
+.bff-dd.open{ z-index:3000 !important; }
+.bff-ddm{ z-index:3000 !important; }
