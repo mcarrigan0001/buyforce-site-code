@@ -2566,3 +2566,12 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-blend-mode: normal !important;
   background-color: #25272B !important;
 }
+
+/* batch 24: sidebar 30% narrower (each state targeted by its own width class so collapse still works) + near-white text/icons */
+[data-testid="navigation-sidebar"].max-w-64{ max-width:179px !important; }              /* expanded 256 -> ~179 */
+[data-testid="navigation-sidebar"].max-w-20{ max-width:56px !important; min-width:56px !important; }  /* collapsed 80 -> 56 */
+[data-testid="navigation-sidebar"] a,
+[data-testid="navigation-sidebar"] p,
+[data-testid="navigation-sidebar"] li,
+[data-testid="navigation-sidebar"] button{ color:#eef0f2 !important; }
+[data-testid="navigation-sidebar"] svg{ color:#eef0f2 !important; }
