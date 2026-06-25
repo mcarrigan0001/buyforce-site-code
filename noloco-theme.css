@@ -2394,3 +2394,43 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 
 /* batch 14 fix: re-enable #bff-wrap::after (was display:none from batch 9) so the ambient glow shows */
 #bff-wrap::after{ display:block !important; }
+
+/* ============================================================================
+   v3 restyle batch 15 — premium environment + container depth
+   (the GOOD intent of the pasted "premium restyle", mapped to the REAL bff-
+   classes; near-black surfaces per the mock; in-widget filters untouched;
+   no global filter/outline/button-reskin that would regress the page)
+   ============================================================================ */
+
+/* Richer layered page environment: green bloom + top highlight + soft vignette + texture + graphite */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse 56% 30% at 50% -6%, rgba(115,255,57,.05), transparent 60%),
+    radial-gradient(ellipse 92% 60% at 50% -16%, rgba(255,255,255,.05), transparent 70%),
+    radial-gradient(130% 102% at 50% 32%, transparent 55%, rgba(0,0,0,.22) 100%),
+    radial-gradient(rgba(255,255,255,.020) .5px, transparent .5px),
+    linear-gradient(180deg,#474A4F 0%,#414449 18%,#3A3D42 40%,#35383D 66%,#2F3236 100%) !important;
+  background-size: cover, cover, cover, 5px 5px, cover !important;
+  background-attachment: fixed, fixed, fixed, fixed, fixed !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat !important;
+}
+
+/* Premium section containers: near-black with a faint top sheen + layered contact+ambient shadow + inner highlight */
+#bff-wrap .bff-funsec, #bff-wrap + .bff-listcard,
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.022), rgba(255,255,255,0) 84px),
+    linear-gradient(180deg,#0c0d0f 0%,#08090A 100%) !important;
+  border:1px solid rgba(255,255,255,.06) !important;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.28),
+    0 22px 48px -24px rgba(0,0,0,.85),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+/* hover lifts deeper than rest (keeps the green border from batch 12) */
+#bff-wrap .bff-actpanel:hover, #bff-wrap .bff-perfpanel:hover, #bff-wrap .bff-reportpanel:hover{
+  box-shadow:
+    0 3px 7px rgba(0,0,0,.30),
+    0 30px 62px -22px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
