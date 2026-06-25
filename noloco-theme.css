@@ -2549,3 +2549,20 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 /* Activity rows: keep within the panel; label ellipsizes */
 #bff-wrap .bff-actrow{ overflow:hidden !important; }
 #bff-wrap .bff-actl{ overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; min-width:0 !important; }
+
+/* ============================================================================
+   v3 restyle batch 23 — use the graphite/green background IMAGE (per recommended)
+   image + subtle vignette overlay; scoped to the command-center page only.
+   Replaces the CSS-layered environment (batch 21) with the hosted image.
+   ============================================================================ */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.18) 100%),
+    url("https://mcarrigan0001.github.io/buyforce-site-code/images/command-bg.webp") !important;
+  background-size: 100% 100%, cover !important;
+  background-position: center, center top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal !important;
+  background-color: #25272B !important;
+}
