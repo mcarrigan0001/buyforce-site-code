@@ -2236,3 +2236,8 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 .bff-tpmet{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
 .bff-tpval{ font-size:20px; font-weight:800; color:#fff; }
 .bff-tplbl{ font-size:11px; color:#6E747C; text-transform:uppercase; letter-spacing:.08em; }
+
+/* v3 restyle batch 4: black panel surfaces */
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ background:#08090A !important; border:1px solid rgba(255,255,255,.06) !important; }
+#bff-wrap .bff-funsec{ background:#08090A !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow:none !important; }
+#bff-wrap .bff-funsec::before, #bff-wrap .bff-funsec::after{ display:none !important; }
