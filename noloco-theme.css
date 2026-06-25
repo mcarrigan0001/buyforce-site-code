@@ -2206,3 +2206,12 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 /* milestone numbers white (v2.5 text) */
 #bff-wrap .bff-n{ color:#fff !important; }
 #bff-wrap .bff-n.zero{ color:#54565c !important; }
+
+/* v3 restyle batch 2 */
+#bff-wrap .bff-kpi::after{ display:none !important; }
+#bff-wrap .bff-actrow{ display:grid !important; grid-template-columns:90px 52px 24px 1fr !important; align-items:center !important; gap:10px !important; }
+#bff-wrap .bff-actrow .bff-actl{ text-align:left !important; font-size:12.5px !important; color:#cfd2d6 !important; }
+#bff-wrap .bff-actrow .bff-delta{ margin-left:0 !important; font-size:11px !important; font-weight:700 !important; white-space:nowrap !important; }
+#bff-wrap .bff-actrow .bff-actn{ min-width:0 !important; text-align:right !important; color:#fff !important; font-size:14px !important; font-weight:700 !important; }
+#bff-wrap .bff-actbar{ display:block !important; height:8px !important; border-radius:999px !important; overflow:hidden !important; background:#17191D !important; border:1px solid rgba(255,255,255,.03) !important; }
+#bff-wrap .bff-actfill{ display:block !important; height:100% !important; border-radius:999px !important; background:linear-gradient(90deg,#5ACF2B,#73FF39) !important; box-shadow:0 0 14px rgba(115,255,57,.3) !important; }
