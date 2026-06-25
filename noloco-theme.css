@@ -2594,7 +2594,7 @@ html:has(#bff-wrap), body:has(#bff-wrap){
    Top Performers fill, record-table top spacing matched to section gaps
    ============================================================================ */
 /* remove the "Jump to" search bar in the sidebar */
-[data-testid="navigation-sidebar"] > .items-center.justify-center.px-3.space-x-2{ display:none !important; }
+[data-testid="navigation-sidebar"] > .items-center.justify-center.px-3{ display:none !important; }
 /* scope line: white, with the deal count in green */
 #bff-wrap .bff-scope{ color:#ffffff !important; }
 #bff-wrap .bff-scope-n{ color:#73FF39 !important; font-weight:700 !important; }
