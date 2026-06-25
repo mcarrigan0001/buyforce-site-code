@@ -2346,3 +2346,48 @@ body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; backgro
 
 /* v3 restyle batch 13: record table matches the width of the sections above (inset by the wrapper's 24px side padding) */
 #bff-wrap + .bff-listcard{ margin-left:24px !important; margin-right:24px !important; }
+
+/* ============================================================================
+   v3 restyle batch 14 — MOCK-MATCH PASS (page + dashboard)
+   Approved items: A1-A6, B1-B3/B5, F1-F5, G1-G4, H, I, J, K.
+   (KPI cards untouched per E=no; navbar C + sidebar D handled separately.)
+   ============================================================================ */
+
+/* A3 — soft viewport vignette layered into the page graphite (no inner seam) */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-image:
+    radial-gradient(135% 105% at 50% 30%, transparent 56%, rgba(0,0,0,.22) 100%),
+    radial-gradient(rgba(255,255,255,.020) .5px, transparent .5px),
+    linear-gradient(180deg,#45484D 0%,#3F4247 18%,#393C41 40%,#34373C 68%,#303338 100%) !important;
+  background-size: cover, 5px 5px, cover !important;
+  background-attachment: fixed, fixed, fixed !important;
+}
+
+/* A5/A6/B5/K3 — breathing room + less dead space above the KPIs (horizontal padding kept at 24px so the table stays aligned) */
+#bff-wrap{ padding-top:16px !important; padding-bottom:28px !important; }
+#bff-wrap .bff-head{ margin-bottom:14px !important; }
+#bff-wrap .bff-kpis{ margin-top:2px !important; }
+
+/* B1 — larger hero title; H1 — heavier */
+#bff-wrap .bff-title{ font-size:46px !important; font-weight:800 !important; }
+/* B2 — green underline accent under the title */
+#bff-wrap .bff-titlerow{ position:relative; }
+#bff-wrap .bff-titlerow::after{ content:""; display:block; margin-top:9px; width:78px; height:3px; border-radius:3px;
+  background:linear-gradient(90deg,#73FF39,rgba(115,255,57,.12)); box-shadow:0 0 10px rgba(115,255,57,.55); }
+/* B3 — subtitle spacing */
+#bff-wrap .bff-scope{ margin-top:7px !important; }
+
+/* F + G3/G4 + I3 + J1/J2/J3/J5 — premium section containers (funnel + record table + the 3 panels):
+   neutral graphite (no blue), soft border, realistic soft shadow, inner top highlight, consistent radius */
+#bff-wrap .bff-funsec, #bff-wrap + .bff-listcard,
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{
+  background: linear-gradient(180deg,#0c0d0f 0%,#08090A 100%) !important;
+  border:1px solid rgba(255,255,255,.07) !important;
+  box-shadow: 0 16px 38px -22px rgba(0,0,0,.82), inset 0 1px 0 rgba(255,255,255,.045) !important;
+}
+#bff-wrap .bff-funsec, #bff-wrap + .bff-listcard{ border-radius:18px !important; }
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ border-radius:16px !important; }
+
+/* G1/G2 — ambient green lighting softly behind the top of the dashboard (page-level, subtle) */
+#bff-wrap::after{ content:""; position:absolute; left:0; right:0; top:0; height:240px; pointer-events:none; z-index:-1;
+  background: radial-gradient(60% 100% at 50% -10%, rgba(115,255,57,.05), transparent 70%) !important; }
