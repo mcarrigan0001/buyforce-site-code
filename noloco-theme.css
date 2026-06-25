@@ -2524,3 +2524,28 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-attachment: fixed !important;
   background-blend-mode: overlay, normal, normal, normal, normal, normal, normal, normal, normal !important;
 }
+
+/* ============================================================================
+   v3 restyle batch 22 — responsive containment: nothing escapes its widget
+   (corner filter dropdowns live outside these content boxes, so they still escape)
+   ============================================================================ */
+/* flex/grid children must be allowed to shrink */
+#bff-wrap .bff-kpi, #bff-wrap .bff-kpi-main, #bff-wrap .bff-extras > *,
+#bff-wrap .bff-actrow, #bff-wrap .bff-tpitem, #bff-wrap .bff-tpinfo{ min-width:0 !important; }
+
+/* funnels scroll inside their panels instead of spilling out the right edge */
+#bff-wrap .bff-funnel, #bff-wrap .bff-rfn{ overflow-x:auto !important; max-width:100% !important; }
+
+/* KPI: content scales down to fit narrow cards (keeps big sizes on wide screens) + body clips as a safety net */
+#bff-wrap .bff-kpi-body{ overflow:hidden !important; min-width:0 !important; gap:clamp(8px,1.3vw,18px) !important; }
+#bff-wrap .bff-kpi-ic{ width:clamp(34px,3vw,46px) !important; height:clamp(34px,3vw,46px) !important; flex:none !important; }
+#bff-wrap .bff-kpi-tf .bff-kpi-v{ font-size:clamp(26px,3.4vw,44px) !important; }
+#bff-wrap .bff-kpi-acqrow .bff-kpi-v{ font-size:clamp(18px,2.2vw,25px) !important; }
+#bff-wrap .bff-kpi-acqrow{ gap:clamp(6px,1vw,14px) !important; min-width:0 !important; }
+
+/* Top Performers: long name/role clip with ellipsis instead of overlapping the number */
+#bff-wrap .bff-tpname, #bff-wrap .bff-tprole{ white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; min-width:0 !important; }
+
+/* Activity rows: keep within the panel; label ellipsizes */
+#bff-wrap .bff-actrow{ overflow:hidden !important; }
+#bff-wrap .bff-actl{ overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; min-width:0 !important; }
