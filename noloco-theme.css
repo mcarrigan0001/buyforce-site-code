@@ -2391,3 +2391,6 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 /* G1/G2 — ambient green lighting softly behind the top of the dashboard (page-level, subtle) */
 #bff-wrap::after{ content:""; position:absolute; left:0; right:0; top:0; height:240px; pointer-events:none; z-index:-1;
   background: radial-gradient(60% 100% at 50% -10%, rgba(115,255,57,.05), transparent 70%) !important; }
+
+/* batch 14 fix: re-enable #bff-wrap::after (was display:none from batch 9) so the ambient glow shows */
+#bff-wrap::after{ display:block !important; }
