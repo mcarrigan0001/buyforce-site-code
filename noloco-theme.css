@@ -2241,3 +2241,12 @@ html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
 #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ background:#08090A !important; border:1px solid rgba(255,255,255,.06) !important; }
 #bff-wrap .bff-funsec{ background:#08090A !important; border:1px solid rgba(255,255,255,.06) !important; box-shadow:none !important; }
 #bff-wrap .bff-funsec::before, #bff-wrap .bff-funsec::after{ display:none !important; }
+
+/* v3 restyle batch 5: KPI rep dropdown opens right (was clipped) + black table w/ alternating rows */
+#bff-wrap .bff-kpi-rep .bff-ddm{ left:0 !important; right:auto !important; }
+.bff-listcard{ background:#08090A !important; border-color:rgba(255,255,255,.06) !important; }
+.bff-tbl th{ background:#08090A !important; }
+.bff-tbl tbody tr{ background:transparent !important; }
+.bff-tbl tbody tr:nth-child(even){ background:#15171c !important; }
+.bff-tbl tbody tr:hover{ background:rgba(255,255,255,.05) !important; }
+.bff-tbl tbody tr:hover td{ background:transparent !important; }
