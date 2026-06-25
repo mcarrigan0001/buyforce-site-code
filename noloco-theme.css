@@ -2459,3 +2459,20 @@ html:has(#bff-wrap), body:has(#bff-wrap){
    - darken the bottom user bar + any inner nav-background to match the rail
    ============================================================================ */
 [data-testid="navigation-sidebar"] [class*="bg-project-nav-background"]{ background-color:#08090A !important; }
+
+/* ============================================================================
+   v3 restyle batch 18 — page background re-tuned to the mock
+   lighter + more uniform medium graphite, gentle vignette (was too dark),
+   keep green bloom + top highlight. Near-black sections now contrast like the mock.
+   ============================================================================ */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse 56% 30% at 50% -5%, rgba(115,255,57,.06), transparent 60%),
+    radial-gradient(ellipse 92% 55% at 50% -18%, rgba(255,255,255,.05), transparent 72%),
+    radial-gradient(150% 120% at 50% 42%, transparent 74%, rgba(0,0,0,.10) 100%),
+    radial-gradient(rgba(255,255,255,.018) .5px, transparent .5px),
+    linear-gradient(180deg, #45484E 0%, #3F4247 30%, #3A3D42 62%, #35383D 100%) !important;
+  background-size: cover, cover, cover, 5px 5px, cover !important;
+  background-attachment: fixed, fixed, fixed, fixed, fixed !important;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat !important;
+}
