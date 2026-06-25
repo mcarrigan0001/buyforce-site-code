@@ -2321,3 +2321,25 @@ body:has(#bff-wrap) *:has(#bff-wrap){ background:transparent !important; backgro
 #bff-wrap .bff-tpav img{ width:100% !important; height:100% !important; object-fit:cover !important; border-radius:inherit !important; display:block !important; }
 /* widen the command-center content ~20% (uses the existing overflow:visible) */
 #bf-pipe-host{ width:120% !important; max-width:none !important; margin-left:-10% !important; }
+
+/* v3 restyle batch 12 */
+/* widget hover: slight lift + light green border (KPI cards + 3 panels; NOT funnel or record table) */
+#bff-wrap .bff-kpi, #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel{ transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease !important; }
+#bff-wrap .bff-kpi:hover, #bff-wrap .bff-actpanel:hover, #bff-wrap .bff-perfpanel:hover, #bff-wrap .bff-reportpanel:hover{ transform:translateY(-3px) !important; border-color:rgba(115,255,57,.35) !important; box-shadow:0 10px 24px rgba(0,0,0,.4) !important; }
+/* light green border on all filter icon buttons */
+#bff-wrap .bff-ddb, #bff-wrap .bff-filter{ border-color:rgba(115,255,57,.35) !important; }
+/* report selector: clean light green rounded border; kill the square overhanging focus ring */
+#bff-wrap *:has(> .bff-reptf:focus){ box-shadow:none !important; border-color:transparent !important; }
+#bff-wrap .bff-reptf, #bff-wrap .bff-reptf:focus, #bff-wrap .bff-reptf:hover{ border:1px solid rgba(115,255,57,.45) !important; border-radius:8px !important; outline:none !important; box-shadow:none !important; }
+/* scope line: +2px size, heavier */
+#bff-wrap .bff-scope{ font-size:13px !important; font-weight:600 !important; }
+/* Top Performers cards: fit all text, no overlap */
+#bff-wrap .bff-perfpanel{ width:290px !important; }
+#bff-wrap .bff-tpitem{ grid-template-columns:24px 44px 1fr auto !important; gap:10px !important; padding:11px 12px !important; }
+#bff-wrap .bff-tpav{ width:44px !important; height:44px !important; }
+#bff-wrap .bff-tprank{ font-size:16px !important; }
+#bff-wrap .bff-tpname{ font-size:13px !important; }
+#bff-wrap .bff-tprole{ white-space:nowrap !important; }
+#bff-wrap .bff-tpmet{ padding-left:4px !important; }
+#bff-wrap .bff-tpval{ font-size:20px !important; line-height:1 !important; }
+#bff-wrap .bff-tplbl{ font-size:10px !important; white-space:nowrap !important; }
