@@ -2610,3 +2610,9 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 
 /* batch 27: anchor background image to top-left (keep green corner visible when narrow) */
 html:has(#bff-wrap), body:has(#bff-wrap){ background-position: center, left top !important; }
+
+/* batch 28: Top Performers — names wrap to 2 lines, no role/close, "Units" centered under the count, left group nudged left */
+#bff-wrap .bff-tpitem{ padding-left:6px !important; }
+#bff-wrap .bff-tpname{ white-space:normal !important; display:-webkit-box !important; -webkit-line-clamp:2 !important; -webkit-box-orient:vertical !important; overflow:hidden !important; line-height:1.2 !important; }
+#bff-wrap .bff-tpmet{ align-items:center !important; }
+#bff-wrap .bff-tplbl{ text-align:center !important; text-transform:none !important; }
