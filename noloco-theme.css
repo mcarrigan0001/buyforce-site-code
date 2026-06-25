@@ -2476,3 +2476,8 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-attachment: fixed, fixed, fixed, fixed, fixed !important;
   background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat !important;
 }
+
+/* batch 19: balance the Pipeline Milestones bottom spacing with its top (~15px) */
+#bff-wrap .bff-funsec{ padding-bottom:2px !important; }
+#bff-wrap .bff-funnel{ padding-bottom:0 !important; }
+#bff-wrap .bff-caret{ margin-top:0 !important; height:13px !important; font-size:12px !important; }
