@@ -2481,3 +2481,23 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 #bff-wrap .bff-funsec{ padding-bottom:2px !important; }
 #bff-wrap .bff-funnel{ padding-bottom:0 !important; }
 #bff-wrap .bff-caret{ margin-top:0 !important; height:13px !important; font-size:12px !important; }
+
+/* ============================================================================
+   v3 restyle batch 20 — mock-grade page environment
+   real film-grain noise (SVG fractal noise, overlay-blended into the graphite)
+   + a stronger, concentrated green bloom from the top. This is the "texture"
+   + "green glow" that gives the mock its premium frosted-graphite look.
+   ============================================================================ */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-color:#3A3D42 !important;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='0.45' intercept='0.28'/%3E%3CfeFuncG type='linear' slope='0.45' intercept='0.28'/%3E%3CfeFuncB type='linear' slope='0.45' intercept='0.28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 44% 30% at 46% -8%, rgba(115,255,57,.20), rgba(115,255,57,.06) 34%, transparent 62%),
+    radial-gradient(ellipse 92% 55% at 50% -18%, rgba(255,255,255,.05), transparent 72%),
+    radial-gradient(150% 120% at 50% 42%, transparent 74%, rgba(0,0,0,.10) 100%),
+    linear-gradient(180deg, #45484E 0%, #3F4247 30%, #3A3D42 62%, #35383D 100%) !important;
+  background-size: 220px 220px, cover, cover, cover, cover !important;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed, fixed, fixed, fixed !important;
+  background-blend-mode: overlay, screen, normal, normal, normal !important;
+}
