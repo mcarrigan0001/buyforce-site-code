@@ -2588,3 +2588,22 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-blend-mode: normal !important;
   background-color: #25272B !important;
 }
+
+/* ============================================================================
+   batch 26 — sidebar search removed, scope colors, toggle to bottom,
+   Top Performers fill, record-table top spacing matched to section gaps
+   ============================================================================ */
+/* remove the "Jump to" search bar in the sidebar */
+[data-testid="navigation-sidebar"] > .items-center.justify-center.px-3.space-x-2{ display:none !important; }
+/* scope line: white, with the deal count in green */
+#bff-wrap .bff-scope{ color:#ffffff !important; }
+#bff-wrap .bff-scope-n{ color:#73FF39 !important; font-weight:700 !important; }
+/* move the collapse toggle arrow near the bottom of the sidebar */
+[data-testid="navigation-sidebar"] .right-0.h-8.w-4{ top:auto !important; bottom:92px !important; }
+/* Top Performers: 3 cards grow to fill the panel with even spacing */
+#bff-wrap .bff-perfpanel{ display:flex !important; flex-direction:column !important; }
+#bff-wrap .bff-tplist{ flex:1 1 auto !important; display:flex !important; flex-direction:column !important; gap:12px !important; }
+#bff-wrap .bff-tpitem{ flex:1 1 0 !important; }
+/* record table: top gap matches the gap between the other sections (~16px) */
+#bff-wrap{ padding-bottom:16px !important; }
+#bff-wrap + .bff-listcard{ margin-top:0 !important; }
