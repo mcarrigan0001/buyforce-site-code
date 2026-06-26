@@ -2908,3 +2908,52 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
     radial-gradient(circle at 18% 0%, rgba(255,255,255,0.12), transparent 34%),
     radial-gradient(circle at 0% 30%, rgba(146,223,2,0.10), transparent 22%) !important;
 }
+
+/* ============================================================================
+   batch 48 — frosted glass refined per critique: darker/cleaner smoky-graphite
+   glass, premium softly-varied background, near-invisible grain (the loud noise
+   was making it read as speckled concrete instead of translucent glass).
+   ============================================================================ */
+/* BACK LAYER: premium soft graphite + a whisper of navy/green atmosphere (no grid/pattern) */
+body:has(#bff-wrap)::before{
+  content:"" !important; position:fixed !important; inset:0 !important; z-index:-1 !important; pointer-events:none !important;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(146,223,2,0.055), transparent 24%),
+    radial-gradient(circle at 80% 0%, rgba(90,120,130,0.08), transparent 30%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 42%),
+    linear-gradient(135deg, #101416 0%, #0b0e10 46%, #07090b 100%) !important;
+}
+/* GLASS fill: darker translucent smoked graphite + restrained diagonal highlight (NO loud grain) */
+body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
+  background-color: rgba(16,21,23,0.48) !important;
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018) 34%, rgba(0,0,0,0.18) 100%) !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-blend-mode: normal !important;
+}
+/* GLASS material */
+[data-bfpipe="1"]{
+  position: relative !important;
+  border: 1px solid rgba(255,255,255,0.075) !important;
+  border-radius: 28px !important;
+  -webkit-backdrop-filter: blur(28px) saturate(1.15) brightness(1.04) !important;
+  backdrop-filter: blur(28px) saturate(1.15) brightness(1.04) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.09),
+    inset 0 -1px 0 rgba(255,255,255,0.025),
+    0 32px 90px rgba(0,0,0,0.48) !important;
+}
+/* restrained top highlight + faint green corner (behind widgets) */
+[data-bfpipe="1"]::before{
+  content:"" !important; position:absolute !important; inset:0 !important; border-radius:inherit !important; pointer-events:none !important; z-index:0 !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,0.075), transparent 34%),
+    radial-gradient(circle at 0% 28%, rgba(146,223,2,0.055), transparent 22%) !important;
+}
+/* grain: barely there (atmosphere, not surface) */
+[data-bfpipe="1"]::after{
+  content:"" !important; position:absolute !important; inset:0 !important; border-radius:inherit !important; pointer-events:none !important;
+  opacity:0.03 !important; mix-blend-mode:soft-light !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") !important;
+  background-size: 200px 200px !important;
+}
