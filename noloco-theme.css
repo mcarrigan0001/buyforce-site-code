@@ -2616,3 +2616,8 @@ html:has(#bff-wrap), body:has(#bff-wrap){ background-position: center, left top 
 #bff-wrap .bff-tpname{ white-space:normal !important; display:-webkit-box !important; -webkit-line-clamp:2 !important; -webkit-box-orient:vertical !important; overflow:hidden !important; line-height:1.2 !important; }
 #bff-wrap .bff-tpmet{ align-items:center !important; }
 #bff-wrap .bff-tplbl{ text-align:center !important; text-transform:none !important; }
+
+/* batch 29: solid white page background */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background: #ffffff !important;
+}
