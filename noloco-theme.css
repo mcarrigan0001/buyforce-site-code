@@ -2957,3 +2957,31 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") !important;
   background-size: 200px 200px !important;
 }
+
+/* batch 49 — restore back layer to the user's image (glass stays CSS) + TIER 2 polish */
+/* BACK LAYER -> image (the glass refracts it) */
+body:has(#bff-wrap)::before{
+  content:"" !important; position:fixed !important; inset:0 !important; z-index:-1 !important; pointer-events:none !important;
+  background-color:#0a0d0f !important;
+  background-image: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3eb037c492ddc24c7105e3.png") !important;
+  background-size: cover !important;
+  background-position: left top !important;
+  background-repeat: no-repeat !important;
+}
+/* TIER 2.4 — borders by light: softer widget borders; inset highlight defines the edge */
+#bff-wrap .bff-kpi, #bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel,
+#bff-wrap .bff-reportpanel, #bff-wrap .bff-funsec, #bff-wrap + .bff-listcard{
+  border-color: rgba(255,255,255,.045) !important;
+}
+/* TIER 2.5/2.6 — KPI green edge bar: three-radius glow (emanates from within) + strengthen */
+#bff-wrap .bff-kpi::before{
+  width:3px !important;
+  background:linear-gradient(transparent, #92DF02 18%, #92DF02 82%, transparent) !important;
+  box-shadow: 0 0 6px rgba(146,223,2,.55), 0 0 18px rgba(146,223,2,.20), 0 0 45px rgba(146,223,2,.06) !important;
+}
+/* TIER 2.6 — soft green bloom behind the title (top-left of the glass), kept subtle */
+[data-bfpipe="1"]::before{
+  background:
+    radial-gradient(circle at 18% 0%, rgba(255,255,255,0.075), transparent 34%),
+    radial-gradient(640px 360px at 7% 5%, rgba(146,223,2,0.07), transparent 60%) !important;
+}
