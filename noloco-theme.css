@@ -2634,3 +2634,16 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-blend-mode: normal !important;
   background-color: #25272B !important;
 }
+
+/* batch 31: page background -> new image */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.16) 100%),
+    url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e700a14a2b82bfee40b43.png") !important;
+  background-size: 100% 100%, cover !important;
+  background-position: center, left top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal !important;
+  background-color: #25272B !important;
+}
