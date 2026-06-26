@@ -1012,9 +1012,9 @@
       if(bfCloseBtn) bfCloseBtn.style.display='none';
     }
   }
-  function bfPipeIsDrawer(){ try{ if(/^\/pipeline\//.test(location.pathname)) return false; var pp=new URLSearchParams(location.search).get('_parentPage'); if(!pp) return false; var d=JSON.parse(atob(pp)); return !!(d&&d.elementId===BF_PIPE_EL); }catch(e){ return false; } }
+  function bfPipeIsDrawer(){ try{ if(/^\/(pipeline|command)\//.test(location.pathname)) return false; var pp=new URLSearchParams(location.search).get('_parentPage'); if(!pp) return false; var d=JSON.parse(atob(pp)); return !!(d&&d.elementId===BF_PIPE_EL); }catch(e){ return false; } }
   function bfPipeGo(u){ var url='/opportunities-1/view/'+u+'/overview'+location.search; try{ history.pushState({},'',url); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href=url; } }
-  function bfPipeClose(){ try{ history.pushState({},'','/pipeline'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/pipeline'; } }
+  function bfPipeClose(){ try{ history.pushState({},'','/command'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/command'; } }
   function bfMkPipeArrow(side){ var b=document.createElement('button'); b.type='button'; b.className='bf-flip bf-pipearrow'; b.style.cssText='position:fixed;top:50%;'+(side==='l'?'left:16px':'right:16px')+';transform:translateY(-50%);z-index:10002;display:none;'; b.innerHTML='<i class="ti ti-chevron-'+(side==='l'?'left':'right')+'" aria-hidden="true"></i>'; b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(u) bfPipeGo(u); }); document.body.appendChild(b); return b; }
   function bfPipeDrawer(){
     if(!bfPipeIsDrawer()){ if(bfPipeBd)bfPipeBd.style.display='none'; if(bfPipeSnap)bfPipeSnap.style.display='none'; if(bfPipeAL)bfPipeAL.style.display='none'; if(bfPipeAR)bfPipeAR.style.display='none'; document.documentElement.removeAttribute('data-bfpipedrawer'); return; }
@@ -1207,7 +1207,7 @@
     return cards+eqPill+otb;
   }
   function bfPipePrice(){
-    if(!/^\/pipeline\/preview\//.test(location.pathname)) return;
+    if(!/^\/(pipeline|command)\/preview\//.test(location.pathname)) return;
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var cols=body.querySelector(':scope > .bf-reccols');
@@ -1288,7 +1288,7 @@
   function bfV2Nav(uuid){
     function ord(){ try{ return JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); }catch(e){ return []; } }
     function go(u){ if(u) location.href='/opportunities/view/'+u+'/summary'; }
-    function back(){ location.href='/pipeline'; }
+    function back(){ location.href='/command'; }
     var nav=document.getElementById('bf-v2nav');
     if(!nav){
       nav=document.createElement('div'); nav.id='bf-v2nav';
@@ -1323,7 +1323,7 @@
     document.documentElement.setAttribute('data-bfv2framed', bfV2Framed?'1':'0');
     if(bfV2Framed){ var _vn=document.getElementById('bf-v2nav'); if(_vn) _vn.remove(); }
     else { try{ bfV2Nav(uuid); }catch(_nv){} }
-    if(!body.__bfV2Bd){ body.__bfV2Bd=1; body.addEventListener('click', function(e){ if(document.documentElement.getAttribute('data-bfv2')!=='1') return; if(document.documentElement.getAttribute('data-bfv2framed')==='1') return; var v=document.getElementById('bf-v2'); if(v && !v.contains(e.target) && !(e.target.closest&&e.target.closest('#bf-v2nav'))){ try{ location.href='/pipeline'; }catch(_x){} } }); }
+    if(!body.__bfV2Bd){ body.__bfV2Bd=1; body.addEventListener('click', function(e){ if(document.documentElement.getAttribute('data-bfv2')!=='1') return; if(document.documentElement.getAttribute('data-bfv2framed')==='1') return; var v=document.getElementById('bf-v2'); if(v && !v.contains(e.target) && !(e.target.closest&&e.target.closest('#bf-v2nav'))){ try{ location.href='/command'; }catch(_x){} } }); }
     var slot=host.querySelector('.bf-v2wsslot');
     var secwrap=host.querySelector('.bf-v2secs');
     [].forEach.call(body.children, function(c){
@@ -2456,7 +2456,7 @@
     R.__bfReload=function(){ try{ load(st.dealId); }catch(e){} };
     load(null);
   }
-  function bfPipelinePage(){ try{ if(!window.__bfPipeLog){ window.__bfPipeLog=1; try{ console.log('BF_PIPE active'); }catch(e){} } bfPipeTitle(); if(/^\/pipeline(\/|$)/.test(location.pathname)){ var vc=document.querySelector('[data-testid="view-collection"]'); if(vc){ var ph=document.getElementById('bf-pipe-host'); if(!ph){ ph=document.createElement('div'); ph.id='bf-pipe-host'; ph.setAttribute('data-bfpipe','1'); ph.style.cssText='display:flex;flex-direction:column;flex:1 1 auto;min-height:0;width:100%;'; vc.insertBefore(ph, vc.firstChild); bfPipeCSS(); bfPipeRender(ph); try{ console.log('BF_PIPE collection host rendered'); }catch(e){} } else if(ph.parentElement!==vc){ vc.insertBefore(ph, vc.firstChild); } var coll=vc.querySelector('.collection-view'); if(coll) coll.style.setProperty('display','none','important'); [].forEach.call(vc.children,function(c){ if(c===ph) return; if(c.classList&&c.classList.contains('collection-view')) return; if(c.querySelector&&c.querySelector('[data-testid="record-view"]')) return; if(c.getAttribute&&c.getAttribute('data-testid')==='record-view') return; c.style.setProperty('display','none','important'); }); if(location.pathname==='/pipeline' && window.__bfPipeDrawerOpenedAt){ var _oa=window.__bfPipeDrawerOpenedAt; window.__bfPipeDrawerOpenedAt=0; var _w=0; try{ _w=+(localStorage.getItem('bf.lastWriteAt')||0); }catch(e){} if(_w>_oa && ph.__bfReload){ ph.__bfReload(); } } } return; } var host=null; var els=document.querySelectorAll('p,span,div,h1,h2,h3,h4,td,li,strong,em,b'); for(var i=0;i<els.length;i++){ var e=els[i]; if(e.children.length>0) continue; if((e.textContent||'').trim()==='BF_PIPELINE_FUNNEL'){ host=e; break; } } if(!host) return; if(host.getAttribute('data-bfpipe')==='1') return; host.setAttribute('data-bfpipe','1'); try{ console.log('BF_PIPE rendering funnel'); }catch(e){} bfPipeCSS(); bfPipeRender(host); }catch(e){} }
+  function bfPipelinePage(){ try{ if(!window.__bfPipeLog){ window.__bfPipeLog=1; try{ console.log('BF_PIPE active'); }catch(e){} } bfPipeTitle(); if(/^\/(pipeline|command)(\/|$)/.test(location.pathname)){ var vc=document.querySelector('[data-testid="view-collection"]'); if(vc){ var ph=document.getElementById('bf-pipe-host'); if(!ph){ ph=document.createElement('div'); ph.id='bf-pipe-host'; ph.setAttribute('data-bfpipe','1'); ph.style.cssText='display:flex;flex-direction:column;flex:1 1 auto;min-height:0;width:100%;'; vc.insertBefore(ph, vc.firstChild); bfPipeCSS(); bfPipeRender(ph); try{ console.log('BF_PIPE collection host rendered'); }catch(e){} } else if(ph.parentElement!==vc){ vc.insertBefore(ph, vc.firstChild); } var coll=vc.querySelector('.collection-view'); if(coll) coll.style.setProperty('display','none','important'); [].forEach.call(vc.children,function(c){ if(c===ph) return; if(c.classList&&c.classList.contains('collection-view')) return; if(c.querySelector&&c.querySelector('[data-testid="record-view"]')) return; if(c.getAttribute&&c.getAttribute('data-testid')==='record-view') return; c.style.setProperty('display','none','important'); }); if((location.pathname==='/pipeline'||location.pathname==='/command') && window.__bfPipeDrawerOpenedAt){ var _oa=window.__bfPipeDrawerOpenedAt; window.__bfPipeDrawerOpenedAt=0; var _w=0; try{ _w=+(localStorage.getItem('bf.lastWriteAt')||0); }catch(e){} if(_w>_oa && ph.__bfReload){ ph.__bfReload(); } } } return; } var host=null; var els=document.querySelectorAll('p,span,div,h1,h2,h3,h4,td,li,strong,em,b'); for(var i=0;i<els.length;i++){ var e=els[i]; if(e.children.length>0) continue; if((e.textContent||'').trim()==='BF_PIPELINE_FUNNEL'){ host=e; break; } } if(!host) return; if(host.getAttribute('data-bfpipe')==='1') return; host.setAttribute('data-bfpipe','1'); try{ console.log('BF_PIPE rendering funnel'); }catch(e){} bfPipeCSS(); bfPipeRender(host); }catch(e){} }
   function bfIframeIsolate(){
     try{
       if(window.self===window.top) return;
