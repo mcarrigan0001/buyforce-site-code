@@ -2663,3 +2663,16 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 
 /* batch 33: COMMAND CENTER title — remove green glow, use a black shadow (keep white fill + black stroke) */
 #bff-wrap .bff-title.bff-glow{ text-shadow: 0 3px 8px rgba(0,0,0,.6) !important; }
+
+/* batch 34: page background -> new image */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background:
+    radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.16) 100%),
+    url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9276cb92c4e0c89b042b.png") !important;
+  background-size: 100% 100%, cover !important;
+  background-position: center, left top !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-attachment: fixed, fixed !important;
+  background-blend-mode: normal !important;
+  background-color: #25272B !important;
+}
