@@ -6,6 +6,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');
 
 /* ---- Font, selection, scrollbar, focus ---- */
 *, body, button, input, textarea, select {
@@ -2728,3 +2729,6 @@ body:has(#bff-wrap)::before{
 html:has(#bff-wrap){ background-color:#15171a !important; }
 body:has(#bff-wrap){ background:transparent !important; }
 body:has(#bff-wrap)::before{ display:block !important; }
+
+/* batch 39: COMMAND CENTER title -> Oswald 700 */
+#bff-wrap .bff-title{ font-family:'Oswald', sans-serif !important; font-weight:700 !important; }
