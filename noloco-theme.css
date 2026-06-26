@@ -2683,7 +2683,7 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 /* back/bottom layer = page background */
 html:has(#bff-wrap), body:has(#bff-wrap){
   background-color:#1a1c1f !important;
-  background-image: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9f5aa24b71f0b2f18b70.png") !important;
+  background-image: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3eb037c492ddc24c7105e3.png") !important;
   background-size: cover !important;
   background-position: center top !important;
   background-repeat: no-repeat !important;
@@ -2691,7 +2691,7 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 }
 /* upper layer = the glass panel that holds the whole dashboard */
 [data-bfpipe="1"]{
-  background: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9f5a5dd1fd13ce639b76.png") center top / cover no-repeat !important;
+  background: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3eb0805dd1fd13ce6648b3.png") center top / cover no-repeat !important;
   border-radius: 28px !important;
   border: 1px solid rgba(255,255,255,.08) !important;
   box-shadow: 0 28px 70px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06) !important;
@@ -2701,3 +2701,6 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 }
 /* let the glass panel show through the dashboard wrapper */
 #bff-wrap{ background-color:transparent !important; background-image:none !important; }
+
+/* batch 36: balance space above/below the header filter buttons */
+#bff-wrap .bff-head{ align-items:center !important; }
