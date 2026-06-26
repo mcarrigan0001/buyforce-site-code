@@ -3007,3 +3007,9 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){ background-color: rgba(16,
 /* stop the KPI body from clipping the icon's glow (overflow:hidden was cutting it off);
    the card itself still has overflow:hidden so content can't spill into neighbors */
 #bff-wrap .bff-kpi-body{ overflow:visible !important; }
+
+/* batch 52 — balance the selected-stage gray rectangle (equal top/bottom, reduce bottom) */
+/* the label's margin-bottom lived INSIDE the .on rectangle, padding out its bottom; drop it.
+   the stage's own symmetric padding still gives every label its breathing room. */
+#bff-wrap .bff-funnel .bff-l{ margin-bottom:0 !important; }
+#bff-wrap .bff-funnel .bff-stage{ padding-top:11px !important; padding-bottom:11px !important; }
