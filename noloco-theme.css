@@ -3013,9 +3013,3 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){ background-color: rgba(16,
    the stage's own symmetric padding still gives every label its breathing room. */
 #bff-wrap .bff-funnel .bff-l{ margin-bottom:0 !important; }
 #bff-wrap .bff-funnel .bff-stage{ padding-top:11px !important; padding-bottom:11px !important; }
-
-/* batch 53 — command-center dashboard fits its flex parent on the /command board page
-   (host is a flex item in the kanban's view-collection; force it to stretch to the
-   parent width instead of growing to the KPI row's min-content width) */
-[data-bfpipe="1"]{ align-self:stretch !important; width:auto !important; min-width:0 !important; max-width:100% !important; }
-[data-bfpipe="1"] > #bff-wrap{ width:100% !important; max-width:100% !important; box-sizing:border-box !important; }
