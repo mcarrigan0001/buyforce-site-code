@@ -1306,7 +1306,7 @@
     else { pos.style.display='none'; pv.style.display='none'; nx.style.display='none'; }
   }
   function bfV2(){
-    if(!/^\/opportunities\/view\/rec[0-9a-z]+\/summary/.test(location.pathname)){ if(document.documentElement.getAttribute('data-bfv2')==='1'){ document.documentElement.removeAttribute('data-bfv2'); var old=document.getElementById('bf-v2'); if(old) old.remove(); var oldn=document.getElementById('bf-v2nav'); if(oldn) oldn.remove(); } return; }
+    if(!/\/(view|preview)\/rec[0-9a-z]+/.test(location.pathname)){ if(document.documentElement.getAttribute('data-bfv2')==='1'){ document.documentElement.removeAttribute('data-bfv2'); document.documentElement.removeAttribute('data-bfv2framed'); var old=document.getElementById('bf-v2'); if(old) old.remove(); var oldn=document.getElementById('bf-v2nav'); if(oldn) oldn.remove(); } return; }
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var host=document.getElementById('bf-v2');
@@ -1319,8 +1319,11 @@
       bfV2Wire(host,uuid,R);
     }
     document.documentElement.setAttribute('data-bfv2','1');
-    try{ bfV2Nav(uuid); }catch(_nv){}
-    if(!body.__bfV2Bd){ body.__bfV2Bd=1; body.addEventListener('click', function(e){ if(document.documentElement.getAttribute('data-bfv2')!=='1') return; var v=document.getElementById('bf-v2'); if(v && !v.contains(e.target) && !(e.target.closest&&e.target.closest('#bf-v2nav'))){ try{ location.href='/pipeline'; }catch(_x){} } }); }
+    var bfV2Framed=false; try{ bfV2Framed = bfPipeIsDrawer() || /\/preview\//.test(location.pathname); }catch(_fr){ bfV2Framed=false; }
+    document.documentElement.setAttribute('data-bfv2framed', bfV2Framed?'1':'0');
+    if(bfV2Framed){ var _vn=document.getElementById('bf-v2nav'); if(_vn) _vn.remove(); }
+    else { try{ bfV2Nav(uuid); }catch(_nv){} }
+    if(!body.__bfV2Bd){ body.__bfV2Bd=1; body.addEventListener('click', function(e){ if(document.documentElement.getAttribute('data-bfv2')!=='1') return; if(document.documentElement.getAttribute('data-bfv2framed')==='1') return; var v=document.getElementById('bf-v2'); if(v && !v.contains(e.target) && !(e.target.closest&&e.target.closest('#bf-v2nav'))){ try{ location.href='/pipeline'; }catch(_x){} } }); }
     var slot=host.querySelector('.bf-v2wsslot');
     var secwrap=host.querySelector('.bf-v2secs');
     [].forEach.call(body.children, function(c){
