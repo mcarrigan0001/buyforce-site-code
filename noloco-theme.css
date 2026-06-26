@@ -2732,3 +2732,35 @@ body:has(#bff-wrap)::before{ display:block !important; }
 
 /* batch 39: COMMAND CENTER title -> Oswald 700 */
 #bff-wrap .bff-title{ font-family:'Oswald', sans-serif !important; font-weight:700 !important; }
+
+/* ============================================================================
+   batch 40 — TIER 1: CSS frosted-glass panel + card float (contrast + lift)
+   ============================================================================ */
+/* glass panel: semi-transparent + frosted (blurs the back image through), a step
+   lighter than the #08090A widgets so the cards read as distinct black objects */
+[data-bfpipe="1"]{
+  background: rgba(34,37,42,0.50) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.15) !important;
+  backdrop-filter: blur(26px) saturate(1.15) !important;
+  border: 1px solid rgba(255,255,255,.06) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 30px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+/* widgets float ABOVE the glass: inset top highlight + grounding halo + contact + ambient */
+#bff-wrap .bff-kpi,
+#bff-wrap .bff-actpanel, #bff-wrap .bff-perfpanel, #bff-wrap .bff-reportpanel,
+#bff-wrap .bff-funsec, #bff-wrap + .bff-listcard{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035),
+    0 0 22px rgba(0,0,0,.28),
+    0 8px 18px rgba(0,0,0,.30),
+    0 22px 48px rgba(0,0,0,.50) !important;
+}
+/* keep hover lifting deeper than the new resting shadow */
+#bff-wrap .bff-actpanel:hover, #bff-wrap .bff-perfpanel:hover, #bff-wrap .bff-reportpanel:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.045),
+    0 0 26px rgba(0,0,0,.30),
+    0 10px 22px rgba(0,0,0,.34),
+    0 32px 66px rgba(0,0,0,.58) !important;
+}
