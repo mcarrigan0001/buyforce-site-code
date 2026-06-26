@@ -2660,3 +2660,6 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-blend-mode: normal !important;
   background-color: #25272B !important;
 }
+
+/* batch 33: COMMAND CENTER title — remove green glow, use a black shadow (keep white fill + black stroke) */
+#bff-wrap .bff-title.bff-glow{ text-shadow: 0 3px 8px rgba(0,0,0,.6) !important; }
