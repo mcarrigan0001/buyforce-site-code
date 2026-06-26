@@ -2996,3 +2996,14 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){ background-color: rgba(16,
 #bff-wrap .bff-extras{ margin-top:19px !important; }
 #bff-wrap .bff-funsec{ margin-top:23px !important; }
 #bff-wrap + .bff-listcard{ margin-top:5px !important; }
+
+/* batch 51 — acqrow value size up + tighter divider; funnel label bottom spacing; un-clip KPI icon glow */
+/* bigger Acquired/Pace values (closer to the other cards) + tighter gap around the divider */
+#bff-wrap .bff-kpi-acqrow .bff-kpi-v{ font-size:clamp(26px,3.2vw,40px) !important; }
+#bff-wrap .bff-kpi-acqrow{ gap:clamp(4px,0.6vw,8px) !important; }
+#bff-wrap .bff-kpi-div{ min-height:38px !important; }
+/* a few px of breathing room beneath the funnel stage labels */
+#bff-wrap .bff-funnel .bff-l{ margin-bottom:6px !important; }
+/* stop the KPI body from clipping the icon's glow (overflow:hidden was cutting it off);
+   the card itself still has overflow:hidden so content can't spill into neighbors */
+#bff-wrap .bff-kpi-body{ overflow:visible !important; }
