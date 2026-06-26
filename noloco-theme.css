@@ -2772,3 +2772,13 @@ body:has(#bff-wrap)::before{ display:block !important; }
   -webkit-backdrop-filter: blur(15px) saturate(1.22) brightness(1.10) !important;
   backdrop-filter: blur(15px) saturate(1.22) brightness(1.10) !important;
 }
+
+/* batch 42 FIX: the panel tint was being overridden by batch 8's *:has(#bff-wrap) transparency
+   (higher specificity). Re-apply the frosted tint with a selector that wins, + more brightness. */
+body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
+  background: rgba(64,68,77, 0.32) !important;
+}
+[data-bfpipe="1"]{
+  -webkit-backdrop-filter: blur(14px) saturate(1.20) brightness(1.16) !important;
+  backdrop-filter: blur(14px) saturate(1.20) brightness(1.16) !important;
+}
