@@ -2704,3 +2704,21 @@ html:has(#bff-wrap), body:has(#bff-wrap){
 
 /* batch 36: balance space above/below the header filter buttons */
 #bff-wrap .bff-head{ align-items:center !important; }
+
+/* batch 37: render the back layer as a fixed positioned element (crisp on HiDPI).
+   background-attachment:fixed rasterizes at 1x in Chrome -> blurry; a real fixed
+   element renders at full device resolution. */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-image: none !important;
+  background-color: #15171a !important;
+}
+body:has(#bff-wrap)::before{
+  content:"" !important;
+  position:fixed !important; inset:0 !important; z-index:-1 !important; pointer-events:none !important;
+  background-image: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3eb037c492ddc24c7105e3.png") !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+}
+/* glass panel: ensure it is NOT fixed (sizes to the element -> crisp) */
+[data-bfpipe="1"]{ background-attachment: scroll !important; }
