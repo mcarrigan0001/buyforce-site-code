@@ -2782,3 +2782,13 @@ body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
   -webkit-backdrop-filter: blur(14px) saturate(1.20) brightness(1.16) !important;
   backdrop-filter: blur(14px) saturate(1.20) brightness(1.16) !important;
 }
+
+/* batch 43 (Tier 1 tune): slightly darker + more textured — lower tint opacity so the back
+   layer's grain reads through, less blur so texture stays crisp, ease brightness down */
+body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){
+  background: rgba(54,58,66, 0.19) !important;
+}
+[data-bfpipe="1"]{
+  -webkit-backdrop-filter: blur(8px) saturate(1.18) brightness(1.06) !important;
+  backdrop-filter: blur(8px) saturate(1.18) brightness(1.06) !important;
+}
