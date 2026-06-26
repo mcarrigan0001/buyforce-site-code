@@ -2676,3 +2676,28 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-blend-mode: normal !important;
   background-color: #25272B !important;
 }
+
+/* ============================================================================
+   batch 35 — two-layer background: back image (page) + glass-panel image (host)
+   ============================================================================ */
+/* back/bottom layer = page background */
+html:has(#bff-wrap), body:has(#bff-wrap){
+  background-color:#1a1c1f !important;
+  background-image: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9f5aa24b71f0b2f18b70.png") !important;
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+/* upper layer = the glass panel that holds the whole dashboard */
+#bf-pipe-host{
+  background: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9f5a5dd1fd13ce639b76.png") center top / cover no-repeat !important;
+  border-radius: 28px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  box-shadow: 0 28px 70px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+/* let the glass panel show through the dashboard wrapper */
+#bff-wrap{ background-color:transparent !important; background-image:none !important; }
