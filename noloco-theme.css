@@ -2985,3 +2985,14 @@ body:has(#bff-wrap)::before{
     radial-gradient(circle at 18% 0%, rgba(255,255,255,0.075), transparent 34%),
     radial-gradient(640px 360px at 7% 5%, rgba(146,223,2,0.07), transparent 60%) !important;
 }
+
+/* batch 50 — brighter back layer + more transparent glass + 5px more between rows */
+/* brighten the back image (also brightens what the glass refracts) */
+body:has(#bff-wrap)::before{ filter: brightness(1.40) saturate(1.05) !important; }
+/* more transparent glass so the brighter back shows through */
+body:has(#bff-wrap) [data-bfpipe="1"]:has(#bff-wrap){ background-color: rgba(16,21,23,0.34) !important; }
+/* +5px between each row of objects (header -> KPIs -> panels -> funnel -> table) */
+#bff-wrap .bff-head{ margin-bottom:19px !important; }
+#bff-wrap .bff-extras{ margin-top:19px !important; }
+#bff-wrap .bff-funsec{ margin-top:23px !important; }
+#bff-wrap + .bff-listcard{ margin-top:5px !important; }
