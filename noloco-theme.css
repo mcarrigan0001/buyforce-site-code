@@ -2690,7 +2690,7 @@ html:has(#bff-wrap), body:has(#bff-wrap){
   background-attachment: fixed !important;
 }
 /* upper layer = the glass panel that holds the whole dashboard */
-#bf-pipe-host{
+[data-bfpipe="1"]{
   background: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a3e9f5a5dd1fd13ce639b76.png") center top / cover no-repeat !important;
   border-radius: 28px !important;
   border: 1px solid rgba(255,255,255,.08) !important;
