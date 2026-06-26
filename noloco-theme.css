@@ -2722,3 +2722,9 @@ body:has(#bff-wrap)::before{
 }
 /* glass panel: ensure it is NOT fixed (sizes to the element -> crisp) */
 [data-bfpipe="1"]{ background-attachment: scroll !important; }
+
+/* batch 38: back image was hidden because the body's bg-color painted over the z-index:-1 pseudo.
+   Make body transparent; put the fallback color on html so the fixed image layer shows. */
+html:has(#bff-wrap){ background-color:#15171a !important; }
+body:has(#bff-wrap){ background:transparent !important; }
+body:has(#bff-wrap)::before{ display:block !important; }
