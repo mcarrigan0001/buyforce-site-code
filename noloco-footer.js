@@ -939,11 +939,9 @@
     document.body.appendChild(h);
   }
   function bfFlipGo(u){
-    var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]');
-    if(tc){ tc.click(); return; }
-    var _base=location.pathname.split('/')[1]||'command';
+    var _parts=location.pathname.split('/'); var _base=_parts[1]||'command'; var _tab=_parts[4]||'overview';
     var _s=location.search||'';
-    var _rec='/'+_base+'/preview/'+u+'/overview'+_s;
+    var _rec='/'+_base+'/preview/'+u+'/'+_tab+_s;
     try{
       history.pushState({},'','/'+_base+_s); window.dispatchEvent(new PopStateEvent('popstate'));
       setTimeout(function(){ try{ history.pushState({},'',_rec); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href=_rec; } }, 60);
