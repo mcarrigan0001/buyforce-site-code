@@ -832,7 +832,7 @@
     } else if(wrap.hasAttribute('data-recstage')){
       var rec=wrap.getAttribute('data-recstage'); var dash=wrap.getAttribute('data-dashstage')||'';
       wrap.removeAttribute('data-recstage'); wrap.removeAttribute('data-dashstage');
-      if(rec && rec!==dash){ var target=null; [].forEach.call(stages,function(stg){ if(lblOf(stg)===rec) target=stg; }); if(target && !target.classList.contains('on')) try{ target.click(); }catch(e){} }
+      if(rec && rec!==dash){ var target=null; [].forEach.call(stages,function(stg){ if(lblOf(stg)===rec) target=stg; }); if(target) try{ target.click(); }catch(e){} }
     }
   }
   function bfBuildFullOrder(){
