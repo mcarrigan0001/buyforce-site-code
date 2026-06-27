@@ -808,6 +808,7 @@
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
   var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0, bfBoardDirty=true;
   var bfPipeBd=null,bfPipeSnap=null,bfPipeAL=null,bfPipeAR=null; var BF_PIPE_EL='vewCcJTaXm4WOtOcuaCNz1a7';
+  function bfPipeFlipOrder(uuid){ try{ var pipe=JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); if(pipe&&pipe.length&&uuid&&pipe.indexOf(uuid)>-1){ return pipe.map(function(u){ return {u:u,col:''}; }); } }catch(e){} return null; }
   function bfBuildFullOrder(){
     var groups=[].slice.call(document.querySelectorAll('[data-testid="collection-group"]'));
     if(!groups.length) return null;
@@ -913,8 +914,13 @@
   }
   function bfFlipGo(u){
     var tc=document.querySelector('[data-testid="collection-record"][href*="'+u+'"]');
-    if(tc){ tc.click(); }
-    else { try{ history.pushState({},'','/opportunities-1/preview/'+u+'/overview'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/opportunities-1/preview/'+u+'/overview'; } }
+    if(tc){ tc.click(); return; }
+    try{
+      var _t=document.querySelector('[data-testid="collection-record"][href*="/preview/"],[data-testid="collection-record"][href*="/view/"]');
+      var _url; if(_t){ _url=(_t.getAttribute('href')||'').replace(/rec[0-9a-z]+/i, u); } else { var _p=location.pathname.split('/'); _url='/'+(_p[1]||'opportunities-1')+'/preview/'+u+'/'+(_p[4]||'overview'); }
+      if(location.search) _url+=location.search;
+      history.pushState({},'',_url); window.dispatchEvent(new PopStateEvent('popstate'));
+    }catch(e){ location.href='/opportunities-1/preview/'+u+'/overview'; }
   }
   function bfShortStage(name){
     var n=name||'';
@@ -928,7 +934,7 @@
     if(location.pathname.indexOf('/preview/')<0 || window.innerWidth>900){ if(nav) nav.remove(); return; }
     var sb=document.querySelector('[data-testid="record-view-body"] > [data-testid="record-view-section"][class*="section-container"]:has([class*="section-highlights"])'); if(!sb) return;
     var host=sb.querySelector('.max-w-6xl')||sb.querySelector('[class*="section-highlights"]')||sb;
-    var order=bfFlipOrder; if(!order){ order=bfBuildFullOrder(); if(order) bfFlipOrder=order; }
+    var _mm=location.pathname.match(/\/(rec[0-9a-z]+)/i); var order=bfPipeFlipOrder(_mm?_mm[1]:''); if(order){ bfFlipOrder=order; } else { order=bfFlipOrder; if(!order){ order=bfBuildFullOrder(); if(order) bfFlipOrder=order; } }
     if(!order||!order.length) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; var idx=-1; for(var i=0;i<order.length;i++){ if(order[i].u===uuid){ idx=i; break; } }
     if(idx<0){ if(nav) nav.remove(); return; }
@@ -959,11 +965,11 @@
     if(location.pathname.indexOf('/preview/')<0){ if(bfFlipL)bfFlipL.style.display='none'; if(bfFlipR)bfFlipR.style.display='none'; return; }
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
     var cards=document.querySelectorAll('[data-testid="collection-record"]'); var cnt=cards.length;
-    var order=bfFlipOrder;
-    var stale=!order||!order.some(function(o){return o.u===uuid;});
-    if(stale){
-      order=bfBuildFullOrder();
-      if(order){ bfFlipOrder=order; bfFlipCount=cnt; }
+    var order=bfPipeFlipOrder(uuid);
+    if(order){ bfFlipOrder=order; }
+    else { order=bfFlipOrder;
+      var stale=!order||!order.some(function(o){return o.u===uuid;});
+      if(stale){ order=bfBuildFullOrder(); if(order){ bfFlipOrder=order; bfFlipCount=cnt; } }
     }
     if(!order||!order.length) return;
     var idx=-1; for(var i=0;i<order.length;i++){ if(order[i].u===uuid){ idx=i; break; } }
