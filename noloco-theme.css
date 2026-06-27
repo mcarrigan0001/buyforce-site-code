@@ -3065,3 +3065,6 @@ body.bf-kanban [data-testid="collection-group"] > div::after{
 /* batch 56 — kanban: clear the opaque Noloco page containers so the back-layer image shows through */
 body.bf-kanban [data-testid="project-canvas"],
 body.bf-kanban [class*="project-theme"]{ background-color: transparent !important; background-image: none !important; }
+
+/* batch 57 — kanban: make ALL ancestors of the board transparent so the back-layer image shows (mirror of the command-center *:has(#bff-wrap) rule) */
+body.bf-kanban *:has([data-testid="collection-group"]){ background-color: transparent !important; background-image: none !important; }
