@@ -808,7 +808,30 @@
   function bfDeb(fn,ms){ var t; return function(){ clearTimeout(t); t=setTimeout(fn,ms||160); }; }
   var bfFlipL=null, bfFlipR=null, bfFlipOrder=null, bfFlipCount=0, bfBoardDirty=true;
   var bfPipeBd=null,bfPipeSnap=null,bfPipeAL=null,bfPipeAR=null; var BF_PIPE_EL='vewCcJTaXm4WOtOcuaCNz1a7';
-  function bfPipeFlipOrder(uuid){ try{ var pipe=JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); if(pipe&&pipe.length&&uuid&&pipe.indexOf(uuid)>-1){ return pipe.map(function(u){ return {u:u,col:''}; }); } }catch(e){} return null; }
+  function bfMacroStage(st){ st=String(st||'');
+    if(st==='FRESH_LEADS') return 'Fresh Leads';
+    if(st==='ENGAGED_AWAITING_VIN') return 'Capturing VIN';
+    if(/VIN_RECEIVED_APPRAISAL_NEEDED|APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES|APPRAISAL_REVIEW_NEEDED|APPRAISAL_REVIEW_COMPLETE/.test(st)) return 'Appraising';
+    if(/OFFER_SHEET_GENERATED|OFFER_SENT_0_2_DAYS/.test(st)) return 'Fresh Offer Sent';
+    if(/NURTURING_FOLLOW_UP_AND_RE_ENGAGE|VERBAL_YES_SCHEDULE_APPT|SCHEDULED|APPT_SHOWN_FOLLOW_UP/.test(st)) return 'Follow Up';
+    if(st==='ACQUIRED') return 'Acquired';
+    return '';
+  }
+  function bfRecStage(u){ try{ var r=JSON.parse(sessionStorage.getItem('bfrec:'+u)||localStorage.getItem('bfrec:'+u)||'null'); if(r&&r.status) return bfMacroStage(r.status); }catch(e){} return ''; }
+  function bfPipeFlipOrder(uuid){ try{ var pipe=JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); if(pipe&&pipe.length&&uuid&&pipe.indexOf(uuid)>-1){ return pipe.map(function(u){ return {u:u,col:bfRecStage(u)}; }); } }catch(e){} return null; }
+  function bfLitFunnelForRecord(){
+    var wrap=document.getElementById('bff-wrap'); if(!wrap) return;
+    var stages=wrap.querySelectorAll('.bff-funnel .bff-stage'); if(!stages.length) return;
+    if(location.pathname.indexOf('/preview/')>-1){
+      var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); if(!m) return;
+      var macro=bfRecStage(m[1]); if(!macro) return;
+      if(!wrap.hasAttribute('data-litsaved')){ var cs=wrap.querySelector('.bff-funnel .bff-stage.on .bff-l'); wrap.setAttribute('data-litsaved', cs?(cs.textContent||'').trim():''); }
+      [].forEach.call(stages,function(stg){ var lbl=((stg.querySelector('.bff-l')||{}).textContent||'').trim(); stg.classList.toggle('on', lbl===macro); });
+    } else if(wrap.hasAttribute('data-litsaved')){
+      var saved=wrap.getAttribute('data-litsaved'); wrap.removeAttribute('data-litsaved');
+      [].forEach.call(stages,function(stg){ var lbl=((stg.querySelector('.bff-l')||{}).textContent||'').trim(); stg.classList.toggle('on', !!saved && lbl===saved); });
+    }
+  }
   function bfBuildFullOrder(){
     var groups=[].slice.call(document.querySelectorAll('[data-testid="collection-group"]'));
     if(!groups.length) return null;
@@ -2476,7 +2499,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
