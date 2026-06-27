@@ -3068,3 +3068,6 @@ body.bf-kanban [class*="project-theme"]{ background-color: transparent !importan
 
 /* batch 57 — kanban: make ALL ancestors of the board transparent so the back-layer image shows (mirror of the command-center *:has(#bff-wrap) rule) */
 body.bf-kanban *:has([data-testid="collection-group"]){ background-color: transparent !important; background-image: none !important; }
+
+/* batch 58 — kanban: explicitly clear the React #root (its Noloco rule outranked the *:has rule) so the back-layer image shows */
+body.bf-kanban #root{ background-color: transparent !important; background-image: none !important; }
