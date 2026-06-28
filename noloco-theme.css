@@ -3071,3 +3071,10 @@ body.bf-kanban *:has([data-testid="collection-group"]){ background-color: transp
 
 /* batch 58 — kanban: explicitly clear the React #root (its Noloco rule outranked the *:has rule) so the back-layer image shows */
 body.bf-kanban #root{ background-color: transparent !important; background-image: none !important; }
+
+/* batch 59 — round the green focus ring on the login email/password fields (its wrapper had square corners, so the box-shadow ring rendered square). Rounds the focus-ring wrapper to match the rounded input inside. */
+*:has(> input:focus:not(.bf-fedit):not(.bf-amt)),
+*:has(> select:focus),
+*:has(> textarea:focus:not(.bf-fedit)) {
+  border-radius: 9px !important;
+}
