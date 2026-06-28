@@ -3082,3 +3082,12 @@ body.bf-kanban #root{ background-color: transparent !important; background-image
 /* batch 60 — active sidebar page: tint its icon BuyForce green. Noloco marks the active nav link with .bg-project-nav-selected; icons are Tabler icon-font <i class="ti ...">. Also lift the wrapper's opacity-75 so the green reads fully. Label color left unchanged. */
 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected i.ti { color: #92DF02 !important; }
 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected span.opacity-75 { opacity: 1 !important; }
+
+/* batch 61 — remove the custom "Collapse all" button on the command center dashboard */
+.bf-allcollapse { display: none !important; }
+
+/* batch 62 — sidebar user-info avatar: command-center green (#92DF02) when no photo, and smaller so it fits the collapsed (max-w-20) sidebar */
+[data-testid="sidebar-nav-footer"] .bg-nlc_primary-400 { background-color: #92DF02 !important; }
+[data-testid="sidebar-nav-footer"] .bg-nlc_primary-400,
+[data-testid="sidebar-nav-footer"] [data-testid="avatar-initials"] { width: 34px !important; height: 34px !important; }
+[data-testid="sidebar-nav-footer"] [data-testid="avatar-initials"] span { font-size: 12px !important; }
