@@ -938,6 +938,18 @@
     h.addEventListener('click', function(){ document.body.classList.remove('bf-sbcollapsed'); });
     document.body.appendChild(h);
   }
+  function bfNavCollapse(){
+    var sb=document.querySelector('[data-testid="navigation-sidebar"]'); if(!sb) return;
+    var ctl=sb.querySelector(':scope > .bf-navcollapse');
+    if(!ctl){
+      ctl=document.createElement('button'); ctl.type='button'; ctl.className='bf-navcollapse';
+      ctl.innerHTML='<i class="ti ti-chevron-left" aria-hidden="true"></i><span class="bf-nc-label">Collapse</span>';
+      ctl.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); var nb=sb.querySelector('button.shadow-md'); if(nb) nb.click(); });
+      sb.appendChild(ctl);
+    } else if(ctl.parentElement!==sb){ sb.appendChild(ctl); }
+    var collapsed=/max-w-20/.test(sb.className);
+    var ic=ctl.querySelector('i'); if(ic){ var want='ti '+(collapsed?'ti-chevron-right':'ti-chevron-left'); if(ic.className!==want) ic.className=want; }
+  }
   function bfFlipGo(u){
     var _parts=location.pathname.split('/'); var _base=_parts[1]||'command'; var _tab=_parts[4]||'overview';
     var _s=location.search||'';
@@ -2498,7 +2510,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); try{bfNavCollapse();}catch(_nc){} bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }

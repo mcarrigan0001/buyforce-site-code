@@ -3084,10 +3084,19 @@ body.bf-kanban #root{ background-color: transparent !important; background-image
 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected span.opacity-75 { opacity: 1 !important; }
 
 /* batch 61 — remove the custom "Collapse all" button on the command center dashboard */
-.bf-allcollapse { display: none !important; }
+body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 
 /* batch 62 — sidebar user-info avatar: command-center green (#92DF02) when no photo, and smaller so it fits the collapsed (max-w-20) sidebar */
 [data-testid="sidebar-nav-footer"] .bg-nlc_primary-400 { background-color: #92DF02 !important; }
 [data-testid="sidebar-nav-footer"] .bg-nlc_primary-400,
 [data-testid="sidebar-nav-footer"] [data-testid="avatar-initials"] { width: 34px !important; height: 34px !important; }
 [data-testid="sidebar-nav-footer"] [data-testid="avatar-initials"] span { font-size: 12px !important; }
+
+/* batch 63 — custom nav sidebar collapse control (replaces Noloco's edge tab).
+   Expanded: a "‹ Collapse" pill at the bottom; collapsed: caret-only. Injected by bfNavCollapse() in the footer. */
+[data-testid="navigation-sidebar"] button.shadow-md { display: none !important; }
+.bf-navcollapse { order: 100; flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin: 2px 12px 12px 12px; padding: 0 12px; height: 38px; border: 0; cursor: pointer; border-radius: 10px; background: rgba(255,255,255,0.06); color: #c9d1da; font-size: 12px; font-weight: 600; }
+.bf-navcollapse:hover { background: rgba(255,255,255,0.12); color: #eef0f2; }
+.bf-navcollapse i { font-size: 16px; line-height: 1; }
+[data-testid="navigation-sidebar"].max-w-20 .bf-navcollapse { justify-content: center; margin: 2px auto 12px auto; width: 34px; padding: 0; }
+[data-testid="navigation-sidebar"].max-w-20 .bf-navcollapse .bf-nc-label { display: none; }
