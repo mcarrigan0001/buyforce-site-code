@@ -3078,3 +3078,7 @@ body.bf-kanban #root{ background-color: transparent !important; background-image
 *:has(> textarea:focus:not(.bf-fedit)) {
   border-radius: 9px !important;
 }
+
+/* batch 60 — active sidebar page: tint its icon BuyForce green. Noloco marks the active nav link with .bg-project-nav-selected; icons are Tabler icon-font <i class="ti ...">. Also lift the wrapper's opacity-75 so the green reads fully. Label color left unchanged. */
+[data-testid="sidebar-nav-item"] a.bg-project-nav-selected i.ti { color: #92DF02 !important; }
+[data-testid="sidebar-nav-item"] a.bg-project-nav-selected span.opacity-75 { opacity: 1 !important; }
