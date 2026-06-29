@@ -2878,11 +2878,16 @@
   var bfEmbedRT=null;
   function bfEmbedReportHeight(){ try{ var u=(location.pathname.match(/rec[0-9a-z]+/)||[''])[0]; var h=0; var ns=document.querySelectorAll('#bf-v2 .bf-v2wsslot, #bf-v2 .bf-v2secs'); [].forEach.call(ns,function(n){ h+=n.getBoundingClientRect().height; }); if(h<40) h=Math.max(document.body.scrollHeight,260); parent.postMessage({__bfws:1,h:Math.ceil(h)+4,uuid:u},'*'); }catch(e){} }
   function bfEmbedStartReport(){ if(bfEmbedRT) return; bfEmbedReportHeight(); bfEmbedRT=setInterval(bfEmbedReportHeight,1200); try{ window.addEventListener('load',bfEmbedReportHeight); }catch(e){} try{ window.addEventListener('wheel',function(e){ try{ parent.postMessage({__bfwheel:1,dy:e.deltaY},'*'); }catch(_w){} },{passive:true}); }catch(e){} }
+  var _bfNavLocked=false;
+  function bfEmbedLockNav(){ if(_bfNavLocked) return; _bfNavLocked=true; try{ document.addEventListener('click',function(e){ var a=e.target&&e.target.closest&&e.target.closest('a[href]'); if(!a) return; var href=a.getAttribute('href')||''; if(/^(https?:|mailto:|tel:|#)/.test(href)) return; if(a.getAttribute('target')==='_blank') return; var base=location.pathname.replace(/\/overview.*$/,''); if(href.indexOf(base)===-1){ e.preventDefault(); e.stopPropagation(); } }, true); }catch(_e){} }
   function bfIframeIsolate(){
     try{
       if(window.self===window.top) return;
-      if(/bfembed/.test(location.hash)&&document.documentElement.getAttribute('data-bfembed')!=='1'){ document.documentElement.setAttribute('data-bfembed','1'); bfEmbedStartReport(); }
-      if(!/\/(view|preview)\//.test(location.pathname)) return;
+      var _emb=/bfembed/.test(location.hash)||document.documentElement.getAttribute('data-bfembed')==='1';
+      var _onRec=/\/(view|preview)\//.test(location.pathname);
+      if(_emb && !_onRec){ document.documentElement.removeAttribute('data-bfembed'); document.documentElement.removeAttribute('data-bfiso'); return; }
+      if(_emb && _onRec && document.documentElement.getAttribute('data-bfembed')!=='1'){ document.documentElement.setAttribute('data-bfembed','1'); bfEmbedStartReport(); bfEmbedLockNav(); }
+      if(!_onRec) return;
       var rv=document.querySelector('[data-testid="record-view"]'); if(!rv) return;
       if(document.documentElement.getAttribute('data-bfiso')==='1') return;
       var emb=document.documentElement.getAttribute('data-bfembed')==='1';

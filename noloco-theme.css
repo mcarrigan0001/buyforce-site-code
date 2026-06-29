@@ -3264,7 +3264,7 @@ html[data-bfembed="1"] .bf-v2wrap { padding: 0 !important; margin: 0 !important;
 html[data-bfembed="1"] .bf-v2secs { padding: 0 !important; margin: 0 !important; }
 html[data-bfembed="1"] .bf-v2wsslot { padding: 0 !important; margin: 0 !important; }
 /* belt-and-suspenders: no scrollbars / no internal scroll anywhere in the embed */
-html[data-bfembed="1"] * { overflow: visible !important; }
+html[data-bfembed="1"] [data-testid="record-view-body"], html[data-bfembed="1"] [data-testid="record-view-body"] * { overflow: visible !important; }
 html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
 
 /* batch 81 — workspace prefetch pool: persistent hidden iframes (next 5 / prev 5, recentered each flip),
@@ -3552,3 +3552,11 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
   .bf-v2cockpit .bfc-right .bfc-tiles{ flex:1 1 auto; }
   .bf-v2cockpit .bfc-titlerow{ flex-wrap:wrap; }
 }
+
+/* batch 87 — embed: kill the stray white native record-chrome (the vertical white line) and
+   scope the overflow override to the record body so a navigated-away frame can't go transparent */
+html[data-bfembed="1"] .bf-rectop,
+html[data-bfembed="1"] .bf-rtstat,
+html[data-bfembed="1"] .bf-recleft,
+html[data-bfembed="1"] [class*="bf-rectop"],
+html[data-bfembed="1"] [data-testid="record-actions-bar"] { display: none !important; }
