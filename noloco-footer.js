@@ -950,20 +950,24 @@
     var collapsed=/max-w-20/.test(sb.className);
     var ic=ctl.querySelector('i'); if(ic){ var want='ti '+(collapsed?'ti-chevron-right':'ti-chevron-left'); if(ic.className!==want) ic.className=want; }
   }
-  var bfRoleName=null, bfRoleFetching=false;
-  function bfFetchRole(){
-    if(bfRoleName!==null||bfRoleFetching) return;
-    try{ var c=sessionStorage.getItem('bf.role'); if(c){ bfRoleName=c; return; } }catch(e){}
+  var bfRoleName=null, bfAuthDone=false, bfAuthFetching=false;
+  function bfAuthReady(){ try{ var ph=document.getElementById('bf-pipe-host'); if(ph&&ph.__bfReload) ph.__bfReload(); }catch(e){} }
+  function bfFetchAuth(){
+    /* Authoritative auth: read the user's apiToken (and role) straight from Noloco's API using the
+       always-present session JWT. Removes any dependency on scraping a token off a record page,
+       so the command center works on first login for every user. */
+    if(bfAuthDone||bfAuthFetching) return;
     var jwt=''; try{ jwt=(localStorage.getItem('noloco-client-auth')||'').replace(/^"|"$/g,''); }catch(e){}
     if(!jwt) return;
-    bfRoleFetching=true;
+    bfAuthFetching=true;
     try{
-      fetch('https://api.noloco.io/data/buyforce',{method:'POST',headers:{'Content-Type':'application/json','Authorization':jwt},body:JSON.stringify({query:'query{ user{ role{ name } } }'})})
+      fetch('https://api.noloco.io/data/buyforce',{method:'POST',headers:{'Content-Type':'application/json','Authorization':jwt},body:JSON.stringify({query:'query{ user{ apiToken role{ name } } }'})})
         .then(function(r){return r.json();})
-        .then(function(j){ bfRoleFetching=false; var rn=j&&j.data&&j.data.user&&j.data.user.role&&j.data.user.role.name; if(rn){ bfRoleName=rn; try{ sessionStorage.setItem('bf.role',rn); }catch(e){} try{ bfUserInfoRole(); }catch(e){} } })
-        .catch(function(){ bfRoleFetching=false; });
-    }catch(e){ bfRoleFetching=false; }
+        .then(function(j){ bfAuthFetching=false; var u=j&&j.data&&j.data.user; if(!u) return; bfAuthDone=true; if(u.apiToken){ try{ sessionStorage.setItem('bf.apitoken',u.apiToken); localStorage.setItem('bf.apitoken',u.apiToken); }catch(e){} } var rn=u.role&&u.role.name; if(rn){ bfRoleName=rn; try{ sessionStorage.setItem('bf.role',rn); }catch(e){} } try{ bfUserInfoRole(); }catch(e){} bfAuthReady(); })
+        .catch(function(){ bfAuthFetching=false; });
+    }catch(e){ bfAuthFetching=false; }
   }
+  function bfFetchRole(){ if(bfRoleName===null){ try{ var c=sessionStorage.getItem('bf.role'); if(c) bfRoleName=c; }catch(e){} } bfFetchAuth(); }
   function bfUserInfoRole(){
     var foot=document.querySelector('[data-testid="sidebar-nav-footer"]'); if(!foot) return;
     var txt=[].slice.call(foot.querySelectorAll('div.truncate')).filter(function(e){ return e.children.length===0 && (e.textContent||'').trim(); });
@@ -2600,19 +2604,7 @@
       for(var k=0;k<ins.length;k++){ try{ if(rx.test((ins[k].value||'')+'')){ ins[k].style.display='none'; if(ins[k].setAttribute) ins[k].setAttribute('data-bftok','1'); } }catch(e){} }
     }catch(e){}
   }
-  function bfCaptureApiToken(){
-    try{
-      bfHideTokens();
-      if(bfGetApiToken()) return;
-      if(bfTokTries++>120) return;
-      var rx=/bft_[A-Za-z0-9]{20,}/;
-      var done=function(tok){ try{ sessionStorage.setItem('bf.apitoken', tok); }catch(e){} try{ localStorage.setItem('bf.apitoken', tok); }catch(e){} try{ console.log('BF_TOKEN captured ok'); bfToast('BF auth ready \u2713'); }catch(e){} bfHideTokens(); };
-      var tw=document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
-      var tn; while(tn=tw.nextNode()){ var mm=(tn.nodeValue||'').match(rx); if(mm){ done(mm[0]); return; } }
-      var ins=document.querySelectorAll('input,textarea');
-      for(var j=0;j<ins.length;j++){ var m2=((ins[j].value||'')+'').match(rx); if(m2){ done(m2[0]); return; } }
-    }catch(e){}
-  }
+  function bfCaptureApiToken(){ try{ bfHideTokens(); }catch(e){} try{ bfFetchAuth(); }catch(e){} }
   try{ if(!window.__bfTokTimer){ bfCaptureApiToken(); window.__bfTokTimer=setInterval(bfCaptureApiToken, 1500); } }catch(e){}
   window.addEventListener('resize', bfDeb(updateArrows,180));
 })();
