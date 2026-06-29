@@ -1662,7 +1662,7 @@
       var card=t.closest('[data-testid="collection-record"]'); if(!card) return;
       var href=card.getAttribute('href')||''; var m=href.match(/(rec[0-9a-z]+)/i); if(!m) return;
       e.preventDefault(); e.stopPropagation();
-      var url='/pipeline/preview/'+m[1]+'/overview';
+      var url='/command/preview/'+m[1]+'/overview';
       try{ history.pushState({},'',url); window.dispatchEvent(new PopStateEvent('popstate')); }catch(err){ location.href=url; }
     }catch(_e){}
   }, true);
