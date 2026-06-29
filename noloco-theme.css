@@ -3182,3 +3182,28 @@ body.bf-rec-open .animate-pulse,
 body.bf-rec-open [data-testid="record-view-body"] [class*="bg-white"],
 body.bf-rec-open [data-testid="record-view-body"] [class*="bg-gray-50"],
 body.bf-rec-open [data-testid="record-view-body"] [class*="bg-gray-100"] { background-color: #15171c !important; }
+
+/* batch 77 — in-page record modal: opens instantly over the dimmed, still-visible command center.
+   Cockpit is painted from cached data (bfV2Html) so there is no navigation, no reload flash, no blank.
+   Flipping re-paints the cockpit in place. "Full record" link loads the live workspace/timeline. */
+#bf-modal { position: fixed; inset: 0; z-index: 10050; }
+#bf-modal .bf-modal-scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+#bf-modal .bf-modal-card { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: min(1060px, 94vw); max-height: 92vh; overflow: auto; background: #0b0b0d; border: 1px solid #23262d; border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,0.62); }
+#bf-modal .bf-modal-card::-webkit-scrollbar { width: 10px; }
+#bf-modal .bf-modal-card::-webkit-scrollbar-thumb { background: #2a2d33; border-radius: 6px; }
+/* cockpit color vars (mirrors #bf-v2) so the cockpit renders correctly inside the modal */
+#bf-modal .bf-modal-body { --g:#8fe04a; --rd:#f4655f; --am:#f0a528; --bl:#4c8df6; --ln:#2a2d33; --mut:#9aa0a6; --dim:#6b7077; color:#fff; font-family:'Inter',-apple-system,'Segoe UI',sans-serif; }
+#bf-modal .bf-modal-top { position: sticky; top: 0; z-index: 4; display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 10px 12px; background: linear-gradient(#0b0b0d, rgba(11,11,13,0.86)); border-bottom: 1px solid #181a1f; }
+#bf-modal .bf-modal-pos { margin-right: auto; font-size: 12px; font-weight: 600; color: #6b7077; letter-spacing: .3px; padding-left: 4px; }
+#bf-modal .bf-modal-full { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #9aa0a6; text-decoration: none; padding: 7px 11px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.08); background: rgba(26,28,34,0.55); }
+#bf-modal .bf-modal-full:hover { color: #92df02; border-color: #92df02; }
+#bf-modal .bf-modal-x { width: 34px; height: 34px; border-radius: 10px; background: rgba(26,28,34,0.7); border: 1px solid rgba(255,255,255,0.10); color: #cfd2d6; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+#bf-modal .bf-modal-x:hover { color: #fff; background: rgba(40,43,50,0.92); }
+#bf-modal .bf-modal-arrow { position: fixed; top: 50%; transform: translateY(-50%); z-index: 5; display: inline-flex !important; }
+#bf-modal .bf-modal-prev { left: 24px; }
+#bf-modal .bf-modal-next { right: 24px; }
+html[data-bfmodal="1"] body { overflow: hidden !important; }
+@media (max-width: 900px) {
+  #bf-modal .bf-modal-card { width: 96vw; max-height: 94vh; border-radius: 14px; }
+  #bf-modal .bf-modal-arrow { display: none !important; }
+}
