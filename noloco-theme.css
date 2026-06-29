@@ -3122,3 +3122,12 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 /* batch 67 — collapsed sidebar: center nav icons; drop the gray selected pill (green icon marks active) */
 [data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a > div { justify-content: center !important; }
 [data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected { background-color: transparent !important; }
+
+/* batch 68 — command center: stable 85% centered width (replaces the per-render JS width/translateX hack that caused resize jank/overflow) */
+#bf-pipe-host {
+  width: 85% !important;
+  max-width: none !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+}
