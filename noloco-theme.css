@@ -3134,3 +3134,8 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 [data-testid="record-view-body"] { background: #0c0d10 !important; }
 html:not([data-bfv2="1"]) [data-testid="record-view-body"] > *:not(#bf-v2) { visibility: hidden; animation: bfRecReveal 0s linear 2.5s forwards; }
 @keyframes bfRecReveal { to { visibility: visible; } }
+
+/* batch 71 — record open: /command is a Noloco kanban page, so opening a record renders the record over the live kanban board. Hide the board (and its chrome) while a record is open so it doesn't show behind the cockpit. body.bf-rec-open is set by the footer on /preview|/view routes. The record-view subtree is preserved. */
+body.bf-rec-open [data-testid="collection-group"] { display: none !important; }
+body.bf-rec-open [data-testid="collection-search-button"] { display: none !important; }
+body.bf-rec-open [data-testid="view-collection"] > div:not(:has([data-testid="record-view"])):not(:has([data-testid="record-view-body"])) { display: none !important; }
