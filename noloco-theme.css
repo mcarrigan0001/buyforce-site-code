@@ -3560,3 +3560,34 @@ html[data-bfembed="1"] .bf-rtstat,
 html[data-bfembed="1"] .bf-recleft,
 html[data-bfembed="1"] [class*="bf-rectop"],
 html[data-bfembed="1"] [data-testid="record-actions-bar"] { display: none !important; }
+
+/* batch 88 — editable economics (Asking/ACV/Offer with cents + Seller-Will-Take strike) + working VIN tools (scan buttons, NHTSA YMMT apply/dismiss preview). Scoped under .bf-v2cockpit to match the dark+lime cockpit. */
+.bf-v2cockpit .bfc-bigedit{ display:inline-flex; align-items:baseline; gap:2px; margin-top:8px; padding:2px 8px; background:#0a0b0d; border:1px solid rgba(255,255,255,0.1); border-radius:9px; transition:border-color .12s; }
+.bf-v2cockpit .bfc-bigedit:focus-within{ border-color:rgba(163,230,53,0.45); }
+.bf-v2cockpit .bfc-bigdollar{ font-size:18px; font-weight:700; color:#71757c; letter-spacing:-0.02em; }
+.bf-v2cockpit .bfc-biginput{ width:108px; max-width:108px; background:transparent; border:none; color:#f4f4f5; font-family:'Geist',sans-serif; font-variant-numeric:tabular-nums; font-size:24px; font-weight:700; letter-spacing:-0.02em; padding:0; outline:none; }
+.bf-v2cockpit .bfc-offcell.hi .bfc-bigdollar{ color:#84a33f; }
+.bf-v2cockpit .bfc-offcell.hi .bfc-biginput{ color:#a3e635; font-weight:800; }
+.bf-v2cockpit .bfc-offcell.hi .bfc-bigedit{ background:rgba(10,11,13,0.6); border-color:rgba(163,230,53,0.30); }
+/* asking: struck original + seller-will-take caption */
+.bf-v2cockpit .bfc-askorig{ font-variant-numeric:tabular-nums; font-size:13px; font-weight:600; color:#71757c; text-decoration:line-through; text-decoration-color:rgba(248,113,113,0.6); margin-top:2px; }
+.bf-v2cockpit .bfc-asktake{ font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase; color:#84a33f; font-weight:600; margin-top:5px; }
+/* inline ACV edit inside the offer sub */
+.bf-v2cockpit .bfc-offsub.bfc-acvedit{ display:inline-flex; align-items:baseline; gap:2px; }
+.bf-v2cockpit .bfc-acvdollar{ color:#84a33f; }
+.bf-v2cockpit .bfc-acvinput{ width:72px; max-width:72px; background:transparent; border:none; border-bottom:1px dashed rgba(132,204,22,0.4); color:#a3e635; font-family:'Geist',sans-serif; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:600; padding:0 0 1px; outline:none; }
+.bf-v2cockpit .bfc-acvinput:focus{ border-bottom-color:#a3e635; }
+/* scan (camera) buttons next to inputs */
+.bf-v2cockpit .bfc-scan{ flex:0 0 auto; width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:9px; color:#a3e635; cursor:pointer; padding:0; }
+.bf-v2cockpit .bfc-scan:hover{ background:rgba(132,204,22,0.12); border-color:rgba(163,230,53,0.35); }
+.bf-v2cockpit .bfc-scan i{ font-size:16px; }
+/* ghost button variant for Dismiss */
+.bf-v2cockpit .bfc-btn.ghost{ background:transparent; border-color:rgba(255,255,255,0.14); color:#a1a1aa; }
+.bf-v2cockpit .bfc-btn.ghost:hover{ background:rgba(255,255,255,0.05); color:#e4e4e7; }
+/* YMMT apply/dismiss preview block */
+.bf-v2cockpit .bfc-ymmt{ margin-top:12px; padding:13px 14px; background:linear-gradient(150deg,rgba(132,204,22,0.08),rgba(10,11,13,0.5)); border:1px solid rgba(163,230,53,0.30); border-radius:10px; }
+.bf-v2cockpit .bfc-ymmthead{ display:flex; align-items:center; gap:7px; margin-bottom:11px; font-size:11px; font-weight:700; letter-spacing:0.04em; color:#a3e635; }
+.bf-v2cockpit .bfc-ymmthead i{ font-size:14px; }
+.bf-v2cockpit .bfc-ymmtgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px 16px; }
+.bf-v2cockpit .bfc-ymmtbtns{ display:flex; gap:9px; margin-top:13px; }
+.bf-v2cockpit .bfc-ymmtbtns .bfc-btn{ flex:1; }

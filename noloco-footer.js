@@ -1328,6 +1328,12 @@
     var eqBg=eqVal==null?'rgba(255,255,255,0.02)':(eqPos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)');
     var eqBorder=eqVal==null?'rgba(255,255,255,0.06)':(eqPos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)');
     var payStr=isNaN(payN)?'':payN.toLocaleString('en-US',{minimumFractionDigits:(payN%1?2:0),maximumFractionDigits:2});
+    // ---- editable economics: cents-aware big-number formatter + seller-will-take strike state ----
+    var bigMoney=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return '\u2014'; var fd=(Math.abs(n)%1)?2:0; return '$'+n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
+    var bigInput=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return ''; var fd=(Math.abs(n)%1)?2:0; return n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
+    var wtRaw=(R.sellerWillTake!=null&&R.sellerWillTake!=='')?R.sellerWillTake:(R.willTake!=null?R.willTake:'');
+    var wtN=(wtRaw!=null&&wtRaw!=='')?Number((''+wtRaw).replace(/[^0-9.\-]/g,'')):NaN;
+    var askChanged=(!isNaN(askN)&&!isNaN(wtN)&&Math.round(askN*100)!==Math.round(wtN*100));
     // ---- score / hot ----
     var F={'ACV':R.acv,'Asking Price':R.asking,'Offer Amount':R.offer,'Competition':R.competition,'Est Equity Position':R.eq};
     var sc=bfRecScore(F); var score=sc?sc.score:null;
@@ -1448,11 +1454,19 @@
     var header='<div class="bfc-header"><div class="bfc-photo">'+photo+'</div>'+center+right+'</div>';
 
     // ===== ECONOMICS + EQUITY =====
+    // editable big-number input (cents-aware, looks like the payoff input but sized big)
+    function bigEdit(key,v){ return '<div class="bfc-bigedit"><span class="bfc-bigdollar">$</span><input type="text" class="bfc-biginput" data-bfecon="'+key+'" data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(bigInput(v))+'" placeholder="0"></div>'; }
+    // Asking cell: struck original + "Seller will take" when changed; editable value writes asking + sellerWillTake
+    var askDisplayVal=askChanged?wtN:asking;
+    var askCell='<div class="bfc-offcell"><div class="bfc-offlbl">Asking Price</div>'
+      +'<div class="bfc-askorig" data-bfaskorig'+(askChanged?'':' hidden')+'>'+(isNaN(askN)?'':bigMoney(askN))+'</div>'
+      +bigEdit('askingPrice',askDisplayVal)
+      +'<div class="bfc-asktake" data-bfasktake'+(askChanged?'':' hidden')+'>Seller will take</div></div>';
     var econ='<div class="bfc-econrow">'
       +'<div class="bfc-offstrip">'
-        +'<div class="bfc-offcell"><div class="bfc-offlbl">Asking Price</div><div class="bfc-offval">'+M(asking)+'</div></div>'
-        +'<div class="bfc-offcell hi"><div class="bfc-offlbl">Your Offer</div><div class="bfc-offval">'+M(offer)+'</div>'+(acv!=null&&acv!==''?'<div class="bfc-offsub">ACV '+M(acv)+'</div>':'')+'</div>'
-        +'<div class="bfc-offcell"><div class="bfc-offlbl">Spread</div><div class="bfc-offval">'+(spread!=null?M(spread):'—')+'</div>'+(spct!=null?'<div class="bfc-offsub lime"><i class="ti ti-chevron-up" aria-hidden="true"></i>'+spct+'% margin</div>':'')+'</div>'
+        +askCell
+        +'<div class="bfc-offcell hi"><div class="bfc-offlbl">Your Offer</div>'+bigEdit('offerAmount',offer)+'<div class="bfc-offsub bfc-acvedit">ACV <span class="bfc-acvdollar">$</span><input type="text" class="bfc-acvinput" data-bfecon="acv" data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(bigInput(acv))+'" placeholder="—"></div></div>'
+        +'<div class="bfc-offcell"><div class="bfc-offlbl">Spread</div><div class="bfc-offval" data-bfspread>'+(spread!=null?M(spread):'\u2014')+'</div><div class="bfc-offsub lime" data-bfspct'+(spct!=null?'':' hidden')+'><i class="ti ti-chevron-up" aria-hidden="true"></i>'+(spct!=null?spct:0)+'% margin</div></div>'
       +'</div>'
       +'<div class="bfc-equity" data-bfeqcard style="background:'+eqBg+';border-color:'+eqBorder+';">'
         +'<div class="bfc-eqleft"><div class="bfc-eqlbl">Est. Equity</div>'
@@ -1479,24 +1493,41 @@
     var divider='<div class="bfc-wtddiv"><span class="bfc-wtdlbl">Work this deal</span><span class="bfc-wtdline"></span></div>';
     var vinTools='<div class="bfc-card bfc-vintools">'
       +'<div class="bfc-toolhead"><i class="ti ti-id" aria-hidden="true"></i><span class="bfc-toolt">VIN Tools</span><span class="bfc-toolsub">decode &amp; verify</span></div>'
-      +'<div class="bfc-sublabel">Plate → VIN</div>'
+      +'<div class="bfc-sublabel">Plate \u2192 VIN</div>'
       +'<div class="bfc-inrow">'
         +'<input type="text" class="bfc-input plate" data-bfplate placeholder="License plate">'
         +'<select class="bfc-select" data-bfstate><option>FL</option><option>GA</option><option>AL</option><option>TX</option><option>SC</option><option>NC</option><option>TN</option></select>'
-        +'<button class="bfc-btn lime" data-bfc="platedecode" type="button">Decode</button>'
+        +'<button class="bfc-scan" data-bfc="scanplate" type="button" title="Scan photo for plate #"><i class="ti ti-camera" aria-hidden="true"></i></button>'
+        +'<button class="bfc-btn lime" data-bfc="platedecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
       +'</div>'
       +'<div class="bfc-plateres" data-bfplateres hidden><span class="bfc-platevin" data-bfplatevin>'+E(vin||'')+'</span><span class="bfc-matched"><i class="ti ti-check" aria-hidden="true"></i>Matched</span></div>'
       +'<div class="bfc-tooldiv"></div>'
       +'<div class="bfc-sublabel">VIN Decode</div>'
       +'<div class="bfc-inrow">'
         +'<input type="text" class="bfc-input mono" data-bfvinin value="'+E(vin||'')+'" placeholder="Enter VIN">'
+        +'<button class="bfc-scan" data-bfc="scanvin" type="button" title="Scan photo for VIN"><i class="ti ti-camera" aria-hidden="true"></i></button>'
         +'<button class="bfc-btn neutral" data-bfc="vindecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
       +'</div>'
+      +'<input type="file" class="bfc-scaninput" data-bfscanvin accept="image/*" capture="environment" hidden>'
+      +'<input type="file" class="bfc-scaninput" data-bfscanplate accept="image/*" capture="environment" hidden>'
       +'<div class="bfc-vinres" data-bfvinres hidden>'
-        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year / Make</div><div class="bfc-vrval">'+(E((dYear+' '+dMake).trim())||'—')+'</div></div>'
-        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model / Trim</div><div class="bfc-vrval">'+(E((dModel+' '+dTrim).trim())||'—')+'</div></div>'
-        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Engine</div><div class="bfc-vrval">'+(E(dEngine)||'—')+'</div></div>'
-        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Drivetrain</div><div class="bfc-vrval">'+(E(R.drivetrain||'')||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year / Make</div><div class="bfc-vrval">'+(E((dYear+' '+dMake).trim())||'\u2014')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model / Trim</div><div class="bfc-vrval">'+(E((dModel+' '+dTrim).trim())||'\u2014')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Engine</div><div class="bfc-vrval">'+(E(dEngine)||'\u2014')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Drivetrain</div><div class="bfc-vrval">'+(E(R.drivetrain||'')||'\u2014')+'</div></div>'
+      +'</div>'
+      +'<div class="bfc-ymmt" data-bfymmt hidden>'
+        +'<div class="bfc-ymmthead"><i class="ti ti-sparkles" aria-hidden="true"></i><span data-bfymmttitle>Decoded vehicle</span></div>'
+        +'<div class="bfc-ymmtgrid">'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year</div><div class="bfc-vrval" data-bfymmt-year>\u2014</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Make</div><div class="bfc-vrval" data-bfymmt-make>\u2014</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model</div><div class="bfc-vrval" data-bfymmt-model>\u2014</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Trim</div><div class="bfc-vrval" data-bfymmt-trim>\u2014</div></div>'
+        +'</div>'
+        +'<div class="bfc-ymmtbtns">'
+          +'<button class="bfc-btn lime" data-bfc="ymmtapply" data-bfuuid="'+E(uuid)+'" type="button"><i class="ti ti-check" aria-hidden="true"></i>Apply</button>'
+          +'<button class="bfc-btn ghost" data-bfc="ymmtdismiss" type="button">Dismiss</button>'
+        +'</div>'
       +'</div>'
     +'</div>';
 
@@ -1549,27 +1580,76 @@
         bfToast('VIN copied');
       });
     });
+    // ---- shared editable-economics state + recompute helpers (Offer/ACV/Asking + payoff) ----
+    var bfN=function(v){ return (v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; };
+    var bfEcon={ offN:bfN(R.offer), askN:bfN(R.asking), payN:bfN(R.payoff), wtN:(R.sellerWillTake!=null&&R.sellerWillTake!=='')?bfN(R.sellerWillTake):(R.willTake!=null?bfN(R.willTake):NaN) };
+    var offN=bfEcon.offN; // kept for legacy refs below
+    // money sanitizer (shared with payoff): digits + optional 2 decimals
+    function bfMSan(raw){ var clean=raw.replace(/[^0-9.]/g,''); var i=clean.indexOf('.'); if(i>=0){ clean=clean.slice(0,i+1)+clean.slice(i+1).replace(/\./g,'').slice(0,2); } return clean; }
+    function bfMFmt(n){ var fd=(Math.abs(n)%1)?2:0; return n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); }
+    // recompute equity card from current offN/payN
+    function bfRecomputeEquity(){
+      var card=host.querySelector('[data-bfeqcard]'), val=host.querySelector('[data-bfeqval]'), sub=host.querySelector('[data-bfeqsub]');
+      var o=bfEcon.offN, p=bfEcon.payN;
+      if(isNaN(o)||isNaN(p)){ if(val){ val.textContent='\u2014'; val.style.color='#a3e635'; } if(sub){ sub.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>Add payoff'; sub.style.color='#a3e635'; } if(card){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(255,255,255,0.06)'; } return; }
+      var eq=Math.round((o-p)*100)/100; var pos=eq>=0; var col=pos?'#a3e635':'#f87171'; var fd=(Math.abs(eq)%1)?2:0;
+      if(val){ val.textContent='$'+Math.abs(eq).toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); val.style.color=col; }
+      if(sub){ sub.innerHTML='<i class="ti ti-chevron-'+(pos?'up':'down')+'" aria-hidden="true"></i>'+(pos?'Positive Equity':'Negative Equity'); sub.style.color=col; }
+      if(card){ card.style.background=pos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)'; card.style.borderColor=pos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)'; }
+    }
+    // recompute Spread (Asking|WillTake - Offer) + margin %
+    function bfRecomputeSpread(){
+      var sv=host.querySelector('[data-bfspread]'), pc=host.querySelector('[data-bfspct]');
+      var a=!isNaN(bfEcon.wtN)?bfEcon.wtN:bfEcon.askN; var o=bfEcon.offN;
+      if(isNaN(a)||isNaN(o)){ if(sv) sv.textContent='\u2014'; if(pc) pc.hidden=true; return; }
+      var sp=a-o; if(sv) sv.textContent='$'+Math.round(sp).toLocaleString('en-US');
+      if(pc){ if(a>0){ var pct=Math.round(sp/a*1000)/10; pc.hidden=false; pc.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>'+pct+'% margin'; } else { pc.hidden=true; } }
+    }
+    // editable big-number economics inputs (offer / acv / asking) — cents-aware, save on change
+    host.querySelectorAll('[data-bfecon]').forEach(function(inp){
+      var key=inp.getAttribute('data-bfecon');
+      inp.addEventListener('input',function(){
+        var raw=inp.value, clean=bfMSan(raw);
+        if(clean!==raw){ var pos=(inp.selectionStart||clean.length)-(raw.length-clean.length); if(pos<0)pos=0; inp.value=clean; try{ inp.setSelectionRange(pos,pos); }catch(_e){} }
+        var n=(clean===''||clean==='.')?NaN:(parseFloat(clean)||0);
+        if(key==='offerAmount'){ bfEcon.offN=n; bfRecomputeSpread(); bfRecomputeEquity(); }
+        else if(key==='askingPrice'){ bfEcon.askN=n; bfEcon.wtN=n; bfRecomputeSpread(); }
+        else if(key==='acv'){ /* display only */ }
+      });
+      inp.addEventListener('change',function(){
+        var clean=bfMSan(inp.value); var empty=(clean===''||clean==='.');
+        var n=empty?NaN:Math.round(parseFloat(clean)*100)/100;
+        if(!empty && !isNaN(n)) inp.value=bfMFmt(n);
+        var payload={uuid:uuid};
+        if(key==='offerAmount'){ bfEcon.offN=n; payload.offerAmount=(empty?null:n); bfRecomputeSpread(); bfRecomputeEquity(); }
+        else if(key==='acv'){ payload.acv=(empty?null:n); }
+        else if(key==='askingPrice'){
+          // asking edit also writes Seller Will Take; manage strikethrough state
+          bfEcon.askN=n; bfEcon.wtN=n; payload.askingPrice=(empty?null:n); payload.sellerWillTake=(empty?null:n);
+          var orig=host.querySelector('[data-bfaskorig]'), take=host.querySelector('[data-bfasktake]');
+          var origN=bfN(R.asking);
+          var changed=(!empty && !isNaN(origN) && Math.round(origN*100)!==Math.round(n*100));
+          if(orig){ if(changed){ orig.textContent='$'+bfMFmt(origN); orig.hidden=false; } else { orig.hidden=true; } }
+          if(take){ take.hidden=!changed; }
+          bfRecomputeSpread();
+        }
+        try{ bfPost(payload); }catch(_e){}
+      });
+    });
     // editable payoff -> live equity recompute (Offer - Payoff)
-    var offN=(R.offer!=null&&R.offer!=='')?Number((''+R.offer).replace(/[^0-9.\-]/g,'')):NaN;
     var pin=host.querySelector('[data-bfpayoff]');
     if(pin){
-      function bfPaySan(raw){ var clean=raw.replace(/[^0-9.]/g,''); var i=clean.indexOf('.'); if(i>=0){ clean=clean.slice(0,i+1)+clean.slice(i+1).replace(/\./g,'').slice(0,2); } return clean; }
       pin.addEventListener('input',function(){
-        var raw=pin.value; var clean=bfPaySan(raw);
+        var raw=pin.value, clean=bfMSan(raw);
         if(clean!==raw){ var pos=(pin.selectionStart||clean.length)-(raw.length-clean.length); if(pos<0)pos=0; pin.value=clean; try{ pin.setSelectionRange(pos,pos); }catch(_e){} }
-        var card=host.querySelector('[data-bfeqcard]'), val=host.querySelector('[data-bfeqval]'), sub=host.querySelector('[data-bfeqsub]');
         var empty=(clean===''||clean==='.');
-        if(isNaN(offN)||empty){ if(val){ val.textContent='—'; val.style.color='#a3e635'; } if(sub){ sub.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>Add payoff'; sub.style.color='#a3e635'; } if(card){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(255,255,255,0.06)'; } return; }
-        var pay=parseFloat(clean)||0; var eq=Math.round((offN-pay)*100)/100; var pos2=eq>=0;
-        var col=pos2?'#a3e635':'#f87171'; var fd=(Math.abs(eq)%1)?2:0;
-        if(val){ val.textContent='$'+Math.abs(eq).toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); val.style.color=col; }
-        if(sub){ sub.innerHTML='<i class="ti ti-chevron-'+(pos2?'up':'down')+'" aria-hidden="true"></i>'+(pos2?'Positive Equity':'Negative Equity'); sub.style.color=col; }
-        if(card){ card.style.background=pos2?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)'; card.style.borderColor=pos2?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)'; }
+        bfEcon.payN=empty?NaN:(parseFloat(clean)||0);
+        bfRecomputeEquity();
       });
       pin.addEventListener('change',function(){
-        var clean=bfPaySan(pin.value); if(clean===''||clean==='.') return;
+        var clean=bfMSan(pin.value); if(clean===''||clean==='.'){ bfEcon.payN=NaN; bfRecomputeEquity(); try{ bfPost({uuid:uuid, estimatedPayoffAmount:null}); }catch(_e){} return; }
         var num=Math.round(parseFloat(clean)*100)/100; if(isNaN(num)) return;
-        var fd=(Math.abs(num)%1)?2:0; pin.value=num.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2});
+        pin.value=bfMFmt(num); bfEcon.payN=num; bfRecomputeEquity();
         try{ bfPost({uuid:uuid, estimatedPayoffAmount:num}); }catch(_e){}
       });
     }
@@ -1583,26 +1663,113 @@
         dbtn.textContent=open?'Show less':'Show more';
       });
     }
+    // ---- VIN Tools helpers: NHTSA decode, plate lookup, OCR scan, YMMT preview ----
+    var PLATE_VIN_HOOK='https://buyforce.app.n8n.cloud/webhook/plate-vin-lookup';
+    var bfYmmt=null; // pending decoded {vin,year,make,model,trim} awaiting Apply
+    function bfTcase(s){ s=(''+(s||'')).toLowerCase(); return s.replace(/\b([a-z])/g,function(m,c){return c.toUpperCase();}); }
+    // Free NHTSA vPIC decode (client-side, no n8n cost). Resolves to {ok,vin,year,make,model,trim,engine,drive} or {ok:false,reason}.
+    function bfNhtsaDecode(vinRaw){
+      var vin=String(vinRaw||'').toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');
+      if(vin.length<11) return Promise.resolve({ok:false,reason:'Enter a full VIN to decode.'});
+      return fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/'+encodeURIComponent(vin)+'?format=json')
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){ var r=(d&&d.Results&&d.Results[0])||{}; var year=r.ModelYear||''; var trim=r.Trim||r.Series||r.Series2||'';
+          if(!year && !r.Make) return {ok:false,reason:'No match for that VIN.'};
+          var disp=r.DisplacementL?(Math.round(parseFloat(r.DisplacementL)*10)/10+'L'):''; var cyl=r.EngineCylinders?(r.EngineCylinders+'cyl'):'';
+          return {ok:true,vin:vin,year:year,make:bfTcase(r.Make||''),model:r.Model||'',trim:trim,engine:[disp,cyl].filter(Boolean).join(' '),drive:r.DriveType||''}; })
+        .catch(function(){ return {ok:false,reason:'Could not reach NHTSA.'}; });
+    }
+    // Populate + show the YMMT preview block (Apply/Dismiss)
+    function bfShowYmmt(d){
+      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||'',engine:d.engine||'',drive:d.drive||''};
+      var box=host.querySelector('[data-bfymmt]'); if(!box) return;
+      var set=function(sel,v){ var el=host.querySelector(sel); if(el) el.textContent=(v&&(''+v).trim())?v:'\u2014'; };
+      set('[data-bfymmt-year]',d.year); set('[data-bfymmt-make]',d.make); set('[data-bfymmt-model]',d.model); set('[data-bfymmt-trim]',d.trim);
+      var ttl=host.querySelector('[data-bfymmttitle]'); if(ttl) ttl.textContent=((d.year||'')+' '+(d.make||'')+' '+(d.model||'')).trim()||'Decoded vehicle';
+      box.hidden=false;
+    }
+    function bfHideYmmt(){ var box=host.querySelector('[data-bfymmt]'); if(box) box.hidden=true; bfYmmt=null; }
+    // Run a file-picker OCR scan; hint='vin'|'plate'; on success populate target input.
+    function bfScan(hint){
+      var inp=host.querySelector(hint==='vin'?'[data-bfscanvin]':'[data-bfscanplate]'); if(!inp) return;
+      inp.value='';
+      inp.onchange=function(){
+        var f=inp.files&&inp.files[0]; if(!f) return;
+        bfToast('Reading photo\u2026');
+        var rd=new FileReader();
+        rd.onload=function(){ bfPostOcr(rd.result).then(function(d){
+          inp.value='';
+          var txt=(d&&(d.text||d.transcript||d.vin||d.plate))||''; txt=(''+txt).toUpperCase();
+          if(hint==='vin'){
+            var m=txt.replace(/[^A-HJ-NPR-Z0-9]/g,'').match(/[A-HJ-NPR-Z0-9]{17}/);
+            var vi=host.querySelector('[data-bfvinin]');
+            if(m && vi){ vi.value=m[0]; bfToast('VIN read \u2014 tap Decode'); }
+            else bfToast('No VIN found in photo');
+          } else {
+            var pm=(txt.match(/[A-Z0-9]{5,8}/)||[])[0]||'';
+            var pl=host.querySelector('[data-bfplate]');
+            if(pm && pl){ pl.value=pm; bfToast('Plate read \u2014 tap Decode'); }
+            else bfToast('No plate found in photo');
+          }
+        }); };
+        rd.readAsDataURL(f);
+      };
+      inp.click();
+    }
     // cockpit action buttons
     host.querySelectorAll('[data-bfc]').forEach(function(b){
       b.addEventListener('click',function(e){
         e.preventDefault();
         var a=b.getAttribute('data-bfc');
+        if(a==='scanvin'){ bfScan('vin'); return; }
+        if(a==='scanplate'){ bfScan('plate'); return; }
         if(a==='platedecode'){
           var pl=host.querySelector('[data-bfplate]'); var st=host.querySelector('[data-bfstate]');
           var plate=pl?pl.value.trim().toUpperCase():''; if(!plate){ bfToast('Enter a plate first'); return; }
-          var res=host.querySelector('[data-bfplateres]'); var pv=host.querySelector('[data-bfplatevin]');
-          if(pv && !pv.textContent.trim() && R.vin){ pv.textContent=R.vin; }
-          if(res){ res.hidden=false; }
-          bfToast('Plate decoded'+(st&&st.value?' · '+st.value:''));
+          var state=st?st.value:''; if(pl) pl.value=plate;
+          b.disabled=true; bfToast('Looking up VIN\u2026');
+          var tk=''; try{ tk=bfGetApiToken(); }catch(_e){}
+          var hdrs={'Content-Type':'application/json'}; if(tk) hdrs['X-BF-Token']=tk;
+          fetch(PLATE_VIN_HOOK,{method:'POST',headers:hdrs,body:JSON.stringify({plate:plate,state:state})})
+            .then(function(r){ return r.json().catch(function(){ return {ok:false,reason:'bad_response'}; }); })
+            .then(function(resp){
+              if(!resp || resp.ok===false || !resp.vin){ bfToast((resp&&resp.reason)?('Plate: '+resp.reason):'No VIN found for that plate'); return; }
+              var mvin=(''+resp.vin).toUpperCase();
+              var res=host.querySelector('[data-bfplateres]'); var pv=host.querySelector('[data-bfplatevin]');
+              if(pv) pv.textContent=mvin; if(res) res.hidden=false;
+              var vi=host.querySelector('[data-bfvinin]'); if(vi) vi.value=mvin;
+              bfToast('Matched VIN \u2014 decoding\u2026');
+              return bfNhtsaDecode(mvin).then(function(d){ if(d&&d.ok) bfShowYmmt(d); else bfToast((d&&d.reason)||'Decode failed'); });
+            })
+            .catch(function(){ bfToast('Could not reach the plate lookup'); })
+            .then(function(){ b.disabled=false; });
           return;
         }
         if(a==='vindecode'){
-          var vi=host.querySelector('[data-bfvinin]'); var dvin=vi?vi.value.trim():'';
-          if(!dvin){ bfToast('Enter a VIN first'); return; }
-          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:dvin})}); }catch(_e){}
-          var vr=host.querySelector('[data-bfvinres]'); if(vr){ vr.hidden=false; }
-          bfToast('Decoding VIN…');
+          var vi=host.querySelector('[data-bfvinin]'); var dvin=vi?vi.value.trim().toUpperCase():'';
+          var clean=dvin.replace(/[^A-HJ-NPR-Z0-9]/g,'');
+          if(clean.length!==17){ bfToast('Enter a valid 17-character VIN'); return; }
+          if(vi) vi.value=clean;
+          b.disabled=true; bfToast('Decoding VIN\u2026');
+          bfNhtsaDecode(clean).then(function(d){ b.disabled=false; if(d&&d.ok){ bfShowYmmt(d); } else { bfToast((d&&d.reason)||'Decode failed'); } });
+          return;
+        }
+        if(a==='ymmtdismiss'){ bfHideYmmt(); return; }
+        if(a==='ymmtapply'){
+          if(!bfYmmt || !bfYmmt.vin){ bfToast('Nothing to apply'); return; }
+          var y=bfYmmt;
+          // primary write via the record write-hook (friendly keys)
+          try{ bfPost({uuid:uuid, vin:y.vin, year:y.year, make:y.make, model:y.model, trim:y.trim}); }catch(_e){}
+          // server-side decode path (keeps Decode Status / derived fields in sync)
+          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:y.vin})}); }catch(_e2){}
+          // live header update
+          var ttl=host.querySelector('.bfc-title'); if(ttl){ var t=((y.year||'')+' '+(y.make||'')+' '+(y.model||'')).trim(); if(t) ttl.textContent=t; }
+          var trEl=host.querySelector('.bfc-trim');
+          if(y.trim){ if(trEl){ trEl.textContent=y.trim; } else { var tw=host.querySelector('.bfc-titlewrap'); if(tw){ var sp=document.createElement('span'); sp.className='bfc-trim'; sp.textContent=y.trim; tw.appendChild(sp); } } }
+          // also fill the VIN copy row if present
+          var vrow=host.querySelector('.bf-v2vin[data-bfvin]'); if(vrow){ vrow.setAttribute('data-bfvin',y.vin); var vv=vrow.querySelector('.bfc-vinval'); if(vv) vv.textContent=y.vin; }
+          bfHideYmmt();
+          bfToast('Vehicle applied \u2014 VIN saved');
           return;
         }
         if(a==='confirmvin'){
