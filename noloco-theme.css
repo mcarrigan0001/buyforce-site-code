@@ -3265,3 +3265,13 @@ html[data-bfembed="1"] .bf-v2wsslot { padding: 0 !important; margin: 0 !importan
 /* belt-and-suspenders: no scrollbars / no internal scroll anywhere in the embed */
 html[data-bfembed="1"] * { overflow: visible !important; }
 html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+
+/* batch 81 — workspace prefetch pool: persistent hidden iframes (next 5 / prev 5, recentered each flip),
+   shown by toggling visibility so flips are instant with no reload. Pool sits below the cockpit, aligned. */
+#bf-modal .bf-modal-wspool { position: relative; padding: 0 14px 14px; }
+#bf-modal .bf-ws-item { position: relative; }
+#bf-modal .bf-ws-item .bf-modal-wsif { width: 100%; border: 0; background: transparent; height: 90px; display: block; }
+#bf-modal .bf-ws-item .bf-modal-wsload { position: absolute; left: 0; right: 0; top: 20px; display: flex; flex-direction: column; align-items: center; gap: 9px; color: #5c6066; font-size: 12px; pointer-events: none; }
+#bf-modal .bf-ws-item .bf-modal-wsspin { width: 20px; height: 20px; border: 2px solid #2a2c33; border-top-color: #92df02; border-radius: 50%; animation: bfovlspin .8s linear infinite; }
+/* hide the non-functional cockpit action stubs in the modal (real actions live in the workspace Log tab) */
+#bf-modal .bf-v2acts { display: none !important; }

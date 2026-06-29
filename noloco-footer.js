@@ -2417,15 +2417,40 @@
       var m=document.createElement('div'); m.id='bf-modal'; m.style.display='none';
       m.innerHTML='<div class="bf-modal-scrim" data-m="close"></div>'
         +'<button class="bf-flip bf-modal-arrow bf-modal-prev" data-m="prev" title="Previous deal"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>'
-        +'<div class="bf-modal-card"><div class="bf-modal-top"><span class="bf-modal-pos" data-m="pos"></span><a class="bf-modal-full" data-m="full" target="_self" title="Open full record + timeline"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>Full record</a><button class="bf-modal-x" data-m="close" title="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div><div class="bf-modal-body"></div></div>'
+        +'<div class="bf-modal-card"><div class="bf-modal-top"><span class="bf-modal-pos" data-m="pos"></span><a class="bf-modal-full" data-m="full" target="_self" title="Open full record + timeline"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>Full record</a><button class="bf-modal-x" data-m="close" title="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div><div class="bf-modal-body"></div><div class="bf-modal-wspool"></div></div>'
         +'<button class="bf-flip bf-modal-arrow bf-modal-next" data-m="next" title="Next deal"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>';
       document.body.appendChild(m);
       m.addEventListener('click',function(e){ var t=e.target&&e.target.closest&&e.target.closest('[data-m]'); if(!t) return; var k=t.getAttribute('data-m'); if(k==='close'){ bfCloseModal(); } else if(k==='prev'){ bfModalGo(-1); } else if(k==='next'){ bfModalGo(1); } });
       document.addEventListener('keydown',function(e){ if(!bfModalEl||bfModalEl.style.display==='none') return; if(e.key==='Escape'){ bfCloseModal(); } else if(e.key==='ArrowLeft'){ bfModalGo(-1); } else if(e.key==='ArrowRight'){ bfModalGo(1); } });
-      window.addEventListener('message',function(ev){ try{ var d=ev.data; if(!d||!d.__bfws||!bfModalEl) return; var ifr=bfModalEl.querySelector('.bf-modal-wsif'); if(ifr && d.uuid===bfModalList[bfModalIdx]){ ifr.style.height=Math.min(Math.max(d.h,200),4200)+'px'; var ld=bfModalEl.querySelector('.bf-modal-wsload'); if(ld) ld.style.display='none'; } }catch(e){} });
+      window.addEventListener('message',function(ev){ try{ var d=ev.data; if(!d||!d.__bfws) return; var rec=bfWsPool[d.uuid]; if(rec&&rec.ifr){ rec.ifr.style.height=Math.min(Math.max(d.h,110),4600)+'px'; rec.ready=true; if(rec.wrap){ var ld=rec.wrap.querySelector('.bf-modal-wsload'); if(ld) ld.style.display='none'; } } }catch(e){} });
       bfModalEl=m; return m;
     }
-    function bfCloseModal(){ if(bfModalEl){ bfModalEl.style.display='none'; } document.documentElement.removeAttribute('data-bfmodal'); }
+    var bfWsPool={}, bfWsPfT=null;
+    function bfWsGet(uuid){
+      if(bfWsPool[uuid]) return bfWsPool[uuid];
+      var m=bfEnsureModal(); var pool=m.querySelector('.bf-modal-wspool'); if(!pool) return null;
+      var wrap=document.createElement('div'); wrap.className='bf-ws-item'; wrap.setAttribute('data-u',uuid); wrap.style.display='none';
+      wrap.innerHTML='<div class="bf-modal-wsload"><div class="bf-modal-wsspin"></div>Loading workspace\u2026</div><iframe class="bf-modal-wsif" title="Workspace and milestones" scrolling="no"></iframe>';
+      pool.appendChild(wrap);
+      var ifr=wrap.querySelector('iframe');
+      var rec={ifr:ifr,wrap:wrap,ready:false};
+      bfWsPool[uuid]=rec;
+      try{ ifr.src='/command/preview/'+uuid+'/overview#bfembed'; }catch(e){}
+      return rec;
+    }
+    function bfWsShow(uuid){
+      var m=bfEnsureModal(); bfWsGet(uuid);
+      [].forEach.call(m.querySelectorAll('.bf-ws-item'),function(it){ it.style.display=(it.getAttribute('data-u')===uuid)?'block':'none'; });
+    }
+    function bfWsPrefetch(){
+      var idx=bfModalIdx, list=bfModalList, N=5; if(!list||!list.length) return;
+      var order=[]; var k; for(k=1;k<=N;k++){ if(idx+k<list.length) order.push(list[idx+k]); } for(k=1;k<=N;k++){ if(idx-k>=0) order.push(list[idx-k]); }
+      var i=0; try{ clearInterval(bfWsPfT); }catch(e){}
+      bfWsPfT=setInterval(function(){ if(i>=order.length){ try{clearInterval(bfWsPfT);}catch(e){} return; } var u=order[i++]; if(u&&!bfWsPool[u]) bfWsGet(u); }, 450);
+      var keep={}; keep[list[idx]]=1; order.forEach(function(u){keep[u]=1;});
+      Object.keys(bfWsPool).forEach(function(u){ if(!keep[u]){ try{ bfWsPool[u].wrap.remove(); }catch(e){} delete bfWsPool[u]; } });
+    }
+    function bfCloseModal(){ if(bfModalEl){ bfModalEl.style.display='none'; } document.documentElement.removeAttribute('data-bfmodal'); try{ clearInterval(bfWsPfT); }catch(e){} try{ var p=bfModalEl&&bfModalEl.querySelector('.bf-modal-wspool'); if(p) p.innerHTML=''; }catch(e){} bfWsPool={}; }
     function bfModalGo(d){ var ni=bfModalIdx+d; if(ni<0||ni>=bfModalList.length) return; bfModalIdx=ni; bfModalRender(); }
     function bfModalRender(){
       var uuid=bfModalList[bfModalIdx]; if(!uuid) return;
@@ -2434,7 +2459,7 @@
       var m=bfEnsureModal(); var body=m.querySelector('.bf-modal-body');
       try{ body.innerHTML=bfV2Html(R,uuid); }catch(e){ bfNavRec(uuid); return; }
       try{ bfV2Wire(body,uuid,R); }catch(e){}
-      try{ var slot=body.querySelector('.bf-v2wsslot'); if(slot){ slot.innerHTML='<div class="bf-modal-wswrap"><div class="bf-modal-wsload"><div class="bf-modal-wsspin"></div>Loading workspace\u2026</div><iframe class="bf-modal-wsif" title="Workspace and milestones" scrolling="no"></iframe></div>'; var ifr=slot.querySelector('.bf-modal-wsif'); if(ifr){ ifr.src='/command/preview/'+uuid+'/overview#bfembed'; } } }catch(e){}
+      try{ bfWsShow(uuid); bfWsPrefetch(); }catch(e){}
       try{ var ae=body.querySelector('.bf-v2feed[data-vp="act"] .bf-v2empty'); if(ae) ae.textContent='Open the full record to view the activity timeline.'; }catch(e){}
       try{ var card=m.querySelector('.bf-modal-card'); if(card) card.scrollTop=0; }catch(e){}
       var pv=m.querySelector('.bf-modal-prev'), nx=m.querySelector('.bf-modal-next');
