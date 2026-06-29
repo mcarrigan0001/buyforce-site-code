@@ -3164,3 +3164,21 @@ html[data-bfiso="1"] .bf-flip, html[data-bfiso="1"] .bf-pipearrow, html[data-bfi
 #bff-wrap .bff-kpi:has([data-kpiic="acq"]) .bff-kpi-body { justify-content: center !important; }
 #bff-wrap .bff-kpi:has([data-kpiic="acq"]) .bff-kpi-acqrow { justify-content: center !important; }
 #bff-wrap .bff-kpi:has([data-kpiic="acq"]) .bff-kpi-sub { text-align: center !important; }
+
+/* batch 76 — record open/flip polish */
+
+/* (a) flip arrow buttons: dark translucent gray pill with the command-center green chevrons (was solid white) */
+.bf-flip { background: rgba(26,28,34,0.62) !important; color: #92df02 !important; border: 1px solid rgba(255,255,255,0.10) !important; box-shadow: 0 4px 18px rgba(0,0,0,0.38) !important; -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
+.bf-flip:hover { background: rgba(40,43,50,0.80) !important; color: #aef24a !important; }
+.bf-flip i, .bf-flip svg { color: #92df02 !important; }
+.bf-flip:hover i, .bf-flip:hover svg { color: #aef24a !important; }
+
+/* (b) consistent dark background everywhere so a full-page flip never flashes white;
+   #0c0d10 is painted by the browser during navigation instead of the default white */
+html, body { background-color: #0c0d10 !important; }
+body.bf-rec-open [data-testid="record-view-body"] { background: #0b0b0d !important; }
+/* darken Noloco's white loading skeletons so a mid-load frame reads dark, not white */
+body.bf-rec-open .animate-pulse,
+body.bf-rec-open [data-testid="record-view-body"] [class*="bg-white"],
+body.bf-rec-open [data-testid="record-view-body"] [class*="bg-gray-50"],
+body.bf-rec-open [data-testid="record-view-body"] [class*="bg-gray-100"] { background-color: #15171c !important; }
