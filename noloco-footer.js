@@ -987,13 +987,14 @@
     var fh=document.getElementById('bf-v2flip');
     if(!fh){ fh=document.createElement('div'); fh.id='bf-v2flip'; }
     fh.setAttribute('data-uuid',u);
-    try{ fh.innerHTML=bfV2Html(R,u)+'<div class="bf-v2flipfull"><button type="button" class="bf-v2fullbtn" data-bffull="'+u+'"><i class="ti ti-layout-bottombar-expand" aria-hidden="true"></i> Open full record \u00b7 milestones & timeline</button></div>'; }catch(e){ location.assign('/command/preview/'+u+'/overview'); return; }
+    try{ fh.innerHTML=bfV2Html(R,u); }catch(e){ location.assign('/command/preview/'+u+'/overview'); return; }
     if(fh.parentNode!==body) body.insertBefore(fh, body.firstChild);
     try{ bfV2Wire(fh,u,R); }catch(e){}
     try{ var order=JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); var idx=order.indexOf(u);
       [].slice.call(document.querySelectorAll('.bf-pipearrow')).forEach(function(a){ var isLeft=a.getBoundingClientRect().left<window.innerWidth/2; var t=isLeft?order[idx-1]:order[idx+1]; if(idx>-1&&t){ a.setAttribute('data-bfgo',t); a.style.display='inline-flex'; } else { a.style.display='none'; } });
     }catch(e){}
     try{ window.scrollTo(0,0); }catch(e){}
+    try{ clearTimeout(window.__bfFlipLoad); window.__bfFlipLoad=setTimeout(function(){ if(document.documentElement.getAttribute('data-bfflip')==='1' && location.pathname.indexOf(u)>-1){ location.assign('/command/preview/'+u+'/overview'); } }, 1100); }catch(e){}
   }
   function bfFlipGo(u){ bfV2Flip(u); }
   function bfShortStage(name){
