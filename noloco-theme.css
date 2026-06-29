@@ -3240,3 +3240,28 @@ html[data-bfembed="1"] .bf-v2secs { padding: 0 14px 14px !important; max-width: 
 html[data-bfembed="1"] .bf-v2secs, html[data-bfembed="1"] .bf-v2secs * { max-height: none !important; }
 html[data-bfembed="1"] [class*="overflow-y-auto"], html[data-bfembed="1"] [class*="overflow-auto"], html[data-bfembed="1"] [class*="overflow-y-scroll"] { overflow: visible !important; }
 html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+
+/* batch 80 — workspace embed cleanup: kill the black void + extra padding, lighter loader, no inner scroll.
+   Backgrounds go transparent so the modal's own surface shows through (no separate black layer),
+   inner page/section padding is removed so objects align with the cockpit cards, and the loader is subtle. */
+
+/* host + frame: transparent, no reserved black box */
+#bf-modal .bf-modal-wswrap { background: transparent !important; }
+#bf-modal .bf-modal-wsif { background: transparent !important; height: 90px; min-height: 0; }
+#bf-modal .bf-modal-wsload { top: 22px; color: #5c6066; font-size: 12px; }
+#bf-modal .bf-modal-wsspin { width: 20px; height: 20px; border-width: 2px; }
+
+/* inside the embedded record: everything transparent (let the modal surface show), no extra padding */
+html[data-bfembed="1"], html[data-bfembed="1"] body,
+html[data-bfembed="1"] [data-testid="record-view"],
+html[data-bfembed="1"] [data-testid="record-view-body"],
+html[data-bfembed="1"] [data-testid="view-collection"],
+html[data-bfembed="1"] .bf-v2wrap,
+html[data-bfembed="1"] .bf-v2secs,
+html[data-bfembed="1"] .bf-v2wsslot { background: transparent !important; }
+html[data-bfembed="1"] .bf-v2wrap { padding: 0 !important; margin: 0 !important; }
+html[data-bfembed="1"] .bf-v2secs { padding: 0 !important; margin: 0 !important; }
+html[data-bfembed="1"] .bf-v2wsslot { padding: 0 !important; margin: 0 !important; }
+/* belt-and-suspenders: no scrollbars / no internal scroll anywhere in the embed */
+html[data-bfembed="1"] * { overflow: visible !important; }
+html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
