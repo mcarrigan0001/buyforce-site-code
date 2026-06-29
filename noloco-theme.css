@@ -3483,3 +3483,15 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
   .bf-v2cockpit .bfc-tiles{ grid-template-columns:1fr 1fr; }
   .bf-v2cockpit .bfc-title{ font-size:22px; }
 }
+
+/* batch 85 — cockpit polish: bar value never clips; deal-progress stepper gets a connector line + more contrast */
+.bf-v2cockpit .bfc-barval{ left:auto !important; right:12px !important; transform:translateY(-50%) !important; }
+.bf-v2cockpit .bfc-barval.bf{ color:#0c1407 !important; text-shadow:0 1px 0 rgba(163,230,53,0.25); }
+.bf-v2cockpit .bfc-stepper{ position:relative; }
+.bf-v2cockpit .bfc-step{ position:relative; }
+.bf-v2cockpit .bfc-step::before{ content:''; position:absolute; top:11px; left:-50%; width:100%; height:2px; background:rgba(255,255,255,0.09); z-index:0; }
+.bf-v2cockpit .bfc-step:first-child::before{ display:none; }
+.bf-v2cockpit .bfc-step.done::before{ background:rgba(132,204,22,0.5); }
+.bf-v2cockpit .bfc-step.cur::before{ background:linear-gradient(90deg,rgba(132,204,22,0.5),rgba(132,204,22,0.18)); }
+.bf-v2cockpit .bfc-dot{ position:relative; z-index:1; background:#0f1113; }
+.bf-v2cockpit .bfc-step.up .bfc-dot{ border-color:rgba(255,255,255,0.24); }

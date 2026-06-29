@@ -1310,7 +1310,7 @@
     // ---- identity / title / trim ----
     var title=E(R.title||'Opportunity');
     var sub=(R.subtitle||'');
-    var trim=''; { var ts=sub.replace(/^[·\s]+/,'').trim(); if(ts) trim=E(ts); }
+    var trim=''; { var ts=sub.replace(/^[·\s]+/,'').trim(); if(ts && ts.length<=22 && !/mile|seller|owner|\d{3,}/i.test(ts)) trim=E(ts); }
     var vin=(R.vin||'');
     // ---- economics ----
     var asking=R.asking, offer=R.offer, acv=R.acv;
