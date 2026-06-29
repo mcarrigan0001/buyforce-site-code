@@ -3150,3 +3150,8 @@ html[data-bfflip="1"] [data-testid="record-view-body"] > *:not(#bf-v2flip) { dis
 html[data-bfiso="1"] [data-testid="navigation-sidebar"] { display: none !important; }
 html[data-bfiso="1"] .bf-flip, html[data-bfiso="1"] .bf-pipearrow, html[data-bfiso="1"] #bf-v2nav { display: none !important; }
 #bf-ovl .bf-ovl-if { background: #0c0d10 !important; }
+
+/* batch 74 — overlay: dark loading layer over the iframe until the framed cockpit signals ready (data-bfv2), so there's no white flash on open/flip */
+#bf-ovl .bf-ovl-load { position: absolute; left: 0; right: 0; top: 40px; bottom: 0; background: #0c0d10; display: none; align-items: center; justify-content: center; z-index: 3; }
+#bf-ovl .bf-ovl-spin { width: 26px; height: 26px; border: 3px solid #2a2c33; border-top-color: #92df02; border-radius: 50%; animation: bfovlspin .8s linear infinite; }
+@keyframes bfovlspin { to { transform: rotate(360deg); } }
