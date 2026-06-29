@@ -3122,3 +3122,10 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 /* batch 67 — collapsed sidebar: center nav icons; drop the gray selected pill (green icon marks active) */
 [data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a > div { justify-content: center !important; }
 [data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected { background-color: transparent !important; }
+
+/* batch 69 — record page cleanup: keep only the dark cockpit (deal panel + competitive landscape); remove the duplicate price/offers blocks (left rail, native offers-to-beat, native highlight grid). Milestone sections untouched. */
+[data-testid="record-view-body"] .bf-recleft { display: none !important; }
+[data-testid="record-view-body"] .bf-reccols { display: block !important; }
+[data-testid="record-view-body"] .bf-recright { width: 100% !important; max-width: none !important; }
+[data-testid="record-view-body"] .bf-otb { display: none !important; }
+[data-testid="record-view-body"] [class*="section-highlights"] { display: none !important; }
