@@ -3137,3 +3137,11 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 body.bf-rec-open [data-testid="collection-group"] { display: none !important; }
 body.bf-rec-open [data-testid="collection-search-button"] { display: none !important; }
 body.bf-rec-open [data-testid="view-collection"] > div:not(:has([data-testid="record-view"])):not(:has([data-testid="record-view-body"])) { display: none !important; }
+
+/* batch 72 — instant cache flip: while flipping, show the cockpit overlay (#bf-v2flip, painted from cache, no reload) and hide the native record + the normal cockpit. "Open full record" loads the live milestones/timeline. */
+html[data-bfflip="1"] [data-testid="record-view-body"] > *:not(#bf-v2flip) { display: none !important; }
+#bf-v2flip { width: 100%; }
+.bf-v2flipfull { text-align: center; padding: 16px 0 44px; }
+.bf-v2fullbtn { display: inline-flex; align-items: center; gap: 8px; background: #15161b; border: 1px solid #2a2c33; color: #cfd2d6; font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; }
+.bf-v2fullbtn:hover { background: #1b1d22; border-color: #92df02; color: #92df02; }
+.bf-v2fullbtn i { font-size: 16px; }

@@ -978,7 +978,24 @@
     if(bfRoleName){ if(slotEl.getAttribute('data-bfrole')!=='1') slotEl.setAttribute('data-bfrole','1'); if(slotEl.textContent!==bfRoleName) slotEl.textContent=bfRoleName; slotEl.style.visibility='visible'; }
     else { slotEl.style.visibility='hidden'; }
   }
-  function bfFlipGo(u){ try{ sessionStorage.setItem('bf.navts', String(Date.now())); }catch(e){} location.assign('/command/preview/'+u+'/overview'); }
+  function bfV2Flip(u){
+    var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+u)||localStorage.getItem('bfrec:'+u)||'{}'); }catch(e){}
+    if(!R || Object.keys(R).length<3){ location.assign('/command/preview/'+u+'/overview'); return; }
+    try{ history.pushState({},'','/command/preview/'+u+'/overview'); }catch(e){}
+    document.documentElement.setAttribute('data-bfflip','1');
+    var body=document.querySelector('[data-testid="record-view-body"]')||document.body;
+    var fh=document.getElementById('bf-v2flip');
+    if(!fh){ fh=document.createElement('div'); fh.id='bf-v2flip'; }
+    fh.setAttribute('data-uuid',u);
+    try{ fh.innerHTML=bfV2Html(R,u)+'<div class="bf-v2flipfull"><button type="button" class="bf-v2fullbtn" data-bffull="'+u+'"><i class="ti ti-layout-bottombar-expand" aria-hidden="true"></i> Open full record \u00b7 milestones & timeline</button></div>'; }catch(e){ location.assign('/command/preview/'+u+'/overview'); return; }
+    if(fh.parentNode!==body) body.insertBefore(fh, body.firstChild);
+    try{ bfV2Wire(fh,u,R); }catch(e){}
+    try{ var order=JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); var idx=order.indexOf(u);
+      [].slice.call(document.querySelectorAll('.bf-pipearrow')).forEach(function(a){ var isLeft=a.getBoundingClientRect().left<window.innerWidth/2; var t=isLeft?order[idx-1]:order[idx+1]; if(idx>-1&&t){ a.setAttribute('data-bfgo',t); a.style.display='inline-flex'; } else { a.style.display='none'; } });
+    }catch(e){}
+    try{ window.scrollTo(0,0); }catch(e){}
+  }
+  function bfFlipGo(u){ bfV2Flip(u); }
   function bfShortStage(name){
     var n=name||'';
     if(/appraisal complete/i.test(n)) return 'Offer Sheet Values';
@@ -1074,7 +1091,7 @@
     }
   }
   function bfPipeIsDrawer(){ try{ if(/^\/(pipeline|command)\//.test(location.pathname)) return false; var pp=new URLSearchParams(location.search).get('_parentPage'); if(!pp) return false; var d=JSON.parse(atob(pp)); return !!(d&&d.elementId===BF_PIPE_EL); }catch(e){ return false; } }
-  function bfPipeGo(u){ try{ sessionStorage.setItem('bf.navts', String(Date.now())); }catch(e){} location.assign('/command/preview/'+u+'/overview'); }
+  function bfPipeGo(u){ bfV2Flip(u); }
   function bfPipeClose(){ try{ history.pushState({},'','/command'); window.dispatchEvent(new PopStateEvent('popstate')); }catch(e){ location.href='/command'; } }
   function bfMkPipeArrow(side){ var b=document.createElement('button'); b.type='button'; b.className='bf-flip bf-pipearrow'; b.style.cssText='position:fixed;top:50%;'+(side==='l'?'left:16px':'right:16px')+';transform:translateY(-50%);z-index:10002;display:none;'; b.innerHTML='<i class="ti ti-chevron-'+(side==='l'?'left':'right')+'" aria-hidden="true"></i>'; b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); var u=b.getAttribute('data-bfgo'); if(u) bfPipeGo(u); }); document.body.appendChild(b); return b; }
   function bfPipeDrawer(){
@@ -1370,6 +1387,7 @@
     if(!/\/(view|preview)\/rec[0-9a-z]+/.test(location.pathname)){ if(document.documentElement.getAttribute('data-bfv2')==='1'){ document.documentElement.removeAttribute('data-bfv2'); document.documentElement.removeAttribute('data-bfv2framed'); var old=document.getElementById('bf-v2'); if(old) old.remove(); var oldn=document.getElementById('bf-v2nav'); if(oldn) oldn.remove(); } return; }
     var body=document.querySelector('[data-testid="record-view-body"]'); if(!body) return;
     var m=location.pathname.match(/\/(rec[0-9a-z]+)/i); var uuid=m?m[1]:''; if(!uuid) return;
+    if(document.documentElement.getAttribute('data-bfflip')==='1'){ return; }
     var host=document.getElementById('bf-v2');
     if(!host || host.getAttribute('data-uuid')!==uuid){
       var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
@@ -1685,6 +1703,7 @@
       try{ sessionStorage.setItem('bf.navts', String(Date.now())); }catch(_x){} location.assign('/command/preview/'+m[1]+'/overview');
     }catch(_e){}
   }, true);
+  document.addEventListener('click', function(e){ var b=e.target&&e.target.closest&&e.target.closest('.bf-v2fullbtn'); if(b){ e.preventDefault(); e.stopPropagation(); var uu=b.getAttribute('data-bffull'); if(uu){ try{ document.documentElement.removeAttribute('data-bfflip'); }catch(_z){} location.assign('/command/preview/'+uu+'/overview'); } } }, true);
   document.addEventListener('mousedown', function(e){
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing, .bf-vincopy'):null;
     if(el){ e.stopPropagation(); }
@@ -2544,7 +2563,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); try{bfNavCollapse();}catch(_nc){} try{bfUserInfoRole();}catch(_ur){} bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec){ document.body.classList.remove('bf-sbcollapsed'); document.documentElement.removeAttribute('data-bfflip'); var _ff=document.getElementById('bf-v2flip'); if(_ff) _ff.remove(); } bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); try{bfNavCollapse();}catch(_nc){} try{bfUserInfoRole();}catch(_ur){} bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
