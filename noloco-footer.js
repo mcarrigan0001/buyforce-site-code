@@ -1321,13 +1321,13 @@
     // ---- payoff / equity (Offer - Payoff per design) ----
     var payN=(R.payoff!=null&&R.payoff!=='')?Number((''+R.payoff).replace(/[^0-9.\-]/g,'')):NaN;
     var eqHas=(!isNaN(offN)&&!isNaN(payN));
-    var eqVal=eqHas?Math.round(offN-payN):null;
+    var eqVal=eqHas?(Math.round((offN-payN)*100)/100):null;
     var eqPos=(eqVal==null||eqVal>=0);
     var eqColor=eqPos?'#a3e635':'#f87171';
-    var eqStr=eqVal==null?'—':('$'+Math.abs(eqVal).toLocaleString('en-US'));
+    var eqStr=eqVal==null?'—':('$'+Math.abs(eqVal).toLocaleString('en-US',{minimumFractionDigits:(Math.abs(eqVal)%1?2:0),maximumFractionDigits:2}));
     var eqBg=eqVal==null?'rgba(255,255,255,0.02)':(eqPos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)');
     var eqBorder=eqVal==null?'rgba(255,255,255,0.06)':(eqPos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)');
-    var payStr=isNaN(payN)?'':payN.toLocaleString('en-US');
+    var payStr=isNaN(payN)?'':payN.toLocaleString('en-US',{minimumFractionDigits:(payN%1?2:0),maximumFractionDigits:2});
     // ---- score / hot ----
     var F={'ACV':R.acv,'Asking Price':R.asking,'Offer Amount':R.offer,'Competition':R.competition,'Est Equity Position':R.eq};
     var sc=bfRecScore(F); var score=sc?sc.score:null;
@@ -1459,7 +1459,7 @@
           +'<div class="bfc-eqval" data-bfeqval style="color:'+eqColor+';">'+eqStr+'</div>'
           +'<div class="bfc-eqsub" data-bfeqsub style="color:'+eqColor+';"><i class="ti ti-chevron-'+(eqPos?'up':'down')+'" aria-hidden="true"></i>'+(eqVal==null?'Add payoff':(eqPos?'Positive Equity':'Negative Equity'))+'</div></div>'
         +'<div class="bfc-eqright"><div class="bfc-eqlbl r">Est. Payoff</div>'
-          +'<div class="bfc-paybox"><span class="bfc-paydollar">$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="numeric" value="'+E(payStr)+'" placeholder="0"></div>'
+          +'<div class="bfc-paybox"><span class="bfc-paydollar">$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(payStr)+'" placeholder="0"></div>'
           +'<div class="bfc-payhint">editable</div></div>'
       +'</div></div>';
 
@@ -1553,20 +1553,24 @@
     var offN=(R.offer!=null&&R.offer!=='')?Number((''+R.offer).replace(/[^0-9.\-]/g,'')):NaN;
     var pin=host.querySelector('[data-bfpayoff]');
     if(pin){
+      function bfPaySan(raw){ var clean=raw.replace(/[^0-9.]/g,''); var i=clean.indexOf('.'); if(i>=0){ clean=clean.slice(0,i+1)+clean.slice(i+1).replace(/\./g,'').slice(0,2); } return clean; }
       pin.addEventListener('input',function(){
-        var digits=pin.value.replace(/[^0-9]/g,'');
-        if(digits!==pin.value){ var pos=pin.selectionStart; pin.value=digits; try{ pin.setSelectionRange(pos-1<0?0:pos,pos-1<0?0:pos); }catch(_e){} }
+        var raw=pin.value; var clean=bfPaySan(raw);
+        if(clean!==raw){ var pos=(pin.selectionStart||clean.length)-(raw.length-clean.length); if(pos<0)pos=0; pin.value=clean; try{ pin.setSelectionRange(pos,pos); }catch(_e){} }
         var card=host.querySelector('[data-bfeqcard]'), val=host.querySelector('[data-bfeqval]'), sub=host.querySelector('[data-bfeqsub]');
-        if(isNaN(offN)||digits===''){ if(val){ val.textContent='—'; val.style.color='#a3e635'; } if(sub){ sub.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>Add payoff'; sub.style.color='#a3e635'; } if(card){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(255,255,255,0.06)'; } return; }
-        var pay=parseInt(digits,10)||0; var eq=Math.round(offN-pay); var pos2=eq>=0;
-        var col=pos2?'#a3e635':'#f87171';
-        if(val){ val.textContent='$'+Math.abs(eq).toLocaleString('en-US'); val.style.color=col; }
+        var empty=(clean===''||clean==='.');
+        if(isNaN(offN)||empty){ if(val){ val.textContent='—'; val.style.color='#a3e635'; } if(sub){ sub.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>Add payoff'; sub.style.color='#a3e635'; } if(card){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(255,255,255,0.06)'; } return; }
+        var pay=parseFloat(clean)||0; var eq=Math.round((offN-pay)*100)/100; var pos2=eq>=0;
+        var col=pos2?'#a3e635':'#f87171'; var fd=(Math.abs(eq)%1)?2:0;
+        if(val){ val.textContent='$'+Math.abs(eq).toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); val.style.color=col; }
         if(sub){ sub.innerHTML='<i class="ti ti-chevron-'+(pos2?'up':'down')+'" aria-hidden="true"></i>'+(pos2?'Positive Equity':'Negative Equity'); sub.style.color=col; }
         if(card){ card.style.background=pos2?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)'; card.style.borderColor=pos2?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)'; }
       });
       pin.addEventListener('change',function(){
-        var digits=pin.value.replace(/[^0-9]/g,''); if(digits==='') return;
-        try{ bfPost({uuid:uuid, estimatedPayoffAmount:parseInt(digits,10)}); }catch(_e){}
+        var clean=bfPaySan(pin.value); if(clean===''||clean==='.') return;
+        var num=Math.round(parseFloat(clean)*100)/100; if(isNaN(num)) return;
+        var fd=(Math.abs(num)%1)?2:0; pin.value=num.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2});
+        try{ bfPost({uuid:uuid, estimatedPayoffAmount:num}); }catch(_e){}
       });
     }
     // description toggle
