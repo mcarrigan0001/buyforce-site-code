@@ -3100,3 +3100,8 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 .bf-navcollapse i { font-size: 16px; line-height: 1; }
 [data-testid="navigation-sidebar"].max-w-20 .bf-navcollapse { justify-content: center; margin: 2px auto 12px auto; width: 34px; padding: 0; }
 [data-testid="navigation-sidebar"].max-w-20 .bf-navcollapse .bf-nc-label { display: none; }
+
+/* batch 64 — user-info polish: full-width Collapse button, smaller name so it doesn't truncate (email is swapped for role name in JS) */
+.bf-navcollapse { align-self: stretch !important; }
+[data-testid="navigation-sidebar"].max-w-20 .bf-navcollapse { align-self: center !important; }
+[data-testid="sidebar-nav-footer"] div.truncate { font-size: 12px !important; }

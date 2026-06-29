@@ -950,6 +950,30 @@
     var collapsed=/max-w-20/.test(sb.className);
     var ic=ctl.querySelector('i'); if(ic){ var want='ti '+(collapsed?'ti-chevron-right':'ti-chevron-left'); if(ic.className!==want) ic.className=want; }
   }
+  var bfRoleName=null, bfRoleFetching=false;
+  function bfFetchRole(){
+    if(bfRoleName!==null||bfRoleFetching) return;
+    try{ var c=sessionStorage.getItem('bf.role'); if(c){ bfRoleName=c; return; } }catch(e){}
+    var jwt=''; try{ jwt=(localStorage.getItem('noloco-client-auth')||'').replace(/^"|"$/g,''); }catch(e){}
+    if(!jwt) return;
+    bfRoleFetching=true;
+    try{
+      fetch('https://api.noloco.io/data/buyforce',{method:'POST',headers:{'Content-Type':'application/json','Authorization':jwt},body:JSON.stringify({query:'query{ user{ role{ name } } }'})})
+        .then(function(r){return r.json();})
+        .then(function(j){ bfRoleFetching=false; var rn=j&&j.data&&j.data.user&&j.data.user.role&&j.data.user.role.name; if(rn){ bfRoleName=rn; try{ sessionStorage.setItem('bf.role',rn); }catch(e){} try{ bfUserInfoRole(); }catch(e){} } })
+        .catch(function(){ bfRoleFetching=false; });
+    }catch(e){ bfRoleFetching=false; }
+  }
+  function bfUserInfoRole(){
+    var foot=document.querySelector('[data-testid="sidebar-nav-footer"]'); if(!foot) return;
+    var txt=[].slice.call(foot.querySelectorAll('div.truncate')).filter(function(e){ return e.children.length===0 && (e.textContent||'').trim(); });
+    var slotEl=null;
+    txt.forEach(function(e){ if(e.getAttribute('data-bfrole')==='1'){ slotEl=e; } else if(/@/.test(e.textContent||'')){ slotEl=slotEl||e; } });
+    if(!slotEl) return;
+    bfFetchRole();
+    if(bfRoleName){ if(slotEl.getAttribute('data-bfrole')!=='1') slotEl.setAttribute('data-bfrole','1'); if(slotEl.textContent!==bfRoleName) slotEl.textContent=bfRoleName; slotEl.style.visibility='visible'; }
+    else { slotEl.style.visibility='hidden'; }
+  }
   function bfFlipGo(u){
     var _parts=location.pathname.split('/'); var _base=_parts[1]||'command'; var _tab=_parts[4]||'overview';
     var _s=location.search||'';
@@ -2524,7 +2548,7 @@
       document.documentElement.setAttribute('data-bfiso','1');
     }catch(e){}
   }
-  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); try{bfNavCollapse();}catch(_nc){} bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
+  function run(){ try{bfIframeIsolate();}catch(_if){} var onRec=/\/(preview|view)\//.test(location.pathname); document.body.classList.toggle('bf-rec-open', onRec); document.body.classList.toggle('bf-kanban', /^\/pipeline(\/|$)/.test(location.pathname)); if(!onRec) document.body.classList.remove('bf-sbcollapsed'); bfTagContainers(); fixLinks(); addIcons(); bfRecTop(); bfRecHideEmpty(); bfRecTweaks(); bfRecPills(); bfRecHlIcons(); bfRecSectionIcons(); bfRecMobileOffers(); bfRecSectionsUI(); bfRecPort(); bfRecApprBtns(); try{bfRecDedupBtns();}catch(_dd){} bfRecScheduler(); bfRecSecClass(); bfWorkspace(); try{bfPipePrice();}catch(_pp){} bfRecCollapseDefault(); bfRecEditableHl(); manageBackdrop(); try{bfPipeDrawer();}catch(_pd){} bfRecFlip(); bfRecSwipe(); bfSidebarSwipe(); bfEnsureSbRestore(); try{bfNavCollapse();}catch(_nc){} try{bfUserInfoRole();}catch(_ur){} bfRecMobNav(); bfLoadUsers(); try{bfLiEnsureFab();}catch(e){} if(!onRec||bfBoardDirty){ addCards(false); } bfBoardDirty=false; bfRecHideBottomBtns(); try{bfBoardTriage();}catch(_te){} try{bfPipelinePage();}catch(_pe){} try{bfPushExtToken();}catch(_xt){} try{bfV2();}catch(_v2){} try{bfLitFunnelForRecord();}catch(_lf){} if(!onRec){ if(bfFirstDefault) bfColDefaultSweep(); ensureArrow(); bfEnsureToggle(); bfSnap(); bfInitScroll(); bfExpandAllMobile(); bfMoveSearch(); } }
   run();
   var bfLast=0, bfTimer=null, bfObs=null;
   function bfStartObs(){ if(!bfObs) bfObs=new MutationObserver(bfScheduleRun); bfObs.observe(document.body, { childList: true, subtree: true }); }
