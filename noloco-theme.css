@@ -3275,3 +3275,21 @@ html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !imp
 #bf-modal .bf-ws-item .bf-modal-wsspin { width: 20px; height: 20px; border: 2px solid #2a2c33; border-top-color: #92df02; border-radius: 50%; animation: bfovlspin .8s linear infinite; }
 /* hide the non-functional cockpit action stubs in the modal (real actions live in the workspace Log tab) */
 #bf-modal .bf-v2acts { display: none !important; }
+
+/* batch 82 — embed seamless finish: remove the ~96px top gap, neutralize Noloco wrapper bg layers
+   (black + gray/brown), and keep the content edges aligned with the cockpit cards above. */
+html[data-bfembed="1"] [data-testid="record-view-body"] { margin: 0 !important; padding: 0 !important; }
+html[data-bfembed="1"] [data-testid="record-view"] { margin: 0 !important; padding: 0 !important; }
+html[data-bfembed="1"] .bf-reccols,
+html[data-bfembed="1"] .bf-recright,
+html[data-bfembed="1"] .bf-v2wrap,
+html[data-bfembed="1"] .bf-v2secs,
+html[data-bfembed="1"] .bf-v2secs > * { margin-top: 0 !important; }
+/* belt-and-suspenders for the wrapper layers carrying black / gray-brown backgrounds */
+html[data-bfembed="1"] .noloco-project,
+html[data-bfembed="1"] .project-page,
+html[data-bfembed="1"] .project-theme,
+html[data-bfembed="1"] .canvas,
+html[data-bfembed="1"] .project-preview,
+html[data-bfembed="1"] [class*="canvas-scroll"],
+html[data-bfembed="1"] [class*="inset-y-0"] { background: transparent !important; background-color: transparent !important; }
