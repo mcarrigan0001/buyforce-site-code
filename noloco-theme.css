@@ -3118,3 +3118,7 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
   height: 36px !important;
   object-fit: contain !important;
 }
+
+/* batch 67 — collapsed sidebar: center nav icons; drop the gray selected pill (green icon marks active) */
+[data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a > div { justify-content: center !important; }
+[data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-nav-item"] a.bg-project-nav-selected { background-color: transparent !important; }
