@@ -3110,3 +3110,11 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 .bff-lc-ctrls { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
 .bff-lc-ctrls .bff-ddb, .bff-lc-h .bff-filter-lc { height: 32px !important; box-sizing: border-box !important; }
 .bff-lc-ctrls .bff-ddb { padding: 0 9px !important; }
+
+/* batch 66 — collapsed sidebar: show the favicon in place of the full logo */
+[data-testid="navigation-sidebar"].max-w-20 [data-testid="sidebar-logo"] {
+  content: url("https://assets.cdn.filesafe.space/MNFULEQNWAlu025pP1VI/media/6a4271b221adde19f4b4c148.png") !important;
+  width: 36px !important;
+  height: 36px !important;
+  object-fit: contain !important;
+}
