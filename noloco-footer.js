@@ -1652,6 +1652,20 @@
   var BF_HOOK='https://buyforce.app.n8n.cloud/webhook/update-stage';
   var bfStageBusy=false;
   function bfLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  // Kanban: open the FULL record (overview tab, which carries all sections + the auth token) instead of Noloco's minimal deal-snapshot layout.
+  document.addEventListener('click', function(e){
+    try{
+      if(!/^\/pipeline(\/|$)/.test(location.pathname)) return;
+      if(location.pathname.indexOf('/preview/')>-1) return;
+      var t=e.target; if(!(t&&t.closest)) return;
+      if(t.closest('button, a[href^="http"], .bf-ms, .bf-actions, .bf-listing, .bf-vincopy, .bf-comment, .bf-navcollapse, input, textarea, select, [data-testid="collection-group-header"]')) return;
+      var card=t.closest('[data-testid="collection-record"]'); if(!card) return;
+      var href=card.getAttribute('href')||''; var m=href.match(/(rec[0-9a-z]+)/i); if(!m) return;
+      e.preventDefault(); e.stopPropagation();
+      var url='/pipeline/preview/'+m[1]+'/overview';
+      try{ history.pushState({},'',url); window.dispatchEvent(new PopStateEvent('popstate')); }catch(err){ location.href=url; }
+    }catch(_e){}
+  }, true);
   document.addEventListener('mousedown', function(e){
     var el=(e.target&&e.target.closest)?e.target.closest('.bf-ms, .bf-comment, .bf-actions, .bf-listing, .bf-vincopy'):null;
     if(el){ e.stopPropagation(); }
