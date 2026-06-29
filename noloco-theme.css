@@ -3108,5 +3108,5 @@ body:not(.bf-kanban) .bf-allcollapse { display: none !important; }
 
 /* batch 65 — record-table rep + timeframe filter controls (command center list card) */
 .bff-lc-ctrls { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
-.bff-lcf { background: #15161b; border: 1px solid #2a2c33; color: #e8e8ea; font-size: 12px; font-weight: 600; border-radius: 8px; padding: 6px 8px; outline: none; cursor: pointer; }
-.bff-lcf:hover { background: #1b1d22; }
+.bff-lc-ctrls .bff-ddb, .bff-lc-h .bff-filter-lc { height: 32px !important; box-sizing: border-box !important; }
+.bff-lc-ctrls .bff-ddb { padding: 0 9px !important; }
