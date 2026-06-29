@@ -3228,7 +3228,15 @@ html[data-bfembed="1"] .bf-v2secs:empty { display: none !important; }
 
 /* modal workspace pane (host for the iframe) */
 #bf-modal .bf-v2secs:empty { display: none !important; }
-#bf-modal .bf-modal-wswrap { position: relative; margin: 2px 14px 16px; border-top: 1px solid #181a1f; padding-top: 10px; min-height: 120px; }
-#bf-modal .bf-modal-wsif { width: 100%; border: 0; background: #0b0b0d; height: 220px; display: block; }
+#bf-modal .bf-modal-wswrap { position: relative; margin: 0 !important; border: 0 !important; padding: 0 !important; min-height: 0; }
+#bf-modal .bf-modal-wsif { width: 100%; border: 0; background: transparent; height: 200px; display: block; }
 #bf-modal .bf-modal-wsload { position: absolute; left: 0; right: 0; top: 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; color: #6b7077; font-size: 13px; pointer-events: none; }
 #bf-modal .bf-modal-wsspin { width: 24px; height: 24px; border: 3px solid #2a2c33; border-top-color: #92df02; border-radius: 50%; animation: bfovlspin .8s linear infinite; }
+
+/* batch 79 — make the embedded workspace iframe indistinguishable: no internal scrollbar,
+   no capped-height scroll regions (so the modal scrolls as one continuous page), full-bleed, matched bg */
+html[data-bfembed="1"], html[data-bfembed="1"] body { overflow: hidden !important; background: #0b0b0d !important; }
+html[data-bfembed="1"] .bf-v2secs { padding: 0 14px 14px !important; max-width: none !important; margin: 0 !important; }
+html[data-bfembed="1"] .bf-v2secs, html[data-bfembed="1"] .bf-v2secs * { max-height: none !important; }
+html[data-bfembed="1"] [class*="overflow-y-auto"], html[data-bfembed="1"] [class*="overflow-auto"], html[data-bfembed="1"] [class*="overflow-y-scroll"] { overflow: visible !important; }
+html[data-bfembed="1"] ::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }

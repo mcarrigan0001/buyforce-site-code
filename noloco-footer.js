@@ -2434,7 +2434,7 @@
       var m=bfEnsureModal(); var body=m.querySelector('.bf-modal-body');
       try{ body.innerHTML=bfV2Html(R,uuid); }catch(e){ bfNavRec(uuid); return; }
       try{ bfV2Wire(body,uuid,R); }catch(e){}
-      try{ var slot=body.querySelector('.bf-v2wsslot'); if(slot){ slot.innerHTML='<div class="bf-modal-wswrap"><div class="bf-modal-wsload"><div class="bf-modal-wsspin"></div>Loading workspace\u2026</div><iframe class="bf-modal-wsif" title="Workspace and milestones" scrolling="no"></iframe></div>'; var ifr=slot.querySelector('.bf-modal-wsif'); clearTimeout(bfModalWsT); (function(uu,fr){ bfModalWsT=setTimeout(function(){ if(bfModalList[bfModalIdx]===uu&&fr){ fr.src='/command/preview/'+uu+'/overview#bfembed'; } }, 300); })(uuid,ifr); } }catch(e){}
+      try{ var slot=body.querySelector('.bf-v2wsslot'); if(slot){ slot.innerHTML='<div class="bf-modal-wswrap"><div class="bf-modal-wsload"><div class="bf-modal-wsspin"></div>Loading workspace\u2026</div><iframe class="bf-modal-wsif" title="Workspace and milestones" scrolling="no"></iframe></div>'; var ifr=slot.querySelector('.bf-modal-wsif'); if(ifr){ ifr.src='/command/preview/'+uuid+'/overview#bfembed'; } } }catch(e){}
       try{ var ae=body.querySelector('.bf-v2feed[data-vp="act"] .bf-v2empty'); if(ae) ae.textContent='Open the full record to view the activity timeline.'; }catch(e){}
       try{ var card=m.querySelector('.bf-modal-card'); if(card) card.scrollTop=0; }catch(e){}
       var pv=m.querySelector('.bf-modal-prev'), nx=m.querySelector('.bf-modal-next');
