@@ -3215,7 +3215,8 @@ html[data-bfmodal="1"] body { overflow: hidden !important; }
 /* inside the embedded iframe: show only workspace + milestone sections */
 html[data-bfembed="1"] .bf-v2hero,
 html[data-bfembed="1"] .bf-v2grid,
-html[data-bfembed="1"] .bf-v2acts { display: none !important; }
+html[data-bfembed="1"] .bf-v2acts,
+html[data-bfembed="1"] .bf-v2cockpit { display: none !important; }
 html[data-bfembed="1"] .bf-v2wrap { padding: 0 !important; max-width: none !important; margin: 0 !important; }
 html[data-bfembed="1"], html[data-bfembed="1"] body { background: #0b0b0d !important; }
 html[data-bfembed="1"] [data-testid="navigation-sidebar"],
@@ -3299,3 +3300,186 @@ html[data-bfembed="1"] [class*="inset-y-0"] { background: transparent !important
 html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="view-collection"],
 html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-empty-state"],
 html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { visibility: hidden !important; }
+
+/* batch 84 — "Work This Deal" record cockpit redesign (scoped under .bf-v2cockpit so it
+   renders on the full page #bf-v2 AND inside the command-center modal #bf-modal .bf-modal-body) */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap');
+@keyframes bfcRingPulse { 0%{box-shadow:0 0 0 0 rgba(163,230,53,0.45);} 70%{box-shadow:0 0 0 7px rgba(163,230,53,0);} 100%{box-shadow:0 0 0 0 rgba(163,230,53,0);} }
+.bf-v2cockpit{ font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; color:#f4f4f5; display:flex; flex-direction:column; gap:14px; }
+.bf-v2cockpit *{ box-sizing:border-box; }
+.bf-v2cockpit .bfc-card{ background:#0f1113; border:1px solid rgba(255,255,255,0.06); border-radius:14px; }
+.bf-v2cockpit .bfc-eyebrow{ font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-v2cockpit .bfc-sechead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.bf-v2cockpit .bfc-dotlime{ width:6px; height:6px; border-radius:50%; background:#a3e635; box-shadow:0 0 0 3px rgba(163,230,53,0.2); }
+.bf-v2cockpit .bfc-dotlime.sm{ box-shadow:none; width:5px; height:5px; }
+
+/* ---- header ---- */
+.bf-v2cockpit .bfc-header{ display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-photo{ flex:0 0 auto; width:96px; height:96px; border-radius:15px; background:linear-gradient(160deg,#1a1d20,#101214); border:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.bf-v2cockpit .bfc-photo img{ width:100%; height:100%; object-fit:cover; }
+.bf-v2cockpit .bfc-photo i{ font-size:42px; color:#4b4e54; }
+.bf-v2cockpit .bfc-center{ flex:1 1 320px; min-width:0; }
+.bf-v2cockpit .bfc-titlerow{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-title{ margin:0; font-size:25px; font-weight:700; letter-spacing:-0.02em; line-height:1.1; color:#f4f4f5; }
+.bf-v2cockpit .bfc-trim{ font-size:13px; color:#6b6e74; font-weight:500; }
+.bf-v2cockpit .bfc-pills{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:11px; }
+.bf-v2cockpit .bfc-pill{ display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 10px; border-radius:7px; font-size:12px; font-weight:600; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#d4d4d8; }
+.bf-v2cockpit .bfc-pill i{ font-size:13px; }
+.bf-v2cockpit .bfc-pill.win{ background:rgba(132,204,22,0.13); border-color:rgba(132,204,22,0.3); color:#a3e635; }
+.bf-v2cockpit .bfc-pill.comp{ background:rgba(251,146,60,0.13); border-color:rgba(251,146,60,0.3); color:#fb923c; }
+.bf-v2cockpit .bfc-pill.stage{ font-weight:500; }
+.bf-v2cockpit .bfc-pill.clean{ background:rgba(132,204,22,0.08); border-color:rgba(132,204,22,0.22); color:#a3e635; }
+.bf-v2cockpit .bfc-pill.bad{ background:rgba(248,113,113,0.08); border-color:rgba(248,113,113,0.28); color:#f87171; }
+.bf-v2cockpit .bfc-vin{ display:inline-flex; align-items:center; gap:8px; margin-top:13px; cursor:pointer; }
+.bf-v2cockpit .bfc-vin:hover{ opacity:0.85; }
+.bf-v2cockpit .bfc-vinlbl{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#6b6e74; font-weight:600; }
+.bf-v2cockpit .bfc-vinval{ font-family:'Geist Mono',monospace; font-size:13px; color:#d4d4d8; letter-spacing:0.02em; }
+.bf-v2cockpit .bfc-vincopy{ display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#a3e635; font-weight:600; }
+.bf-v2cockpit .bfc-facts{ display:flex; align-items:center; gap:9px; margin-top:10px; font-size:13px; color:#b4b6bb; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-fi{ display:inline-flex; align-items:center; gap:6px; font-variant-numeric:tabular-nums; }
+.bf-v2cockpit .bfc-fi i{ font-size:14px; color:#7b7e84; }
+.bf-v2cockpit .bfc-fsep{ color:#3f4146; }
+.bf-v2cockpit .bfc-sw{ width:11px; height:11px; border-radius:50%; background:#6b6e74; border:1px solid rgba(255,255,255,0.2); }
+.bf-v2cockpit .bfc-flink{ display:inline-flex; align-items:center; gap:5px; color:#a3e635; font-weight:600; text-decoration:none; }
+.bf-v2cockpit .bfc-flink:hover{ text-decoration:underline; }
+.bf-v2cockpit .bfc-flink i{ font-size:13px; }
+
+/* ---- right cluster: tiles + offer sheet ---- */
+.bf-v2cockpit .bfc-right{ flex:0 0 268px; display:flex; flex-direction:column; gap:9px; }
+.bf-v2cockpit .bfc-tiles{ display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.bf-v2cockpit .bfc-tile{ padding:11px 13px; background:#0f1113; border:1px solid rgba(255,255,255,0.06); border-radius:12px; }
+.bf-v2cockpit .bfc-tiletop{ display:flex; align-items:center; gap:7px; }
+.bf-v2cockpit .bfc-tiletop i{ font-size:15px; color:#7b7e84; }
+.bf-v2cockpit .bfc-tileval{ font-variant-numeric:tabular-nums; font-size:19px; font-weight:700; letter-spacing:-0.02em; }
+.bf-v2cockpit .bfc-tilelbl{ font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:#6b6e74; font-weight:600; margin-top:6px; }
+.bf-v2cockpit .bfc-tile.hot{ border-color:rgba(249,115,22,0.22); }
+.bf-v2cockpit .bfc-tile.hot .bfc-tiletop i{ color:#f97316; }
+.bf-v2cockpit .bfc-tile.hot .bfc-tileval{ color:#fb923c; font-weight:800; }
+.bf-v2cockpit .bfc-tile.hot .bfc-tilelbl{ color:#fb923c; }
+.bf-v2cockpit .bfc-sheet{ display:flex; align-items:center; gap:11px; padding:10px 12px; background:#0f1113; border:1px solid rgba(255,255,255,0.07); border-radius:12px; text-decoration:none; cursor:pointer; }
+.bf-v2cockpit .bfc-sheet:hover{ border-color:rgba(163,230,53,0.4); }
+.bf-v2cockpit .bfc-sheetthumb{ position:relative; flex:0 0 auto; width:30px; height:38px; border-radius:5px; background:linear-gradient(160deg,#fff,#d4d4d8); box-shadow:0 2px 8px rgba(0,0,0,0.4); display:block; }
+.bf-v2cockpit .bfc-sheetthumb i{ position:absolute; left:5px; border-radius:2px; }
+.bf-v2cockpit .bfc-sheetthumb i:nth-child(1){ right:5px; top:7px; height:2.5px; background:#84cc16; }
+.bf-v2cockpit .bfc-sheetthumb i:nth-child(2){ right:11px; top:13px; height:2px; background:#c4c7cc; }
+.bf-v2cockpit .bfc-sheetthumb i:nth-child(3){ right:8px; top:18px; height:2px; background:#c4c7cc; }
+.bf-v2cockpit .bfc-sheetthumb i:nth-child(4){ right:14px; bottom:6px; height:5px; background:#1c1e21; }
+.bf-v2cockpit .bfc-sheetthumb.gen{ background:linear-gradient(160deg,#15171a,#0f1113); border:1px dashed rgba(132,204,22,0.4); display:flex; align-items:center; justify-content:center; box-shadow:none; }
+.bf-v2cockpit .bfc-sheettxt{ flex:1; line-height:1.25; }
+.bf-v2cockpit .bfc-sheettitle{ display:block; font-size:12.5px; font-weight:600; color:#f4f4f5; }
+.bf-v2cockpit .bfc-sheetsub{ display:inline-flex; align-items:center; gap:4px; font-size:11px; color:#a3e635; font-weight:600; margin-top:2px; }
+.bf-v2cockpit .bfc-sheetsub.gen{ color:#7b7e84; }
+.bf-v2cockpit .bfc-sheetarrow{ font-size:14px; color:#6b6e74; }
+
+/* ---- economics + equity ---- */
+.bf-v2cockpit .bfc-econrow{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-offstrip{ flex:1 1 60%; min-width:280px; display:flex; background:#0f1113; border:1px solid rgba(255,255,255,0.06); border-radius:14px; overflow:hidden; }
+.bf-v2cockpit .bfc-offcell{ flex:1; padding:16px 18px; }
+.bf-v2cockpit .bfc-offcell.hi{ flex:1.05; background:rgba(132,204,22,0.07); border-left:1px solid rgba(163,230,53,0.35); border-right:1px solid rgba(163,230,53,0.35); }
+.bf-v2cockpit .bfc-offlbl{ font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-v2cockpit .bfc-offcell.hi .bfc-offlbl{ color:#a3e635; }
+.bf-v2cockpit .bfc-offval{ font-variant-numeric:tabular-nums; font-size:24px; font-weight:700; margin-top:8px; letter-spacing:-0.02em; }
+.bf-v2cockpit .bfc-offcell.hi .bfc-offval{ font-weight:800; color:#a3e635; }
+.bf-v2cockpit .bfc-offsub{ font-variant-numeric:tabular-nums; font-size:11.5px; color:#84a33f; margin-top:3px; }
+.bf-v2cockpit .bfc-offsub.lime{ display:inline-flex; align-items:center; gap:3px; color:#a3e635; font-weight:600; }
+.bf-v2cockpit .bfc-offsub.lime i{ font-size:12px; }
+.bf-v2cockpit .bfc-equity{ flex:1 1 40%; min-width:260px; padding:15px 18px; border:1px solid rgba(163,230,53,0.30); border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.bf-v2cockpit .bfc-eqlbl{ font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-v2cockpit .bfc-eqlbl.r{ text-align:right; font-size:10px; color:#6b6e74; }
+.bf-v2cockpit .bfc-eqval{ font-variant-numeric:tabular-nums; font-size:26px; font-weight:800; margin-top:7px; letter-spacing:-0.02em; }
+.bf-v2cockpit .bfc-eqsub{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; margin-top:3px; font-weight:600; }
+.bf-v2cockpit .bfc-eqsub i{ font-size:12px; }
+.bf-v2cockpit .bfc-eqright{ flex:0 0 auto; }
+.bf-v2cockpit .bfc-paybox{ display:inline-flex; align-items:center; margin-top:7px; height:36px; padding:0 11px; background:#0a0b0d; border:1px solid rgba(255,255,255,0.1); border-radius:9px; }
+.bf-v2cockpit .bfc-paydollar{ font-size:14px; color:#9b9ea4; margin-right:2px; }
+.bf-v2cockpit .bfc-payinput{ width:84px; background:transparent; border:none; color:#f4f4f5; font-family:'Geist',sans-serif; font-variant-numeric:tabular-nums; font-size:15px; font-weight:600; text-align:right; padding:0; outline:none; }
+.bf-v2cockpit .bfc-payhint{ font-size:10.5px; color:#5f6168; margin-top:5px; text-align:right; }
+
+/* ---- deal progress stepper ---- */
+.bf-v2cockpit .bfc-progcard{ padding:16px 22px; }
+.bf-v2cockpit .bfc-stepno{ font-variant-numeric:tabular-nums; font-size:12px; color:#9b9ea4; font-weight:600; }
+.bf-v2cockpit .bfc-stepper{ display:flex; align-items:flex-start; justify-content:space-between; }
+.bf-v2cockpit .bfc-step{ display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; min-width:0; }
+.bf-v2cockpit .bfc-dot{ display:flex; align-items:center; justify-content:center; }
+.bf-v2cockpit .bfc-step.done .bfc-dot{ width:24px; height:24px; border-radius:50%; background:#84cc16; }
+.bf-v2cockpit .bfc-step.done .bfc-dot i{ font-size:12px; color:#0a0a0a; font-weight:700; }
+.bf-v2cockpit .bfc-step.cur .bfc-dot{ width:24px; height:24px; border-radius:50%; background:rgba(163,230,53,0.12); border:2px solid #a3e635; animation:bfcRingPulse 2s infinite; }
+.bf-v2cockpit .bfc-step.up .bfc-dot{ width:18px; height:18px; margin:3px 0; border-radius:50%; border:1.5px solid rgba(255,255,255,0.15); }
+.bf-v2cockpit .bfc-slbl{ font-size:11px; color:#6b6e74; text-align:center; }
+.bf-v2cockpit .bfc-step.done .bfc-slbl{ color:#9b9ea4; }
+.bf-v2cockpit .bfc-step.cur .bfc-slbl{ color:#a3e635; font-weight:600; }
+
+/* ---- competitive + description ---- */
+.bf-v2cockpit .bfc-cdrow{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-compcard{ flex:1 1 58%; min-width:300px; padding:18px 20px; }
+.bf-v2cockpit .bfc-desccard{ flex:1 1 42%; min-width:240px; padding:18px 20px; }
+.bf-v2cockpit .bfc-complead{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#7b7e84; }
+.bf-v2cockpit .bfc-complead.win{ color:#a3e635; }
+.bf-v2cockpit .bfc-complead i{ font-size:13px; }
+.bf-v2cockpit .bfc-barrow{ display:flex; align-items:center; gap:12px; margin-bottom:11px; }
+.bf-v2cockpit .bfc-barrow:last-child{ margin-bottom:0; }
+.bf-v2cockpit .bfc-barname{ flex:0 0 70px; font-size:12.5px; font-weight:500; color:#a1a1aa; }
+.bf-v2cockpit .bfc-barname.bf{ font-weight:600; color:#f4f4f5; }
+.bf-v2cockpit .bfc-bartrack{ flex:1; height:30px; background:rgba(255,255,255,0.03); border-radius:8px; position:relative; overflow:hidden; }
+.bf-v2cockpit .bfc-barfill{ position:absolute; top:0; bottom:0; left:0; background:rgba(255,255,255,0.07); border-radius:8px; }
+.bf-v2cockpit .bfc-barfill.bf{ background:linear-gradient(90deg,rgba(132,204,22,0.25),rgba(163,230,53,0.4)); border:1px solid rgba(163,230,53,0.5); }
+.bf-v2cockpit .bfc-barval{ font-variant-numeric:tabular-nums; position:absolute; top:50%; transform:translate(8px,-50%); font-size:14px; font-weight:600; color:#d4d4d8; white-space:nowrap; }
+.bf-v2cockpit .bfc-barval.bf{ font-weight:700; color:#a3e635; }
+.bf-v2cockpit .bfc-bartag{ display:inline-flex; align-items:center; height:22px; padding:0 9px; border-radius:6px; background:rgba(132,204,22,0.15); color:#a3e635; font-size:10.5px; font-weight:700; letter-spacing:0.03em; flex:0 0 auto; }
+.bf-v2cockpit .bfc-bardelta{ font-variant-numeric:tabular-nums; flex:0 0 58px; text-align:right; font-size:11.5px; color:#6b6e74; }
+.bf-v2cockpit .bfc-desc{ margin:0; font-size:13px; line-height:1.6; color:#b4b6bb; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+.bf-v2cockpit .bfc-desc.open{ display:block; overflow:visible; -webkit-line-clamp:unset; }
+.bf-v2cockpit .bfc-desc.nodesc{ color:#6b6e74; display:block; }
+.bf-v2cockpit .bfc-descbtn{ margin-top:8px; background:none; border:none; color:#a3e635; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; padding:0; }
+
+/* ---- work this deal divider ---- */
+.bf-v2cockpit .bfc-wtddiv{ display:flex; align-items:center; gap:12px; margin-top:10px; margin-bottom:-1px; }
+.bf-v2cockpit .bfc-wtdlbl{ font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#a3e635; font-weight:700; }
+.bf-v2cockpit .bfc-wtdline{ flex:1; height:1px; background:linear-gradient(90deg,rgba(163,230,53,0.25),rgba(255,255,255,0.04)); }
+.bf-v2cockpit .bfc-wtdrow{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
+
+/* ---- VIN tools ---- */
+.bf-v2cockpit .bfc-vintools{ flex:1 1 50%; min-width:300px; padding:18px; }
+.bf-v2cockpit .bfc-toolhead{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.bf-v2cockpit .bfc-toolhead i{ font-size:15px; color:#a3e635; }
+.bf-v2cockpit .bfc-toolt{ font-size:13px; font-weight:600; }
+.bf-v2cockpit .bfc-toolsub{ font-size:11px; color:#6b6e74; }
+.bf-v2cockpit .bfc-sublabel{ font-size:11px; color:#8b8d92; font-weight:600; margin-bottom:7px; }
+.bf-v2cockpit .bfc-inrow{ display:flex; gap:8px; margin-bottom:10px; }
+.bf-v2cockpit .bfc-input{ flex:1; min-width:0; height:38px; padding:0 12px; background:#0a0b0d; border:1px solid rgba(255,255,255,0.1); border-radius:9px; color:#f4f4f5; font-family:'Geist',sans-serif; font-size:13px; outline:none; }
+.bf-v2cockpit .bfc-input.plate{ text-transform:uppercase; letter-spacing:0.03em; }
+.bf-v2cockpit .bfc-input.mono{ font-family:'Geist Mono',monospace; font-size:12.5px; letter-spacing:0.02em; }
+.bf-v2cockpit .bfc-select{ flex:0 0 66px; height:38px; padding:0 8px; background:#0a0b0d; border:1px solid rgba(255,255,255,0.1); border-radius:9px; color:#f4f4f5; font-family:inherit; font-size:13px; cursor:pointer; outline:none; }
+.bf-v2cockpit .bfc-select option{ background:#15171a; color:#f4f4f5; }
+.bf-v2cockpit .bfc-btn{ flex:0 0 auto; height:38px; padding:0 16px; border-radius:9px; font-family:'Geist',sans-serif; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+.bf-v2cockpit .bfc-btn.lime{ background:#84cc16; border:none; color:#0a0a0a; font-weight:700; }
+.bf-v2cockpit .bfc-btn.lime:hover{ background:#a3e635; }
+.bf-v2cockpit .bfc-btn.neutral{ background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.12); color:#e4e4e7; }
+.bf-v2cockpit .bfc-btn.neutral:hover{ background:rgba(255,255,255,0.09); }
+.bf-v2cockpit .bfc-btn.lg{ height:44px; padding:0 20px; border-radius:11px; font-size:14px; }
+.bf-v2cockpit .bfc-btn.lg i{ font-size:15px; }
+.bf-v2cockpit .bfc-plateres{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; margin-bottom:14px; background:rgba(132,204,22,0.07); border:1px solid rgba(163,230,53,0.25); border-radius:9px; }
+.bf-v2cockpit .bfc-platevin{ font-family:'Geist Mono',monospace; font-size:13px; color:#e4e4e7; }
+.bf-v2cockpit .bfc-matched{ display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#a3e635; font-weight:600; }
+.bf-v2cockpit .bfc-matched i{ font-size:13px; }
+.bf-v2cockpit .bfc-tooldiv{ height:1px; background:rgba(255,255,255,0.06); margin:4px 0 14px; }
+.bf-v2cockpit .bfc-vinres{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px 16px; margin-top:12px; padding:12px 14px; background:#0a0b0d; border:1px solid rgba(255,255,255,0.08); border-radius:9px; }
+.bf-v2cockpit .bfc-vrlbl{ font-size:10px; color:#6b6e74; text-transform:uppercase; letter-spacing:0.04em; }
+.bf-v2cockpit .bfc-vrval{ font-size:13px; font-weight:600; margin-top:2px; }
+
+/* ---- next best action ---- */
+.bf-v2cockpit .bfc-nba{ flex:1 1 50%; min-width:300px; padding:18px; background:linear-gradient(150deg,rgba(132,204,22,0.06),rgba(15,17,19,0.4)); border:1px solid rgba(163,230,53,0.22); display:flex; flex-direction:column; }
+.bf-v2cockpit .bfc-nbaeyebrow{ display:flex; align-items:center; gap:7px; margin-bottom:13px; font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:#a3e635; font-weight:700; }
+.bf-v2cockpit .bfc-nbaeyebrow i{ font-size:14px; }
+.bf-v2cockpit .bfc-nbahead{ margin:0; font-size:19px; font-weight:700; letter-spacing:-0.01em; line-height:1.25; }
+.bf-v2cockpit .bfc-nbabody{ margin:8px 0 0; font-size:13.5px; line-height:1.5; color:#a1a1aa; }
+.bf-v2cockpit .bfc-nbabody .bfc-sig{ color:#a3e635; font-weight:600; }
+.bf-v2cockpit .bfc-nbabtns{ display:flex; gap:9px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+
+/* ---- modal context: keep cockpit fluid inside #bf-modal ---- */
+#bf-modal .bf-modal-body .bf-v2cockpit{ max-width:none; }
+@media (max-width:760px){
+  .bf-v2cockpit .bfc-right{ flex:1 1 100%; }
+  .bf-v2cockpit .bfc-tiles{ grid-template-columns:1fr 1fr; }
+  .bf-v2cockpit .bfc-title{ font-size:22px; }
+}

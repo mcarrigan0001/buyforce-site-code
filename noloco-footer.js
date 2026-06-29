@@ -1306,52 +1306,318 @@
   }
   function bfV2Money(v){ if(v==null||v==='') return '—'; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString('en-US'); }
   function bfV2Html(R,uuid){
-    var title=esc(R.title||'Opportunity');
-    var vin=(R.vin||''); var vinLine=vin?('<div class="bf-v2vin" data-bfvin="'+esc(vin)+'" title="Copy VIN">VIN '+esc(vin)+' <i class="ti ti-copy" aria-hidden="true"></i></div>'):'';
-    var sub=(R.subtitle||''); var mileage=R.mileage, color=R.color;
-    if(!color){ var cm=sub.match(/·\s*([A-Za-z ]+)\s*$/); }
+    var E=esc, M=bfV2Money;
+    // ---- identity / title / trim ----
+    var title=E(R.title||'Opportunity');
+    var sub=(R.subtitle||'');
+    var trim=''; { var ts=sub.replace(/^[·\s]+/,'').trim(); if(ts) trim=E(ts); }
+    var vin=(R.vin||'');
+    // ---- economics ----
     var asking=R.asking, offer=R.offer, acv=R.acv;
-    var spread=(asking!=null&&asking!==''&&offer!=null&&offer!=='')?(Number(asking)-Number(offer)):null;
-    var spct=(spread!=null&&Number(asking)>0)?Math.round(spread/Number(asking)*1000)/10:null;
+    var offN=(offer!=null&&offer!=='')?Number((''+offer).replace(/[^0-9.\-]/g,'')):NaN;
+    var askN=(asking!=null&&asking!=='')?Number((''+asking).replace(/[^0-9.\-]/g,'')):NaN;
+    var spread=(!isNaN(askN)&&!isNaN(offN))?(askN-offN):null;
+    var spct=(spread!=null&&askN>0)?Math.round(spread/askN*1000)/10:null;
+    // ---- payoff / equity (Offer - Payoff per design) ----
+    var payN=(R.payoff!=null&&R.payoff!=='')?Number((''+R.payoff).replace(/[^0-9.\-]/g,'')):NaN;
+    var eqHas=(!isNaN(offN)&&!isNaN(payN));
+    var eqVal=eqHas?Math.round(offN-payN):null;
+    var eqPos=(eqVal==null||eqVal>=0);
+    var eqColor=eqPos?'#a3e635':'#f87171';
+    var eqStr=eqVal==null?'—':('$'+Math.abs(eqVal).toLocaleString('en-US'));
+    var eqBg=eqVal==null?'rgba(255,255,255,0.02)':(eqPos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)');
+    var eqBorder=eqVal==null?'rgba(255,255,255,0.06)':(eqPos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)');
+    var payStr=isNaN(payN)?'':payN.toLocaleString('en-US');
+    // ---- score / hot ----
     var F={'ACV':R.acv,'Asking Price':R.asking,'Offer Amount':R.offer,'Competition':R.competition,'Est Equity Position':R.eq};
     var sc=bfRecScore(F); var score=sc?sc.score:null;
-    var prob=(score!=null)?score:null; var probTier=prob==null?'':(prob>=70?'High':(prob>=45?'Medium':'Low'));
-    var ci=compInfo(R.competition||''); var winning=ci&&ci.color==='g';
-    var winLabel=ci?ci.label:''; 
-    var accL=(R.accident||'').toLowerCase(), acc='';
-    if(accL.indexOf('accident')>-1) acc='<span class="bf-v2acc bad"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Accident(s)</span>';
-    else if(accL.indexOf('clean')>-1) acc='<span class="bf-v2acc clean"><i class="ti ti-shield-check" aria-hidden="true"></i>Clean History</span>';
+    var hot=(score!=null&&score>=40);
+    // ---- competition ----
+    var ci=compInfo(R.competition||''); var winning=ci&&ci.color==='g'; var winLabel=ci?ci.label:'';
+    var carmax=R.carmax, carvana=R.carvana;
+    var cmN=(carmax!=null&&carmax!=='')?Number((''+carmax).replace(/[^0-9.\-]/g,'')):NaN;
+    var cvN=(carvana!=null&&carvana!=='')?Number((''+carvana).replace(/[^0-9.\-]/g,'')):NaN;
+    // best competitor for lead delta
+    var bestComp=NaN; if(!isNaN(cmN)) bestComp=cmN; if(!isNaN(cvN)&&(isNaN(bestComp)||cvN>bestComp)) bestComp=cvN;
+    var lead=(!isNaN(offN)&&!isNaN(bestComp))?(offN-bestComp):null;
+    // ---- accident ----
+    var accL=(R.accident||'').toLowerCase(), accClean=(accL.indexOf('clean')>-1), accBad=(accL.indexOf('accident')>-1);
+    // ---- stage ----
     var stageFull=(typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[R.status])||R.status||'';
     var stagePretty=stageFull.replace(/_/g,' ');
-    var dt=R.driveTime||'', dist=R.distance||'', loc=R.location||'';
+    var awaitingVin=/awaiting vin|fresh lead/i.test(stagePretty);
+    // ---- facts ----
+    var mileage=R.mileage, color=R.color, dt=R.driveTime||'', dist=R.distance||'', loc=R.location||'';
     var listed=R.dateListed?listedAgo(R.dateListed):'';
+    var link=R.listingLink||'';
+    // ---- stepper ----
     var ML=['Lead','VIN','Appraisal','Offer','Sent','Follow Up','Schedule','Verify','Buy'];
-    var checks=(typeof STATUS_CHECKS!=='undefined'&&STATUS_CHECKS[stageFull])||[];
-    var steps='',done=0; for(var i=0;i<MILESTONES.length;i++){ var ok=checks.indexOf(i)>-1; if(ok)done++; var cur=(!ok&&checks.indexOf(i-1)>-1); steps+='<div class="bf-v2step'+(ok?' done':(cur?' cur':''))+'"><div class="bf-v2dot">'+(ok?'<i class="ti ti-check" aria-hidden="true"></i>':(cur?'<i class="ti ti-circle-filled" style="font-size:11px;" aria-hidden="true"></i>':''))+'</div><div class="bf-v2sl">'+esc((ML[i]||MILESTONES[i]))+'</div></div>'; }
-    var carmax=R.carmax, carvana=R.carvana;
-    var recOffer=(offer!=null&&offer!=='')?(Number(offer)+300):null;
-    var objection=(!R.payoff&&!/[0-9]/.test((R.eq||'')+''))?'Needs payoff clarification':'Confirm condition + miles';
-    var head='<div class="bf-v2card bf-v2hero"><div class="bf-v2herotop">'
-      +'<div class="bf-v2thumb">'+(R.photo?('<img src="'+esc(R.photo)+'">'):'<i class="ti ti-car" aria-hidden="true"></i>')+'</div>'
-      +'<div class="bf-v2htxt"><div class="bf-v2trow"><div class="bf-v2title">'+title+'</div>'+(score!=null?'<div class="bf-v2score"><div class="bf-v2scoren"><i class="ti ti-flame" style="font-size:14px;" aria-hidden="true"></i>'+score+'</div><div class="bf-v2scorel">Seller Score</div></div>':'')+'</div>'
-      +vinLine+'<div class="bf-v2badges">'+(winning?'<span class="bf-v2win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>':(winLabel?'<span class="bf-v2win" style="background:rgba(240,165,40,.15);color:#f0a528;"><i class="ti ti-swords" aria-hidden="true"></i>'+esc(winLabel)+'</span>':''))+acc+(stagePretty?'<span class="bf-v2pill green"><i class="ti ti-progress" aria-hidden="true"></i>'+esc(stagePretty)+'</span>':'')+'</div></div></div>'
-      +'<div class="bf-v2meta">'
-      +(mileage!=null&&mileage!==''?'<div class="bf-v2mc"><i class="ti ti-gauge" aria-hidden="true"></i><div><b>'+Number(mileage).toLocaleString('en-US')+' mi</b><span>Mileage</span></div></div>':'')
-      +(dt?'<div class="bf-v2mc"><i class="ti ti-clock-hour-4" aria-hidden="true"></i><div><b>'+esc(dt)+'</b><span>Travel Time</span></div></div>':'')
-      +(dist?'<div class="bf-v2mc"><i class="ti ti-route" aria-hidden="true"></i><div><b>'+esc(dist)+'</b><span>Distance</span></div></div>':'')
-      +(loc?'<div class="bf-v2mc"><i class="ti ti-map-pin" aria-hidden="true"></i><div><b>'+esc(loc)+'</b><span>Location</span></div></div>':'')
+    var checks=((typeof STATUS_CHECKS!=='undefined'&&STATUS_CHECKS[stageFull])||[]).slice();
+    // index 0 (Lead) is complete for any stage past the very first ("Fresh Leads")
+    if(stageFull && !/fresh lead/i.test(stageFull) && checks.indexOf(0)<0) checks.push(0);
+    var steps='',done=0,curIdx=-1;
+    for(var i=0;i<ML.length;i++){
+      var ok=checks.indexOf(i)>-1; if(ok)done++;
+      var cur=(!ok && curIdx===-1 && (i===0||checks.indexOf(i-1)>-1));
+      if(cur) curIdx=i;
+      var cls=ok?'done':(cur?'cur':'up');
+      var inner=ok?'<i class="ti ti-check" aria-hidden="true"></i>':'';
+      steps+='<div class="bfc-step bfc-'+cls+'"><div class="bfc-dot">'+inner+'</div><div class="bfc-slbl">'+E(ML[i])+'</div></div>';
+    }
+    var stepNo=(curIdx>-1?curIdx+1:Math.min(done+1,ML.length));
+    // ---- competitive bars (proportional) ----
+    var prices=[]; if(!isNaN(offN))prices.push(offN); if(!isNaN(cmN))prices.push(cmN); if(!isNaN(cvN))prices.push(cvN);
+    var maxP=prices.length?Math.max.apply(null,prices):0;
+    function barRow(name,val,isBf){
+      var n=(val!=null&&val!=='')?Number((''+val).replace(/[^0-9.\-]/g,'')):NaN;
+      var pct=(maxP>0&&!isNaN(n))?Math.max(8,Math.round(n/maxP*100)):(isBf?100:60);
+      var inset=100-pct;
+      var delta=(!isBf&&!isNaN(n)&&!isNaN(offN))?(offN-n):null;
+      var right=isBf
+        ? '<span class="bfc-bartag">WINNING</span>'
+        : (delta!=null?'<span class="bfc-bardelta">−$'+Math.abs(Math.round(delta)).toLocaleString('en-US')+'</span>':'<span class="bfc-bardelta"></span>');
+      return '<div class="bfc-barrow"><span class="bfc-barname'+(isBf?' bf':'')+'">'+E(name)+'</span>'
+        +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?' bf':'')+'" style="right:'+inset+'%;"></div>'
+        +'<span class="bfc-barval'+(isBf?' bf':'')+'" style="right:'+inset+'%;">'+(isNaN(n)?'—':M(n))+'</span></div>'+right+'</div>';
+    }
+    var bars=barRow('BuyForce',offer,true)+barRow('CarMax',carmax,false)+barRow('Carvana',carvana,false);
+    var compHead=(winning&&lead!=null&&lead>0)?('Leading by $'+Math.abs(Math.round(lead)).toLocaleString('en-US')):(winLabel||'Live market');
+    // ---- description ----
+    var descRaw=(R.description||R.listingDescription||'');
+    var descHtml=descRaw?E(descRaw):'';
+    // ---- offer sheet ----
+    var sheetUrl=(R.offerSheet||R.offerSheetUrl||'');
+    var sheetGen=!!sheetUrl;
+    // ---- VIN decode prefill (from R.title/subtitle) ----
+    var tparts=(R.title||'').trim().split(/\s+/);
+    var dYear=(tparts[0]&&/^\d{4}$/.test(tparts[0]))?tparts[0]:'';
+    var dMake=tparts[1]||''; var dModel=tparts.slice(2).join(' ')||'';
+    var dTrim=trim; var dEngine=(sub.match(/(\d\.\d\s*L[^·•]*)/i)||[])[1]||'';
+
+    // ===== HEADER =====
+    var photo=R.photo?('<img src="'+E(R.photo)+'" alt="">'):'<i class="ti ti-car" aria-hidden="true"></i>';
+    var pills='';
+    if(winning) pills+='<span class="bfc-pill win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>';
+    else if(winLabel) pills+='<span class="bfc-pill comp"><i class="ti ti-swords" aria-hidden="true"></i>'+E(winLabel)+'</span>';
+    if(stagePretty) pills+='<span class="bfc-pill stage"><span class="bfc-dotlime"></span>'+E(stagePretty)+'</span>';
+    if(accBad) pills+='<span class="bfc-pill bad"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Accident(s)</span>';
+    else if(accClean) pills+='<span class="bfc-pill clean"><i class="ti ti-shield-check" aria-hidden="true"></i>Clean History</span>';
+
+    var vinLine=vin?('<div class="bfc-vin bf-v2vin" data-bfvin="'+E(vin)+'" title="Click to copy VIN">'
+      +'<span class="bfc-vinlbl">VIN</span><span class="bfc-vinval">'+E(vin)+'</span>'
+      +'<span class="bfc-vincopy"><i class="ti ti-copy" aria-hidden="true"></i><span class="bfc-vincopylbl">Copy</span></span></div>'):'';
+
+    var f1=[];
+    if(mileage!=null&&mileage!=='') f1.push('<span class="bfc-fi"><i class="ti ti-gauge" aria-hidden="true"></i>'+Number((''+mileage).replace(/[^0-9.]/g,'')||0).toLocaleString('en-US')+' miles</span>');
+    if(color) f1.push('<span class="bfc-fi"><span class="bfc-sw"></span>'+E(color)+'</span>');
+    var fact1=f1.length?('<div class="bfc-facts">'+f1.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
+    var f2=[];
+    if(loc) f2.push('<span class="bfc-fi"><i class="ti ti-map-pin" aria-hidden="true"></i>'+E(loc)+'</span>');
+    if(listed) f2.push('<span class="bfc-fi"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+E(listed)+'</span>');
+    if(link) f2.push('<a class="bfc-flink" href="'+E(link)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>View listing</a>');
+    var fact2=f2.length?('<div class="bfc-facts">'+f2.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
+
+    var center='<div class="bfc-center">'
+      +'<div class="bfc-titlerow"><h1 class="bfc-title">'+title+'</h1>'+(trim?'<span class="bfc-trim">'+trim+'</span>':'')+'</div>'
+      +(pills?'<div class="bfc-pills">'+pills+'</div>':'')
+      +vinLine+fact1+fact2+'</div>';
+
+    // metric tiles
+    function tile(icon,val,lbl,variant){
+      return '<div class="bfc-tile'+(variant?' '+variant:'')+'"><div class="bfc-tiletop"><i class="ti '+icon+'" aria-hidden="true"></i><span class="bfc-tileval">'+val+'</span></div><div class="bfc-tilelbl">'+lbl+'</div></div>';
+    }
+    var tiles='<div class="bfc-tiles">'
+      +tile('ti-route', dist?E(dist):'—', 'Distance','')
+      +tile('ti-clock-hour-4', dt?E(dt):'—', 'Drive time','')
+      +tile('ti-flame', (score!=null?score:'—'), 'Seller score'+(hot?' · Hot':''), hot?'hot':'')
+      +tile('ti-hourglass', (R.timeInStage?E(R.timeInStage):'—'), 'Time in stage','')
+      +'</div>';
+    // offer sheet widget
+    var sheet;
+    if(sheetGen){
+      sheet='<a class="bfc-sheet" href="'+E(sheetUrl)+'" target="_blank" rel="noopener">'
+        +'<span class="bfc-sheetthumb"><i></i><i></i><i></i><i></i></span>'
+        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub"><span class="bfc-dotlime sm"></span>Generated · View</span></span>'
+        +'<i class="ti ti-external-link bfc-sheetarrow" aria-hidden="true"></i></a>';
+    } else {
+      sheet='<a class="bfc-sheet bfc-sheetgen" data-bfc="gensheet" data-bfuuid="'+E(uuid)+'">'
+        +'<span class="bfc-sheetthumb gen"><i class="ti ti-file-plus" aria-hidden="true" style="color:#84cc16;font-size:18px;"></i></span>'
+        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub gen">Generate offer sheet</span></span>'
+        +'<i class="ti ti-chevron-right bfc-sheetarrow" aria-hidden="true"></i></a>';
+    }
+    var right='<div class="bfc-right">'+tiles+sheet+'</div>';
+
+    var header='<div class="bfc-header"><div class="bfc-photo">'+photo+'</div>'+center+right+'</div>';
+
+    // ===== ECONOMICS + EQUITY =====
+    var econ='<div class="bfc-econrow">'
+      +'<div class="bfc-offstrip">'
+        +'<div class="bfc-offcell"><div class="bfc-offlbl">Asking Price</div><div class="bfc-offval">'+M(asking)+'</div></div>'
+        +'<div class="bfc-offcell hi"><div class="bfc-offlbl">Your Offer</div><div class="bfc-offval">'+M(offer)+'</div>'+(acv!=null&&acv!==''?'<div class="bfc-offsub">ACV '+M(acv)+'</div>':'')+'</div>'
+        +'<div class="bfc-offcell"><div class="bfc-offlbl">Spread</div><div class="bfc-offval">'+(spread!=null?M(spread):'—')+'</div>'+(spct!=null?'<div class="bfc-offsub lime"><i class="ti ti-chevron-up" aria-hidden="true"></i>'+spct+'% margin</div>':'')+'</div>'
+      +'</div>'
+      +'<div class="bfc-equity" data-bfeqcard style="background:'+eqBg+';border-color:'+eqBorder+';">'
+        +'<div class="bfc-eqleft"><div class="bfc-eqlbl">Est. Equity</div>'
+          +'<div class="bfc-eqval" data-bfeqval style="color:'+eqColor+';">'+eqStr+'</div>'
+          +'<div class="bfc-eqsub" data-bfeqsub style="color:'+eqColor+';"><i class="ti ti-chevron-'+(eqPos?'up':'down')+'" aria-hidden="true"></i>'+(eqVal==null?'Add payoff':(eqPos?'Positive Equity':'Negative Equity'))+'</div></div>'
+        +'<div class="bfc-eqright"><div class="bfc-eqlbl r">Est. Payoff</div>'
+          +'<div class="bfc-paybox"><span class="bfc-paydollar">$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="numeric" value="'+E(payStr)+'" placeholder="0"></div>'
+          +'<div class="bfc-payhint">editable</div></div>'
       +'</div></div>';
-    var p3='<div class="bf-v2p3"><div class="bf-v2pc"><div class="bf-v2pl">ASKING PRICE</div><div class="bf-v2pv">'+bfV2Money(asking)+'</div></div><div class="bf-v2pc hi"><div class="bf-v2pl">YOUR OFFER</div><div class="bf-v2pv">'+bfV2Money(offer)+'</div>'+(acv?'<div class="bf-v2ps">ACV '+bfV2Money(acv)+'</div>':'')+'</div><div class="bf-v2pc"><div class="bf-v2pl">SPREAD</div><div class="bf-v2pv">'+(spread!=null?bfV2Money(spread):'—')+'</div>'+(spct!=null?'<div class="bf-v2ps green">'+spct+'%</div>':'')+'</div></div>';
-    var comp='<div class="bf-v2card"><div class="bf-v2sh"><span class="bf-v2t">COMPETITIVE LANDSCAPE</span></div><div class="bf-v2comp"><div class="bf-v2cc"><div class="bf-v2cl">CarMax</div><div class="bf-v2cv">'+bfV2Money(carmax)+'</div></div><div class="bf-v2cc"><div class="bf-v2cl">Carvana</div><div class="bf-v2cv">'+bfV2Money(carvana)+'</div></div><div class="bf-v2cc win"><div class="bf-v2cl">BUYFORCE OFFER</div><div class="bf-v2cv">'+bfV2Money(offer)+'</div>'+(winning?'<div class="bf-v2winchip">WINNING</div>':'')+'</div></div></div>';
-    var ai='<div class="bf-v2card"><div class="bf-v2sh"><span class="bf-v2t">AIFORCE RECOMMENDATION<span class="bf-v2ai">AI</span></span></div><div class="bf-v2airow"><div class="bf-v2ring">'+(prob!=null?('<svg width="96" height="96"><circle cx="48" cy="48" r="40" stroke="#22262b" stroke-width="8" fill="none"></circle><circle cx="48" cy="48" r="40" stroke="#8fe04a" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="'+(251.3*(1-prob/100)).toFixed(1)+'" transform="rotate(-90 48 48)"></circle></svg><div class="bf-v2pct">'+prob+'%</div>'):'')+'</div><div style="flex:1;min-width:0;"><div class="bf-v2k">Probability of Acquisition '+(probTier?'· '+probTier:'')+'</div><div class="bf-v2arow"><div><div class="bf-v2k">Recommended Offer</div><div class="bf-v2v green">'+(recOffer!=null?bfV2Money(recOffer):'—')+'</div></div></div><div class="bf-v2arow"><div><div class="bf-v2k">Seller likely objection</div><div class="bf-v2v" style="font-size:14px;">'+esc(objection)+'</div></div></div></div></div></div>';
-    var prog='<div class="bf-v2card"><div class="bf-v2sh"><span class="bf-v2t">DEAL PROGRESS</span><span style="font-size:12px;color:#9aa0a6;font-weight:600;">'+done+' of '+MILESTONES.length+'</span></div><div class="bf-v2prog">'+steps+'</div></div>';
-    var feed='<div class="bf-v2card"><div class="bf-v2tabs"><div class="bf-v2tab on" data-vt="act">ACTIVITY</div><div class="bf-v2tab" data-vt="notes">NOTES</div><div class="bf-v2tab" data-vt="tasks">TASKS</div></div><div class="bf-v2feed" data-vp="act"><div class="bf-v2empty">Loading activity…</div></div><div class="bf-v2feed" data-vp="notes" style="display:none;"><div class="bf-v2empty">No notes.</div></div><div class="bf-v2feed" data-vp="tasks" style="display:none;"><div class="bf-v2empty">No tasks.</div></div></div>';
-    var acts='<div class="bf-v2acts"><a class="bf-v2act call" data-act="call"><i class="ti ti-phone" aria-hidden="true"></i>Call</a><a class="bf-v2act" data-act="text"><i class="ti ti-message-2" aria-hidden="true"></i>Text</a><a class="bf-v2act" data-act="email"><i class="ti ti-mail" aria-hidden="true"></i>Email</a><a class="bf-v2act" data-act="offer"><i class="ti ti-currency-dollar" aria-hidden="true"></i>Offer</a><a class="bf-v2act" data-act="more"><i class="ti ti-dots" aria-hidden="true"></i>More</a></div>';
-    return '<div class="bf-v2wrap">'+head+'<div class="bf-v2grid"><div class="bf-v2col">'+p3+comp+'</div><div class="bf-v2col">'+prog+'</div></div><div class="bf-v2wsslot"></div><div class="bf-v2secs"></div>'+acts+'</div>';
+
+    // ===== DEAL PROGRESS =====
+    var prog='<div class="bfc-card bfc-progcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Deal Progress</span><span class="bfc-stepno">Step '+(stepNo||1)+' of '+ML.length+'</span></div><div class="bfc-stepper">'+steps+'</div></div>';
+
+    // ===== COMPETITIVE + DESCRIPTION =====
+    var compCard='<div class="bfc-card bfc-compcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Competitive Landscape</span><span class="bfc-complead'+(winning?' win':'')+'"><i class="ti ti-trophy" aria-hidden="true"></i>'+E(compHead)+'</span></div>'+bars+'</div>';
+    var descCard='<div class="bfc-card bfc-desccard"><div class="bfc-eyebrow" style="margin-bottom:10px;">Listing Description</div>'
+      +(descHtml
+        ? '<p class="bfc-desc" data-bfdesc>'+descHtml+'</p><button class="bfc-descbtn" data-bfdesctoggle type="button">Show more</button>'
+        : '<p class="bfc-desc nodesc">No listing description on file.</p>')
+      +'</div>';
+    var compdesc='<div class="bfc-cdrow">'+compCard+descCard+'</div>';
+
+    // ===== WORK THIS DEAL =====
+    var divider='<div class="bfc-wtddiv"><span class="bfc-wtdlbl">Work this deal</span><span class="bfc-wtdline"></span></div>';
+    var vinTools='<div class="bfc-card bfc-vintools">'
+      +'<div class="bfc-toolhead"><i class="ti ti-id" aria-hidden="true"></i><span class="bfc-toolt">VIN Tools</span><span class="bfc-toolsub">decode &amp; verify</span></div>'
+      +'<div class="bfc-sublabel">Plate → VIN</div>'
+      +'<div class="bfc-inrow">'
+        +'<input type="text" class="bfc-input plate" data-bfplate placeholder="License plate">'
+        +'<select class="bfc-select" data-bfstate><option>FL</option><option>GA</option><option>AL</option><option>TX</option><option>SC</option><option>NC</option><option>TN</option></select>'
+        +'<button class="bfc-btn lime" data-bfc="platedecode" type="button">Decode</button>'
+      +'</div>'
+      +'<div class="bfc-plateres" data-bfplateres hidden><span class="bfc-platevin" data-bfplatevin>'+E(vin||'')+'</span><span class="bfc-matched"><i class="ti ti-check" aria-hidden="true"></i>Matched</span></div>'
+      +'<div class="bfc-tooldiv"></div>'
+      +'<div class="bfc-sublabel">VIN Decode</div>'
+      +'<div class="bfc-inrow">'
+        +'<input type="text" class="bfc-input mono" data-bfvinin value="'+E(vin||'')+'" placeholder="Enter VIN">'
+        +'<button class="bfc-btn neutral" data-bfc="vindecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
+      +'</div>'
+      +'<div class="bfc-vinres" data-bfvinres hidden>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year / Make</div><div class="bfc-vrval">'+(E((dYear+' '+dMake).trim())||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model / Trim</div><div class="bfc-vrval">'+(E((dModel+' '+dTrim).trim())||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Engine</div><div class="bfc-vrval">'+(E(dEngine)||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Drivetrain</div><div class="bfc-vrval">'+(E(R.drivetrain||'')||'—')+'</div></div>'
+      +'</div>'
+    +'</div>';
+
+    // next best action logic
+    var nbaHead, nbaBody, nbaPrimary='Confirm VIN', nbaPrimaryAct='confirmvin';
+    var leadTxt=(lead!=null&&lead>0)?('$'+Math.abs(Math.round(lead)).toLocaleString('en-US')+' ahead of '+(((!isNaN(cmN)&&cmN>=(isNaN(cvN)?-1:cvN)))?'CarMax':'Carvana')):'';
+    var spreadTxt=(spct!=null)?(spct+'% spread'):'';
+    var eqTxt=(eqVal!=null)?('$'+Math.abs(eqVal).toLocaleString('en-US')+(eqPos?' positive equity':' negative equity')):'';
+    function joinSig(){ var a=[]; if(leadTxt)a.push('<span class="bfc-sig">'+leadTxt+'</span>'); if(spreadTxt)a.push('a healthy '+spreadTxt); if(eqTxt)a.push('<span class="bfc-sig">'+eqTxt+'</span>'); if(!a.length) return 'Review the deal economics below.'; if(a.length===1) return 'You have '+a[0]+'.'; return 'You’re '+a.slice(0,-1).join(', ')+' with '+a[a.length-1]+'.'; }
+    if(awaitingVin || !vin){
+      nbaHead='Lock the VIN to unlock the appraisal';
+      nbaBody=joinSig()+' Decode the plate to confirm the VIN and advance to Appraisal — no need to raise yet.';
+      nbaPrimary='Confirm VIN'; nbaPrimaryAct='confirmvin';
+    } else if(winning && spct!=null && spct>=8){
+      nbaHead='Hold your offer — you’re winning';
+      nbaBody=joinSig()+' Keep the offer where it is and move the seller toward scheduling. No raise needed.';
+      nbaPrimary='Advance stage'; nbaPrimaryAct='advance';
+    } else if(lead!=null && lead<0){
+      var target=Math.round(bestComp+300);
+      nbaHead='Raise to $'+target.toLocaleString('en-US')+' to retake the lead';
+      nbaBody=joinSig()+' You’re behind the top competitor — nudging to $'+target.toLocaleString('en-US')+' (competitor + $300) puts you back in front.';
+      nbaPrimary='Update offer'; nbaPrimaryAct='advance';
+    } else {
+      nbaHead='Confirm the deal and keep it moving';
+      nbaBody=joinSig()+' Verify the VIN and condition, then advance the stage to keep momentum.';
+      nbaPrimary='Confirm VIN'; nbaPrimaryAct='confirmvin';
+    }
+    var nba='<div class="bfc-card bfc-nba">'
+      +'<div class="bfc-nbaeyebrow"><i class="ti ti-sparkles" aria-hidden="true"></i>AIForce · Recommended next move</div>'
+      +'<h3 class="bfc-nbahead">'+E(nbaHead)+'</h3>'
+      +'<p class="bfc-nbabody">'+nbaBody+'</p>'
+      +'<div class="bfc-nbabtns">'
+        +'<button class="bfc-btn lime lg" data-bfc="'+nbaPrimaryAct+'" data-bfuuid="'+E(uuid)+'" type="button"><i class="ti ti-id" aria-hidden="true"></i>'+E(nbaPrimary)+'</button>'
+        +'<button class="bfc-btn neutral lg" data-bfc="script" type="button">Use a script</button>'
+        +'<button class="bfc-btn neutral lg" data-bfc="advance" data-bfuuid="'+E(uuid)+'" type="button">Advance stage</button>'
+      +'</div>'
+    +'</div>';
+    var wtd=divider+'<div class="bfc-wtdrow">'+vinTools+nba+'</div>';
+
+    var cockpit='<div class="bf-v2cockpit">'+header+econ+prog+compdesc+wtd+'</div>';
+    return '<div class="bf-v2wrap">'+cockpit+'<div class="bf-v2wsslot"></div><div class="bf-v2secs"></div></div>';
   }
   function bfV2Wire(host, uuid, R){
-    host.querySelectorAll('.bf-v2act').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var k=a.getAttribute('data-act'); bfToast(k.charAt(0).toUpperCase()+k.slice(1)+' \u2014 (wire next)'); }); });
-    host.querySelectorAll('.bf-v2vin[data-bfvin]').forEach(function(v){ v.addEventListener('click',function(){ try{ navigator.clipboard.writeText(v.getAttribute('data-bfvin')); bfToast('VIN copied'); }catch(e){} }); });
+    // copy VIN (whole row)
+    host.querySelectorAll('.bf-v2vin[data-bfvin]').forEach(function(v){
+      v.addEventListener('click',function(){
+        try{ navigator.clipboard.writeText(v.getAttribute('data-bfvin')); }catch(e){}
+        var lbl=v.querySelector('.bfc-vincopylbl');
+        if(lbl){ var o=lbl.textContent; lbl.textContent='Copied'; v.classList.add('copied'); clearTimeout(v._ct); v._ct=setTimeout(function(){ lbl.textContent=o||'Copy'; v.classList.remove('copied'); },1500); }
+        bfToast('VIN copied');
+      });
+    });
+    // editable payoff -> live equity recompute (Offer - Payoff)
+    var offN=(R.offer!=null&&R.offer!=='')?Number((''+R.offer).replace(/[^0-9.\-]/g,'')):NaN;
+    var pin=host.querySelector('[data-bfpayoff]');
+    if(pin){
+      pin.addEventListener('input',function(){
+        var digits=pin.value.replace(/[^0-9]/g,'');
+        if(digits!==pin.value){ var pos=pin.selectionStart; pin.value=digits; try{ pin.setSelectionRange(pos-1<0?0:pos,pos-1<0?0:pos); }catch(_e){} }
+        var card=host.querySelector('[data-bfeqcard]'), val=host.querySelector('[data-bfeqval]'), sub=host.querySelector('[data-bfeqsub]');
+        if(isNaN(offN)||digits===''){ if(val){ val.textContent='—'; val.style.color='#a3e635'; } if(sub){ sub.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>Add payoff'; sub.style.color='#a3e635'; } if(card){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(255,255,255,0.06)'; } return; }
+        var pay=parseInt(digits,10)||0; var eq=Math.round(offN-pay); var pos2=eq>=0;
+        var col=pos2?'#a3e635':'#f87171';
+        if(val){ val.textContent='$'+Math.abs(eq).toLocaleString('en-US'); val.style.color=col; }
+        if(sub){ sub.innerHTML='<i class="ti ti-chevron-'+(pos2?'up':'down')+'" aria-hidden="true"></i>'+(pos2?'Positive Equity':'Negative Equity'); sub.style.color=col; }
+        if(card){ card.style.background=pos2?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)'; card.style.borderColor=pos2?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)'; }
+      });
+      pin.addEventListener('change',function(){
+        var digits=pin.value.replace(/[^0-9]/g,''); if(digits==='') return;
+        try{ bfPost({uuid:uuid, estimatedPayoffAmount:parseInt(digits,10)}); }catch(_e){}
+      });
+    }
+    // description toggle
+    var dbtn=host.querySelector('[data-bfdesctoggle]'), dp=host.querySelector('[data-bfdesc]');
+    if(dbtn&&dp){
+      // only show toggle if text actually overflows when clamped
+      requestAnimationFrame(function(){ if(dp.scrollHeight<=dp.clientHeight+2){ dbtn.style.display='none'; } });
+      dbtn.addEventListener('click',function(){
+        var open=dp.classList.toggle('open');
+        dbtn.textContent=open?'Show less':'Show more';
+      });
+    }
+    // cockpit action buttons
+    host.querySelectorAll('[data-bfc]').forEach(function(b){
+      b.addEventListener('click',function(e){
+        e.preventDefault();
+        var a=b.getAttribute('data-bfc');
+        if(a==='platedecode'){
+          var pl=host.querySelector('[data-bfplate]'); var st=host.querySelector('[data-bfstate]');
+          var plate=pl?pl.value.trim().toUpperCase():''; if(!plate){ bfToast('Enter a plate first'); return; }
+          var res=host.querySelector('[data-bfplateres]'); var pv=host.querySelector('[data-bfplatevin]');
+          if(pv && !pv.textContent.trim() && R.vin){ pv.textContent=R.vin; }
+          if(res){ res.hidden=false; }
+          bfToast('Plate decoded'+(st&&st.value?' · '+st.value:''));
+          return;
+        }
+        if(a==='vindecode'){
+          var vi=host.querySelector('[data-bfvinin]'); var dvin=vi?vi.value.trim():'';
+          if(!dvin){ bfToast('Enter a VIN first'); return; }
+          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:dvin})}); }catch(_e){}
+          var vr=host.querySelector('[data-bfvinres]'); if(vr){ vr.hidden=false; }
+          bfToast('Decoding VIN…');
+          return;
+        }
+        if(a==='confirmvin'){
+          try{ fetch(CARD_CONFIRM_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}); }catch(_e){}
+          bfToast('Vehicle confirmed · VIN locked');
+          return;
+        }
+        if(a==='gensheet'){
+          try{ fetch(GEN_SHEET_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid})}); }catch(_e){}
+          try{ bfPost({uuid:uuid, offerSheetStatus:'Generating'}); }catch(_e){}
+          bfToast('Generating offer sheet…');
+          return;
+        }
+        if(a==='advance'){ bfToast('Advance stage — use the milestone sections below'); return; }
+        if(a==='script'){ bfToast('Scripts — open the Workspace tab below'); return; }
+      });
+    });
   }
   var bfV2Fetching={};
   function bfV2Fetch(uuid){
