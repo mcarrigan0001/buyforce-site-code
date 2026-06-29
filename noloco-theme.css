@@ -3293,3 +3293,9 @@ html[data-bfembed="1"] .canvas,
 html[data-bfembed="1"] .project-preview,
 html[data-bfembed="1"] [class*="canvas-scroll"],
 html[data-bfembed="1"] [class*="inset-y-0"] { background: transparent !important; background-color: transparent !important; }
+
+/* batch 83 — suppress the native "Opportunity Pipeline" kanban flash on /command until our
+   dashboard (#bff-wrap) has painted. data-bfcmd is set early; data-bfcmdready is set once ready. */
+html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="view-collection"],
+html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-empty-state"],
+html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { visibility: hidden !important; }
