@@ -1414,11 +1414,11 @@
     var f2=[];
     if(loc) f2.push('<span class="bfc-fi"><i class="ti ti-map-pin" aria-hidden="true"></i>'+E(loc)+'</span>');
     if(listed) f2.push('<span class="bfc-fi"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+E(listed)+'</span>');
-    if(link) f2.push('<a class="bfc-flink" href="'+E(link)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>View listing</a>');
     var fact2=f2.length?('<div class="bfc-facts">'+f2.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
+    var viewBtn=link?('<a class="bfc-viewbtn" href="'+E(link)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>View listing</a>'):'';
 
     var center='<div class="bfc-center">'
-      +'<div class="bfc-titlerow"><h1 class="bfc-title">'+title+'</h1>'+(trim?'<span class="bfc-trim">'+trim+'</span>':'')+'</div>'
+      +'<div class="bfc-titlerow"><div class="bfc-titlewrap"><h1 class="bfc-title">'+title+'</h1>'+(trim?'<span class="bfc-trim">'+trim+'</span>':'')+'</div>'+viewBtn+'</div>'
       +(pills?'<div class="bfc-pills">'+pills+'</div>':'')
       +vinLine+fact1+fact2+'</div>';
 
@@ -1437,15 +1437,13 @@
     if(sheetGen){
       sheet='<a class="bfc-sheet" href="'+E(sheetUrl)+'" target="_blank" rel="noopener">'
         +'<span class="bfc-sheetthumb"><i></i><i></i><i></i><i></i></span>'
-        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub"><span class="bfc-dotlime sm"></span>Generated · View</span></span>'
-        +'<i class="ti ti-external-link bfc-sheetarrow" aria-hidden="true"></i></a>';
+        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub"><span class="bfc-dotlime sm"></span>Generated · View</span></span></a>';
     } else {
       sheet='<a class="bfc-sheet bfc-sheetgen" data-bfc="gensheet" data-bfuuid="'+E(uuid)+'">'
-        +'<span class="bfc-sheetthumb gen"><i class="ti ti-file-plus" aria-hidden="true" style="color:#84cc16;font-size:18px;"></i></span>'
-        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub gen">Generate offer sheet</span></span>'
-        +'<i class="ti ti-chevron-right bfc-sheetarrow" aria-hidden="true"></i></a>';
+        +'<span class="bfc-sheetthumb gen"><i class="ti ti-file-plus" aria-hidden="true" style="color:#84cc16;font-size:22px;"></i></span>'
+        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub gen">Generate offer sheet</span></span></a>';
     }
-    var right='<div class="bfc-right">'+tiles+sheet+'</div>';
+    var right='<div class="bfc-right">'+sheet+tiles+'</div>';
 
     var header='<div class="bfc-header"><div class="bfc-photo">'+photo+'</div>'+center+right+'</div>';
 

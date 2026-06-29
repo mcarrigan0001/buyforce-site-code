@@ -3495,3 +3495,60 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
 .bf-v2cockpit .bfc-step.bfc-cur::before{ background:linear-gradient(90deg,rgba(132,204,22,0.5),rgba(132,204,22,0.18)); }
 .bf-v2cockpit .bfc-dot{ position:relative; z-index:1; background:#0f1113; }
 .bf-v2cockpit .bfc-step.bfc-up .bfc-dot{ border-color:rgba(255,255,255,0.24); }
+
+/* batch 86 — cockpit layout refinement: side-by-side rows fit at the ~1048px modal width;
+   vertical Offer Sheet card sits LEFT of the 2x2 metric tiles; "View listing" is a button.
+   Root cause of the previous wrapping: the flex children in .bfc-econrow / .bfc-cdrow /
+   .bfc-wtdrow used flex-basis percentages that summed to ~100% — once the 14px gap is added
+   there is no room for both on one line so they wrapped. Trim the bases (and lower the
+   min-widths) so two columns + gap fit comfortably at ~1048px, and only stack at <=720px. */
+
+/* ---- economics + equity: keep on one row ---- */
+.bf-v2cockpit .bfc-econrow{ flex-wrap:wrap; gap:14px; }
+.bf-v2cockpit .bfc-offstrip{ flex:1 1 58%; min-width:0; }
+.bf-v2cockpit .bfc-equity{ flex:1 1 38%; min-width:0; }
+
+/* ---- competitive + description: keep on one row ---- */
+.bf-v2cockpit .bfc-cdrow{ flex-wrap:wrap; gap:14px; }
+.bf-v2cockpit .bfc-compcard{ flex:1 1 56%; min-width:0; }
+.bf-v2cockpit .bfc-desccard{ flex:1 1 40%; min-width:0; }
+
+/* ---- VIN tools + AIForce next-best-action: keep on one row ---- */
+.bf-v2cockpit .bfc-wtdrow{ flex-wrap:wrap; gap:14px; }
+.bf-v2cockpit .bfc-vintools{ flex:1 1 48%; min-width:0; }
+.bf-v2cockpit .bfc-nba{ flex:1 1 48%; min-width:0; }
+
+/* ---- View listing: a real button in the title row (top-right of the center column) ---- */
+.bf-v2cockpit .bfc-titlerow{ justify-content:space-between; gap:14px; }
+.bf-v2cockpit .bfc-titlewrap{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; min-width:0; }
+.bf-v2cockpit .bfc-viewbtn{ flex:0 0 auto; align-self:flex-start; display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border-radius:9px; font-size:12.5px; font-weight:600; text-decoration:none; cursor:pointer; white-space:nowrap; color:#a3e635; background:rgba(132,204,22,0.10); border:1px solid rgba(163,230,53,0.32); transition:background .15s,border-color .15s; }
+.bf-v2cockpit .bfc-viewbtn:hover{ background:rgba(132,204,22,0.18); border-color:rgba(163,230,53,0.5); }
+.bf-v2cockpit .bfc-viewbtn i{ font-size:14px; }
+
+/* ---- right cluster becomes a horizontal row: [Offer Sheet portrait card][2x2 tiles] ---- */
+.bf-v2cockpit .bfc-right{ flex:0 0 auto; flex-direction:row; align-items:stretch; gap:10px; }
+.bf-v2cockpit .bfc-right .bfc-tiles{ flex:0 0 auto; }
+
+/* Offer Sheet: portrait document card, full height of the tile grid, narrow */
+.bf-v2cockpit .bfc-right .bfc-sheet{ flex:0 0 96px; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; gap:10px; padding:13px 10px; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb{ width:44px; height:58px; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(1){ top:11px; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(2){ top:20px; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(3){ top:28px; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(4){ bottom:9px; height:8px; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheettxt{ flex:0 0 auto; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheettitle{ font-size:12px; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheetsub{ margin-top:4px; justify-content:center; flex-wrap:wrap; }
+
+/* ---- mobile: stack the side-by-side rows + right cluster ---- */
+@media (max-width:720px){
+  .bf-v2cockpit .bfc-offstrip,
+  .bf-v2cockpit .bfc-equity,
+  .bf-v2cockpit .bfc-compcard,
+  .bf-v2cockpit .bfc-desccard,
+  .bf-v2cockpit .bfc-vintools,
+  .bf-v2cockpit .bfc-nba{ flex:1 1 100%; }
+  .bf-v2cockpit .bfc-right{ flex:1 1 100%; flex-direction:row; }
+  .bf-v2cockpit .bfc-right .bfc-tiles{ flex:1 1 auto; }
+  .bf-v2cockpit .bfc-titlerow{ flex-wrap:wrap; }
+}
