@@ -3401,13 +3401,13 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
 .bf-v2cockpit .bfc-stepper{ display:flex; align-items:flex-start; justify-content:space-between; }
 .bf-v2cockpit .bfc-step{ display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; min-width:0; }
 .bf-v2cockpit .bfc-dot{ display:flex; align-items:center; justify-content:center; }
-.bf-v2cockpit .bfc-step.done .bfc-dot{ width:24px; height:24px; border-radius:50%; background:#84cc16; }
-.bf-v2cockpit .bfc-step.done .bfc-dot i{ font-size:12px; color:#0a0a0a; font-weight:700; }
-.bf-v2cockpit .bfc-step.cur .bfc-dot{ width:24px; height:24px; border-radius:50%; background:rgba(163,230,53,0.12); border:2px solid #a3e635; animation:bfcRingPulse 2s infinite; }
-.bf-v2cockpit .bfc-step.up .bfc-dot{ width:18px; height:18px; margin:3px 0; border-radius:50%; border:1.5px solid rgba(255,255,255,0.15); }
+.bf-v2cockpit .bfc-step.bfc-done .bfc-dot{ width:24px; height:24px; border-radius:50%; background:#84cc16; }
+.bf-v2cockpit .bfc-step.bfc-done .bfc-dot i{ font-size:12px; color:#0a0a0a; font-weight:700; }
+.bf-v2cockpit .bfc-step.bfc-cur .bfc-dot{ width:24px; height:24px; border-radius:50%; background:rgba(163,230,53,0.12); border:2px solid #a3e635; animation:bfcRingPulse 2s infinite; }
+.bf-v2cockpit .bfc-step.bfc-up .bfc-dot{ width:18px; height:18px; margin:3px 0; border-radius:50%; border:1.5px solid rgba(255,255,255,0.15); }
 .bf-v2cockpit .bfc-slbl{ font-size:11px; color:#6b6e74; text-align:center; }
-.bf-v2cockpit .bfc-step.done .bfc-slbl{ color:#9b9ea4; }
-.bf-v2cockpit .bfc-step.cur .bfc-slbl{ color:#a3e635; font-weight:600; }
+.bf-v2cockpit .bfc-step.bfc-done .bfc-slbl{ color:#9b9ea4; }
+.bf-v2cockpit .bfc-step.bfc-cur .bfc-slbl{ color:#a3e635; font-weight:600; }
 
 /* ---- competitive + description ---- */
 .bf-v2cockpit .bfc-cdrow{ display:flex; gap:14px; align-items:stretch; flex-wrap:wrap; }
@@ -3491,7 +3491,7 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
 .bf-v2cockpit .bfc-step{ position:relative; }
 .bf-v2cockpit .bfc-step::before{ content:''; position:absolute; top:11px; left:-50%; width:100%; height:2px; background:rgba(255,255,255,0.09); z-index:0; }
 .bf-v2cockpit .bfc-step:first-child::before{ display:none; }
-.bf-v2cockpit .bfc-step.done::before{ background:rgba(132,204,22,0.5); }
-.bf-v2cockpit .bfc-step.cur::before{ background:linear-gradient(90deg,rgba(132,204,22,0.5),rgba(132,204,22,0.18)); }
+.bf-v2cockpit .bfc-step.bfc-done::before{ background:rgba(132,204,22,0.5); }
+.bf-v2cockpit .bfc-step.bfc-cur::before{ background:linear-gradient(90deg,rgba(132,204,22,0.5),rgba(132,204,22,0.18)); }
 .bf-v2cockpit .bfc-dot{ position:relative; z-index:1; background:#0f1113; }
-.bf-v2cockpit .bfc-step.up .bfc-dot{ border-color:rgba(255,255,255,0.24); }
+.bf-v2cockpit .bfc-step.bfc-up .bfc-dot{ border-color:rgba(255,255,255,0.24); }
