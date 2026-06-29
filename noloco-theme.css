@@ -3207,3 +3207,28 @@ html[data-bfmodal="1"] body { overflow: hidden !important; }
   #bf-modal .bf-modal-card { width: 96vw; max-height: 94vh; border-radius: 14px; }
   #bf-modal .bf-modal-arrow { display: none !important; }
 }
+
+/* batch 78 — record modal: load milestones + workspace via a chrome-stripped iframe (#bfembed).
+   Live Noloco React components stay interactive in the frame; the cockpit + all chrome are hidden
+   so only the workspace + milestone sections show, and the frame auto-reports its height to the modal. */
+
+/* inside the embedded iframe: show only workspace + milestone sections */
+html[data-bfembed="1"] .bf-v2hero,
+html[data-bfembed="1"] .bf-v2grid,
+html[data-bfembed="1"] .bf-v2acts { display: none !important; }
+html[data-bfembed="1"] .bf-v2wrap { padding: 0 !important; max-width: none !important; margin: 0 !important; }
+html[data-bfembed="1"], html[data-bfembed="1"] body { background: #0b0b0d !important; }
+html[data-bfembed="1"] [data-testid="navigation-sidebar"],
+html[data-bfembed="1"] .bf-flip,
+html[data-bfembed="1"] .bf-pipearrow,
+html[data-bfembed="1"] #bf-v2nav,
+html[data-bfembed="1"] .bf-mobnav { display: none !important; }
+html[data-bfembed="1"] .bf-v2wsslot:empty,
+html[data-bfembed="1"] .bf-v2secs:empty { display: none !important; }
+
+/* modal workspace pane (host for the iframe) */
+#bf-modal .bf-v2secs:empty { display: none !important; }
+#bf-modal .bf-modal-wswrap { position: relative; margin: 2px 14px 16px; border-top: 1px solid #181a1f; padding-top: 10px; min-height: 120px; }
+#bf-modal .bf-modal-wsif { width: 100%; border: 0; background: #0b0b0d; height: 220px; display: block; }
+#bf-modal .bf-modal-wsload { position: absolute; left: 0; right: 0; top: 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; color: #6b7077; font-size: 13px; pointer-events: none; }
+#bf-modal .bf-modal-wsspin { width: 24px; height: 24px; border: 3px solid #2a2c33; border-top-color: #92df02; border-radius: 50%; animation: bfovlspin .8s linear infinite; }
