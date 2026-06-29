@@ -3145,3 +3145,8 @@ html[data-bfflip="1"] [data-testid="record-view-body"] > *:not(#bf-v2flip) { dis
 .bf-v2fullbtn { display: inline-flex; align-items: center; gap: 8px; background: #15161b; border: 1px solid #2a2c33; color: #cfd2d6; font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 10px; cursor: pointer; }
 .bf-v2fullbtn:hover { background: #1b1d22; border-color: #92df02; color: #92df02; }
 .bf-v2fullbtn i { font-size: 16px; }
+
+/* batch 73 — record open/flip restored to the reliable iframe overlay. Inside the framed record (data-bfiso set by bfIframeIsolate), hide the in-frame nav + the in-frame flip arrows so only the cockpit shows; the outer overlay owns the prev/next arrows. */
+html[data-bfiso="1"] [data-testid="navigation-sidebar"] { display: none !important; }
+html[data-bfiso="1"] .bf-flip, html[data-bfiso="1"] .bf-pipearrow, html[data-bfiso="1"] #bf-v2nav { display: none !important; }
+#bf-ovl .bf-ovl-if { background: #0c0d10 !important; }
