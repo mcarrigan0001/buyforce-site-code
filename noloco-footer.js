@@ -1328,6 +1328,7 @@
     var eqBg=eqVal==null?'rgba(255,255,255,0.02)':(eqPos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)');
     var eqBorder=eqVal==null?'rgba(255,255,255,0.06)':(eqPos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)');
     var payStr=isNaN(payN)?'':payN.toLocaleString('en-US',{minimumFractionDigits:(payN%1?2:0),maximumFractionDigits:2});
+    var noPayoff=(R.noPayoff===true||R.noPayoff==='true'||R.noPayoff==='Yes'||R.noPayoff==='yes'||R['No Payoff']===true||R['No Payoff']==='Yes');
     // ---- editable economics: cents-aware big-number formatter + seller-will-take strike state ----
     var bigMoney=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return '\u2014'; var fd=(Math.abs(n)%1)?2:0; return '$'+n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
     var bigInput=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return ''; var fd=(Math.abs(n)%1)?2:0; return n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
@@ -1416,7 +1417,7 @@
     var f1=[];
     var mileNum=(mileage!=null&&mileage!=='')?Number((''+mileage).replace(/[^0-9.]/g,'')||0):NaN;
     f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
-    if(color) f1.push('<span class="bfc-fi"><span class="bfc-sw"></span>'+E(color)+'</span>');
+    f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw"></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
     var fact1=f1.length?('<div class="bfc-facts">'+f1.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
     var f2=[];
     f2.push('<span class="bfc-fi bfc-fedit" data-bffedit="listingLocation" data-bfuuid="'+E(uuid)+'" title="Click to edit listing location"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(loc?E(loc):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
@@ -1467,15 +1468,15 @@
       +'<div class="bfc-offstrip">'
         +askCell
         +'<div class="bfc-offcell hi"><div class="bfc-offlbl">Your Offer</div>'+bigEdit('offerAmount',offer)+'<div class="bfc-offsub bfc-acvedit">ACV <span class="bfc-acvdollar">$</span><input type="text" class="bfc-acvinput" data-bfecon="acv" data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(bigInput(acv))+'" placeholder="—"></div></div>'
-        +'<div class="bfc-offcell"><div class="bfc-offlbl">Spread</div><div class="bfc-offval" data-bfspread>'+(spread!=null?M(spread):'\u2014')+'</div><div class="bfc-offsub lime" data-bfspct'+(spct!=null?'':' hidden')+'><i class="ti ti-chevron-up" aria-hidden="true"></i>'+(spct!=null?spct:0)+'% margin</div></div>'
+        +'<div class="bfc-offcell"><div class="bfc-offlbl">Spread</div><div class="bfc-offval" data-bfspread>'+(spread!=null?M(spread):'\u2014')+'</div><div class="bfc-offsub lime" data-bfspct'+(spct!=null?'':' hidden')+'><i class="ti ti-chevron-up" aria-hidden="true"></i>'+(spct!=null?spct:0)+'% difference</div></div>'
       +'</div>'
       +'<div class="bfc-equity" data-bfeqcard style="background:'+eqBg+';border-color:'+eqBorder+';">'
         +'<div class="bfc-eqleft"><div class="bfc-eqlbl">Est. Equity</div>'
           +'<div class="bfc-eqval" data-bfeqval style="color:'+eqColor+';">'+eqStr+'</div>'
           +'<div class="bfc-eqsub" data-bfeqsub style="color:'+eqColor+';"><i class="ti ti-chevron-'+(eqPos?'up':'down')+'" aria-hidden="true"></i>'+(eqVal==null?'Add payoff':(eqPos?'Positive Equity':'Negative Equity'))+'</div></div>'
         +'<div class="bfc-eqright"><div class="bfc-eqlbl r">Est. Payoff</div>'
-          +'<div class="bfc-paybox"><span class="bfc-paydollar">$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(payStr)+'" placeholder="0"></div>'
-          +'<div class="bfc-payhint">editable</div></div>'
+          +'<div class="bfc-paybox'+(noPayoff?' nopay':'')+'"><span class="bfc-paydollar"'+(noPayoff?' style="display:none;"':'')+'>$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+(noPayoff?'NO PAYOFF':E(payStr))+'" placeholder="ENTER PAYOFF (if available)"'+(noPayoff?' readonly style="color:#a3e635;font-weight:700;"':'')+'></div>'
+          +'<label class="bfc-paidoff"><input type="checkbox" class="bfc-paidoffcb" data-bfpaidoff data-bfuuid="'+E(uuid)+'"'+(noPayoff?' checked':'')+'><span>Paid Off</span></label></div>'
       +'</div></div>';
 
     // ===== DEAL PROGRESS =====
@@ -1602,7 +1603,7 @@
       var a=!isNaN(bfEcon.wtN)?bfEcon.wtN:bfEcon.askN; var o=bfEcon.offN;
       if(isNaN(a)||isNaN(o)){ if(sv) sv.textContent='\u2014'; if(pc) pc.hidden=true; return; }
       var sp=a-o; if(sv) sv.textContent='$'+Math.round(sp).toLocaleString('en-US');
-      if(pc){ if(a>0){ var pct=Math.round(sp/a*1000)/10; pc.hidden=false; pc.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>'+pct+'% margin'; } else { pc.hidden=true; } }
+      if(pc){ if(a>0){ var pct=Math.round(sp/a*1000)/10; pc.hidden=false; pc.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>'+pct+'% difference'; } else { pc.hidden=true; } }
     }
     // editable big-number economics inputs (offer / acv / asking) — cents-aware, save on change
     host.querySelectorAll('[data-bfecon]').forEach(function(inp){
@@ -1650,6 +1651,14 @@
         var num=Math.round(parseFloat(clean)*100)/100; if(isNaN(num)) return;
         pin.value=bfMFmt(num); bfEcon.payN=num; bfRecomputeEquity();
         try{ bfPost({uuid:uuid, estimatedPayoffAmount:num}); }catch(_e){}
+      });
+    }
+    var pcb=host.querySelector('[data-bfpaidoff]');
+    if(pcb&&pin){
+      pcb.addEventListener('change',function(){
+        var box=pin.closest('.bfc-paybox'); var dl=box&&box.querySelector('.bfc-paydollar');
+        if(pcb.checked){ pin.value='NO PAYOFF'; pin.readOnly=true; pin.style.color='#a3e635'; pin.style.fontWeight='700'; if(box) box.classList.add('nopay'); if(dl) dl.style.display='none'; bfEcon.payN=0; bfRecomputeEquity(); try{ bfPost({uuid:uuid, noPayoff:true, estimatedPayoffAmount:0}); }catch(_e){} }
+        else { pin.readOnly=false; pin.style.color=''; pin.style.fontWeight=''; pin.value=''; if(box) box.classList.remove('nopay'); if(dl) dl.style.display=''; bfEcon.payN=NaN; bfRecomputeEquity(); try{ bfPost({uuid:uuid, noPayoff:false, estimatedPayoffAmount:null}); }catch(_e){} pin.focus(); }
       });
     }
     // description toggle
@@ -1726,8 +1735,9 @@
           if(isNaN(n)){ val.textContent='—'; fe.setAttribute('data-bfempty',''); if((''+startRaw)!==''){ try{ bfPost({uuid:uuid, mileage:null}); R.mileage=''; }catch(_e){} } }
           else { val.textContent=n.toLocaleString('en-US'); fe.removeAttribute('data-bfempty'); if(String(n)!==String(startRaw).replace(/[^0-9.]/g,'')){ try{ bfPost({uuid:uuid, mileage:n}); R.mileage=n; }catch(_e){} } }
         } else {
-          if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ bfPost({uuid:uuid, listingLocation:null}); R.location=''; }catch(_e){} } }
-          else { val.textContent=txt; if(txt!==startRaw){ try{ bfPost({uuid:uuid, listingLocation:txt}); R.location=txt; }catch(_e){} } }
+          var fk=(key==='color')?'color':'listingLocation'; var rk=(key==='color')?'color':'location';
+          if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ var _p={uuid:uuid}; _p[fk]=null; bfPost(_p); R[rk]=''; }catch(_e){} } }
+          else { val.textContent=txt; if(txt!==startRaw){ try{ var _p2={uuid:uuid}; _p2[fk]=txt; bfPost(_p2); R[rk]=txt; }catch(_e){} } }
         }
         try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
       }
@@ -2663,10 +2673,11 @@
   }
   /* ===== Workspace: tabbed object replacing the comments box ===== */
   var BF_WH='https://buyforce.app.n8n.cloud/webhook';
+  var BF_TESTMODE=(Date.now()<Date.parse('2026-07-01T00:00:00'));  // conserve n8n executions during UI build; auto-expires 7/1/26
   function bfPostEvent(p){ try{ if(p&&p.uuid) delete bfEvCache[p.uuid]; }catch(_c){} try{ fetch(BF_WH+'/add-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); }catch(e){} }
   var bfEvCache={}, bfTaskCache={}, BF_WSTTL=300000;
-  function bfGetEvents(uuid){ var c=bfEvCache[uuid]; if(c && (Date.now()-c.at)<BF_WSTTL) return Promise.resolve(c.data); return fetch(BF_WH+'/get-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}).then(function(r){return r.json();}).then(function(d){ d=d||{events:[]}; bfEvCache[uuid]={at:Date.now(),data:d}; return d; }).catch(function(){return {events:[]};}); }
-  function bfPostTask(p){ try{ if(p&&p.action==='list'&&p.uuid){ var c=bfTaskCache[p.uuid]; if(c && (Date.now()-c.at)<BF_WSTTL) return Promise.resolve(c.data); } if(p&&(p.action==='create'||p.action==='complete')){ if(p.uuid) delete bfTaskCache[p.uuid]; else bfTaskCache={}; } }catch(_c){} return fetch(BF_WH+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).then(function(r){return r.json();}).then(function(d){ try{ if(p&&p.action==='list'&&p.uuid) bfTaskCache[p.uuid]={at:Date.now(),data:d}; }catch(_c2){} return d; }).catch(function(){return null;}); }
+  function bfGetEvents(uuid){ if(BF_TESTMODE) return Promise.resolve({events:[]}); var c=bfEvCache[uuid]; if(c && (Date.now()-c.at)<BF_WSTTL) return Promise.resolve(c.data); return fetch(BF_WH+'/get-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}).then(function(r){return r.json();}).then(function(d){ d=d||{events:[]}; bfEvCache[uuid]={at:Date.now(),data:d}; return d; }).catch(function(){return {events:[]};}); }
+  function bfPostTask(p){ if(BF_TESTMODE && (!p||p.action==='list')) return Promise.resolve({tasks:[]}); try{ if(p&&p.action==='list'&&p.uuid){ var c=bfTaskCache[p.uuid]; if(c && (Date.now()-c.at)<BF_WSTTL) return Promise.resolve(c.data); } if(p&&(p.action==='create'||p.action==='complete')){ if(p.uuid) delete bfTaskCache[p.uuid]; else bfTaskCache={}; } }catch(_c){} return fetch(BF_WH+'/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).then(function(r){return r.json();}).then(function(d){ try{ if(p&&p.action==='list'&&p.uuid) bfTaskCache[p.uuid]={at:Date.now(),data:d}; }catch(_c2){} return d; }).catch(function(){return null;}); }
   function bfWsUpdateBadge(ws){ var open=ws.querySelectorAll('.bf-ws-task:not(.done)').length; var tab=ws.querySelector('.bf-ws-tab[data-tab="tasks"]'); if(tab){ if(open>0) tab.setAttribute('data-badge', String(open)); else tab.removeAttribute('data-badge'); } }
   function bfWsDueChip(iso){ if(!iso) return ''; var t=new Date(iso).getTime(); if(isNaN(t)) return ''; var days=Math.round((t-Date.now())/86400000); var soon=days<=1; var lbl; if(days<0) lbl='Overdue'; else if(days===0) lbl='Due today'; else if(days===1) lbl='Due tomorrow'; else lbl='In '+days+' days'; return '<span class="bf-ws-due '+(soon?'soon':'later')+'">'+lbl+'</span>'; }
   function bfWsTaskHtml(t){ var done=(t.status==='done'); return '<div class="bf-ws-task'+(done?' done':'')+'" data-id="'+esc(String(t.id||''))+'"><span class="bf-ws-check'+(done?' done':'')+'">'+(done?'<i class="ti ti-check" aria-hidden="true"></i>':'')+'</span><div class="bf-ws-taskb"><div class="bf-ws-taskt">'+esc(t.text||'')+'</div>'+(done?'':bfWsDueChip(t.dueAt))+'</div></div>'; }
@@ -3005,6 +3016,7 @@
       [].forEach.call(m.querySelectorAll('.bf-ws-item'),function(it){ it.style.display=(it.getAttribute('data-u')===uuid)?'block':'none'; });
     }
     function bfWsPrefetch(){
+      if(BF_TESTMODE) return;  // no neighbor prefetch while conserving n8n executions
       var idx=bfModalIdx, list=bfModalList, FW=3, BW=2; if(!list||!list.length) return;
       var order=[]; var k; for(k=1;k<=FW;k++){ if(idx+k<list.length) order.push(list[idx+k]); } for(k=1;k<=BW;k++){ if(idx-k>=0) order.push(list[idx-k]); }
       var i=0; try{ clearInterval(bfWsPfT); }catch(e){}

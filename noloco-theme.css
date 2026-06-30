@@ -3990,3 +3990,8 @@ html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div:has(te
 html[data-bfv2="1"] .bf-v2secs .bf-pill.gset{ background:rgba(132,204,22,0.14) !important; color:#a3e635 !important; }
 html[data-bfv2="1"] .bf-v2secs .bf-pill.rset{ background:#341515 !important; color:#f87171 !important; }
 /* end batch 91 (tile grid) */
+
+/* batch 92 — Est Payoff: Paid Off checkbox + NO PAYOFF state */
+.bf-v2cockpit .bfc-paidoff{ display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:5px; font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:#7b7e84; cursor:pointer; user-select:none; }
+.bf-v2cockpit .bfc-paidoff input{ width:13px; height:13px; accent-color:#84cc16; cursor:pointer; margin:0; }
+.bf-v2cockpit .bfc-paybox.nopay .bfc-payinput{ text-align:right; letter-spacing:.04em; }
