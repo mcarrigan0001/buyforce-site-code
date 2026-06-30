@@ -1388,7 +1388,7 @@
         ? '<span class="bfc-bartag'+compCls+'">'+E(compClr==='g'?'WINNING':(winLabel||'WINNING'))+'</span>'
         : (delta!=null?'<span class="bfc-bardelta">−$'+Math.abs(Math.round(delta)).toLocaleString('en-US')+'</span>':'<span class="bfc-bardelta"></span>');
       return '<div class="bfc-barrow"><span class="bfc-barname'+(isBf?' bf':'')+'">'+E(name)+'</span>'
-        +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?(' bf'+(compClr==='r'?' r':'')):'')+'" style="right:'+inset+'%;"></div>'
+        +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?(' bf'+(compClr==='r'?' r':(compClr==='y'?' y':''))):'')+'" style="right:'+inset+'%;"></div>'
         +'<span class="bfc-barval'+(isBf?' bf':'')+'" style="right:'+inset+'%;">'+(isNaN(n)?'—':M(n))+'</span></div>'+right+'</div>';
     }
     var bars=barRow('BuyForce',offer,true)+barRow('CarMax',carmax,false)+barRow('Carvana',carvana,false);
@@ -1457,15 +1457,15 @@
     }
     var right='<div class="bfc-right">'+sheet+tiles+'</div>';
 
-    var header='<div class="bfc-header"><div class="bfc-photo">'+photo+'</div>'+center+right+'</div>';
+    var header='<div class="bfc-header">'+center+right+'</div>';
 
     // ===== ECONOMICS + EQUITY =====
     // editable big-number input (cents-aware, looks like the payoff input but sized big)
     function bigEdit(key,v){ return '<div class="bfc-bigedit"><span class="bfc-bigdollar">$</span><input type="text" class="bfc-biginput" data-bfecon="'+key+'" data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(bigInput(v))+'" placeholder="0"></div>'; }
     // Asking cell: struck original + "Seller will take" when changed; editable value writes asking + sellerWillTake
     var askDisplayVal=askChanged?wtN:asking;
-    var askCell='<div class="bfc-offcell"><div class="bfc-offlbl">Asking Price</div>'
-      +'<div class="bfc-askorig" data-bfaskorig'+(askChanged?'':' hidden')+'>'+(isNaN(askN)?'':bigMoney(askN))+'</div>'
+    var askCell='<div class="bfc-offcell"><div class="bfc-offlblrow"><span class="bfc-offlbl">Asking Price</span>'
+      +'<span class="bfc-askorig" data-bfaskorig'+(askChanged?'':' hidden')+'>'+(isNaN(askN)?'':bigMoney(askN))+'</span></div>'
       +bigEdit('askingPrice',askDisplayVal)
       +'<div class="bfc-asktake" data-bfasktake'+(askChanged?'':' hidden')+'>Seller will take</div></div>';
     var econ='<div class="bfc-econrow">'
@@ -1479,7 +1479,7 @@
           +'<div class="bfc-eqval" data-bfeqval style="color:'+eqColor+';">'+eqStr+'</div>'
           +'<div class="bfc-eqsub" data-bfeqsub style="color:'+eqColor+';"><i class="ti ti-chevron-'+(eqPos?'up':'down')+'" aria-hidden="true"></i>'+(eqVal==null?'Add payoff':(eqPos?'Positive Equity':'Negative Equity'))+'</div></div>'
         +'<div class="bfc-eqright"><div class="bfc-eqlbl r">Est. Payoff</div>'
-          +'<div class="bfc-paybox'+(noPayoff?' nopay':'')+'"><span class="bfc-paydollar"'+(noPayoff?' style="display:none;"':'')+'>$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+(noPayoff?'NO PAYOFF':E(payStr))+'" placeholder="ENTER PAYOFF (if available)"'+(noPayoff?' readonly style="color:#a3e635;font-weight:700;"':'')+'></div>'
+          +'<div class="bfc-paybox'+(noPayoff?' nopay':'')+'"><span class="bfc-paydollar"'+(noPayoff?' style="display:none;"':'')+'>$</span><input type="text" class="bfc-payinput" data-bfpayoff data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+(noPayoff?'NO PAYOFF':E(payStr))+'" placeholder="(Enter Payoff)"'+(noPayoff?' readonly style="color:#a3e635;font-weight:700;"':'')+'></div>'
           +'<label class="bfc-paidoff"><input type="checkbox" class="bfc-paidoffcb" data-bfpaidoff data-bfuuid="'+E(uuid)+'"'+(noPayoff?' checked':'')+'><span>Paid Off</span></label></div>'
       +'</div></div>';
 
@@ -1487,7 +1487,7 @@
     var prog='<div class="bfc-card bfc-progcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Deal Progress</span><span class="bfc-stepno">Step '+(stepNo||1)+' of '+ML.length+'</span></div><div class="bfc-stepper">'+steps+'</div></div>';
 
     // ===== COMPETITIVE + DESCRIPTION =====
-    var compCard='<div class="bfc-card bfc-compcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Competitive Landscape</span><span class="bfc-complead'+(winning?' win':compCls)+'"><i class="ti ti-'+(winning?'trophy':(compClr==='r'?'alert-triangle':'swords'))+'" aria-hidden="true"></i>'+E(compHead)+'</span></div>'+bars+'</div>';
+    var compCard='<div class="bfc-card bfc-compcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Competitive Landscape</span></div>'+bars+'</div>';
     var descCard='<div class="bfc-card bfc-desccard"><div class="bfc-eyebrow" style="margin-bottom:10px;">Listing Description</div>'
       +(descHtml
         ? '<p class="bfc-desc" data-bfdesc data-bfdescedit data-bfuuid="'+E(uuid)+'" title="Click to edit description">'+descHtml+'</p><button class="bfc-descbtn" data-bfdesctoggle type="button">Show more</button><button class="bfc-descedit" data-bfdesceditbtn type="button"><i class="ti ti-pencil" aria-hidden="true"></i>Edit</button>'
@@ -1614,6 +1614,60 @@
       var sp=a-o; if(sv) sv.textContent='$'+Math.round(sp).toLocaleString('en-US');
       if(pc){ if(a>0){ var pct=Math.round(sp/a*1000)/10; pc.hidden=false; pc.innerHTML='<i class="ti ti-chevron-up" aria-hidden="true"></i>'+pct+'% difference'; } else { pc.hidden=true; } }
     }
+    // recompute Competitive Landscape (BuyForce vs CarMax/Carvana) live from current offer
+    function bfRecomputeCompetitive(){
+      var cmN=bfN(R.carmax), cvN=bfN(R.carvana), o=bfEcon.offN;
+      var rows=host.querySelectorAll('.bfc-compcard .bfc-barrow'); if(!rows||!rows.length) return;
+      // proportional bar widths: max of offer/carmax/carvana
+      var prices=[]; if(!isNaN(o))prices.push(o); if(!isNaN(cmN))prices.push(cmN); if(!isNaN(cvN))prices.push(cvN);
+      var maxP=prices.length?Math.max.apply(null,prices):0;
+      function setRow(row,val,isBf){
+        var n=isBf?o:val;
+        var fill=row.querySelector('.bfc-barfill'), barval=row.querySelector('.bfc-barval');
+        var pct=(maxP>0&&!isNaN(n))?Math.max(8,Math.round(n/maxP*100)):(isBf?100:60);
+        var inset=100-pct;
+        if(fill) fill.style.right=inset+'%';
+        if(barval){ barval.style.right=inset+'%'; barval.textContent=isNaN(n)?'—':bfV2Money(n); }
+        if(!isBf){
+          var delta=(!isNaN(n)&&!isNaN(o))?(o-n):null;
+          var dl=row.querySelector('.bfc-bardelta');
+          if(dl) dl.textContent=(delta!=null)?('−$'+Math.abs(Math.round(delta)).toLocaleString('en-US')):'';
+        }
+      }
+      // identify rows by name; BuyForce row is the one with .bfc-barname.bf / .bfc-bartag
+      var bfRow=null, cmRow=null, cvRow=null;
+      [].forEach.call(rows,function(r){
+        var nm=(r.querySelector('.bfc-barname')||{}).textContent||'';
+        if(r.querySelector('.bfc-barname.bf')||r.querySelector('.bfc-bartag')) bfRow=bfRow||r;
+        else if(/carmax/i.test(nm)) cmRow=r;
+        else if(/carvana/i.test(nm)) cvRow=r;
+      });
+      if(cmRow) setRow(cmRow,cmN,false);
+      if(cvRow) setRow(cvRow,cvN,false);
+      if(bfRow) setRow(bfRow,o,true);
+      // beats-comparison -> color + tag text
+      var color,label;
+      var bCm=(!isNaN(o)&&!isNaN(cmN))?o>cmN:null;
+      var bCv=(!isNaN(o)&&!isNaN(cvN))?o>cvN:null;
+      if(isNaN(o)||(isNaN(cmN)&&isNaN(cvN))){
+        // no live comparison possible; fall back to static label/color from R.competition
+        var ci=compInfo(R.competition||''); color=ci?ci.color:'g'; label=ci?(ci.color==='g'?'WINNING':ci.label):'WINNING';
+      } else {
+        var beatsCm=(bCm===true), beatsCv=(bCv===true);
+        // only count a side if it has a value
+        var cmActive=!isNaN(cmN), cvActive=!isNaN(cvN);
+        var winCount=(cmActive&&beatsCm?1:0)+(cvActive&&beatsCv?1:0);
+        var totalActive=(cmActive?1:0)+(cvActive?1:0);
+        if(winCount===totalActive&&totalActive>0){ color='g'; label='WINNING'; }
+        else if(winCount>0){ color='y'; label=(cmActive&&beatsCm)?'Beats CarMax':'Beats Carvana'; }
+        else { color='r'; label='Beats Neither'; }
+      }
+      if(bfRow){
+        var fill=bfRow.querySelector('.bfc-barfill.bf'), tag=bfRow.querySelector('.bfc-bartag');
+        if(fill){ fill.classList.remove('y','r'); if(color==='y') fill.classList.add('y'); else if(color==='r') fill.classList.add('r'); }
+        if(tag){ tag.classList.remove('y','r'); if(color==='y') tag.classList.add('y'); else if(color==='r') tag.classList.add('r'); tag.textContent=label; }
+      }
+    }
     // editable big-number economics inputs (offer / acv / asking) — cents-aware, save on change
     host.querySelectorAll('[data-bfecon]').forEach(function(inp){
       var key=inp.getAttribute('data-bfecon');
@@ -1621,7 +1675,7 @@
         var raw=inp.value, clean=bfMSan(raw);
         if(clean!==raw){ var pos=(inp.selectionStart||clean.length)-(raw.length-clean.length); if(pos<0)pos=0; inp.value=clean; try{ inp.setSelectionRange(pos,pos); }catch(_e){} }
         var n=(clean===''||clean==='.')?NaN:(parseFloat(clean)||0);
-        if(key==='offerAmount'){ bfEcon.offN=n; bfRecomputeSpread(); bfRecomputeEquity(); }
+        if(key==='offerAmount'){ bfEcon.offN=n; bfRecomputeSpread(); bfRecomputeEquity(); bfRecomputeCompetitive(); }
         else if(key==='askingPrice'){ bfEcon.askN=n; bfEcon.wtN=n; bfRecomputeSpread(); }
         else if(key==='acv'){ /* display only */ }
       });
@@ -1630,7 +1684,7 @@
         var n=empty?NaN:Math.round(parseFloat(clean)*100)/100;
         if(!empty && !isNaN(n)) inp.value=bfMFmt(n);
         var payload={uuid:uuid};
-        if(key==='offerAmount'){ bfEcon.offN=n; payload.offerAmount=(empty?null:n); bfRecomputeSpread(); bfRecomputeEquity(); }
+        if(key==='offerAmount'){ bfEcon.offN=n; payload.offerAmount=(empty?null:n); bfRecomputeSpread(); bfRecomputeEquity(); bfRecomputeCompetitive(); }
         else if(key==='acv'){ payload.acv=(empty?null:n); }
         else if(key==='askingPrice'){
           // asking edit also writes Seller Will Take; manage strikethrough state
@@ -3433,7 +3487,7 @@
       var m=document.createElement('div'); m.id='bf-modal'; m.style.display='none';
       m.innerHTML='<div class="bf-modal-scrim" data-m="close"></div>'
         +'<button class="bf-flip bf-modal-arrow bf-modal-prev" data-m="prev" title="Previous deal"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>'
-        +'<div class="bf-modal-card"><div class="bf-modal-top"><span class="bf-modal-pos" data-m="pos"></span><a class="bf-modal-full" data-m="full" target="_self" title="Open full record + timeline"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>Full record</a><button class="bf-modal-x" data-m="close" title="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div><div class="bf-modal-body"></div><div class="bf-modal-wspool"></div></div>'
+        +'<div class="bf-modal-card"><div class="bf-modal-top"><span class="bf-modal-pos" data-m="pos"></span><a class="bf-modal-full" data-m="full" target="_blank" rel="noopener" title="Open the full record in a new tab"><i class="ti ti-arrow-up-right" aria-hidden="true"></i>Open in new tab</a><a class="bf-modal-view" data-m="view" target="_blank" rel="noopener" title="View the original listing" style="display:none;"><i class="ti ti-external-link" aria-hidden="true"></i>View Listing</a><button class="bf-modal-x" data-m="close" title="Close"><i class="ti ti-x" aria-hidden="true"></i></button></div><div class="bf-modal-body"></div><div class="bf-modal-wspool"></div></div>'
         +'<button class="bf-flip bf-modal-arrow bf-modal-next" data-m="next" title="Next deal"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>';
       document.body.appendChild(m);
       m.addEventListener('click',function(e){ var t=e.target&&e.target.closest&&e.target.closest('[data-m]'); if(!t) return; var k=t.getAttribute('data-m'); if(k==='close'){ bfCloseModal(); } else if(k==='prev'){ bfModalGo(-1); } else if(k==='next'){ bfModalGo(1); } });
@@ -3514,6 +3568,7 @@
       if(nx) nx.style.visibility=bfModalIdx<bfModalList.length-1?'visible':'hidden';
       var ps=m.querySelector('.bf-modal-pos'); if(ps){ ps.innerHTML=bfModalPosLabel(uuid)||((bfModalIdx+1)+' of '+bfModalList.length); }
       var full=m.querySelector('.bf-modal-full'); if(full) full.href='/command/preview/'+uuid+'/overview';
+      var mview=m.querySelector('.bf-modal-view'); if(mview){ var _vl=(R.listingLink||''); if(_vl){ mview.href=_vl; mview.style.display=''; } else { mview.removeAttribute('href'); mview.style.display='none'; } }
     }
     function bfOpenModal(uuid){
       if(!uuid) return;

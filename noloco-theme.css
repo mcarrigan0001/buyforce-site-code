@@ -3315,9 +3315,6 @@ html[data-bfcmd="1"]:not([data-bfcmdready]) [data-testid="collection-header"] { 
 
 /* ---- header ---- */
 .bf-v2cockpit .bfc-header{ display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; }
-.bf-v2cockpit .bfc-photo{ flex:0 0 auto; width:96px; height:96px; border-radius:15px; background:linear-gradient(160deg,#1a1d20,#101214); border:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.bf-v2cockpit .bfc-photo img{ width:100%; height:100%; object-fit:cover; }
-.bf-v2cockpit .bfc-photo i{ font-size:42px; color:#4b4e54; }
 .bf-v2cockpit .bfc-center{ flex:1 1 320px; min-width:0; }
 .bf-v2cockpit .bfc-titlerow{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
 .bf-v2cockpit .bfc-title{ margin:0; font-size:25px; font-weight:700; letter-spacing:-0.02em; line-height:1.1; color:#f4f4f5; }
@@ -4361,3 +4358,46 @@ html[data-bfv2="1"] .bf-rsicon{ color:#a3e635 !important; }
 .bf-ms .bf-mschev{ transition:transform .15s ease; }
 .bf-ms .bf-msopen .bf-mschev, .bf-ms .bf-msec.bf-msopen .bf-mschev{ transform:rotate(180deg); }
 .bf-ms .bf-msbody[hidden]{ display:none !important; }
+
+/* ===================================================================
+   batch 97 — cockpit refinements
+   (payoff placeholder/size, removed header photo, competitive bar
+   color + equal-width tracks + amber fill, removed duplicate Beats
+   pill, Open-in-new-tab + View Listing in modal top bar, aligned big
+   economics values). Scoped to .bf-v2cockpit / #bf-modal.
+   =================================================================== */
+
+/* --- #1 Est. Payoff placeholder fully visible: widen input + shrink placeholder --- */
+.bf-v2cockpit .bfc-payinput{ width:150px; }
+.bf-v2cockpit .bfc-payinput::placeholder{ font-size:12px; font-weight:500; letter-spacing:0; color:#6b6e74; opacity:1; }
+
+/* --- #2 "NO PAYOFF" readonly state fits without clipping --- */
+.bf-v2cockpit .bfc-paybox.nopay .bfc-payinput{ font-size:13px; letter-spacing:0.02em; }
+
+/* --- #4a BuyForce bar fill amber variant (matches the 'y' pill) --- */
+.bf-v2cockpit .bfc-barfill.bf.y{ background:linear-gradient(90deg,rgba(240,165,40,0.22),rgba(240,165,40,0.42)); border:1px solid rgba(240,165,40,0.55); }
+/* keep the BuyForce value legible on the amber fill (dark text, like the lime fill) */
+.bf-v2cockpit .bfc-barfill.bf.y ~ .bfc-barval.bf{ color:#241704 !important; text-shadow:0 1px 0 rgba(240,165,40,0.25); }
+
+/* --- #4b equal-width tracks: give the right-side tag/delta column a fixed width so
+       .bfc-bartrack is the same width on every row and bar length is truly proportional --- */
+.bf-v2cockpit .bfc-bartag,
+.bf-v2cockpit .bfc-bardelta{ flex:0 0 96px; min-width:96px; max-width:96px; text-align:right; justify-content:flex-end; }
+/* give the competitive card a touch more room so the wider right column doesn't force a wrap */
+.bf-v2cockpit .bfc-compcard{ flex:1 1 60%; }
+.bf-v2cockpit .bfc-desccard{ flex:1 1 36%; }
+
+/* --- #8 align the four big economics values: struck original asking goes inline
+       to the right of the "ASKING PRICE" label so the big value keeps its baseline --- */
+.bf-v2cockpit .bfc-offlblrow{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.bf-v2cockpit .bfc-offlblrow .bfc-askorig{ margin-top:0; }
+.bf-v2cockpit .bfc-offlblrow .bfc-askorig[hidden]{ display:none; }
+
+/* --- #7 View Listing relocated into the modal top bar (styled like Open-in-new-tab);
+       hide the duplicate cockpit-header View-listing button when inside the modal
+       (it stays visible on the standalone full-record page) --- */
+#bf-modal .bf-modal-view{ display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; color:#a3e635; text-decoration:none; padding:7px 11px; border-radius:9px; border:1px solid rgba(163,230,53,0.32); background:rgba(132,204,22,0.10); }
+#bf-modal .bf-modal-view:hover{ border-color:#92df02; background:rgba(132,204,22,0.18); }
+#bf-modal .bf-modal-view i{ font-size:14px; }
+#bf-modal .bf-v2cockpit .bfc-viewbtn{ display:none; }
+/* end batch 97 */
