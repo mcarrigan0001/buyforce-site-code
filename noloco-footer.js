@@ -2160,8 +2160,8 @@
     // double-attached or lost on re-render. Toggles any .bf-mshead's body.
     if(!window.__bfMsDeleg){ window.__bfMsDeleg=1;
       function bfMsTog(hd){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); body.hidden=!open; }
-      document.addEventListener('click', function(e){ var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; if(e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; bfMsTog(hd); }, false);
-      document.addEventListener('keydown', function(e){ if(e.key!=='Enter'&&e.key!==' ') return; var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; e.preventDefault(); bfMsTog(hd); }, false);
+      document.addEventListener('click', function(e){ var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; if(e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; bfMsTog(hd); }, true);
+      document.addEventListener('keydown', function(e){ if(e.key!=='Enter'&&e.key!==' ') return; var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; e.preventDefault(); bfMsTog(hd); }, true);
     }
     // ---- stage-transition buttons (reuse bfButton's data-bfto) -> bfPost({uuid,status}) directly ----
     // plus the low-risk milestone actions that map onto EXISTING hooks.
