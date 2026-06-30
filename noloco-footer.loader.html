@@ -1,0 +1,18 @@
+<!-- ===================================================================== -->
+<!-- BuyForce NOLOCO FOOTER LOADER                                          -->
+<!-- Paste this ONCE into the Noloco footer custom-code box, REPLACING any  -->
+<!-- existing <script src=".../noloco-footer.js"> line.                     -->
+<!-- It loads the footer JS with a fresh ?v= timestamp every page load, so  -->
+<!-- pushes to GitHub appear immediately (no stale CDN/browser cache).      -->
+<!-- The CSS already self-cache-busts from inside noloco-footer.js.         -->
+<!-- ===================================================================== -->
+<script>
+(function(){
+  try{
+    var s = document.createElement('script');
+    s.src = 'https://mcarrigan0001.github.io/buyforce-site-code/noloco-footer.js?v=' + Date.now();
+    s.async = false;
+    (document.head || document.documentElement).appendChild(s);
+  }catch(e){ console.error('BuyForce footer load failed:', e); }
+})();
+</script>
