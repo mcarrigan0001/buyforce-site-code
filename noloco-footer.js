@@ -1328,7 +1328,7 @@
     var eqBg=eqVal==null?'rgba(255,255,255,0.02)':(eqPos?'rgba(132,204,22,0.07)':'rgba(248,113,113,0.07)');
     var eqBorder=eqVal==null?'rgba(255,255,255,0.06)':(eqPos?'rgba(163,230,53,0.30)':'rgba(248,113,113,0.30)');
     var payStr=isNaN(payN)?'':payN.toLocaleString('en-US',{minimumFractionDigits:(payN%1?2:0),maximumFractionDigits:2});
-    var noPayoff=(R.noPayoff===true||R.noPayoff==='true'||R.noPayoff==='Yes'||R.noPayoff==='yes'||R['No Payoff']===true||R['No Payoff']==='Yes');
+    var noPayoff=(R.paidOff===true||R.paidOff==='true'||R.paidOff==='Yes'||R.paidOff==='yes');
     // ---- editable economics: cents-aware big-number formatter + seller-will-take strike state ----
     var bigMoney=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return '\u2014'; var fd=(Math.abs(n)%1)?2:0; return '$'+n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
     var bigInput=function(v){ var n=(v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; if(isNaN(n)) return ''; var fd=(Math.abs(n)%1)?2:0; return n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
@@ -1657,8 +1657,8 @@
     if(pcb&&pin){
       pcb.addEventListener('change',function(){
         var box=pin.closest('.bfc-paybox'); var dl=box&&box.querySelector('.bfc-paydollar');
-        if(pcb.checked){ pin.value='NO PAYOFF'; pin.readOnly=true; pin.style.color='#a3e635'; pin.style.fontWeight='700'; if(box) box.classList.add('nopay'); if(dl) dl.style.display='none'; bfEcon.payN=0; bfRecomputeEquity(); try{ bfPost({uuid:uuid, noPayoff:true, estimatedPayoffAmount:0}); }catch(_e){} }
-        else { pin.readOnly=false; pin.style.color=''; pin.style.fontWeight=''; pin.value=''; if(box) box.classList.remove('nopay'); if(dl) dl.style.display=''; bfEcon.payN=NaN; bfRecomputeEquity(); try{ bfPost({uuid:uuid, noPayoff:false, estimatedPayoffAmount:null}); }catch(_e){} pin.focus(); }
+        if(pcb.checked){ pin.value='NO PAYOFF'; pin.readOnly=true; pin.style.color='#a3e635'; pin.style.fontWeight='700'; if(box) box.classList.add('nopay'); if(dl) dl.style.display='none'; bfEcon.payN=0; bfRecomputeEquity(); try{ bfPost({uuid:uuid, paidOff:true, estimatedPayoffAmount:0}); }catch(_e){} }
+        else { pin.readOnly=false; pin.style.color=''; pin.style.fontWeight=''; pin.value=''; if(box) box.classList.remove('nopay'); if(dl) dl.style.display=''; bfEcon.payN=NaN; bfRecomputeEquity(); try{ bfPost({uuid:uuid, paidOff:false, estimatedPayoffAmount:null}); }catch(_e){} pin.focus(); }
       });
     }
     // description toggle
@@ -1699,7 +1699,7 @@
         if(!editing) return; var val=ta.value.trim();
         if(val===rawText.trim()){ teardown(); refresh(); return; }
         rawText=val; R.description=val; R.listingDescription=val;
-        try{ bfPost({uuid:uuid, listingDescription:(val===''?null:val)}); }catch(_e){}
+        try{ bfPost({uuid:uuid, sellerDescription:(val===''?null:val)}); }catch(_e){}
         try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
         teardown(); refresh();
       }
@@ -1735,7 +1735,7 @@
           if(isNaN(n)){ val.textContent='—'; fe.setAttribute('data-bfempty',''); if((''+startRaw)!==''){ try{ bfPost({uuid:uuid, mileage:null}); R.mileage=''; }catch(_e){} } }
           else { val.textContent=n.toLocaleString('en-US'); fe.removeAttribute('data-bfempty'); if(String(n)!==String(startRaw).replace(/[^0-9.]/g,'')){ try{ bfPost({uuid:uuid, mileage:n}); R.mileage=n; }catch(_e){} } }
         } else {
-          var fk=(key==='color')?'color':'listingLocation'; var rk=(key==='color')?'color':'location';
+          var fk=(key==='color')?'exteriorColor':'listingLocation'; var rk=(key==='color')?'color':'location';
           if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ var _p={uuid:uuid}; _p[fk]=null; bfPost(_p); R[rk]=''; }catch(_e){} } }
           else { val.textContent=txt; if(txt!==startRaw){ try{ var _p2={uuid:uuid}; _p2[fk]=txt; bfPost(_p2); R[rk]=txt; }catch(_e){} } }
         }
