@@ -2216,6 +2216,27 @@
       function bfMsTog(hd){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); body.hidden=!open; }
       document.addEventListener('click', function(e){ var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; if(e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; bfMsTog(hd); }, true);
       document.addEventListener('keydown', function(e){ if(e.key!=='Enter'&&e.key!==' ') return; var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; e.preventDefault(); bfMsTog(hd); }, true);
+      // milestone VIN/plate photo scan: robust capture-phase delegated drop-zone (paste/drop/upload -> OCR)
+      document.addEventListener('click', function(e){ var sb=e.target&&e.target.closest&&e.target.closest('.bf-ms [data-bfc="scanvin"], .bf-ms [data-bfc="scanplate"]'); if(!sb) return; e.preventDefault(); e.stopPropagation();
+        var kind=(sb.getAttribute('data-bfc')==='scanvin')?'vin':'plate';
+        var vt=sb.closest('.bfc-vintools, .bf-msvintools, .bf-msbody')||document;
+        var open=vt.querySelector('.bf-msdz'); if(open){ open.remove(); return; }
+        document.querySelectorAll('.bf-ms .bf-msdz').forEach(function(x){x.remove();});
+        var dz=document.createElement('div'); dz.className='bfc-dropzone bf-msdz'; dz.setAttribute('tabindex','0');
+        dz.innerHTML='<button type="button" class="bf-msdzx" aria-label="Close">\u2715</button><div class="bf-msdzhint"><i class="ti ti-photo-up" aria-hidden="true"></i> Paste, drop, or click to upload a photo of the '+(kind==='vin'?'VIN':'plate')+'</div><input type="file" accept="image/*" class="bf-msdzfile" style="display:none;">';
+        (sb.closest('.bfc-inrow, .bf-msinrow')||sb.parentNode).after(dz);
+        var fileIn=dz.querySelector('.bf-msdzfile'), hint=dz.querySelector('.bf-msdzhint');
+        function done(t){ var inp=vt.querySelector(kind==='vin'?'[data-bfvinin]':'[data-bfplate]'); if(inp&&t){ inp.value=t; try{inp.dispatchEvent(new Event('input',{bubbles:true}));}catch(_){} } dz.remove(); }
+        function proc(durl){ hint.textContent='Reading photo\u2026'; try{ bfPostOcr(durl).then(function(d){ var t=((d&&(d.text||d.transcript||d.vin||d.plate))||'')+''; var m=kind==='vin'?t.toUpperCase().match(/[A-HJ-NPR-Z0-9]{17}/):t.toUpperCase().match(/[A-Z0-9]{5,8}/); if(m){ done(m[0]); try{bfToast('Read from photo');}catch(_){} } else { hint.textContent='No '+(kind==='vin'?'VIN':'plate')+' found \u2014 try again'; } }); }catch(_e){ hint.textContent='Could not read photo'; } }
+        function rf(file){ if(!file) return; var rd=new FileReader(); rd.onload=function(){ proc(rd.result); }; rd.readAsDataURL(file); }
+        dz.addEventListener('click', function(ev){ if(ev.target.closest('.bf-msdzx')){ dz.remove(); return; } if(ev.target===fileIn) return; fileIn.click(); });
+        fileIn.addEventListener('change', function(){ rf(fileIn.files&&fileIn.files[0]); });
+        dz.addEventListener('paste', function(ev){ var it=(ev.clipboardData||{}).items||[]; for(var i=0;i<it.length;i++){ if(it[i].type&&it[i].type.indexOf('image')===0){ rf(it[i].getAsFile()); ev.preventDefault(); return; } } });
+        dz.addEventListener('dragover', function(ev){ ev.preventDefault(); dz.classList.add('bfc-dzover'); });
+        dz.addEventListener('dragleave', function(){ dz.classList.remove('bfc-dzover'); });
+        dz.addEventListener('drop', function(ev){ ev.preventDefault(); dz.classList.remove('bfc-dzover'); rf(ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0]); });
+        try{ dz.focus(); }catch(_f){}
+      }, true);
     }
     // ---- stage-transition buttons (reuse bfButton's data-bfto) -> bfPost({uuid,status}) directly ----
     // plus the low-risk milestone actions that map onto EXISTING hooks.
