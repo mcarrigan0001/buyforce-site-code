@@ -2157,6 +2157,7 @@
     var root=host.querySelector('.bf-ms'); if(!root) return;
     // ---- accordion: header toggles its body open/closed (only one concern; no data fetch) ----
     root.querySelectorAll('[data-mstoggle]').forEach(function(hd){
+      if(hd.__bfTog) return; hd.__bfTog=1;  // guard: never attach the toggle twice (double-attach made clicks cancel out)
       function tog(){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); if(open){ body.hidden=false; } else { body.hidden=true; } }
       hd.addEventListener('click', function(e){ if(e.target.closest&&e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; tog(); });
       hd.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(); } });
