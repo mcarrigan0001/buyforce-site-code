@@ -4497,3 +4497,47 @@ html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; 
 @keyframes bfcEtaPulse{ 0%{opacity:.35;} 50%{opacity:.7;} 100%{opacity:.35;} }
 .bf-v2cockpit .bfc-tileval[data-bfupd]{ animation:bfcEtaPulse 1s ease-in-out infinite; color:#8b8e94; }
 /* end batch 99 */
+
+/* ===================================================================
+   batch 100 — cockpit header: editable Accident-Status pill (dropdown
+   -> accidentHistory) + consistent fact-line horizontal spacing.
+   Scoped under .bf-v2cockpit. PURELY ADDITIVE.
+   =================================================================== */
+
+/* --- consistent fact-line spacing: even rhythm between .bfc-fi items --- */
+/* normalize the gap between every fact item AND the separator dots so
+   "16,000 miles · Black · [pill]" and "Largo, FL · Listed · View" line up. */
+.bf-v2cockpit .bfc-facts{ gap:10px; }
+.bf-v2cockpit .bfc-facts .bfc-fsep{ margin:0; }
+
+/* --- accident pill (built as a <button> styled like .bfc-pill) --- */
+.bf-v2cockpit .bfc-accfi{ position:relative; }
+.bf-v2cockpit .bfc-accpill{
+  cursor:pointer; font-family:inherit; line-height:1;
+  /* match status pills exactly: same height/radius/font; neutral default */
+}
+.bf-v2cockpit .bfc-accpill .bfc-acccar{ font-size:12px; opacity:.7; margin-left:1px; }
+.bf-v2cockpit .bfc-accpill:hover{ filter:brightness(1.08); }
+.bf-v2cockpit .bfc-accpill.neutral{ background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.1); color:#d4d4d8; }
+.bf-v2cockpit .bfc-accpill.clean{ background:rgba(132,204,22,0.08); border-color:rgba(132,204,22,0.22); color:#a3e635; }
+.bf-v2cockpit .bfc-accpill.bad{ background:rgba(248,113,113,0.08); border-color:rgba(248,113,113,0.28); color:#f87171; }
+.bf-v2cockpit .bfc-accfi.bfc-accopen .bfc-accpill .bfc-acccar{ transform:rotate(180deg); }
+
+/* --- dark dropdown menu (mirrors the look of .bff-ddm) --- */
+.bf-v2cockpit .bfc-accddm{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:2000;
+  min-width:200px; display:none;
+  background:#101116; border:1px solid #2a2c33; border-radius:10px; padding:4px;
+  box-shadow:0 12px 30px rgba(0,0,0,.6);
+}
+.bf-v2cockpit .bfc-accfi.bfc-accopen .bfc-accddm{ display:block; }
+.bf-v2cockpit .bfc-accddo{
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; color:#dcdce2; padding:8px 9px; border-radius:7px;
+  cursor:pointer; white-space:nowrap;
+}
+.bf-v2cockpit .bfc-accddo i{ font-size:14px; color:#9a9ca2; }
+.bf-v2cockpit .bfc-accddo:hover{ background:#1b1d22; }
+.bf-v2cockpit .bfc-accddo.on{ color:#92df02; font-weight:600; }
+.bf-v2cockpit .bfc-accddo.on i{ color:#92df02; }
+/* end batch 100 */

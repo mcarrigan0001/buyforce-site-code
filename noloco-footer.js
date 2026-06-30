@@ -1422,6 +1422,14 @@
     var mileNum=(mileage!=null&&mileage!=='')?Number((''+mileage).replace(/[^0-9.]/g,'')||0):NaN;
     f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
     f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw"></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
+    // editable Accident-Status pill (dropdown -> accidentHistory). state: clean | bad | neutral.
+    var accState=accBad?'bad':(accClean?'clean':'neutral');
+    var accIcon=accBad?'ti-alert-triangle':(accClean?'ti-shield-check':'ti-help-circle');
+    var accLabel=accBad?'Accident(s) Reported':(accClean?'Clean History':'Accident Status');
+    var ACC_OPTS=[['Clean History','clean','ti-shield-check'],['Accident(s) Reported','bad','ti-alert-triangle'],['Unknown / Not Checked','neutral','ti-help-circle']];
+    var accCur=(R.accident||'');
+    var accMenu=ACC_OPTS.map(function(o){ var on=((accCur||'').toLowerCase()===o[0].toLowerCase())?' on':''; return '<div class="bfc-accddo'+on+'" data-bfaccv="'+E(o[0])+'" data-bfaccstate="'+o[1]+'"><i class="ti '+o[2]+'" aria-hidden="true"></i>'+E(o[0])+'</div>'; }).join('');
+    f1.push('<span class="bfc-fi bfc-accfi"><button type="button" class="bfc-pill bfc-accpill '+accState+'" data-bfaccpill data-bfuuid="'+E(uuid)+'" title="Click to set accident status"><i class="ti '+accIcon+' bfc-acci" aria-hidden="true"></i><span class="bfc-acclbl">'+E(accLabel)+'</span><i class="ti ti-chevron-down bfc-acccar" aria-hidden="true"></i></button><div class="bfc-accddm" data-bfaccmenu>'+accMenu+'</div></span>');
     var fact1=f1.length?('<div class="bfc-facts">'+f1.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
     var f2=[];
     f2.push('<span class="bfc-fi bfc-fedit" data-bffedit="listingLocation" data-bfuuid="'+E(uuid)+'" title="Click to edit listing location"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(loc?E(loc):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
@@ -1589,6 +1597,52 @@
         bfToast('VIN copied');
       });
     });
+    // ---- editable Accident-Status pill: dropdown -> accidentHistory ----
+    (function(){
+      var pill=host.querySelector('[data-bfaccpill]'); if(!pill||pill._bfAccBound) return;
+      pill._bfAccBound=true;
+      var fi=pill.closest('.bfc-accfi');
+      var menu=fi?fi.querySelector('[data-bfaccmenu]'):null;
+      var lblEl=pill.querySelector('.bfc-acclbl'), icoEl=pill.querySelector('.bfc-acci');
+      var ICON={clean:'ti-shield-check',bad:'ti-alert-triangle',neutral:'ti-help-circle'};
+      function closeMenu(){ if(fi) fi.classList.remove('bfc-accopen'); }
+      function openMenu(){
+        // close any other cockpit menus first
+        host.querySelectorAll('.bfc-accfi.bfc-accopen').forEach(function(x){ if(x!==fi) x.classList.remove('bfc-accopen'); });
+        if(fi) fi.classList.add('bfc-accopen');
+      }
+      pill.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        if(fi&&fi.classList.contains('bfc-accopen')) closeMenu(); else openMenu();
+      });
+      if(menu) menu.addEventListener('click', function(e){
+        var op=e.target.closest&&e.target.closest('.bfc-accddo'); if(!op) return;
+        e.preventDefault(); e.stopPropagation();
+        var val=op.getAttribute('data-bfaccv')||'';
+        var state=op.getAttribute('data-bfaccstate')||'neutral';
+        // update pill label + color
+        pill.classList.remove('clean','bad','neutral'); pill.classList.add(state);
+        if(lblEl) lblEl.textContent=(state==='neutral'?'Accident Status':val);
+        if(icoEl){ icoEl.classList.remove('ti-shield-check','ti-alert-triangle','ti-help-circle'); icoEl.classList.add(ICON[state]||'ti-help-circle'); }
+        // mark selected option
+        menu.querySelectorAll('.bfc-accddo').forEach(function(o){ o.classList.toggle('on', o===op); });
+        // persist: write to record + cache + R
+        var writeVal=(state==='neutral'?null:val);
+        try{ bfPost({uuid:uuid, accidentHistory:writeVal}); }catch(_e){}
+        R.accident=(state==='neutral'?'':val);
+        try{ sessionStorage.setItem('bfrec:'+uuid, JSON.stringify(R)); }catch(_s){}
+        closeMenu();
+      });
+      // click outside closes (bind once per host)
+      if(!host._bfAccDoc){
+        host._bfAccDoc=true;
+        document.addEventListener('click', function(e){
+          host.querySelectorAll('.bfc-accfi.bfc-accopen').forEach(function(x){
+            if(!x.contains(e.target)) x.classList.remove('bfc-accopen');
+          });
+        });
+      }
+    })();
     // ---- shared editable-economics state + recompute helpers (Offer/ACV/Asking + payoff) ----
     var bfN=function(v){ return (v!=null&&v!=='')?Number((''+v).replace(/[^0-9.\-]/g,'')):NaN; };
     var bfEcon={ offN:bfN(R.offer), askN:bfN(R.asking), payN:bfN(R.payoff), wtN:(R.sellerWillTake!=null&&R.sellerWillTake!=='')?bfN(R.sellerWillTake):(R.willTake!=null?bfN(R.willTake):NaN) };
