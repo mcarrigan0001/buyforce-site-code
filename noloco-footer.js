@@ -1308,7 +1308,65 @@
     cols.appendChild(left); cols.appendChild(right);
     if(rectop.nextSibling) body.insertBefore(cols, rectop.nextSibling); else body.appendChild(cols);
   }
+  // Map a free-text color value to a CSS color for the header color-swatch dot.
+  // Known names -> CSS color; unknown -> '' (caller leaves the neutral default).
+  function bfColorDot(val){
+    var v=(''+(val||'')).trim().toLowerCase(); if(!v) return '';
+    // strip common qualifiers so "metallic dark gray" / "pearl white" still match
+    v=v.replace(/\b(metallic|pearl|mica|tinted|coat|clearcoat|premium|deep|dark|light|bright|crystal|jet|pure|true|gloss|matte)\b/g,'').replace(/\s+/g,' ').trim();
+    var MAP={
+      'black':'#1a1a1a','white':'#f4f4f5','gray':'#9aa0a6','grey':'#9aa0a6','silver':'#cfd2d6',
+      'red':'#d8392b','blue':'#2f6fe0','navy':'#1e3a8a','green':'#2e9e54','tan':'#d6c39a',
+      'beige':'#e3d9bf','brown':'#6b4a2b','gold':'#caa341','orange':'#e07a1f','yellow':'#e6c218',
+      'maroon':'#7a1f2b','burgundy':'#5e1a2a','charcoal':'#33363b','gunmetal':'#444a52',
+      'champagne':'#e6dcc0','bronze':'#9c7a3c','purple':'#6b3fa0','pink':'#df6fa0','cream':'#efe8d6'
+    };
+    if(MAP[v]) return MAP[v];
+    // try the last word (e.g. "midnight blue" -> "blue")
+    var toks=v.split(' '); for(var i=toks.length-1;i>=0;i--){ if(MAP[toks[i]]) return MAP[toks[i]]; }
+    return '';
+  }
   function bfV2Money(v){ if(v==null||v==='') return '—'; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString('en-US'); }
+  // Shared VIN-decode -> Noloco write. Takes the decoded vehicle object `y` (carrying the full
+  // NHTSA->Noloco map) and writes EVERY relevant field via bfPost, mirrors them onto the cached
+  // record R + sessionStorage so the cockpit/grids reflect the new values immediately, and updates
+  // the live header. Used by BOTH the cockpit VIN-tools apply and the milestone VIN-tools apply.
+  // NHTSA->Noloco write keys (verify against n8n record-write field names):
+  //   year, make, model, trim, bodyStyle, drivetrain, vehicleEngine, vehicleFuelType,
+  //   transmissionType, vehicleCabType, exteriorColor(left as-is), vin
+  function bfApplyVinDecode(uuid, R, y, scope){
+    if(!y || !y.vin) return;
+    // build the write payload — only include keys that actually decoded (skip empties so we never
+    // blank out an existing Noloco value with a missing NHTSA field).
+    var payload={uuid:uuid, vin:y.vin};
+    function put(k,v){ if(v!=null && (''+v).trim()!=='') payload[k]=(''+v).trim(); }
+    put('year', y.year); put('make', y.make); put('model', y.model); put('trim', y.trim);
+    put('bodyStyle', y.bodyStyle); put('drivetrain', y.drivetrain);
+    put('vehicleEngine', y.vehicleEngine); put('vehicleFuelType', y.vehicleFuelType);
+    put('transmissionType', y.transmissionType); put('vehicleCabType', y.vehicleCabType);
+    try{ bfPost(payload); }catch(_e){}
+    // server-side decode path (keeps Decode Status / derived fields in sync)
+    try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:y.vin})}); }catch(_e2){}
+    // mirror onto the cached record R (both display aliases + write keys) + sessionStorage
+    try{
+      R.vin=y.vin;
+      if(y.year) R.year=y.year; if(y.make) R.make=y.make; if(y.model) R.model=y.model; if(y.trim) R.trim=y.trim;
+      if(y.bodyStyle) R.bodyStyle=y.bodyStyle; if(y.drivetrain) R.drivetrain=y.drivetrain;
+      if(y.vehicleEngine){ R.vehicleEngine=y.vehicleEngine; R.engine=y.vehicleEngine; }
+      if(y.vehicleFuelType) R.vehicleFuelType=y.vehicleFuelType;
+      if(y.transmissionType) R.transmissionType=y.transmissionType;
+      if(y.vehicleCabType) R.vehicleCabType=y.vehicleCabType;
+      var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j);
+    }catch(_s){}
+    // live header update (title + trim + VIN copy row) — scope to the host/root that owns this apply
+    try{
+      var sc=scope||document;
+      var ttl=sc.querySelector('.bfc-title'); if(ttl){ var t=((y.year||'')+' '+(y.make||'')+' '+(y.model||'')).trim(); if(t) ttl.textContent=t; }
+      var trEl=sc.querySelector('.bfc-trim');
+      if(y.trim){ if(trEl){ trEl.textContent=y.trim; } else { var tw=sc.querySelector('.bfc-titlewrap'); if(tw){ var sp=document.createElement('span'); sp.className='bfc-trim'; sp.textContent=y.trim; tw.appendChild(sp); } } }
+      var vrow=sc.querySelector('.bf-v2vin[data-bfvin]'); if(vrow){ vrow.setAttribute('data-bfvin',y.vin); var vv=vrow.querySelector('.bfc-vinval'); if(vv) vv.textContent=y.vin; }
+    }catch(_h){}
+  }
   function bfV2Html(R,uuid){
     var E=esc, M=bfV2Money;
     // ---- identity / title / trim ----
@@ -1425,7 +1483,8 @@
 
     var mileNum=(mileage!=null&&mileage!=='')?Number((''+mileage).replace(/[^0-9.]/g,'')||0):NaN;
     var mileItem='<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>';
-    var colorItem='<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw"></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>';
+    var _cdot=bfColorDot(color); var _cdotStyle=_cdot?(' style="background:'+_cdot+';"'):'';
+    var colorItem='<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw" data-bfsw'+_cdotStyle+'></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>';
     // Row A: VIN (copy) · mileage (editable) · color (editable)
     var rowA=[]; if(vinItem) rowA.push(vinItem); rowA.push(mileItem); rowA.push(colorItem);
     var fact1='<div class="bfc-facts">'+rowA.join('<span class="bfc-fsep">·</span>')+'</div>';
@@ -1898,6 +1957,8 @@
           var fk=(key==='color')?'exteriorColor':'listingLocation'; var rk=(key==='color')?'color':'location';
           if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ var _p={uuid:uuid}; _p[fk]=null; bfPost(_p); R[rk]=''; }catch(_e){} } }
           else { val.textContent=txt; if(txt!==startRaw){ try{ var _p2={uuid:uuid}; _p2[fk]=txt; bfPost(_p2); R[rk]=txt; }catch(_e){} if(key==='listingLocation'){ try{ bfV2RefreshDriveEta(host, uuid, txt, R); }catch(_e){} } } }
+          // color swatch dot reflects the selected/typed color (live)
+          if(key==='color'){ try{ var _sw=fe.querySelector('[data-bfsw]')||fe.querySelector('.bfc-sw'); if(_sw){ var _cd=bfColorDot(txt); _sw.style.background=_cd||''; } }catch(_e){} }
         }
         try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
       }
@@ -1918,12 +1979,20 @@
         .then(function(d){ var r=(d&&d.Results&&d.Results[0])||{}; var year=r.ModelYear||''; var trim=r.Trim||r.Series||r.Series2||'';
           if(!year && !r.Make) return {ok:false,reason:'No match for that VIN.'};
           var disp=r.DisplacementL?(Math.round(parseFloat(r.DisplacementL)*10)/10+'L'):''; var cyl=r.EngineCylinders?(r.EngineCylinders+'cyl'):'';
-          return {ok:true,vin:vin,year:year,make:bfTcase(r.Make||''),model:r.Model||'',trim:trim,engine:[disp,cyl].filter(Boolean).join(' '),drive:r.DriveType||''}; })
+          // full engine string: displacement / cylinders / engine model
+          var engine=[disp,cyl,(r.EngineModel||'')].filter(Boolean).join(' ').trim();
+          return {ok:true,vin:vin,year:year,make:bfTcase(r.Make||''),model:r.Model||'',trim:trim,
+            engine:engine,drive:r.DriveType||'',
+            bodyStyle:r.BodyClass||'',drivetrain:r.DriveType||'',vehicleEngine:engine,
+            vehicleFuelType:r.FuelTypePrimary||'',transmissionType:r.TransmissionStyle||'',
+            vehicleCabType:r.BodyCabType||''}; })
         .catch(function(){ return {ok:false,reason:'Could not reach NHTSA.'}; });
     }
     // Populate + show the YMMT preview block (Apply/Dismiss)
     function bfShowYmmt(d){
-      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||'',engine:d.engine||'',drive:d.drive||''};
+      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||'',engine:d.engine||'',drive:d.drive||'',
+        bodyStyle:d.bodyStyle||'',drivetrain:d.drivetrain||'',vehicleEngine:d.vehicleEngine||d.engine||'',
+        vehicleFuelType:d.vehicleFuelType||'',transmissionType:d.transmissionType||'',vehicleCabType:d.vehicleCabType||''};
       var box=host.querySelector('[data-bfymmt]'); if(!box) return;
       var set=function(sel,v){ var el=host.querySelector(sel); if(el) el.textContent=(v&&(''+v).trim())?v:'\u2014'; };
       set('[data-bfymmt-year]',d.year); set('[data-bfymmt-make]',d.make); set('[data-bfymmt-model]',d.model); set('[data-bfymmt-trim]',d.trim);
@@ -2037,17 +2106,9 @@
         if(a==='ymmtdismiss'){ bfHideYmmt(); return; }
         if(a==='ymmtapply'){
           if(!bfYmmt || !bfYmmt.vin){ bfToast('Nothing to apply'); return; }
-          var y=bfYmmt;
-          // primary write via the record write-hook (friendly keys)
-          try{ bfPost({uuid:uuid, vin:y.vin, year:y.year, make:y.make, model:y.model, trim:y.trim}); }catch(_e){}
-          // server-side decode path (keeps Decode Status / derived fields in sync)
-          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:y.vin})}); }catch(_e2){}
-          // live header update
-          var ttl=host.querySelector('.bfc-title'); if(ttl){ var t=((y.year||'')+' '+(y.make||'')+' '+(y.model||'')).trim(); if(t) ttl.textContent=t; }
-          var trEl=host.querySelector('.bfc-trim');
-          if(y.trim){ if(trEl){ trEl.textContent=y.trim; } else { var tw=host.querySelector('.bfc-titlewrap'); if(tw){ var sp=document.createElement('span'); sp.className='bfc-trim'; sp.textContent=y.trim; tw.appendChild(sp); } } }
-          // also fill the VIN copy row if present
-          var vrow=host.querySelector('.bf-v2vin[data-bfvin]'); if(vrow){ vrow.setAttribute('data-bfvin',y.vin); var vv=vrow.querySelector('.bfc-vinval'); if(vv) vv.textContent=y.vin; }
+          // full NHTSA->Noloco write (year/make/model/trim + bodyStyle/drivetrain/engine/fuel/
+          // transmission/cab), R + sessionStorage mirror, and live header update — shared helper.
+          try{ bfApplyVinDecode(uuid, R, bfYmmt, host); }catch(_e){}
           bfHideYmmt();
           bfToast('Vehicle applied \u2014 VIN saved');
           return;
@@ -2226,13 +2287,15 @@
         +T('Trim', bfMsVeh(R,'trim'))
       +'</div>';
       var tools=bfMsVinTools(R, uuid);
-      var info='<div class="bf-msinfo">Check the photos and description for a VIN or Plate # — if none is listed, ask the seller for the VIN.</div>';
+      // helper note sits ABOVE the VIN/Plate tools (subtle muted style)
+      var info='<div class="bf-msinfo bf-msinfo-vinhint">Check the photos and description for a VIN or Plate # — if none is listed, ask the seller for the VIN.</div>';
       var btns='<div class="bf-msbtns">'
         +bfButton({l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', g:1, i:'ti-message-2'}, uuid)
         +bfButton({l:'Follow Up Sent', a:'msfollowup', g:1, i:'ti-rotate-clockwise'}, uuid)
         +bfButton({l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}, uuid)
       +'</div>';
-      return grid+tools+info+btns;
+      // tools first (helper note + decode/plate tools), THEN the read-only field grid
+      return info+tools+grid+btns;
     }
     if(id==='compete'){
       var F=bfMsFMap(R);
@@ -2453,11 +2516,18 @@
         .then(function(d){ var r=(d&&d.Results&&d.Results[0])||{}; var year=r.ModelYear||''; var trim=r.Trim||r.Series||r.Series2||'';
           if(!year && !r.Make) return {ok:false,reason:'No match for that VIN.'};
           var disp=r.DisplacementL?(Math.round(parseFloat(r.DisplacementL)*10)/10+'L'):''; var cyl=r.EngineCylinders?(r.EngineCylinders+'cyl'):'';
-          return {ok:true,vin:vin,year:year,make:tcase(r.Make||''),model:r.Model||'',trim:trim,engine:[disp,cyl].filter(Boolean).join(' '),drive:r.DriveType||''}; })
+          var engine=[disp,cyl,(r.EngineModel||'')].filter(Boolean).join(' ').trim();
+          return {ok:true,vin:vin,year:year,make:tcase(r.Make||''),model:r.Model||'',trim:trim,
+            engine:engine,drive:r.DriveType||'',
+            bodyStyle:r.BodyClass||'',drivetrain:r.DriveType||'',vehicleEngine:engine,
+            vehicleFuelType:r.FuelTypePrimary||'',transmissionType:r.TransmissionStyle||'',
+            vehicleCabType:r.BodyCabType||''}; })
         .catch(function(){ return {ok:false,reason:'Could not reach NHTSA.'}; });
     }
     function showYmmt(d){
-      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||''};
+      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||'',engine:d.engine||'',drive:d.drive||'',
+        bodyStyle:d.bodyStyle||'',drivetrain:d.drivetrain||'',vehicleEngine:d.vehicleEngine||d.engine||'',
+        vehicleFuelType:d.vehicleFuelType||'',transmissionType:d.transmissionType||'',vehicleCabType:d.vehicleCabType||''};
       var box=vt.querySelector('[data-bfymmt]'); if(!box) return;
       var set=function(sel,v){ var el=vt.querySelector(sel); if(el) el.textContent=(v&&(''+v).trim())?v:'—'; };
       set('[data-bfymmt-year]',d.year); set('[data-bfymmt-make]',d.make); set('[data-bfymmt-model]',d.model); set('[data-bfymmt-trim]',d.trim);
@@ -2558,9 +2628,10 @@
         if(a==='ymmtapply'){
           if(!bfYmmt || !bfYmmt.vin){ bfToast('Nothing to apply'); return; }
           var y=bfYmmt;
-          try{ bfPost({uuid:uuid, vin:y.vin, year:y.year, make:y.make, model:y.model, trim:y.trim}); }catch(_e){}
-          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:y.vin})}); }catch(_e2){}
-          try{ R.vin=y.vin; R.year=y.year; R.make=y.make; R.model=y.model; R.trim=y.trim; var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+          // full NHTSA->Noloco write + R/sessionStorage mirror + live header (shared helper).
+          // Pass the cockpit host as the header scope so the title/trim/VIN row update too.
+          var _hdrScope=root.closest&&root.closest('#bf-v2, .bf-modal-body, [data-testid="record-view-body"]');
+          try{ bfApplyVinDecode(uuid, R, y, _hdrScope||root); }catch(_e){}
           var pv=vt.querySelector('[data-bfplatevin]'); if(pv) pv.textContent=y.vin;
           hideYmmt(); bfToast('Vehicle applied — VIN saved');
           return;
@@ -2595,6 +2666,9 @@
       btn.classList.remove('bf-v2navbtn-stage');
       if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
       if(!adjU){ return; }
+      // Stage-arrow invariant: compare EACH neighbor to the CURRENT record's stage (cs), never
+      // prev-vs-next. So first-in-stage -> prev double (prev is previous stage), next single
+      // (next is same stage). Double only when the neighbor crosses out of the current stage.
       var cs=recSt(curU), as=recSt(adjU);
       if(!cs||!as||cs===as){ return; }
       if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
@@ -3772,6 +3846,9 @@
       btn.classList.remove('bf-modal-arrow-stage');
       if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
       if(!adjUuid){ return; }
+      // Stage-arrow invariant: compare EACH neighbor to the CURRENT record's stage (curSt), never
+      // prev-vs-next. So first-in-stage -> prev double (prev neighbor = previous stage), next
+      // single (next neighbor = same stage). Double only when the neighbor crosses out of curSt.
       var curSt=bfModalRecStatus(curUuid), adjSt=bfModalRecStatus(adjUuid);
       if(!curSt||!adjSt||curSt===adjSt){ return; }
       // crossing a stage boundary -> double chevron + label

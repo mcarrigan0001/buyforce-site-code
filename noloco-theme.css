@@ -4604,3 +4604,160 @@ html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; 
 .bf-v2cockpit .bfc-barvalpen{ font-size:11px; color:#6b6e74; opacity:0; transition:opacity .12s; }
 .bf-v2cockpit .bfc-barvaledit:hover .bfc-barvalpen{ opacity:0.8; }
 /* end batch 101 */
+
+/* ===================================================================
+   batch 102 — cockpit/milestone refinements
+   (A) header text & layout cleanup: VIN font parity, hover-only edit
+       icons (no layout width), discreet field backgrounds, color dot,
+       tidy line gaps.
+   (B) shorter right-cluster widgets + Offer Sheet polish.
+   (C) re-fix dark Schedule & Appraisal fields (still rendering light).
+   (D) reshape the Make-the-Offer milestone sheet to match the header.
+   (F) VIN-tools helper-note style (muted) above the tools.
+   Scoped under .bf-v2cockpit / html[data-bfv2="1"] .bf-ms.
+   PURELY ADDITIVE — appended last so it overrides earlier batches.
+   =================================================================== */
+
+/* ---- A1 · VIN text parity with sibling fact items (miles/color) ----
+   The fact line is 13px sans. Make the VIN LABEL + VALUE share that
+   font-family / size / weight; the value may keep its distinct color. */
+.bf-v2cockpit .bfc-facts .bfc-vinitem .bfc-vinlbl{
+  font-family:inherit !important; font-size:13px !important; font-weight:400 !important;
+  letter-spacing:normal !important; text-transform:none !important; color:#7b7e84 !important;
+}
+.bf-v2cockpit .bfc-facts .bfc-vinitem .bfc-vinval{
+  font-family:inherit !important; font-size:13px !important; font-weight:400 !important;
+  letter-spacing:normal !important; color:#d4d4d8 !important; /* keep its slightly distinct color */
+}
+
+/* ---- A2 · editable fact icons: no layout width (absolute, hover-reveal) ----
+   The pencil used to consume horizontal width, leaving an uneven gap after
+   each editable item. Pin it absolutely inside the field so spacing between
+   ALL items (VIN · miles · color, location · listed) is even. */
+.bf-v2cockpit .bfc-facts .bfc-fi.bfc-fedit{ position:relative; }
+.bf-v2cockpit .bfc-facts .bfc-fi.bfc-fedit .bfc-fpen{
+  position:absolute !important; right:-12px; top:50%; transform:translateY(-50%);
+  margin:0 !important; pointer-events:none; z-index:1;
+}
+/* hovering the field hides the adjacent separators' clash by sitting above them */
+.bf-v2cockpit .bfc-facts .bfc-fi.bfc-fedit:last-child .bfc-fpen{ right:-2px; }
+/* the absolutely-positioned pen no longer pushes the row; keep even separators */
+.bf-v2cockpit .bfc-facts{ gap:10px !important; }
+
+/* ---- A3 · discreet editable backgrounds (transparent by default) ----
+   Header editable fact fields + economics inputs show NO box until hover/focus. */
+.bf-v2cockpit .bfc-facts .bfc-fedit{ background:transparent !important; }
+.bf-v2cockpit .bfc-facts .bfc-fedit:hover{ background:rgba(255,255,255,0.045) !important; }
+.bf-v2cockpit .bfc-facts .bfc-fedit.bfc-fediting{ background:transparent !important; }
+/* economics ACV input: transparent until hover/focus (matches bigedit treatment) */
+.bf-v2cockpit .bfc-acvedit{ border-radius:7px; padding:1px 4px; margin:-1px -4px; transition:background .12s; }
+.bf-v2cockpit .bfc-acvedit:hover{ background:rgba(255,255,255,0.03); }
+.bf-v2cockpit .bfc-acvinput{ border-bottom-color:transparent !important; }
+.bf-v2cockpit .bfc-acvedit:hover .bfc-acvinput,
+.bf-v2cockpit .bfc-acvinput:focus{ border-bottom-color:rgba(132,204,22,0.55) !important; }
+
+/* ---- A4 · color swatch dot already painted inline via [data-bfsw];
+   keep the neutral default visible when no color matched ---- */
+.bf-v2cockpit .bfc-sw{ box-shadow:0 0 0 1px rgba(0,0,0,0.4); }
+
+/* ---- A5 · tidy vertical rhythm below the title ---- */
+.bf-v2cockpit .bfc-facts{ margin-top:9px !important; }
+.bf-v2cockpit .bfc-pills{ margin-top:11px !important; }
+
+/* ===================================================================
+   B · right-cluster widgets shorter + Offer Sheet polish
+   =================================================================== */
+/* tiles: trim vertical padding so the right half isn't taller than the
+   left identity block */
+.bf-v2cockpit .bfc-tile{ padding:9px 12px !important; }
+.bf-v2cockpit .bfc-tilelbl{ margin-top:4px !important; }
+.bf-v2cockpit .bfc-right{ gap:8px !important; }
+
+/* Offer Sheet header widget: tighten the title/subtext block, bottom-align
+   it, and enlarge the document mock to fill the freed space. */
+.bf-v2cockpit .bfc-right .bfc-sheet{ padding:11px 10px !important; gap:8px !important; justify-content:space-between !important; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb{ width:50px !important; height:66px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(1){ top:12px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(2){ top:23px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(3){ top:32px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheetthumb i:nth-child(4){ bottom:10px !important; height:9px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheettxt{ line-height:1.1 !important; align-self:flex-end !important; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheettitle{ font-size:12px !important; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheetsub{ margin-top:1px !important; font-size:10px !important; line-height:1.1 !important; }
+
+/* ===================================================================
+   C · Schedule & Confirm Appointment — force dark (re-fix)
+   Date / time / pickup inputs + the Location card still rendered white.
+   Scope under html[data-bfv2="1"] .bf-ms so it overrides native white.
+   Keep green SELECTED chips (.bf-ws-type.sel) untouched.
+   =================================================================== */
+html[data-bfv2="1"] .bf-ms .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-ms .bf-ws-timeinput,
+html[data-bfv2="1"] .bf-ms .bf-ws-pickupinput,
+html[data-bfv2="1"] .bf-ms .bf-msrecsched .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-ms .bf-msrecsched .bf-ws-timeinput,
+html[data-bfv2="1"] .bf-ms .bf-msrecsched .bf-ws-pickupinput{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  color:#e4e4e7 !important;
+}
+html[data-bfv2="1"] .bf-ms .bf-ws-dateinput::-webkit-calendar-picker-indicator,
+html[data-bfv2="1"] .bf-ms .bf-ws-timeinput::-webkit-calendar-picker-indicator{
+  filter:invert(1) !important;
+}
+html[data-bfv2="1"] .bf-ms .bf-ws-loc,
+html[data-bfv2="1"] .bf-ms .bf-ws-loc-deal,
+html[data-bfv2="1"] .bf-ms .bf-ws-loc-pick{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  color:#e4e4e7 !important;
+}
+html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locname{ color:#e4e4e7 !important; }
+html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; }
+/* green selected chips stay green — NOT overridden */
+
+/* ---- C2 · Appraisal fields (CarMax / Carvana / Condition notes) ----
+   These render via bfInlineField (.bf-fi / .bf-fta-wrap / .bf-fedit). Force
+   the same dark recess in case any still render light. */
+html[data-bfv2="1"] .bf-ms .bf-fi,
+html[data-bfv2="1"] .bf-ms .bf-fta-wrap,
+html[data-bfv2="1"] .bf-ms .bf-fta,
+html[data-bfv2="1"] .bf-ms .bf-fedit,
+html[data-bfv2="1"] .bf-ms .bf-msnotes textarea,
+html[data-bfv2="1"] .bf-ms .bf-mscol input{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  color:#e4e4e7 !important;
+}
+
+/* ===================================================================
+   D · reshape the Make-the-Offer milestone sheet to match the header sheet
+   The milestone offer-sheet (.bf-mssheet, in .bf-msofferrow) should share
+   the header widget's portrait proportions, mock size, and text placement.
+   =================================================================== */
+html[data-bfv2="1"] .bf-ms .bf-msofferrow{ grid-template-columns:148px 1fr !important; align-items:stretch !important; }
+@media(max-width:760px){ html[data-bfv2="1"] .bf-ms .bf-msofferrow{ grid-template-columns:1fr !important; } }
+html[data-bfv2="1"] .bf-ms .bf-mssheet{
+  width:100% !important; flex-direction:column !important; align-items:center !important;
+  justify-content:space-between !important; text-align:center !important;
+  gap:10px !important; padding:14px 12px !important; min-height:120px !important;
+}
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetthumb{ width:50px !important; height:66px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(1){ top:12px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(2){ top:23px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(3){ top:32px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(4){ bottom:10px !important; height:9px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheettxt{ flex:0 0 auto !important; line-height:1.15 !important; align-self:flex-end !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheettitle{ font-size:12px !important; }
+html[data-bfv2="1"] .bf-ms .bf-mssheet .bfc-sheetsub{ margin-top:2px !important; font-size:10px !important; justify-content:center !important; }
+
+/* ===================================================================
+   F · VIN-tools helper note — subtle muted style (sits above the tools)
+   =================================================================== */
+html[data-bfv2="1"] .bf-ms .bf-msinfo.bf-msinfo-vinhint{
+  background:rgba(255,255,255,0.03) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  color:#9aa0a6 !important;
+  margin-bottom:12px;
+}
+/* end batch 102 */
