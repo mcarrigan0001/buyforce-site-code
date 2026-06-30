@@ -4347,3 +4347,7 @@ html[data-bfv2="1"] .bf-recsched .bf-ws-loc-deal{ background:#0e1115 !important;
 .bf-v2cockpit .bf-ms .bfc-vintools{ flex:0 0 auto !important; min-width:0 !important; width:100% !important; padding:0 !important; background:transparent !important; border:none !important; box-shadow:none !important; }
 .bf-v2cockpit .bf-ms .bf-mssheet{ flex:0 0 auto !important; width:100% !important; flex-direction:row !important; }
 /* end batch 94 (overrides) */
+
+/* batch 95 — group the vehicle filters into their own labeled row in the deal-table filter panel */
+.bff-fpanel .bff-vehhdr { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #7a7c84; margin: 12px 0 7px; padding-top: 11px; border-top: 1px solid #21232a; }
+.bff-fpanel .bff-vehgrid { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
