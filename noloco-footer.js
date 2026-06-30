@@ -1442,7 +1442,7 @@
       +tile('ti-route', dist?E(dist):'—', 'Distance','')
       +tile('ti-clock-hour-4', dt?E(dt):'—', 'Drive time','')
       +tile('ti-flame', (score!=null?score:'—'), 'Seller score'+(hot?' · Hot':''), hot?'hot':'')
-      +tile('ti-hourglass', (R.timeInStage?E(R.timeInStage):'—'), 'Time in stage','')
+      +tile('ti-hourglass', (function(){var se=R.stageEnteredAt;var bt=se?new Date(se).getTime():NaN;if(!isNaN(bt)){var mn=Math.floor((Date.now()-bt)/60000);if(mn<0)mn=0;return E(fmtDuration(mn));}if(R.daysInStage!=null&&R.daysInStage!=='')return E(R.daysInStage+(Number(R.daysInStage)===1?' day':' days'));return '\u2014';})(), 'Time in stage','')
       +'</div>';
     // offer sheet widget
     var sheet;

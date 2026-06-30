@@ -1230,10 +1230,10 @@ div:has(> div > [data-testid="record-view"]) {
 /* ===== Record section redesign: status header + field tiles ===== */
 [data-testid="details-section"] h2 { display: flex !important; align-items: center !important; gap: 10px !important; flex-wrap: wrap !important; }
 .bf-rscc { font-size: 22px !important; flex: none !important; line-height: 1 !important; }
-.bf-rsec-done .bf-rscc { color: #2b6012 !important; }
-.bf-rsec-current .bf-rscc { color: #92DF02 !important; }
+.bf-rsec-done .bf-rscc { color: #84cc16 !important; }
+.bf-rsec-current .bf-rscc { color: #a3e635 !important; }
 .bf-rsec-upcoming .bf-rscc { color: #c9c7bd !important; }
-.bf-rsicon { font-size: 17px !important; flex: none !important; line-height: 1 !important; color: #2b6012 !important; }
+.bf-rsicon { font-size: 17px !important; flex: none !important; line-height: 1 !important; color: #a3e635 !important; }
 .bf-rsec-upcoming .bf-rsicon { color: #9aa0a6 !important; }
 .bf-rschip { font-size: 11px !important; font-weight: 500 !important; padding: 3px 9px !important; border-radius: 8px !important; background: #EAF3DE !important; color: #27500A !important; margin-left: auto !important; text-transform: none !important; letter-spacing: 0 !important; }
 [data-testid="details-section"].bf-rsec-current { border-left: 4px solid #92DF02 !important; }
@@ -1250,8 +1250,8 @@ div:has(> div > [data-testid="record-view"]) {
 
 /* ---- Section check-circle: left of caret; solid green done (white check) like deal progress ---- */
 .bf-rscc { width: 20px !important; height: 20px !important; border-radius: 50% !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: none !important; font-size: 13px !important; box-sizing: border-box !important; margin-right: 2px !important; }
-.bf-rsec-done .bf-rscc { background: #2b6012 !important; color: #fff !important; border: none !important; }
-.bf-rsec-current .bf-rscc { border: 2px solid #92DF02 !important; background: transparent !important; color: #92DF02 !important; }
+.bf-rsec-done .bf-rscc { background: #84cc16 !important; color: #0a0a0a !important; border: none !important; }
+.bf-rsec-current .bf-rscc { border: 2px solid #a3e635 !important; background: transparent !important; color: #a3e635 !important; }
 .bf-rsec-upcoming .bf-rscc { border: 2px solid #d3d1c7 !important; background: transparent !important; }
 .bf-secblurb { font-size: 13px !important; color: #6b6b64 !important; line-height: 1.5 !important; margin: 0 0 12px 0 !important; }
 /* ---- Top section spacing: desktop -50%, mobile +10px ---- */
@@ -1717,7 +1717,7 @@ html[data-bfv2="1"] .bf-secblurb,
 html[data-bfv2="1"] .bf-info{ color:var(--mut) !important; }
 html[data-bfv2="1"] .bf-rsicon{ color:var(--g) !important; }
 html[data-bfv2="1"] .bf-rsec-current .bf-rscc{ border-color:var(--g) !important; color:var(--g) !important; }
-html[data-bfv2="1"] .bf-rsec-done .bf-rscc{ background:#2b6012 !important; color:#fff !important; }
+html[data-bfv2="1"] .bf-rsec-done .bf-rscc{ background:#84cc16 !important; color:#0a0a0a !important; }
 html[data-bfv2="1"] .bf-rsec-upcoming .bf-rscc{ border-color:var(--ln) !important; }
 html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-upcoming{ border-left-color:var(--ln) !important; }
 html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-current{ border-left-color:var(--g) !important; }
@@ -4351,3 +4351,13 @@ html[data-bfv2="1"] .bf-recsched .bf-ws-loc-deal{ background:#0e1115 !important;
 /* batch 95 — group the vehicle filters into their own labeled row in the deal-table filter panel */
 .bff-fpanel .bff-vehhdr { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #7a7c84; margin: 12px 0 7px; padding-top: 11px; border-top: 1px solid #21232a; }
 .bff-fpanel .bff-vehgrid { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; }
+
+
+/* batch 96 — milestone polish: lime greens to match the cockpit, accordion affordance */
+html[data-bfv2="1"] .bf-rsec-done .bf-rscc{ background:#84cc16 !important; color:#0a0a0a !important; }
+html[data-bfv2="1"] .bf-rsec-current .bf-rscc{ border-color:#a3e635 !important; color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-rsicon{ color:#a3e635 !important; }
+.bf-ms .bf-mshead{ cursor:pointer; }
+.bf-ms .bf-mschev{ transition:transform .15s ease; }
+.bf-ms .bf-msopen .bf-mschev, .bf-ms .bf-msec.bf-msopen .bf-mschev{ transform:rotate(180deg); }
+.bf-ms .bf-msbody[hidden]{ display:none !important; }
