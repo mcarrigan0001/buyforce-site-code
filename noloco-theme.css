@@ -1701,7 +1701,7 @@ html[data-bfv2="1"] .bf-ws-attach:hover{ background:#1c1f24; color:var(--g); }
 
 /* ---- milestone detail sections (.bf-rsec) reparented onto v2 ---- */
 html[data-bfv2="1"] .bf-v2secs{ margin-top:12px; display:flex; flex-direction:column; gap:0; }
-html[data-bfv2="1"] .bf-v2secs > div{ padding:0 !important; }
+html[data-bfv2="1"] > div{ padding:0 !important; }
 html[data-bfv2="1"] [data-testid="details-section"]{ background:#141619 !important; border:1px solid var(--ln) !important; border-radius:18px !important; color:#f2f3f5 !important; margin-bottom:12px !important; }
 html[data-bfv2="1"] [data-testid="details-section"] .bg-stone-50,
 html[data-bfv2="1"] [data-testid="details-section"] [class*="bg-stone"],
@@ -1736,45 +1736,45 @@ html[data-bfv2="1"] .bf-recsched .bf-ws-lbl{ color:var(--mut) !important; }
    (scripts, buttons, field cells, dropdowns) — scoped to .bf-v2secs
    ============================================================ */
 /* field cells -> v2 meta-card look */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:12px !important; padding:10px 12px !important; }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div label{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] [id="field-cell"]{ font-size:14px !important; font-weight:600 !important; }
+html[data-bfv2="1"] [data-testid="details-section"] form > div{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:12px !important; padding:10px 12px !important; }
+html[data-bfv2="1"] [data-testid="details-section"] form > div label{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
+html[data-bfv2="1"] [data-testid="details-section"] [id="field-cell"]{ font-size:14px !important; font-weight:600 !important; }
 /* script block labels (Ask for the VIN, Follow up…) */
-html[data-bfv2="1"] .bf-v2secs .bf-fl{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
+html[data-bfv2="1"] .bf-fl{ font-size:10px !important; letter-spacing:.6px !important; text-transform:uppercase !important; color:var(--mut) !important; font-weight:600 !important; }
 /* script copy boxes -> dark inner cards */
-html[data-bfv2="1"] .bf-v2secs .bf-wt{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:10px !important; padding:9px 11px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wt:hover{ border-color:rgba(143,224,74,.45) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wttext{ color:#cfd2d6 !important; font-size:12px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wtcopy{ color:var(--mut) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wt:hover .bf-wtcopy{ color:var(--g) !important; }
+html[data-bfv2="1"] .bf-wt{ background:#0e1012 !important; border:1px solid var(--ln) !important; border-radius:10px !important; padding:9px 11px !important; }
+html[data-bfv2="1"] .bf-wt:hover{ border-color:rgba(143,224,74,.45) !important; }
+html[data-bfv2="1"] .bf-wttext{ color:#cfd2d6 !important; font-size:12px !important; }
+html[data-bfv2="1"] .bf-wtcopy{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-wt:hover .bf-wtcopy{ color:var(--g) !important; }
 /* helper text + divider */
-html[data-bfv2="1"] .bf-v2secs .bf-info,
-html[data-bfv2="1"] .bf-v2secs .bf-secblurb{ color:var(--mut) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-secport .bf-secdiv{ border-top-color:var(--ln) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-ph{ color:var(--dim) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-confirm-head{ color:#e6e7e9 !important; }
+html[data-bfv2="1"] .bf-info,
+html[data-bfv2="1"] .bf-secblurb{ color:var(--mut) !important; }
+html[data-bfv2="1"] .bf-secport .bf-secdiv{ border-top-color:var(--ln) !important; }
+html[data-bfv2="1"] .bf-ph{ color:var(--dim) !important; }
+html[data-bfv2="1"] .bf-confirm-head{ color:#e6e7e9 !important; }
 /* buttons -> v2 green primary + dark ghost secondary */
-html[data-bfv2="1"] .bf-v2secs .bf-btn{ border-radius:10px !important; padding:9px 13px !important; font-size:12.5px !important; font-weight:600 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p{ background:rgba(143,224,74,.14) !important; color:var(--g) !important; border:1px solid rgba(143,224,74,.5) !important; font-weight:700 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p:hover{ background:rgba(143,224,74,.22) !important; border-color:var(--g) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s{ background:#16181c !important; color:#e6e7e9 !important; border:1px solid var(--ln) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s:hover{ background:#1c1f24 !important; border-color:rgba(143,224,74,.5) !important; color:var(--g) !important; }
+html[data-bfv2="1"] .bf-btn{ border-radius:10px !important; padding:9px 13px !important; font-size:12.5px !important; font-weight:600 !important; }
+html[data-bfv2="1"] .bf-btn-p{ background:rgba(143,224,74,.14) !important; color:var(--g) !important; border:1px solid rgba(143,224,74,.5) !important; font-weight:700 !important; }
+html[data-bfv2="1"] .bf-btn-p:hover{ background:rgba(143,224,74,.22) !important; border-color:var(--g) !important; }
+html[data-bfv2="1"] .bf-btn-s{ background:#16181c !important; color:#e6e7e9 !important; border:1px solid var(--ln) !important; }
+html[data-bfv2="1"] .bf-btn-s:hover{ background:#1c1f24 !important; border-color:rgba(143,224,74,.5) !important; color:var(--g) !important; }
 /* belt-and-suspenders: some buttons reject background; ensure readable text+border regardless */
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-p{ color:var(--g) !important; }
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-s{ color:#e6e7e9 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-g{ background:rgba(143,224,74,.16) !important; color:var(--g) !important; border-color:rgba(143,224,74,.4) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-g:hover{ background:rgba(143,224,74,.24) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-choicecaret{ color:var(--mut) !important; }
+html[data-bfv2="1"] button.bf-btn-p{ color:var(--g) !important; }
+html[data-bfv2="1"] button.bf-btn-s{ color:#e6e7e9 !important; }
+html[data-bfv2="1"] .bf-btn-g{ background:rgba(143,224,74,.16) !important; color:var(--g) !important; border-color:rgba(143,224,74,.4) !important; }
+html[data-bfv2="1"] .bf-btn-g:hover{ background:rgba(143,224,74,.24) !important; }
+html[data-bfv2="1"] .bf-choicecaret{ color:var(--mut) !important; }
 
 /* ===== v2 milestone sections — uniform spacing ===== */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form{ gap:10px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-secport{ margin-top:14px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-portgrid{ gap:16px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-port-text{ gap:10px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-port-btns{ gap:8px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-f.bf-fcol{ gap:5px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-getval-wrap{ margin:0 0 6px 0 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-info{ margin:0 0 4px 0 !important; }
+html[data-bfv2="1"] [data-testid="details-section"] form{ gap:10px !important; }
+html[data-bfv2="1"] .bf-secport{ margin-top:14px !important; }
+html[data-bfv2="1"] .bf-portgrid{ gap:16px !important; }
+html[data-bfv2="1"] .bf-port-text{ gap:10px !important; }
+html[data-bfv2="1"] .bf-port-btns{ gap:8px !important; }
+html[data-bfv2="1"] .bf-f.bf-fcol{ gap:5px !important; }
+html[data-bfv2="1"] .bf-getval-wrap{ margin:0 0 6px 0 !important; }
+html[data-bfv2="1"] .bf-info{ margin:0 0 4px 0 !important; }
 
 /* ===== v2 record-page navigation (prev/next, back, click-off) ===== */
 #bf-v2nav{ position:fixed; inset:0; pointer-events:none; z-index:40; }
@@ -3700,7 +3700,7 @@ html[data-bfembed="1"] .bf-ws *{ background:initial; }
    Send Offer & Follow Up, Schedule & Confirm Appointment,
    Payoff) to the "Deal Steps" high-fidelity design.
    PURELY ADDITIVE — overrides the batch 84/88 v2 section styling.
-   Scope: html[data-bfv2="1"] .bf-v2secs … which the footer sets on
+   Scope: html[data-bfv2="1"] … which the footer sets on
    BOTH the full record page and the embedded modal iframe
    (data-bfembed loads /command/preview/<uuid> which also flips
    data-bfv2="1"). All functional hooks (.bf-btn[data-bfaction],
@@ -3712,7 +3712,7 @@ html[data-bfembed="1"] .bf-ws *{ background:initial; }
    ============================================================ */
 
 /* ---- stage-card shell ---- */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"]{
+html[data-bfv2="1"] [data-testid="details-section"]{
   background:#0c0d0f !important;
   border:1px solid rgba(255,255,255,0.07) !important;
   border-left:1px solid rgba(255,255,255,0.07) !important;
@@ -3721,18 +3721,18 @@ html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"]{
   margin-bottom:14px !important;
 }
 /* current step = lime border (overrides the old 4px left accent) */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"].bf-rsec-current{
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-current{
   border-color:rgba(163,230,53,0.22) !important;
   border-left-color:rgba(163,230,53,0.22) !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"].bf-rsec-done{
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-done{
   border-left-color:rgba(255,255,255,0.07) !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"].bf-rsec-upcoming{
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-upcoming{
   border-left-color:rgba(255,255,255,0.07) !important;
 }
 /* header row */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] h2{
+html[data-bfv2="1"] [data-testid="details-section"] h2{
   color:#f4f4f5 !important;
   font-size:15px !important;
   font-weight:700 !important;
@@ -3740,40 +3740,40 @@ html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] h2{
   gap:12px !important;
 }
 /* section body inner cards keep the dark canvas */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] .bg-stone-50,
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] [class*="bg-stone"],
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] [class*="bg-white"]{ background:transparent !important; }
+html[data-bfv2="1"] [data-testid="details-section"] .bg-stone-50,
+html[data-bfv2="1"] [data-testid="details-section"] [class*="bg-stone"],
+html[data-bfv2="1"] [data-testid="details-section"] [class*="bg-white"]{ background:transparent !important; }
 
 /* ---- state indicator (.bf-rscc) ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-rscc{
+html[data-bfv2="1"] .bf-rscc{
   width:22px !important; height:22px !important; border-radius:50% !important;
   display:inline-flex !important; align-items:center !important; justify-content:center !important;
   box-sizing:border-box !important; flex:none !important; font-size:13px !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-rsec-current .bf-rscc{
+html[data-bfv2="1"] .bf-rsec-current .bf-rscc{
   background:rgba(163,230,53,0.12) !important;
   border:2px solid #a3e635 !important;
   color:#a3e635 !important;
   animation:bfcRingPulse 2s infinite !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-rsec-upcoming .bf-rscc{
+html[data-bfv2="1"] .bf-rsec-upcoming .bf-rscc{
   width:20px !important; height:20px !important;
   background:transparent !important;
   border:1.5px solid rgba(255,255,255,0.2) !important;
   color:transparent !important;
   animation:none !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-rsec-done .bf-rscc{
+html[data-bfv2="1"] .bf-rsec-done .bf-rscc{
   background:#84cc16 !important;
   border:none !important;
   color:#0a0a0a !important;
   animation:none !important;
 }
 /* stage icon (lime stroke look) */
-html[data-bfv2="1"] .bf-v2secs .bf-rsicon{ color:#a3e635 !important; font-size:17px !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-rsec-upcoming .bf-rsicon{ color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-rsicon{ color:#a3e635 !important; font-size:17px !important; }
+html[data-bfv2="1"] .bf-rsec-upcoming .bf-rsicon{ color:#a3e635 !important; }
 /* "Current step" badge */
-html[data-bfv2="1"] .bf-v2secs .bf-rschip{
+html[data-bfv2="1"] .bf-rschip{
   background:rgba(132,204,22,0.14) !important;
   color:#a3e635 !important;
   font-size:11px !important; font-weight:600 !important;
@@ -3783,105 +3783,105 @@ html[data-bfv2="1"] .bf-v2secs .bf-rschip{
 }
 
 /* ---- field tiles (native form cells + ported .bf-f tiles) ---- */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div,
-html[data-bfv2="1"] .bf-v2secs .bf-f{
+html[data-bfv2="1"] [data-testid="details-section"] form > div,
+html[data-bfv2="1"] .bf-f{
   background:#0f1113 !important;
   border:1px solid rgba(255,255,255,0.06) !important;
   border-radius:11px !important;
   padding:11px 14px !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div label,
-html[data-bfv2="1"] .bf-v2secs .bf-fl,
-html[data-bfv2="1"] .bf-v2secs .bf-field-lbl{
+html[data-bfv2="1"] [data-testid="details-section"] form > div label,
+html[data-bfv2="1"] .bf-fl,
+html[data-bfv2="1"] .bf-field-lbl{
   font-size:10px !important; letter-spacing:0.06em !important;
   text-transform:uppercase !important; color:#7b7e84 !important; font-weight:600 !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] [id="field-cell"],
-html[data-bfv2="1"] .bf-v2secs .bf-fi,
-html[data-bfv2="1"] .bf-v2secs .bf-fval,
-html[data-bfv2="1"] .bf-v2secs .bf-field-val{
+html[data-bfv2="1"] [data-testid="details-section"] [id="field-cell"],
+html[data-bfv2="1"] .bf-fi,
+html[data-bfv2="1"] .bf-fval,
+html[data-bfv2="1"] .bf-field-val{
   font-size:15px !important; font-weight:600 !important; color:#f4f4f5 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-ph,
-html[data-bfv2="1"] .bf-v2secs .bf-fro:empty::before{ color:#5f6168 !important; }
+html[data-bfv2="1"] .bf-ph,
+html[data-bfv2="1"] .bf-fro:empty::before{ color:#5f6168 !important; }
 
 /* ---- inputs / textareas ---- */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] input,
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] textarea,
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] select,
-html[data-bfv2="1"] .bf-v2secs .bf-fta,
-html[data-bfv2="1"] .bf-v2secs .bf-ws-pickupinput{
+html[data-bfv2="1"] [data-testid="details-section"] input,
+html[data-bfv2="1"] [data-testid="details-section"] textarea,
+html[data-bfv2="1"] [data-testid="details-section"] select,
+html[data-bfv2="1"] .bf-fta,
+html[data-bfv2="1"] .bf-ws-pickupinput{
   background:#0a0b0d !important;
   border:1px solid rgba(255,255,255,0.1) !important;
   border-radius:9px !important;
   color:#f4f4f5 !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] input:focus,
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] textarea:focus,
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] select:focus,
-html[data-bfv2="1"] .bf-v2secs .bf-fta:focus{
+html[data-bfv2="1"] [data-testid="details-section"] input:focus,
+html[data-bfv2="1"] [data-testid="details-section"] textarea:focus,
+html[data-bfv2="1"] [data-testid="details-section"] select:focus,
+html[data-bfv2="1"] .bf-fta:focus{
   outline:none !important; border-color:rgba(163,230,53,0.5) !important;
 }
 /* VIN / plate inputs in mono */
-html[data-bfv2="1"] .bf-v2secs [data-bfk="vin"] input,
-html[data-bfv2="1"] .bf-v2secs input[data-bftype="vin"],
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div:has(label) input[name*="vin" i],
-html[data-bfv2="1"] .bf-v2secs .bf-vin-input{
+html[data-bfv2="1"] [data-bfk="vin"] input,
+html[data-bfv2="1"] input[data-bftype="vin"],
+html[data-bfv2="1"] [data-testid="details-section"] form > div:has(label) input[name*="vin" i],
+html[data-bfv2="1"] .bf-vin-input{
   font-family:'Geist Mono','SFMono-Regular',ui-monospace,monospace !important;
   letter-spacing:0.02em !important;
 }
 
 /* ---- SOLID button system (overrides batch-84 translucent fills) ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-btn{
+html[data-bfv2="1"] .bf-btn{
   border-radius:11px !important;
   font-size:13px !important; font-weight:600 !important;
   gap:8px !important;
 }
 /* primary / lime */
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p,
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-p{
+html[data-bfv2="1"] .bf-btn-p,
+html[data-bfv2="1"] button.bf-btn-p{
   background:#84cc16 !important;
   border:none !important;
   color:#0a0a0a !important;
   font-weight:700 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-p:hover{ background:#a3e635 !important; }
+html[data-bfv2="1"] .bf-btn-p:hover{ background:#a3e635 !important; }
 /* stage-green (solid) */
-html[data-bfv2="1"] .bf-v2secs .bf-btn-g,
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-g{
+html[data-bfv2="1"] .bf-btn-g,
+html[data-bfv2="1"] button.bf-btn-g{
   background:#2c4711 !important;
   border:1px solid rgba(132,204,22,0.55) !important;
   color:#bdf25a !important;
   font-weight:600 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-g:hover{ background:#365a16 !important; }
+html[data-bfv2="1"] .bf-btn-g:hover{ background:#365a16 !important; }
 /* neutral (solid) */
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s,
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-s{
+html[data-bfv2="1"] .bf-btn-s,
+html[data-bfv2="1"] button.bf-btn-s{
   background:#191b1f !important;
   border:1px solid rgba(255,255,255,0.14) !important;
   color:#e4e4e7 !important;
   font-weight:600 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-btn-s:hover{ background:#202327 !important; border-color:rgba(255,255,255,0.14) !important; color:#e4e4e7 !important; }
+html[data-bfv2="1"] .bf-btn-s:hover{ background:#202327 !important; border-color:rgba(255,255,255,0.14) !important; color:#e4e4e7 !important; }
 /* destructive (solid) — "No Deal" : a stage-transition button to a lost/no-deal stage */
-html[data-bfv2="1"] .bf-v2secs .bf-btn[data-bfto*="no deal" i],
-html[data-bfv2="1"] .bf-v2secs .bf-btn[data-bfto*="lost" i],
-html[data-bfv2="1"] .bf-v2secs .bf-btn-r,
-html[data-bfv2="1"] .bf-v2secs button.bf-btn-r{
+html[data-bfv2="1"] .bf-btn[data-bfto*="no deal" i],
+html[data-bfv2="1"] .bf-btn[data-bfto*="lost" i],
+html[data-bfv2="1"] .bf-btn-r,
+html[data-bfv2="1"] button.bf-btn-r{
   background:#341515 !important;
   border:1px solid rgba(248,113,113,0.4) !important;
   color:#f87171 !important;
   font-weight:600 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-btn[data-bfto*="no deal" i]:hover,
-html[data-bfv2="1"] .bf-v2secs .bf-btn[data-bfto*="lost" i]:hover,
-html[data-bfv2="1"] .bf-v2secs .bf-btn-r:hover{ background:#431a1a !important; }
+html[data-bfv2="1"] .bf-btn[data-bfto*="no deal" i]:hover,
+html[data-bfv2="1"] .bf-btn[data-bfto*="lost" i]:hover,
+html[data-bfv2="1"] .bf-btn-r:hover{ background:#431a1a !important; }
 /* choice caret */
-html[data-bfv2="1"] .bf-v2secs .bf-choicecaret{ color:inherit !important; }
+html[data-bfv2="1"] .bf-choicecaret{ color:inherit !important; }
 
 /* ---- script cards (.bf-wt) : 2px lime left accent + copy button ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-wt{
+html[data-bfv2="1"] .bf-wt{
   background:#0f1113 !important;
   border:1px solid rgba(255,255,255,0.06) !important;
   border-left:2px solid #84cc16 !important;
@@ -3889,56 +3889,56 @@ html[data-bfv2="1"] .bf-v2secs .bf-wt{
   padding:12px 38px 12px 14px !important;
   position:relative !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-wt:hover{ border-color:rgba(255,255,255,0.06) !important; border-left-color:#a3e635 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wttext{ color:#d4d4d8 !important; font-size:13px !important; line-height:1.5 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-wtcopy{
+html[data-bfv2="1"] .bf-wt:hover{ border-color:rgba(255,255,255,0.06) !important; border-left-color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-wttext{ color:#d4d4d8 !important; font-size:13px !important; line-height:1.5 !important; }
+html[data-bfv2="1"] .bf-wtcopy{
   position:absolute !important; top:10px !important; right:10px !important;
   width:24px !important; height:24px !important;
   display:flex !important; align-items:center !important; justify-content:center !important;
   background:#191b1f !important; border:1px solid rgba(255,255,255,0.14) !important;
   border-radius:6px !important; color:#9b9ea4 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-wt:hover .bf-wtcopy{ color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-wt:hover .bf-wtcopy{ color:#a3e635 !important; }
 /* script-group headers (Initial Outreach / Follow Up) */
-html[data-bfv2="1"] .bf-v2secs .bf-trn,
-html[data-bfv2="1"] .bf-v2secs .bf-port-head{
+html[data-bfv2="1"] .bf-trn,
+html[data-bfv2="1"] .bf-port-head{
   font-size:10px !important; letter-spacing:0.06em !important;
   text-transform:uppercase !important; color:#7b7e84 !important; font-weight:600 !important;
 }
 
 /* ---- helper / info bars ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-info,
-html[data-bfv2="1"] .bf-v2secs .bf-secblurb{
+html[data-bfv2="1"] .bf-info,
+html[data-bfv2="1"] .bf-secblurb{
   color:#a9b6a0 !important;
   font-size:12.5px !important; line-height:1.5 !important;
 }
 
 /* ---- get CarMax/Carvana value buttons sit above their input ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-getval-wrap{ margin:0 0 8px 0 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-getval-wrap .bf-btn{
+html[data-bfv2="1"] .bf-getval-wrap{ margin:0 0 8px 0 !important; }
+html[data-bfv2="1"] .bf-getval-wrap .bf-btn{
   background:#84cc16 !important; border:none !important; color:#0a0a0a !important; font-weight:700 !important;
   width:100% !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-getval-wrap .bf-btn:hover{ background:#a3e635 !important; }
+html[data-bfv2="1"] .bf-getval-wrap .bf-btn:hover{ background:#a3e635 !important; }
 
 /* ---- value pills (Accident History / Offer Sheet Status) ---- */
-html[data-bfv2="1"] .bf-v2secs .bf-pillval.bf-pg{ background:rgba(132,204,22,0.14) !important; color:#a3e635 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-pillval.bf-pa{ background:rgba(251,146,60,0.12) !important; color:#fb923c !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-pillval.bf-pr{ background:#341515 !important; color:#f87171 !important; }
+html[data-bfv2="1"] .bf-pillval.bf-pg{ background:rgba(132,204,22,0.14) !important; color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-pillval.bf-pa{ background:rgba(251,146,60,0.12) !important; color:#fb923c !important; }
+html[data-bfv2="1"] .bf-pillval.bf-pr{ background:#341515 !important; color:#f87171 !important; }
 
 /* ============================================================
    batch 91 — Schedule & Confirm: chip selectors + read-back + book
    ============================================================ */
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-lbl{
+html[data-bfv2="1"] .bf-recsched .bf-ws-lbl{
   font-size:11px !important; letter-spacing:0.06em !important;
   text-transform:uppercase !important; color:#a3e635 !important; font-weight:700 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-sublbl{
+html[data-bfv2="1"] .bf-recsched .bf-ws-sublbl{
   font-size:10px !important; letter-spacing:0.06em !important;
   text-transform:uppercase !important; color:#7b7e84 !important; font-weight:600 !important;
 }
 /* date / time / location chips */
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-type{
+html[data-bfv2="1"] .bf-recsched .bf-ws-type{
   height:36px !important; padding:0 15px !important;
   border-radius:9px !important;
   background:#0f1113 !important;
@@ -3946,49 +3946,49 @@ html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-type{
   color:#d4d4d8 !important;
   font-size:13px !important; font-weight:500 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-type:hover{ border-color:rgba(255,255,255,0.2) !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-type.sel{
+html[data-bfv2="1"] .bf-recsched .bf-ws-type:hover{ border-color:rgba(255,255,255,0.2) !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-type.sel{
   background:rgba(132,204,22,0.14) !important;
   border:1px solid rgba(132,204,22,0.45) !important;
   color:#a3e635 !important;
   font-weight:600 !important;
 }
 /* read-back date/time inputs + location card */
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-dateinput,
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-timeinput{
+html[data-bfv2="1"] .bf-recsched .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-recsched .bf-ws-timeinput{
   background:#0a0b0d !important; border:1px solid rgba(255,255,255,0.1) !important;
   border-radius:10px !important; color:#f4f4f5 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-loc,
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-loc-deal{
+html[data-bfv2="1"] .bf-recsched .bf-ws-loc,
+html[data-bfv2="1"] .bf-recsched .bf-ws-loc-deal{
   background:#0f1113 !important; border:1px solid rgba(255,255,255,0.07) !important;
   border-radius:11px !important; color:#f4f4f5 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-locname{ color:#f4f4f5 !important; font-weight:600 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-locaddr{ color:#7b7e84 !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-locname{ color:#f4f4f5 !important; font-weight:600 !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-locaddr{ color:#7b7e84 !important; }
 /* Book appointment = full-width lime primary */
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-btn.primary{
+html[data-bfv2="1"] .bf-recsched .bf-ws-btn.primary{
   width:100% !important; height:50px !important;
   background:#84cc16 !important; border:none !important;
   border-radius:12px !important; color:#0a0a0a !important;
   font-size:15px !important; font-weight:700 !important;
 }
-html[data-bfv2="1"] .bf-v2secs .bf-recsched .bf-ws-btn.primary:hover{ background:#a3e635 !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-btn.primary:hover{ background:#a3e635 !important; }
 /* end batch 91 */
 
 /* batch 91 — denser tile grid for the read-only field sections (Vehicle / Payoff /
    Make-the-Offer). Native Noloco form is already display:grid; we only tighten the
    minmax so the compact tiles flow into more columns like the design (≈3-4 up),
    while textarea cells stay full-width. Purely visual — no DOM change. */
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form{
+html[data-bfv2="1"] [data-testid="details-section"] form{
   grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)) !important;
 }
-html[data-bfv2="1"] .bf-v2secs [data-testid="details-section"] form > div:has(textarea){
+html[data-bfv2="1"] [data-testid="details-section"] form > div:has(textarea){
   grid-column:1 / -1 !important;
 }
 /* select-as-pill values keep dark-theme pill colors */
-html[data-bfv2="1"] .bf-v2secs .bf-pill.gset{ background:rgba(132,204,22,0.14) !important; color:#a3e635 !important; }
-html[data-bfv2="1"] .bf-v2secs .bf-pill.rset{ background:#341515 !important; color:#f87171 !important; }
+html[data-bfv2="1"] .bf-pill.gset{ background:rgba(132,204,22,0.14) !important; color:#a3e635 !important; }
+html[data-bfv2="1"] .bf-pill.rset{ background:#341515 !important; color:#f87171 !important; }
 /* end batch 91 (tile grid) */
 
 /* batch 92 — Est Payoff: Paid Off checkbox + NO PAYOFF state */
