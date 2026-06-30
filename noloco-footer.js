@@ -1435,12 +1435,12 @@
       +vinLine+fact1+fact2+'</div>';
 
     // metric tiles
-    function tile(icon,val,lbl,variant){
-      return '<div class="bfc-tile'+(variant?' '+variant:'')+'"><div class="bfc-tiletop"><i class="ti '+icon+'" aria-hidden="true"></i><span class="bfc-tileval">'+val+'</span></div><div class="bfc-tilelbl">'+lbl+'</div></div>';
+    function tile(icon,val,lbl,variant,attr){
+      return '<div class="bfc-tile'+(variant?' '+variant:'')+'"><div class="bfc-tiletop"><i class="ti '+icon+'" aria-hidden="true"></i><span class="bfc-tileval"'+(attr?(' '+attr):'')+'>'+val+'</span></div><div class="bfc-tilelbl">'+lbl+'</div></div>';
     }
     var tiles='<div class="bfc-tiles">'
-      +tile('ti-route', dist?E(dist):'—', 'Distance','')
-      +tile('ti-clock-hour-4', dt?E(dt):'—', 'Drive time','')
+      +tile('ti-route', dist?E(dist):'—', 'Distance','','data-bfdist')
+      +tile('ti-clock-hour-4', dt?E(dt):'—', 'Drive time','','data-bfdrive')
       +tile('ti-flame', (score!=null?score:'—'), 'Seller score'+(hot?' · Hot':''), hot?'hot':'')
       +tile('ti-hourglass', (function(){var se=R.stageEnteredAt;var bt=se?new Date(se).getTime():NaN;if(!isNaN(bt)){var mn=Math.floor((Date.now()-bt)/60000);if(mn<0)mn=0;return E(fmtDuration(mn));}if(R.daysInStage!=null&&R.daysInStage!=='')return E(R.daysInStage+(Number(R.daysInStage)===1?' day':' days'));return '\u2014';})(), 'Time in stage','')
       +'</div>';
@@ -1800,7 +1800,7 @@
         } else {
           var fk=(key==='color')?'exteriorColor':'listingLocation'; var rk=(key==='color')?'color':'location';
           if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ var _p={uuid:uuid}; _p[fk]=null; bfPost(_p); R[rk]=''; }catch(_e){} } }
-          else { val.textContent=txt; if(txt!==startRaw){ try{ var _p2={uuid:uuid}; _p2[fk]=txt; bfPost(_p2); R[rk]=txt; }catch(_e){} } }
+          else { val.textContent=txt; if(txt!==startRaw){ try{ var _p2={uuid:uuid}; _p2[fk]=txt; bfPost(_p2); R[rk]=txt; }catch(_e){} if(key==='listingLocation'){ try{ bfV2RefreshDriveEta(host, uuid, txt, R); }catch(_e){} } } }
         }
         try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
       }
@@ -3339,6 +3339,28 @@
     if(act==='addtask'){ var ti=ws.querySelector('.bf-ws-taskinput'); var tt=(ti&&ti.value||'').trim(); if(!tt){ bfToast('Type a reminder first'); return; } var ddEl=ws.querySelector('.bf-ws-type.sel[data-due]'); var nd=ddEl?parseInt(ddEl.getAttribute('data-due'),10):1; if(isNaN(nd)) nd=1; var due=new Date(); due.setDate(due.getDate()+nd); bfPostTask({action:'create', uuid:uuid, text:tt, dueAt:due.toISOString(), createdBy:actor}).then(function(){ if(ws.isConnected) bfWsLoadTasks(ws, uuid); }); if(ti) ti.value=''; bfToast('Reminder added'); return; }
   }
   function bfPostDriveEta(p){ return fetch(BF_WH+'/drive-eta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).then(function(r){return r.json();}).catch(function(){return null;}); }
+  // Cockpit: when Listing Location is edited, recompute Distance + Drive Time to the listing.
+  // Mirrors the scheduler's /drive-eta contract (origin/destination/departureTime -> {ok,distance,durationText,...}).
+  // Origin is the dealership address; destination is the new listing location. No departureTime (no appt) -> typical/no-traffic estimate.
+  function bfV2RefreshDriveEta(host, uuid, loc, R){
+    if(!host||!loc) return;
+    var distEl=host.querySelector('[data-bfdist]'), driveEl=host.querySelector('[data-bfdrive]');
+    var origin=(R&&(R.dealershipAddress||R.dealerAddress))||'';
+    if(!origin){ return; } // no dealership origin on the record -> nothing to compute against
+    var tok=(R&&R._bfEtaTok!==undefined? (R._bfEtaTok=(R._bfEtaTok||0)+1) : (R._bfEtaTok=1));
+    if(distEl){ distEl.setAttribute('data-bfupd',''); }
+    if(driveEl){ driveEl.setAttribute('data-bfupd',''); }
+    bfPostDriveEta({origin:origin, destination:loc}).then(function(d){
+      if(!host.isConnected || (R&&R._bfEtaTok!==tok)) return;
+      if(distEl) distEl.removeAttribute('data-bfupd');
+      if(driveEl) driveEl.removeAttribute('data-bfupd');
+      if(!d||(d.ok===false)) return;
+      var newDist=d.distance||'', newDrive=d.durationText||'';
+      if(newDist){ if(distEl) distEl.textContent=newDist; R.distance=newDist; }
+      if(newDrive){ if(driveEl) driveEl.textContent=newDrive; R.driveTime=newDrive; }
+      try{ sessionStorage.setItem('bfrec:'+uuid, JSON.stringify(R)); }catch(_s){}
+    });
+  }
   function bfWsFmtTime(iso){ var d=new Date(iso); if(isNaN(d.getTime())) return ''; return d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
   function bfWsSchedISO(ws){ var di=ws.querySelector('.bf-ws-dateinput'); var ti=ws.querySelector('.bf-ws-timeinput'); var day=(di&&di.value)||''; var tm=(ti&&ti.value)||''; if(!day){ var d2=ws.querySelector('.bf-ws-type.sel[data-day]'); day=d2?d2.getAttribute('data-day'):''; } if(!tm){ var t2=ws.querySelector('.bf-ws-type.sel[data-time]'); tm=t2?t2.getAttribute('data-time'):''; } if(!day||!tm) return ''; var o=new Date(day+'T'+tm+':00'); return isNaN(o.getTime())?'':o.toISOString(); }
   function bfPlacesFetch(q){ return fetch(BF_WH+'/places-autocomplete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:q})}).then(function(r){return r.json();}).catch(function(){return null;}); }

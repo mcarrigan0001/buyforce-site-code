@@ -4479,3 +4479,21 @@ html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; 
 #bf-v2nav .bf-v2navbtn.bf-v2navbtn-stage{ width:auto; min-width:44px; height:auto; min-height:44px; border-radius:22px; flex-direction:column; padding:7px 12px; gap:2px; }
 #bf-v2nav .bf-v2navlbl{ font-size:9px; font-weight:700; letter-spacing:.2px; line-height:1.1; text-align:center; color:#8fe04a; max-width:96px; white-space:normal; text-transform:uppercase; }
 /* end batch 98 */
+
+/* ===================================================================
+   batch 99 — cockpit: center the Competitive Landscape right-side label/value column
+   The tag pill (WINNING / Beats X) and the −$delta sit in a fixed-width slot
+   (batch 97, flex:0 0 96px) so bar lengths stay comparable. They were right-aligned;
+   center their text/value horizontally within that slot. Width + colors unchanged.
+   Scoped under .bf-v2cockpit. PURELY ADDITIVE — overrides batch 97 alignment only.
+   =================================================================== */
+.bf-v2cockpit .bfc-bartag,
+.bf-v2cockpit .bfc-bardelta{ justify-content:center; text-align:center; }
+/* the tag is an inline-flex pill in the fixed slot — center the pill itself */
+.bf-v2cockpit .bfc-bartag{ margin-left:auto; margin-right:auto; }
+
+/* subtle "updating…" state on the Distance / Drive-time tile values while a
+   recompute (drive-eta) call triggered by a Listing-Location edit is in flight */
+@keyframes bfcEtaPulse{ 0%{opacity:.35;} 50%{opacity:.7;} 100%{opacity:.35;} }
+.bf-v2cockpit .bfc-tileval[data-bfupd]{ animation:bfcEtaPulse 1s ease-in-out infinite; color:#8b8e94; }
+/* end batch 99 */
