@@ -4824,3 +4824,17 @@ html[data-bfv2="1"] .bf-ms .bf-msinfo.bf-msinfo-vinhint{
 .bf-v2cockpit .bf-ms .bf-msofferrow{ grid-template-columns:190px 1fr !important; gap:12px !important; align-items:start !important; }
 @media(max-width:760px){ .bf-v2cockpit .bf-ms .bf-msofferrow{ grid-template-columns:1fr !important; } }
 .bf-v2cockpit .bf-ms .bf-mssheet{ width:190px !important; max-width:190px !important; align-self:start !important; }
+
+/* Batch 104b — full column layout so the Make-the-Offer card matches the   */
+/* header Offer Sheet card exactly (the header card gets its column shape    */
+/* from .bfc-right .bfc-sheet rules that don't reach the milestone card).    */
+/* Overrides the flex-direction:row at line ~4346 (same specificity, later). */
+.bf-v2cockpit .bf-ms .bf-mssheet{ flex-direction:column !important; align-items:center !important; justify-content:space-between !important; text-align:center !important; gap:8px !important; padding:13px 10px !important; min-height:145px !important; box-sizing:border-box !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetthumb{ width:50px !important; height:66px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(1){ top:12px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(2){ top:23px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(3){ top:32px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetthumb i:nth-child(4){ bottom:10px !important; height:9px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheettxt{ flex:0 0 auto !important; width:100% !important; line-height:1.1 !important; align-self:flex-end !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheettitle{ font-size:12px !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet .bfc-sheetsub{ margin-top:1px !important; font-size:10px !important; line-height:1.1 !important; justify-content:center !important; }
