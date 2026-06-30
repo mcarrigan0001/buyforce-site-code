@@ -11,6 +11,10 @@
 /* ===================================================================== */
 (function () {
   window.BF_VERSION='2026-06-19-c';
+  /* Phase 1: render the six milestone stage cards from cached record data (instant, like the cockpit)
+     instead of the slow embedded iframe. SAFETY: when false, everything falls back to today's iframe
+     behavior exactly — the iframe/embed code, native milestone sections and workspace are untouched. */
+  var BF_CUSTOM_MILESTONES=true;
   /* Default pipeline columns: keep only the active stages open, collapse EVERY other stage (incl. null/"No value" and any future stage), once per browser. Reps can open any column; Noloco persists their choice. Collapsed columns don't render their cards -> faster board. */
   var bfFirstDefault=false, bfDefaultAt=0;
   var BF_KEEPOPEN={FRESH_LEADS:1, APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES:1, OFFER_SHEET_GENERATED:1, OFFER_SENT_0_2_DAYS:1};
@@ -1567,7 +1571,12 @@
     +'</div>';
     var wtd=divider+'<div class="bfc-wtdrow">'+vinTools+nba+'</div>';
 
-    var cockpit='<div class="bf-v2cockpit">'+header+econ+prog+compdesc+wtd+'</div>';
+    // Phase 1: when the flag is on, paint the six milestone stage cards from cache (instant) and place
+    // them inside the .bf-v2cockpit container (after the cockpit content) so they inherit the same
+    // cockpit-scoped .bfc-* styling (VIN tools, offer-sheet object) and the batch-94 .bf-ms styles.
+    // The native milestone iframe/sections still live in the slots below and are hidden via the flag.
+    var milestones=(typeof BF_CUSTOM_MILESTONES!=='undefined' && BF_CUSTOM_MILESTONES) ? bfMilestonesHtml(R,uuid) : '';
+    var cockpit='<div class="bf-v2cockpit">'+header+econ+prog+compdesc+wtd+milestones+'</div>';
     return '<div class="bf-v2wrap">'+cockpit+'<div class="bf-v2wsslot"></div><div class="bf-v2secs"></div></div>';
   }
   function bfV2Wire(host, uuid, R){
@@ -1833,7 +1842,11 @@
       try{ zone.focus(); }catch(_e){}
     }
     // cockpit action buttons
+    // cockpit action buttons. NOTE: skip any data-bfc inside the custom milestone cards (.bf-ms) —
+    // those are wired separately by bfMsWireVinTools so they act on the milestone's own inputs,
+    // not the cockpit's first-match inputs.
     host.querySelectorAll('[data-bfc]').forEach(function(b){
+      if(b.closest && b.closest('.bf-ms')) return;
       b.addEventListener('click',function(e){
         e.preventDefault();
         var a=b.getAttribute('data-bfc');
@@ -1903,7 +1916,430 @@
         if(a==='script'){ bfToast('Scripts — open the Workspace tab below'); return; }
       });
     });
+
+    // Phase 1: wire the custom milestone stage cards (no-op when the flag is off / not rendered)
+    try{ bfMilestonesWire(host, uuid, R); }catch(_ms){}
   }
+  /* ============================================================
+     Phase 1 — custom cache-rendered milestone stages (behind BF_CUSTOM_MILESTONES).
+     Renders the six Deal-Steps stage cards from the cached record R, matching the
+     batch 91/93 design. Reuses existing constants/markup so the heavy interactions
+     keep using the SAME handlers/hooks the rest of the footer already listens for:
+       - stage transitions: bfButton({a:'stage',to,...}) emits data-bfto; wired locally to bfPost({uuid,status})
+       - inline edits (Condition Notes etc.): bfInlineField(...) -> data-bfk/data-bftype, wired locally to bfPost
+       - scheduler: bfSchedFormHtml(...) markup + bfWsAction(rs,uuid,'book') (the existing booking path)
+       - offer sheet: GEN_SHEET_HOOK / VIEW_SHEET_PAGE (the existing hooks)
+       - VIN tools: same data-bfc markup as the cockpit, re-wired with the same NHTSA/plate logic
+  ============================================================ */
+  function bfMsTile(lbl, val){
+    var E=esc;
+    var has=(val!=null && (''+val).trim()!=='' );
+    return '<div class="bf-mst"><div class="bf-mstl">'+E(lbl)+'</div><div class="bf-mstv'+(has?'':' empty')+'">'+(has?E(''+val):'—')+'</div></div>';
+  }
+  function bfMsMoney(v){ if(v==null||v==='') return ''; var n=parseFloat((''+v).replace(/[^0-9.\-]/g,'')); if(isNaN(n)) return ''; return '$'+Math.round(n).toLocaleString('en-US'); }
+  function bfMsDate(v){ if(!v) return ''; var d=new Date(v); if(isNaN(d.getTime())) return (''+v); return d.toLocaleDateString('en-US')+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+  function bfMsField(R,keys){ for(var i=0;i<keys.length;i++){ var v=R[keys[i]]; if(v!=null && (''+v).trim()!=='') return v; } return ''; }
+  function bfMsVeh(R,which){
+    var direct=bfMsField(R,[which]);
+    if(direct) return direct;
+    var title=(''+(R.title||'')).trim();
+    var tm=title.match(/(19|20)\d{2}\s*(.*)$/); var rest=tm?tm[2].trim():title; var toks=rest.split(/\s+/).filter(Boolean);
+    if(which==='year'){ var ym=title.match(/(19|20)\d{2}/); return ym?ym[0]:''; }
+    if(which==='make'){ return toks[0]||''; }
+    if(which==='model'){ return toks.slice(1).join(' ')||''; }
+    if(which==='trim'){ var sub=(''+(R.subtitle||'')).trim(); return sub?sub.split(/[•|,·]/)[0].trim():''; }
+    return '';
+  }
+  function bfMilestonesHtml(R, uuid){
+    var E=esc;
+    var stageFull=(typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[R.status])||R.status||'';
+    // checks completed for this stage (same source the cockpit Deal Progress uses)
+    var checks=((typeof STATUS_CHECKS!=='undefined'&&STATUS_CHECKS[stageFull])||[]).slice();
+    // the six visible milestone cards, in design order, each tied to a MILESTONES check index
+    // (mirrors bfRecSectionsUI's MAP so current/done/upcoming match the native sections exactly)
+    var CARDS=[
+      {id:'vin',     title:'VIN & Vehicle',                         icon:'ti-car',          chk:0},
+      {id:'compete', title:'Competing Offers & Notes for Appraisal',icon:'ti-scale',        chk:2},
+      {id:'offer',   title:'Make the Offer',                        icon:'ti-businessplan', chk:4},
+      {id:'send',    title:'Send Offer & Follow Up',                icon:'ti-send',         chk:5},
+      {id:'sched',   title:'Schedule & Confirm Appointment',        icon:'ti-calendar-event',chk:7},
+      {id:'payoff',  title:'Payoff',                                icon:'ti-receipt',      chk:8}
+    ];
+    // determine done/current/upcoming exactly like bfRecSectionsUI
+    var firstNotDone=false;
+    CARDS.forEach(function(c){
+      var done=checks.indexOf(c.chk)>-1;
+      c.status = done?'done':(firstNotDone?'upcoming':'current');
+      if(!done && !firstNotDone) firstNotDone=true;
+    });
+    var html='<div class="bf-ms" data-uuid="'+E(uuid)+'">'
+      +'<div class="bf-msdiv"><span class="bf-mslbl">Milestone stages</span><span class="bf-msline"></span></div>';
+    CARDS.forEach(function(c){
+      var open=(c.status==='current');
+      var body=bfMsBody(c.id, R, uuid);
+      var cc=(c.status==='done')?'<i class="ti ti-check" aria-hidden="true"></i>':'';
+      var chip=(c.status==='current')?'<span class="bf-rschip">Current step</span>':'';
+      html+='<section class="bf-rsec bf-msec bf-rsec-'+c.status+(open?' bf-msopen':'')+'" data-msid="'+c.id+'">'
+        +'<div class="bf-mshead" data-mstoggle role="button" tabindex="0">'
+          +'<span class="bf-rscc" data-st="'+c.status+'">'+cc+'</span>'
+          +'<span class="bf-rsicon"><i class="ti '+c.icon+'" aria-hidden="true"></i></span>'
+          +'<h2 class="bf-mstitle">'+E(c.title)+'</h2>'
+          +chip
+          +'<i class="ti ti-chevron-down bf-mschev" aria-hidden="true"></i>'
+        +'</div>'
+        +'<div class="bf-msbody"'+(open?'':' hidden')+'>'+body+'</div>'
+      +'</section>';
+    });
+    html+='</div>';
+    return html;
+  }
+  // VIN-tools markup identical to the cockpit's (.bfc-vintools) so bfMilestonesWire can reuse
+  // the same decode/plate/scan logic by emitting the same data-bfc / data-bf* hooks.
+  function bfMsVinTools(R, uuid){
+    var E=esc;
+    var vin=(R.vin||'');
+    var tparts=(R.title||'').trim().split(/\s+/);
+    var dYear=(tparts[0]&&/^\d{4}$/.test(tparts[0]))?tparts[0]:'';
+    var dMake=bfMsVeh(R,'make'); var dModel=bfMsVeh(R,'model'); var dTrim=bfMsVeh(R,'trim');
+    var dEngine=R.engine||'';
+    return '<div class="bfc-vintools bf-msvintools">'
+      +'<div class="bfc-sublabel">Plate → VIN</div>'
+      +'<div class="bfc-inrow">'
+        +'<input type="text" class="bfc-input plate" data-bfplate placeholder="License plate">'
+        +'<select class="bfc-select" data-bfstate><option>FL</option><option>GA</option><option>AL</option><option>TX</option><option>SC</option><option>NC</option><option>TN</option></select>'
+        +'<button class="bfc-scan" data-bfc="scanplate" type="button" title="Scan photo for plate #"><i class="ti ti-camera" aria-hidden="true"></i></button>'
+        +'<button class="bfc-btn lime" data-bfc="platedecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
+      +'</div>'
+      +'<div class="bfc-plateres" data-bfplateres hidden><span class="bfc-platevin" data-bfplatevin>'+E(vin||'')+'</span><span class="bfc-matched"><i class="ti ti-check" aria-hidden="true"></i>Matched</span></div>'
+      +'<div class="bfc-tooldiv"></div>'
+      +'<div class="bfc-sublabel">VIN Decode</div>'
+      +'<div class="bfc-inrow">'
+        +'<input type="text" class="bfc-input mono" data-bfvinin value="'+E(vin||'')+'" placeholder="Enter to Decode VIN">'
+        +'<button class="bfc-scan" data-bfc="scanvin" type="button" title="Scan photo for VIN"><i class="ti ti-camera" aria-hidden="true"></i></button>'
+        +'<button class="bfc-btn neutral" data-bfc="vindecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
+      +'</div>'
+      +'<div class="bfc-vinres" data-bfvinres hidden>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year / Make</div><div class="bfc-vrval">'+(E((dYear+' '+dMake).trim())||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model / Trim</div><div class="bfc-vrval">'+(E((dModel+' '+dTrim).trim())||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Engine</div><div class="bfc-vrval">'+(E(dEngine)||'—')+'</div></div>'
+        +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Drivetrain</div><div class="bfc-vrval">'+(E(R.drivetrain||'')||'—')+'</div></div>'
+      +'</div>'
+      +'<div class="bfc-ymmt" data-bfymmt hidden>'
+        +'<div class="bfc-ymmthead"><i class="ti ti-sparkles" aria-hidden="true"></i><span data-bfymmttitle>Decoded vehicle</span></div>'
+        +'<div class="bfc-ymmtgrid">'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year</div><div class="bfc-vrval" data-bfymmt-year>—</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Make</div><div class="bfc-vrval" data-bfymmt-make>—</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model</div><div class="bfc-vrval" data-bfymmt-model>—</div></div>'
+          +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Trim</div><div class="bfc-vrval" data-bfymmt-trim>—</div></div>'
+        +'</div>'
+        +'<div class="bfc-ymmtbtns">'
+          +'<button class="bfc-btn lime" data-bfc="ymmtapply" data-bfuuid="'+E(uuid)+'" type="button"><i class="ti ti-check" aria-hidden="true"></i>Apply</button>'
+          +'<button class="bfc-btn ghost" data-bfc="ymmtdismiss" type="button">Dismiss</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }
+  // Offer-sheet object — same hooks as the cockpit header (GEN_SHEET_HOOK gensheet / link to sheet url).
+  function bfMsSheet(R, uuid){
+    var E=esc;
+    var sheetUrl=(R.offerSheet||R.offerSheetUrl||'');
+    if(sheetUrl){
+      return '<a class="bfc-sheet bf-mssheet" href="'+E(sheetUrl)+'" target="_blank" rel="noopener">'
+        +'<span class="bfc-sheetthumb"><i></i><i></i><i></i><i></i></span>'
+        +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub"><span class="bfc-dotlime sm"></span>Generated · View</span></span></a>';
+    }
+    return '<a class="bfc-sheet bfc-sheetgen bf-mssheet" data-bfc="gensheet" data-bfuuid="'+E(uuid)+'">'
+      +'<span class="bfc-sheetthumb gen"><i class="ti ti-file-plus" aria-hidden="true" style="color:#84cc16;font-size:22px;"></i></span>'
+      +'<span class="bfc-sheettxt"><span class="bfc-sheettitle">Offer Sheet</span><span class="bfc-sheetsub gen">Generate offer sheet</span></span></a>';
+  }
+  // Builds {F} field-map for the milestone inline-edit fields (bfInlineField reads by display label).
+  function bfMsFMap(R){
+    return {
+      'Condition Notes': R.conditionNotes||R.notesForAppraisal||'',
+      'CarMax Offer':    R.carmax||'',
+      'Carvana Offer':   R.carvana||''
+    };
+  }
+  function bfMsBody(id, R, uuid){
+    var E=esc, T=bfMsTile;
+    var stageFull=(typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[R.status])||R.status||'';
+    if(id==='vin'){
+      var grid='<div class="bf-msgrid g4">'
+        +T('Year', bfMsVeh(R,'year'))
+        +T('Make', bfMsVeh(R,'make'))
+        +T('Model', bfMsVeh(R,'model'))
+        +T('Exterior Color', R.color)
+        +T('Mileage', (function(){ var n=(R.mileage!=null&&R.mileage!=='')?Number((''+R.mileage).replace(/[^0-9.]/g,'')):NaN; return isNaN(n)?'':n.toLocaleString('en-US'); })())
+        +T('Drivetrain', R.drivetrain)
+        +T('Body Style', R.bodyStyle)
+        +T('Trim', bfMsVeh(R,'trim'))
+      +'</div>';
+      var tools=bfMsVinTools(R, uuid);
+      var info='<div class="bf-msinfo">Check the photos and description for a VIN or Plate # — if none is listed, ask the seller for the VIN.</div>';
+      var btns='<div class="bf-msbtns">'
+        +bfButton({l:'Engaged / Asked for VIN', a:'stage', to:'Engaged - Awaiting VIN', g:1, i:'ti-message-2'}, uuid)
+        +bfButton({l:'Follow Up Sent', a:'msfollowup', g:1, i:'ti-rotate-clockwise'}, uuid)
+        +bfButton({l:'VIN Received', a:'stage', to:'VIN Received - Appraisal Needed', i:'ti-arrow-right'}, uuid)
+      +'</div>';
+      return grid+tools+info+btns;
+    }
+    if(id==='compete'){
+      var F=bfMsFMap(R);
+      var note='<div class="bf-msinfo amber">Enter the CarMax and Carvana values and any condition notes so the appraiser knows where the competition is.</div>';
+      var vals='<div class="bf-msgrid g2">'
+        +'<div class="bf-mscol"><div class="bf-msvalbtnwrap">'+bfButton({l:'Get CarMax Value', a:'url', url:'https://www.carmax.com/sell-my-car', i:'ti-external-link'}, uuid)+'</div>'+bfInlineField(IF.conmax, F, uuid)+'</div>'
+        +'<div class="bf-mscol"><div class="bf-msvalbtnwrap">'+bfButton({l:'Get Carvana Value', a:'url', url:'https://www.carvana.com/sell-my-car', i:'ti-external-link'}, uuid)+'</div>'+bfInlineField(IF.convana, F, uuid)+'</div>'
+      +'</div>';
+      var notesHdr='<div class="bf-msnoteshdr"><span class="bf-fl">Condition Notes</span>'+(R.listingLink?('<a class="bf-msvisit bfc-btn neutral" href="'+E(R.listingLink)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>Visit Listing</a>'):'')+'</div>';
+      var notes='<div class="bf-msnotes">'+notesHdr+bfInlineField(IF.notes, F, uuid)+'</div>';
+      var btns='<div class="bf-msbtns">'+bfButton({l:'Mark Appraisal Complete', a:'stage', to:'Appraisal Complete - Enter Offer Sheet Values', g:1, i:'ti-clipboard-check'}, uuid)+'</div>';
+      return note+vals+notes+btns;
+    }
+    if(id==='offer'){
+      var grid='<div class="bf-msgrid g3">'
+        +T('Accident History', R.accident)
+        +T('Competing Vehicles', R.competingVehicles)
+        +T('Est. Dealer Days to Sale', R.dealerDays)
+        +T('Est. Private Party Retail', bfMsMoney(R.privatePartyRetail))
+        +T('Offer Sheet Status', R.offerStatus||R.offerSheetGenerated&&'Generated')
+        +T('Offer Sheet Generated', bfMsDate(R.offerSheetGenerated))
+      +'</div>';
+      var sheet='<div class="bf-msofferrow"><div class="bf-msoffersheet">'+bfMsSheet(R, uuid)+'</div>'
+        +'<div class="bf-msbtns col">'
+          +bfButton({l:'Generate Offer Sheet', a:'gensheet', g:1, i:'ti-file-invoice'}, uuid)
+          +bfButton({l:'View Offer Sheet', a:'msviewsheet', i:'ti-eye'}, uuid)
+          +bfButton({l:'Move to Generated', a:'stage', to:'Offer Sheet Generated', g:1, i:'ti-arrow-right'}, uuid)
+        +'</div></div>';
+      return grid+sheet;
+    }
+    if(id==='send'){
+      var grid='<div class="bf-msgrid g2">'
+        +T('Last Follow Up At', bfMsDate(R.lastFollowUpAt||R.lastActivityAt))
+        +T('Offer Status', R.offerStatusReal||R.offerStatus)
+      +'</div>';
+      var btns='<div class="bf-msbtns col">'
+        +bfButton({l:'View Offer Sheet', a:'msviewsheet', i:'ti-eye'}, uuid)
+        +bfButton({l:'Move to Offer Sheet Sent', a:'stage', to:'Offer Sent (0-2 Days)', g:1, i:'ti-send'}, uuid)
+        +bfButton({l:'Follow Up Sent', a:'msfollowup', g:1, i:'ti-rotate-clockwise'}, uuid)
+        +bfButton({l:'No Deal', a:'stage', to:'No Deal', i:'ti-x'}, uuid)
+      +'</div>';
+      return grid+btns;
+    }
+    if(id==='sched'){
+      // reuse the EXISTING scheduler form builder + booking path (bfWsAction(...,'book'))
+      var Fsched={};
+      Fsched['Dealership Address']=R.dealershipAddress||R.dealerAddress||'';
+      Fsched['Vehicle Location Address']=[R.addrStreet,R.addrCity,R.addrState,R.addrZip].filter(Boolean).join(', ');
+      Fsched['Appt Date and Time']=R.apptDateAndTime||'';
+      var form=bfSchedFormHtml(Fsched);
+      return '<div class="bf-recsched bf-msrecsched" data-uuid="'+E(uuid)+'">'+form+'</div>';
+    }
+    if(id==='payoff'){
+      var addr=[R.addrStreet,R.addrLine2,R.addrCity,R.addrState,R.addrZip];
+      var grid='<div class="bf-msgrid g3">'
+        +T('Actual Payoff Amount', bfMsMoney(R.actualPayoff))
+        +T('Good Thru Date', R.goodThru?(function(){var d=new Date(R.goodThru);return isNaN(d.getTime())?R.goodThru:d.toLocaleDateString('en-US');})():'')
+        +T('Daily Per Diem', bfMsMoney(R.perDiem))
+        +T('Payoff Lender', R.lender)
+        +T('Street Address', R.addrStreet)
+        +T('Street Address Line 2', R.addrLine2)
+        +T('Address City', R.addrCity)
+        +T('Address State', R.addrState)
+        +T('Address Zip', R.addrZip)
+      +'</div>';
+      var btns='<div class="bf-msbtns">'+bfButton({l:'Pull Actual Payoff', a:'mspayoff', p:1, i:'ti-receipt'}, uuid)+'</div>';
+      return btns+grid;
+    }
+    return '';
+  }
+  function bfMilestonesWire(host, uuid, R){
+    if(typeof BF_CUSTOM_MILESTONES==='undefined' || !BF_CUSTOM_MILESTONES) return;
+    var root=host.querySelector('.bf-ms'); if(!root) return;
+    // ---- accordion: header toggles its body open/closed (only one concern; no data fetch) ----
+    root.querySelectorAll('[data-mstoggle]').forEach(function(hd){
+      function tog(){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); if(open){ body.hidden=false; } else { body.hidden=true; } }
+      hd.addEventListener('click', function(e){ if(e.target.closest&&e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; tog(); });
+      hd.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(); } });
+    });
+    // ---- stage-transition buttons (reuse bfButton's data-bfto) -> bfPost({uuid,status}) directly ----
+    // plus the low-risk milestone actions that map onto EXISTING hooks.
+    root.querySelectorAll('.bf-btn[data-bfaction]').forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        var a=b.getAttribute('data-bfaction');
+        if(a==='url'){ try{ bfOpen(b.getAttribute('data-bfurl')); }catch(_){} return; }
+        if(a==='stage'){
+          var to=b.getAttribute('data-bfto'); if(!to) return;
+          try{ bfPost({uuid:uuid, status:to}); }catch(_){}
+          // keep cache + UI roughly in sync so a re-render reflects the new stage
+          try{ R.status=to; var inv={}; if(typeof PIPE_STATUSNAME!=='undefined'){ for(var k in PIPE_STATUSNAME){ inv[PIPE_STATUSNAME[k]]=k; } } if(inv[to]){ R.status=inv[to]; } var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+          bfToast('Moving to '+to+'…');
+          return;
+        }
+        if(a==='gensheet'){
+          try{ fetch(GEN_SHEET_HOOK,{method:'POST',body:JSON.stringify({uuid:uuid})}); }catch(_){}
+          try{ bfPost({uuid:uuid, offerSheetStatus:'Generating'}); }catch(_){}
+          bfToast('Generating offer sheet…'); return;
+        }
+        if(a==='msviewsheet'){
+          var url=(R.offerSheet||R.offerSheetUrl||''); var img=R.offerSheetImageUrl||R.offerSheetImage||'';
+          if(url){ try{ bfOpen(url); }catch(_){} return; }
+          if(img){ try{ bfOpen(VIEW_SHEET_PAGE+'?img='+encodeURIComponent(img)+'&name='+encodeURIComponent(R.title||'')); }catch(_){} return; }
+          bfToast('No offer sheet yet'); return;
+        }
+        if(a==='msfollowup'){
+          var iso=new Date().toISOString();
+          try{ bfPost({uuid:uuid, lastFollowUpAt:iso}); }catch(_){}
+          bfToast('Follow-up logged · clock reset'); return;
+        }
+        if(a==='mspayoff'){
+          // Pull Actual Payoff: no dedicated cache-side hook exists in this context.
+          bfToast('Pull payoff runs from the full record — open it to fetch the payoff.'); return;
+        }
+      });
+    });
+    // ---- inline field edits (Condition Notes, CarMax/Carvana) reuse the cockpit's
+    // bf-fi / bf-fpills / bf-fta-wrap edit pattern via the existing global .bf-btn/.bf-fi click
+    // handlers. Those handlers find the card via closest('[data-testid="collection-record"]'),
+    // which doesn't exist here; so we wire these few editors directly to bfPost. ----
+    bfMsWireInline(root, uuid, R);
+    // ---- VIN tools: reuse the cockpit VIN-tools logic by re-running bfV2Wire's data-bfc handler.
+    // The cockpit already wired host's data-bfc once; our milestone VIN tools live in the SAME host,
+    // but were appended after that pass, so they need their own wiring. We delegate to a shared helper. ----
+    bfMsWireVinTools(root, uuid, R);
+    // ---- scheduler: reuse the EXISTING bfWsAction(...,'book') booking path on our embedded form ----
+    var rs=root.querySelector('.bf-msrecsched');
+    if(rs){
+      rs._bfDeal={ vehicle:(R.title||''), stage:((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[R.status])||R.status||''), sellerFirst:((R.seller||'').split(/\s+/)[0]||''), address:(R.dealershipAddress||R.dealerAddress||'') };
+      rs.addEventListener('click', function(e){ var tg=e.target;
+        var ty=tg.closest&&tg.closest('.bf-ws-type'); if(ty){ var row=ty.closest('.bf-ws-row'); if(row){ row.querySelectorAll('.bf-ws-type').forEach(function(x){x.classList.toggle('sel',x===ty);}); } var _dv=ty.getAttribute('data-day'); if(_dv){ var _di2=rs.querySelector('.bf-ws-dateinput'); if(_di2) _di2.value=_dv; } var _tv=ty.getAttribute('data-time'); if(_tv){ var _tin=rs.querySelector('.bf-ws-timeinput'); if(_tin) _tin.value=_tv; } var _lk=ty.getAttribute('data-loc'); if(_lk){ var _dd=rs.querySelector('.bf-ws-loc-deal'); var _pp=rs.querySelector('.bf-ws-loc-pick'); var _ip=(_lk==='pickup'); if(_dd)_dd.style.display=_ip?'none':''; if(_pp)_pp.style.display=_ip?'':'none'; } try{ bfWsDriveEtaSoon(rs, uuid); }catch(_e){} return; }
+        var ac=tg.closest&&tg.closest('[data-act]'); if(ac){ e.preventDefault(); try{ bfWsAction(rs, uuid, ac.getAttribute('data-act')); }catch(_e){} return; }
+      });
+      var _dIn=rs.querySelector('.bf-ws-dateinput'); if(_dIn) _dIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-day]').forEach(function(x){ x.classList.remove('sel'); }); try{ bfWsDriveEtaSoon(rs, uuid); }catch(_e){} });
+      var _tIn=rs.querySelector('.bf-ws-timeinput'); if(_tIn) _tIn.addEventListener('input', function(){ rs.querySelectorAll('.bf-ws-type[data-time]').forEach(function(x){ x.classList.remove('sel'); }); try{ bfWsDriveEtaSoon(rs, uuid); }catch(_e){} });
+      var _pIn=rs.querySelector('.bf-ws-pickupinput'); if(_pIn){ _pIn.addEventListener('input', function(){ try{ bfWsDriveEtaSoon(rs, uuid); }catch(_e){} }); try{ bfAttachPlacesAuto(_pIn); }catch(_ac){} }
+      try{ var Fi={}; Fi['Appt Date and Time']=R.apptDateAndTime||''; Fi['Dealership Address']=rs._bfDeal.address; bfWsScheduleInit(rs, Fi); }catch(_e){}
+    }
+  }
+  // Inline editors for the milestone tiles (Condition Notes / CarMax / Carvana). Reuses the SAME
+  // markup bfInlineField emits and the SAME write-key model as bfPost — just scoped wiring so it
+  // works without a kanban card in the DOM.
+  function bfMsWireInline(root, uuid, R){
+    // pill selects (none currently) + bf-fi (money) + bf-fta-wrap (textarea)
+    function saveKey(el, val){
+      var key=el.getAttribute('data-bfk'); var type=el.getAttribute('data-bftype'); if(!key) return;
+      var out=val; if(type==='number'||type==='money'){ var n=parseFloat((''+val).replace(/[^0-9.\-]/g,'')); out=isNaN(n)?null:n; }
+      var p={uuid:uuid}; p[key]=(out===''?null:out); try{ bfPost(p); }catch(_){}
+      // mirror to cache field names where we know them
+      try{ if(key==='conditionNotes'){ R.conditionNotes=val; } else if(key==='carMaxOffer'){ R.carmax=out; } else if(key==='carvanaOffer'){ R.carvana=out; } var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+    }
+    // money / text single-line tiles
+    root.querySelectorAll('.bf-fi[data-bfk]').forEach(function(fi){
+      if(fi.getAttribute('data-msbound')) return; fi.setAttribute('data-msbound','1');
+      fi.addEventListener('click', function(e){
+        if(fi.getAttribute('data-editing')) return; e.preventDefault(); e.stopPropagation();
+        fi.setAttribute('data-editing','1');
+        var raw=fi.getAttribute('data-bfval')||''; var ph=fi.getAttribute('data-bfph')||'';
+        fi.innerHTML='<input type="text" class="bf-fedit" placeholder="'+esc(ph)+'" value="'+esc(raw)+'">';
+        var inp=fi.querySelector('input'); if(inp){ inp.focus(); try{ inp.select(); }catch(_){} }
+        var done=false;
+        function fin(save){ if(done) return; done=true; fi.removeAttribute('data-editing'); var v=inp?inp.value.trim():''; if(save){ saveKey(fi, v); fi.setAttribute('data-bfval', v); fi.innerHTML='<span class="bf-fval">'+(v?esc(money(v)):'<span class="bf-ph">'+esc(ph||'—')+'</span>')+'</span><i class="ti ti-check bf-fsave" aria-hidden="true"></i>'; } else { fi.innerHTML='<span class="bf-fval">'+(raw?esc(money(raw)):'<span class="bf-ph">'+esc(ph||'—')+'</span>')+'</span><i class="ti ti-check bf-fsave" aria-hidden="true"></i>'; } }
+        inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); fin(true); } else if(ev.key==='Escape'){ ev.preventDefault(); fin(false); } });
+        inp.addEventListener('blur', function(){ setTimeout(function(){ if(!done) fin(true); }, 140); });
+      });
+    });
+    // textarea tiles (Condition Notes)
+    root.querySelectorAll('.bf-fta-wrap[data-bfk]').forEach(function(ta){
+      if(ta.getAttribute('data-msbound')) return; ta.setAttribute('data-msbound','1');
+      ta.addEventListener('click', function(e){
+        if(ta.getAttribute('data-editing')) return; e.preventDefault(); e.stopPropagation();
+        ta.setAttribute('data-editing','1');
+        var raw=ta.getAttribute('data-bfval')||''; var ph=ta.getAttribute('data-bfph')||'';
+        ta.innerHTML='<textarea class="bf-fedit" rows="3" placeholder="'+esc(ph)+'">'+esc(raw)+'</textarea>';
+        var inp=ta.querySelector('textarea'); if(inp){ inp.focus(); }
+        var done=false;
+        function fin(save){ if(done) return; done=true; ta.removeAttribute('data-editing'); var v=inp?inp.value.trim():''; if(save){ saveKey(ta, v); ta.setAttribute('data-bfval', v); } var disp=(save?v:raw); ta.innerHTML='<div class="bf-fta">'+(disp?esc(disp):'<span class="bf-ph">'+esc(ph)+'</span>')+'</div><div class="bf-facts"><i class="ti ti-check bf-fsave" aria-hidden="true"></i></div>'; }
+        inp.addEventListener('keydown', function(ev){ if(ev.key==='Enter'&&(ev.metaKey||ev.ctrlKey)){ ev.preventDefault(); fin(true); } else if(ev.key==='Escape'){ ev.preventDefault(); fin(false); } });
+        inp.addEventListener('blur', function(){ setTimeout(function(){ if(!done) fin(true); }, 140); });
+      });
+    });
+  }
+  // VIN tools wiring — same NHTSA / plate-lookup / OCR-scan / YMMT-apply logic as the cockpit,
+  // re-applied to the milestone copy of the VIN-tools markup (same data-bfc / data-bf* hooks).
+  function bfMsWireVinTools(root, uuid, R){
+    var vt=root.querySelector('.bf-msvintools'); if(!vt) return;
+    var PLATE_VIN_HOOK='https://buyforce.app.n8n.cloud/webhook/plate-vin-lookup';
+    var bfYmmt=null;
+    function tcase(s){ s=(''+(s||'')).toLowerCase(); return s.replace(/\b([a-z])/g,function(m,c){return c.toUpperCase();}); }
+    function nhtsa(vinRaw){
+      var vin=String(vinRaw||'').toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g,'');
+      if(vin.length<11) return Promise.resolve({ok:false,reason:'Enter a full VIN to decode.'});
+      return fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/'+encodeURIComponent(vin)+'?format=json')
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){ var r=(d&&d.Results&&d.Results[0])||{}; var year=r.ModelYear||''; var trim=r.Trim||r.Series||r.Series2||'';
+          if(!year && !r.Make) return {ok:false,reason:'No match for that VIN.'};
+          var disp=r.DisplacementL?(Math.round(parseFloat(r.DisplacementL)*10)/10+'L'):''; var cyl=r.EngineCylinders?(r.EngineCylinders+'cyl'):'';
+          return {ok:true,vin:vin,year:year,make:tcase(r.Make||''),model:r.Model||'',trim:trim,engine:[disp,cyl].filter(Boolean).join(' '),drive:r.DriveType||''}; })
+        .catch(function(){ return {ok:false,reason:'Could not reach NHTSA.'}; });
+    }
+    function showYmmt(d){
+      bfYmmt={vin:d.vin||'',year:d.year||'',make:d.make||'',model:d.model||'',trim:d.trim||''};
+      var box=vt.querySelector('[data-bfymmt]'); if(!box) return;
+      var set=function(sel,v){ var el=vt.querySelector(sel); if(el) el.textContent=(v&&(''+v).trim())?v:'—'; };
+      set('[data-bfymmt-year]',d.year); set('[data-bfymmt-make]',d.make); set('[data-bfymmt-model]',d.model); set('[data-bfymmt-trim]',d.trim);
+      var ttl=vt.querySelector('[data-bfymmttitle]'); if(ttl) ttl.textContent=((d.year||'')+' '+(d.make||'')+' '+(d.model||'')).trim()||'Decoded vehicle';
+      box.hidden=false;
+    }
+    function hideYmmt(){ var box=vt.querySelector('[data-bfymmt]'); if(box) box.hidden=true; bfYmmt=null; }
+    vt.querySelectorAll('[data-bfc]').forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        var a=b.getAttribute('data-bfc');
+        if(a==='scanvin'||a==='scanplate'){ bfToast('Photo scan runs from the full record — open it to snip a VIN/plate.'); return; }
+        if(a==='platedecode'){
+          var pl=vt.querySelector('[data-bfplate]'); var st=vt.querySelector('[data-bfstate]');
+          var plate=pl?pl.value.trim().toUpperCase():''; if(!plate){ bfToast('Enter a plate first'); return; }
+          var state=st?st.value:''; if(pl) pl.value=plate; b.disabled=true; bfToast('Looking up VIN…');
+          var tk=''; try{ tk=bfGetApiToken(); }catch(_e){}
+          var hdrs={'Content-Type':'application/json'}; if(tk) hdrs['X-BF-Token']=tk;
+          fetch(PLATE_VIN_HOOK,{method:'POST',headers:hdrs,body:JSON.stringify({plate:plate,state:state})})
+            .then(function(r){ return r.json().catch(function(){ return {ok:false,reason:'bad_response'}; }); })
+            .then(function(resp){
+              if(!resp || resp.ok===false || !resp.vin){ bfToast((resp&&resp.reason)?('Plate: '+resp.reason):'No VIN found for that plate'); return; }
+              var mvin=(''+resp.vin).toUpperCase();
+              var res=vt.querySelector('[data-bfplateres]'); var pv=vt.querySelector('[data-bfplatevin]');
+              if(pv) pv.textContent=mvin; if(res) res.hidden=false;
+              var vi=vt.querySelector('[data-bfvinin]'); if(vi) vi.value=mvin;
+              bfToast('Matched VIN — decoding…');
+              return nhtsa(mvin).then(function(d){ if(d&&d.ok) showYmmt(d); else bfToast((d&&d.reason)||'Decode failed'); });
+            })
+            .catch(function(){ bfToast('Could not reach the plate lookup'); })
+            .then(function(){ b.disabled=false; });
+          return;
+        }
+        if(a==='vindecode'){
+          var vi=vt.querySelector('[data-bfvinin]'); var dvin=vi?vi.value.trim().toUpperCase():'';
+          var clean=dvin.replace(/[^A-HJ-NPR-Z0-9]/g,'');
+          if(clean.length!==17){ bfToast('Enter a valid 17-character VIN'); return; }
+          if(vi) vi.value=clean; b.disabled=true; bfToast('Decoding VIN…');
+          nhtsa(clean).then(function(d){ b.disabled=false; if(d&&d.ok){ showYmmt(d); } else { bfToast((d&&d.reason)||'Decode failed'); } });
+          return;
+        }
+        if(a==='ymmtdismiss'){ hideYmmt(); return; }
+        if(a==='ymmtapply'){
+          if(!bfYmmt || !bfYmmt.vin){ bfToast('Nothing to apply'); return; }
+          var y=bfYmmt;
+          try{ bfPost({uuid:uuid, vin:y.vin, year:y.year, make:y.make, model:y.model, trim:y.trim}); }catch(_e){}
+          try{ fetch(CARD_DECODE_HOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid, vin:y.vin})}); }catch(_e2){}
+          try{ R.vin=y.vin; R.year=y.year; R.make=y.make; R.model=y.model; R.trim=y.trim; var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+          var pv=vt.querySelector('[data-bfplatevin]'); if(pv) pv.textContent=y.vin;
+          hideYmmt(); bfToast('Vehicle applied — VIN saved');
+          return;
+        }
+      });
+    });
+  }
+
   var bfV2Fetching={};
   function bfV2Fetch(uuid){
     if(bfV2Fetching[uuid]) return; bfV2Fetching[uuid]=1;
@@ -1964,6 +2400,10 @@
       if(secwrap && c.querySelector){ var _ds=c.querySelector('[data-testid="details-section"]'); var _h2=_ds&&_ds.querySelector('h2'); if(_ds && _h2 && /vin|competing offers|make the offer|send offer|schedule|payoff/i.test(_h2.textContent||'')){ if(c.parentNode!==secwrap){ secwrap.appendChild(c); } c.style.removeProperty('display'); return; } }
       if(c.style.display!=='none') c.style.setProperty('display','none','important');
     });
+    // Phase 1: when custom milestones are on, hide the native milestone sections (moved into secwrap)
+    // and the embed iframe — the cache-rendered cards in the cockpit now own the milestone workflow.
+    // The native sections stay in the DOM (just hidden) so BF_CUSTOM_MILESTONES=false restores them.
+    try{ if(secwrap){ secwrap.style.display=(typeof BF_CUSTOM_MILESTONES!=='undefined' && BF_CUSTOM_MILESTONES)?'none':''; } }catch(_cm){}
     // Item 6: in embed mode, hide the 4 leftover NATIVE field displays (Equity / CarMax / Carvana /
     // Beats-xx / Competition) that ride along at the bottom of the moved milestone sections. Match by
     // label text only, so workspace cards + milestone steps are untouched.
@@ -2545,6 +2985,12 @@
 
   document.addEventListener('click', function(e){
     var t=e.target; if(!t||!t.closest) return;
+    // Phase 1: clicks inside the custom milestone cards (.bf-ms) are owned by bfMilestonesWire's
+    // own (bubble-phase) handlers — which know how to act without a kanban card in the DOM. Bail out
+    // here so this kanban-oriented capture handler doesn't swallow them (its bfMoveCard/bfEnterEdit
+    // paths assume a board card exists). Editing the .bf-fedit input it spawns must still work, so we
+    // only skip when the click is NOT already on an open editor input.
+    if(t.closest('.bf-ms') && !t.closest('.bf-fedit, .bf-amt')){ return; }
     if(t.closest('.bf-fedit, .bf-amt')){ e.preventDefault(); e.stopPropagation(); return; }
     var lst=t.closest('.bf-listing');
     if(lst){ e.preventDefault(); e.stopPropagation(); var lu=lst.getAttribute('data-bfurl'); bfOpen(lu); return; }
@@ -3053,7 +3499,12 @@
       var m=bfEnsureModal(); var body=m.querySelector('.bf-modal-body');
       try{ body.innerHTML=bfV2Html(R,uuid); }catch(e){ bfNavRec(uuid); return; }
       try{ bfV2Wire(body,uuid,R); }catch(e){}
-      try{ bfWsShow(uuid); bfWsMaybePrefetch(); }catch(e){}
+      // Phase 1: when custom milestones are on, DON'T show the slow workspace iframe pool — the
+      // milestones now come from the cache-rendered cards in `body`. Keep the iframe code intact
+      // (just hidden) so flipping BF_CUSTOM_MILESTONES=false restores the iframe instantly.
+      var _bfCM=(typeof BF_CUSTOM_MILESTONES!=='undefined' && BF_CUSTOM_MILESTONES);
+      try{ var _pool=m.querySelector('.bf-modal-wspool'); if(_pool) _pool.style.display=_bfCM?'none':''; }catch(e){}
+      if(!_bfCM){ try{ bfWsShow(uuid); bfWsMaybePrefetch(); }catch(e){} }
       try{ var ae=body.querySelector('.bf-v2feed[data-vp="act"] .bf-v2empty'); if(ae) ae.textContent='Open the full record to view the activity timeline.'; }catch(e){}
       try{ var card=m.querySelector('.bf-modal-card'); if(card) card.scrollTop=0; }catch(e){}
       var pv=m.querySelector('.bf-modal-prev'), nx=m.querySelector('.bf-modal-next');

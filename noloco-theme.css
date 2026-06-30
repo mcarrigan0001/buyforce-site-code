@@ -4222,3 +4222,128 @@ html[data-bfv2="1"] .bf-recsched .bf-ws-timeinput{ background:#090b0d !important
 html[data-bfv2="1"] .bf-recsched .bf-ws-loc,
 html[data-bfv2="1"] .bf-recsched .bf-ws-loc-deal{ background:#0e1115 !important; box-shadow:inset 0 1px 2px rgba(0,0,0,0.4) !important; }
 /* end batch 93 */
+
+/* ============================================================
+   batch 94 — custom milestone cards (Phase 1)
+   Cache-rendered six Deal-Steps stage cards painted by
+   bfMilestonesHtml() and appended into the cockpit (.bf-v2cockpit
+   context), shown when BF_CUSTOM_MILESTONES is true. Reuses the
+   batch 91/93 tokens + the .bf-rsec-current/.bf-rscc/.bf-rsicon/
+   .bf-rschip and .bfc-* / .bf-btn-* classes already defined above;
+   this batch only adds the NEW pieces the custom render introduces:
+   the accordion shell inside the cockpit, the field-tile grids, the
+   "Milestone stages" divider, helper bars and offer-sheet row.
+   Scoped under .bf-ms so it renders in both modal + full page and
+   never leaks onto the native sections.
+   ============================================================ */
+.bf-ms{ display:flex; flex-direction:column; gap:14px; margin-top:18px; }
+/* divider */
+.bf-msdiv{ display:flex; align-items:center; gap:14px; }
+.bf-mslbl{ font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:#7b7e84; font-weight:700; white-space:nowrap; }
+.bf-msline{ flex:1; height:1px; background:linear-gradient(90deg, rgba(255,255,255,0.10), rgba(255,255,255,0)); }
+/* stage-card shell (mirrors batch 91 native-section shell, but for our .bf-rsec markup) */
+.bf-ms .bf-msec{
+  background:linear-gradient(180deg,#1b1f24,#121519);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 44px -26px rgba(0,0,0,0.85);
+}
+.bf-ms .bf-msec.bf-rsec-current{
+  border-color:rgba(163,230,53,0.45);
+  box-shadow:0 0 0 1px rgba(163,230,53,0.12), 0 0 36px -6px rgba(163,230,53,0.45), 0 1px 0 rgba(255,255,255,0.05) inset;
+}
+/* header row */
+.bf-ms .bf-mshead{
+  display:flex; align-items:center; gap:12px;
+  padding:16px 18px; cursor:pointer; user-select:none;
+}
+.bf-ms .bf-mshead:focus-visible{ outline:2px solid rgba(163,230,53,0.5); outline-offset:-2px; }
+.bf-ms .bf-mstitle{ margin:0; font-size:15px; font-weight:700; letter-spacing:0.02em; color:#f4f4f5; }
+.bf-ms .bf-rschip{ margin-left:auto; }
+.bf-ms .bf-mschev{ color:#7b7e84; font-size:18px; transition:transform 0.15s ease; flex:none; }
+/* chevron starts collapsed (-90deg); rotates to 0 when open. When .bf-rschip pushed title with
+   margin-left:auto, ensure chevron stays at the far right by giving it its own margin when no chip. */
+.bf-ms .bf-msec:not(.bf-msopen) .bf-mschev{ transform:rotate(-90deg); }
+.bf-ms .bf-msec:not(.bf-rsec-current) .bf-mstitle{ margin-right:auto; }
+.bf-ms .bf-msec.bf-rsec-current .bf-mschev,
+.bf-ms .bf-msec:not(.bf-rsec-current) .bf-mschev{ margin-left:0; }
+.bf-ms .bf-msec:not(.bf-rsec-current) .bf-mshead .bf-mschev{ margin-left:auto; }
+.bf-ms .bf-msec.bf-rsec-current .bf-mshead .bf-mschev{ margin-left:8px; }
+/* body */
+.bf-ms .bf-msbody{ padding:0 18px 18px; border-top:1px solid rgba(255,255,255,0.06); display:flex; flex-direction:column; gap:14px; }
+.bf-ms .bf-msbody[hidden]{ display:none; }
+.bf-ms .bf-msbody > :first-child{ margin-top:14px; }
+/* state indicator + icon reuse batch 91 .bf-rscc / .bf-rsicon, but those are scoped to
+   html[data-bfv2="1"]. The cockpit modal/full-page both set data-bfv2="1", so they apply.
+   Provide a fallback in case the cockpit renders without that attr (defensive). */
+.bf-ms .bf-rscc{ width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; flex:none; font-size:13px; }
+.bf-ms .bf-rsec-current .bf-rscc{ background:rgba(163,230,53,0.12); border:2px solid #a3e635; color:#a3e635; animation:bfcRingPulse 2s infinite; }
+.bf-ms .bf-rsec-upcoming .bf-rscc{ width:20px; height:20px; background:transparent; border:1.5px solid rgba(255,255,255,0.2); color:transparent; }
+.bf-ms .bf-rsec-done .bf-rscc{ background:#84cc16; border:none; color:#0a0a0a; }
+.bf-ms .bf-rsicon{ color:#a3e635; font-size:17px; flex:none; }
+.bf-ms .bf-rschip{ background:rgba(132,204,22,0.14); color:#a3e635; font-size:11px; font-weight:600; padding:0 9px; height:22px; display:inline-flex; align-items:center; border-radius:6px; }
+
+/* ---- field-tile grids ---- */
+.bf-ms .bf-msgrid{ display:grid; gap:10px; }
+.bf-ms .bf-msgrid.g4{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+.bf-ms .bf-msgrid.g3{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+.bf-ms .bf-msgrid.g2{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+@media(max-width:760px){
+  .bf-ms .bf-msgrid.g4{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  .bf-ms .bf-msgrid.g3{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+}
+.bf-ms .bf-mst{ background:#0f1113; border:1px solid rgba(255,255,255,0.06); border-radius:9px; padding:9px 11px; min-width:0; }
+.bf-ms .bf-mstl{ font-size:9px; letter-spacing:0.05em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-ms .bf-mstv{ font-size:13px; font-weight:600; color:#f4f4f5; margin-top:3px; font-variant-numeric:tabular-nums; word-break:break-word; }
+.bf-ms .bf-mstv.empty{ color:#5f6168; }
+
+/* ---- helper / info bars ---- */
+.bf-ms .bf-msinfo{ background:rgba(163,230,53,0.06); border:1px solid rgba(163,230,53,0.18); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; color:#a9b6a0; }
+.bf-ms .bf-msinfo.amber{ background:rgba(251,146,60,0.08); border-color:rgba(251,146,60,0.22); color:#e7b489; }
+
+/* ---- button rows ---- */
+.bf-ms .bf-msbtns{ display:flex; gap:10px; flex-wrap:wrap; }
+.bf-ms .bf-msbtns.col{ flex-direction:column; }
+.bf-ms .bf-msbtns > .bf-btn{ flex:1; min-width:140px; justify-content:center; height:44px; }
+.bf-ms .bf-msbtns.col > .bf-btn{ flex:none; width:100%; }
+
+/* ---- Competing Offers: get-value button over input + condition-notes header + visit listing ---- */
+.bf-ms .bf-mscol{ display:flex; flex-direction:column; gap:8px; }
+.bf-ms .bf-msvalbtnwrap .bf-btn{ width:100%; justify-content:center; background:#84cc16; border:none; color:#0a0a0a; font-weight:700; }
+.bf-ms .bf-msvalbtnwrap .bf-btn:hover{ background:#a3e635; }
+.bf-ms .bf-msnoteshdr{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+.bf-ms .bf-msnoteshdr .bf-fl{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-ms .bf-msvisit{ height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:6px; border-radius:9px; background:#191b1f; border:1px solid rgba(255,255,255,0.14); color:#e4e4e7; font-size:12px; font-weight:600; text-decoration:none; }
+.bf-ms .bf-msvisit:hover{ background:#202327; }
+
+/* ---- Make the Offer: offer-sheet object + button column ---- */
+.bf-ms .bf-msofferrow{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start; }
+@media(max-width:760px){ .bf-ms .bf-msofferrow{ grid-template-columns:1fr; } }
+.bf-ms .bf-mssheet{ width:100%; }
+
+/* ---- inline-edit field tiles (Condition Notes / CarMax / Carvana) reuse .bf-f markup ---- */
+.bf-ms .bf-f{ background:#0f1113; border:1px solid rgba(255,255,255,0.06); border-radius:11px; padding:11px 14px; }
+.bf-ms .bf-f .bf-fl{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#7b7e84; font-weight:600; }
+.bf-ms .bf-f .bf-fi, .bf-ms .bf-f .bf-fval{ font-size:15px; font-weight:600; color:#f4f4f5; }
+.bf-ms .bf-f .bf-ph{ color:#5f6168; }
+.bf-ms .bf-fta{ color:#d4d4d8; font-size:13px; line-height:1.5; white-space:pre-wrap; min-height:18px; }
+.bf-ms .bf-fedit{ width:100%; background:#0a0b0d; border:1px solid rgba(255,255,255,0.1); border-radius:9px; color:#f4f4f5; padding:7px 9px; font:inherit; box-sizing:border-box; }
+.bf-ms .bf-fedit:focus{ outline:none; border-color:rgba(163,230,53,0.5); }
+
+/* ---- Schedule: the embedded reused scheduler form. The batch 91/93 .bf-recsched styles
+   already cover this since we render with class="bf-recsched". Just give it spacing. ---- */
+.bf-ms .bf-msrecsched{ display:flex; flex-direction:column; }
+
+/* ---- VIN tools inside the VIN stage reuse the cockpit .bfc-vintools styling already defined
+   (it isn't .bf-v2cockpit-scoped — .bfc-* classes are global), so nothing new needed; just a
+   small top margin so it separates from the vehicle grid. ---- */
+.bf-ms .bf-msvintools{ margin-top:4px; }
+/* end batch 94 */
+
+/* batch 94 — neutralize the cockpit flex-row sizing on the milestone VIN-tools copy (it lives in a
+   block body, not the .bfc-wtdrow flex row) so it spans full width inside the stage card. Also drop
+   the cockpit card chrome since the stage card already provides the shell. */
+.bf-v2cockpit .bf-ms .bfc-vintools{ flex:0 0 auto !important; min-width:0 !important; width:100% !important; padding:0 !important; background:transparent !important; border:none !important; box-shadow:none !important; }
+.bf-v2cockpit .bf-ms .bf-mssheet{ flex:0 0 auto !important; width:100% !important; flex-direction:row !important; }
+/* end batch 94 (overrides) */
