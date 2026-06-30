@@ -2995,14 +2995,8 @@
       // Smoother no-scroll: iframe is pointer-inert by default so wheel/scroll always reaches
       // the modal card (native scroll). Re-enable interaction only after a brief hover, so the
       // user can click workspace tabs/buttons and type notes; disable again on leave.
-      try{
-        ifr.style.pointerEvents='none';
-        var _hov=null;
-        wrap.addEventListener('mouseenter',function(){ clearTimeout(_hov); _hov=setTimeout(function(){ ifr.style.pointerEvents='auto'; },260); });
-        wrap.addEventListener('mouseleave',function(){ clearTimeout(_hov); ifr.style.pointerEvents='none'; });
-        // a deliberate click should engage immediately
-        wrap.addEventListener('mousedown',function(){ clearTimeout(_hov); ifr.style.pointerEvents='auto'; });
-      }catch(_pe){}
+      // Scroll: the iframe stays fully interactive; wheel inside it directly scrolls the parent
+      // modal card (same-origin, synchronous = smooth), and internal scroll is suppressed. See bfEmbedStartReport.
       try{ ifr.src='/command/preview/'+uuid+'/overview#bfembed'; }catch(e){}
       return rec;
     }
@@ -3205,7 +3199,9 @@
     var h=(bottom>0 && isFinite(top))?(bottom-top):0;
     if(h<40) h=Math.max(document.body.scrollHeight,260);
     parent.postMessage({__bfws:1,h:Math.ceil(h)+2,uuid:u},'*'); }catch(e){} }
-  function bfEmbedStartReport(){ if(bfEmbedRT) return; bfEmbedReportHeight(); bfEmbedRT=setInterval(bfEmbedReportHeight,1200); try{ window.addEventListener('load',bfEmbedReportHeight); }catch(e){} }
+  function bfEmbedStartReport(){ if(bfEmbedRT) return; bfEmbedReportHeight(); bfEmbedRT=setInterval(bfEmbedReportHeight,1200); try{ window.addEventListener('load',bfEmbedReportHeight); }catch(e){}
+    try{ window.addEventListener('wheel',function(e){ try{ var d=window.parent&&window.parent.document; var pc=d&&(d.querySelector('#bf-modal .bf-modal-card')); if(pc){ pc.scrollTop+=e.deltaY; e.preventDefault(); } }catch(_w){} }, {passive:false}); }catch(e){}
+  }
   var _bfNavLocked=false;
   function bfEmbedLockNav(){ if(_bfNavLocked) return; _bfNavLocked=true; try{ document.addEventListener('click',function(e){ var a=e.target&&e.target.closest&&e.target.closest('a[href]'); if(!a) return; var href=a.getAttribute('href')||''; if(/^(https?:|mailto:|tel:|#)/.test(href)) return; if(a.getAttribute('target')==='_blank') return; var base=location.pathname.replace(/\/overview.*$/,''); if(href.indexOf(base)===-1){ e.preventDefault(); e.stopPropagation(); } }, true); }catch(_e){} }
   function bfIframeIsolate(){
