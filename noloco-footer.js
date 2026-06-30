@@ -2657,24 +2657,66 @@
     function go(u){ if(u) location.href='/opportunities/view/'+u+'/summary'; }
     function back(){ location.href='/command'; }
     function recSt(u){ try{ var r=JSON.parse(sessionStorage.getItem('bfrec:'+u)||localStorage.getItem('bfrec:'+u)||'{}'); return r&&r.status?r.status:''; }catch(e){ return ''; } }
-    // Stage-aware full-page arrow: double-chevron + "Next/Prev stage: <name>" label when the
-    // adjacent record crosses a stage boundary; single chevron + no label within the same stage.
+    function stName(s){ return ((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[s])||s||'').replace(/_/g,' '); }
+    // Board data isn't in this closure (it lives in the command-center IIFE), so read the same data
+    // the funnel cached to localStorage under bf.cc.cache.* and pick the freshest snapshot. This
+    // lets the full-page nav use the FULL stage data, exactly like the modal, instead of nav-list
+    // adjacency (which can omit stage-mates and misfire the double-chevron).
+    function boardData(){
+      try{
+        var best=null, bestT=-1;
+        for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k&&k.indexOf('bf.cc.cache.')===0){ try{ var o=JSON.parse(localStorage.getItem(k)||'{}'); if(o&&o.d&&o.d.stages){ var t=+o.t||0; if(t>=bestT){ bestT=t; best=o.d; } } }catch(e){} } }
+        return best;
+      }catch(e){ return null; }
+    }
+    // Position of `uuid` WITHIN ITS OWN STAGE from full stage data, plus ordered prev/next stage
+    // names. Records are sorted by daysInStage desc -- the board/nav default (sortK 'daysInStage',
+    // sortDir -1) -- so order matches the typical prev/next clicks. Returns null to fall back.
+    function stagePos(uuid){
+      try{
+        var d=boardData(); if(!d||!d.stages) return null;
+        var myStatus=recSt(uuid); if(!myStatus) return null;
+        var ordered=[]; (d.stages||[]).forEach(function(s){ordered.push(s);}); (d.other||[]).forEach(function(s){ordered.push(s);});
+        var si=-1; for(var i=0;i<ordered.length;i++){ if(ordered[i]&&ordered[i].status===myStatus){ si=i; break; } }
+        if(si<0) return null;
+        var recs=(ordered[si].records||[]).slice().sort(function(a,b){ var av=(a&&a.daysInStage!=null&&a.daysInStage!=='')?Number(a.daysInStage):-Infinity; var bv=(b&&b.daysInStage!=null&&b.daysInStage!=='')?Number(b.daysInStage):-Infinity; if(av<bv) return 1; if(av>bv) return -1; return 0; });
+        var pos=-1, n=recs.length;
+        for(var j=0;j<n;j++){ if(recs[j]&&recs[j].uuid===uuid){ pos=j; break; } }
+        if(pos<0) return null;
+        var prevName=(si>0)?stName(ordered[si-1].status):'';
+        var nextName=(si<ordered.length-1)?stName(ordered[si+1].status):'';
+        return {pos:pos, n:n, prevName:prevName, nextName:nextName};
+      }catch(e){ return null; }
+    }
+    // Stage-aware full-page arrow: double-chevron + "Next/Prev stage: <name>" when the current
+    // record is first/last in its stage (within-stage position from full data); single chevron
+    // + no label otherwise. Falls back to adjacent-record comparison if stage data isn't cached.
     function stageArrow(btn, dir, adjU, curU){
       if(!btn) return;
       var ic=btn.querySelector('i.ti'); var lbl=btn.querySelector('.bf-v2navlbl');
       if(ic) ic.className='ti ti-chevron-'+(dir==='prev'?'left':'right');
       btn.classList.remove('bf-v2navbtn-stage');
       if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
+      var sp=stagePos(curU);
+      if(sp){
+        var crosses=(dir==='prev')?(sp.pos===0):(sp.pos===sp.n-1);
+        var nm=(dir==='prev')?sp.prevName:sp.nextName;
+        if(crosses && nm){
+          if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
+          btn.classList.add('bf-v2navbtn-stage');
+          if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-v2navlbl'; btn.appendChild(lbl); }
+          lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+nm;
+          lbl.style.display='';
+        }
+        return;
+      }
       if(!adjU){ return; }
-      // Stage-arrow invariant: compare EACH neighbor to the CURRENT record's stage (cs), never
-      // prev-vs-next. So first-in-stage -> prev double (prev is previous stage), next single
-      // (next is same stage). Double only when the neighbor crosses out of the current stage.
       var cs=recSt(curU), as=recSt(adjU);
       if(!cs||!as||cs===as){ return; }
       if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
       btn.classList.add('bf-v2navbtn-stage');
       if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-v2navlbl'; btn.appendChild(lbl); }
-      lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+(((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[as])||as||'').replace(/_/g,' '));
+      lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+stName(as);
       lbl.style.display='';
     }
     var nav=document.getElementById('bf-v2nav');
@@ -3752,6 +3794,12 @@
     function decorate(d){ var ap=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ r._score=calcScore(r); r._ovp=calcOvp(r); if(!r.location) r.location='Tampa, FL 33607'; if(!r.listingLink) r.listingLink='https://www.facebook.com/marketplace/item/100200300'; try{ var _j=JSON.stringify(r); sessionStorage.setItem('bfrec:'+r.uuid,_j); localStorage.setItem('bfrec:'+r.uuid,_j); }catch(e){} }); }); }; if(d){ ap(d.stages); ap(d.other); } }
     function bfVehField(r,which){ if(!r) return ''; var direct=function(){ switch(which){ case 'bodyStyle': return r.bodyStyle||r['Body Style']||''; case 'drivetrain': return r.drivetrain||''; case 'engine': return r.engine||''; case 'fuelType': return r.fuelType||r['Fuel Type']||''; case 'transmission': return r.transmission||''; case 'cabType': return r.cabType||r['Cab Type']||''; default: return ''; } }; if(which==='year'){ if(r.year!=null&&r.year!==''){ var yn=parseInt(r.year,10); if(!isNaN(yn)) return yn; } var ym=String(r.title||'').match(/(19|20)\d{2}/); return ym?parseInt(ym[0],10):null; } var title=String(r.title||''); var tm=title.match(/(19|20)\d{2}\s*(.*)$/); var rest=tm?tm[2].trim():title.trim(); var toks=rest.split(/\s+/).filter(Boolean); if(which==='make'){ if(r.make) return String(r.make).trim(); return toks[0]||''; } if(which==='model'){ if(r.model) return String(r.model).trim(); return toks.slice(1).join(' ').trim(); } if(which==='trim'){ if(r.trim) return String(r.trim).trim(); var sub=String(r.subtitle||'').trim(); return sub?sub.split(/[•|,]/)[0].trim():''; } return String(direct()).trim(); }
     function distinct(getter){ var set={},out=[]; var add=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ var v=getter(r); if(v&&!set[v]){ set[v]=1; out.push(v); } }); }); }; add(st.data&&st.data.stages); add(st.data&&st.data.other); out.sort(); return out; }
+    // Full sales-rep roster from the pipeline-summary response (st.data.reps): every active user who
+    // can be a rep, even with zero deals. Defensive: returns [] if reps absent (older cached payload),
+    // so callers fall back to the deal-derived list. Accepts {name}/{label}/string entries.
+    function rosterNames(){ try{ var arr=(st.data&&st.data.reps)||[]; var out=[]; arr.forEach(function(x){ var nm=(x&&typeof x==='object')?(x.name||x.label||''):x; nm=(nm==null?'':String(nm)).trim(); if(nm) out.push(nm); }); return out; }catch(e){ return []; } }
+    // Union deal-derived rep names with the full roster, dedupe, keep sorted.
+    function unionReps(dealNames){ var seen={}, out=[]; var push=function(v){ v=(v==null?'':String(v)).trim(); if(v&&!seen[v]){ seen[v]=1; out.push(v); } }; (dealNames||[]).forEach(push); rosterNames().forEach(push); out.sort(); return out; }
     function nIn(v,mn,mx){ if(mn!==''&&mn!=null){ if(v==null||v<Number(mn)) return false; } if(mx!==''&&mx!=null){ if(v==null||v>Number(mx)) return false; } return true; }
     function macroLabelOf(s){ for(var i=0;i<MACRO.length;i++){ if(MACRO[i].statuses.indexOf(s)>-1) return MACRO[i].label; } return ''; }
     function fOpp(r){ var f=st.f; if(f.mstage){ if(macroLabelOf(r.status)!==f.mstage) return false; } if(f.stage){ if((r.status||'')!==f.stage) return false; } if(f.comp){ if((r.competition||'').toLowerCase().indexOf(f.comp)<0) return false; } if(f.rep){ if(f.rep==='__none__'){ if(r.rep) return false; } else if(r.rep!==f.rep) return false; } if(f.ostatus){ if((r.offerStatus||'')!==f.ostatus) return false; } if(!nIn(r.daysInStage,f.daysMin,f.daysMax)) return false; if(!nIn(r.mileage,f.mileMin,f.mileMax)) return false; if(!nIn(r._score,f.scoreMin,f.scoreMax)) return false; if(!nIn(r._ovp,f.ovpMin,f.ovpMax)) return false; if((f.driveMin!==''&&f.driveMin!=null)||(f.driveMax!==''&&f.driveMax!=null)){ var dm=dMin(r.driveTime); if(dm<0) return false; if(!nIn(dm,f.driveMin,f.driveMax)) return false; } if(!nIn(bfVehField(r,'year'),f.yearMin,f.yearMax)) return false; var vsel=[['make','make'],['model','model'],['trim','trim'],['bodyStyle','bodyStyle'],['drivetrain','drivetrain'],['engine','engine'],['fuelType','fuelType'],['transmission','transmission'],['cabType','cabType']]; for(var _vi=0;_vi<vsel.length;_vi++){ var _fk=vsel[_vi][0]; if(f[_fk]){ if(String(bfVehField(r,vsel[_vi][1])||'')!==f[_fk]) return false; } } return true; }
@@ -3837,6 +3885,30 @@
     }
     // Adjacent-record stage awareness for the modal nav arrows.
     function bfModalStageName(st){ return ((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[st])||st||'').replace(/_/g,' '); }
+    // Compute the current record's position WITHIN ITS OWN STAGE from the FULL stage data
+    // (st.data.stages/other), NOT from nav-list adjacency. bfModalList can omit stage-mates, so
+    // adjacency lies; the full stage record list does not. Records are sorted with the SAME
+    // comparator the board/nav uses (sortRows) so pos/n line up with actual prev/next clicks, and
+    // agree with the "X of Y of <stage>" head in bfModalPosLabel. prevName/nextName come from the
+    // ORDERED stage list (stages then other), indexed off the current stage -- never a neighbor
+    // record. Returns null when the stage can't be located (data not loaded) so callers fall back.
+    function bfModalStagePos(uuid){
+      try{
+        var d=st&&st.data; if(!d||!d.stages) return null;
+        var myStatus=bfModalRecStatus(uuid); if(!myStatus) return null;
+        // Ordered stage list: pipeline stages first, then "other" (e.g. NO_DEAL), matching the board.
+        var ordered=[]; (d.stages||[]).forEach(function(s){ordered.push(s);}); (d.other||[]).forEach(function(s){ordered.push(s);});
+        var si=-1; for(var i=0;i<ordered.length;i++){ if(ordered[i]&&ordered[i].status===myStatus){ si=i; break; } }
+        if(si<0) return null;
+        var sorted=sortRows(ordered[si].records||[]);
+        var pos=-1, n=sorted.length;
+        for(var j=0;j<n;j++){ if(sorted[j]&&sorted[j].uuid===uuid){ pos=j; break; } }
+        if(pos<0) return null;
+        var prevName=(si>0)?bfModalStageName(ordered[si-1].status):'';
+        var nextName=(si<ordered.length-1)?bfModalStageName(ordered[si+1].status):'';
+        return {pos:pos, n:n, prevName:prevName, nextName:nextName};
+      }catch(e){ return null; }
+    }
     function bfModalStageArrow(btn, dir, adjUuid, curUuid){
       if(!btn) return;
       var ic=btn.querySelector('i.ti');
@@ -3845,13 +3917,26 @@
       if(ic) ic.className='ti ti-chevron-'+(dir==='prev'?'left':'right');
       btn.classList.remove('bf-modal-arrow-stage');
       if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
+      // Preferred: decide from the current record's WITHIN-STAGE position using full stage data.
+      // prev double-chevron only when first-in-stage AND a previous stage exists; next double-chevron
+      // only when last-in-stage AND a next stage exists. Stage name comes from the ordered stage list.
+      var sp=bfModalStagePos(curUuid);
+      if(sp){
+        var crosses=(dir==='prev')?(sp.pos===0):(sp.pos===sp.n-1);
+        var nm=(dir==='prev')?sp.prevName:sp.nextName;
+        if(crosses && nm){
+          if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
+          btn.classList.add('bf-modal-arrow-stage');
+          if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-modal-stagelbl'; btn.appendChild(lbl); }
+          lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+nm;
+          lbl.style.display='';
+        }
+        return;
+      }
+      // Fallback (stage data not loaded): legacy adjacent-record comparison so nav never breaks.
       if(!adjUuid){ return; }
-      // Stage-arrow invariant: compare EACH neighbor to the CURRENT record's stage (curSt), never
-      // prev-vs-next. So first-in-stage -> prev double (prev neighbor = previous stage), next
-      // single (next neighbor = same stage). Double only when the neighbor crosses out of curSt.
       var curSt=bfModalRecStatus(curUuid), adjSt=bfModalRecStatus(adjUuid);
       if(!curSt||!adjSt||curSt===adjSt){ return; }
-      // crossing a stage boundary -> double chevron + label
       if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
       btn.classList.add('bf-modal-arrow-stage');
       if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-modal-stagelbl'; btn.appendChild(lbl); }
@@ -3924,7 +4009,7 @@
         return {key:key,start:s2,end:e2,prevStart:ps,prevEnd:pe,pace:pace};
       }
       var TFL={today:'Today',mtd:'Month to date',last7:'Last 7 days',thisweek:'This week',last30:'Last 30 days',qtd:'Quarter to date',lastq:'Last quarter',ytd:'Year to date',prioryear:'Prior year'};
-      var REPS=(function(){ var s={},o=[]; recs.forEach(function(r){ var v=(r.rep||'').trim(); if(v&&!s[v]){s[v]=1;o.push(v);} }); o.sort(); return o; })();
+      var REPS=(function(){ var s={},o=[]; recs.forEach(function(r){ var v=(r.rep||'').trim(); if(v&&!s[v]){s[v]=1;o.push(v);} }); return unionReps(o); })();
       function effRep(w){ return (st.repW[w]!==undefined)?st.repW[w]:st.repMaster; }
       function effTF(w){ var d=(w==='reporttf')?'ytd':'mtd'; return (st.tfW[w]!==undefined)?st.tfW[w]:(st.tfMaster||d); }
       function repRecs(w){ var rp=effRep(w); return rp?recs.filter(function(r){return (r.rep||'').trim()===rp;}):recs; }
@@ -4012,7 +4097,7 @@
     function refresh(){ render(); renderList(); updateCaret(); try{bfPipeKPI();}catch(_k){} }
     function ctlRange(lbl,key){ return '<div class="bff-fc"><label>'+lbl+'</label><div class="bff-frange"><input type="number" data-f="'+key+'Min" placeholder="min" value="'+esc2(st.f[key+'Min']||'')+'"><span>–</span><input type="number" data-f="'+key+'Max" placeholder="max" value="'+esc2(st.f[key+'Max']||'')+'"></div></div>'; }
     function ctlSelect(lbl,key,opts,allLbl){ var o='<option value="">'+esc2(allLbl||'All')+'</option>'; opts.forEach(function(op){ o+='<option value="'+esc2(op.v)+'"'+(st.f[key]===op.v?' selected':'')+'>'+esc2(op.t)+'</option>'; }); return '<div class="bff-fc"><label>'+lbl+'</label><select data-f="'+key+'">'+o+'</select></div>'; }
-    function buildFilter(){ var fp=q('fpanel'); if(!fp) return; var html=''; if(st.data&&st.data.canFilter){ var dop='<option value="">All dealerships</option>'; (st.data.dealerships||[]).forEach(function(dl){ dop+='<option value="'+dl.id+'"'+(st.data.selectedDealershipId===dl.id?' selected':'')+'>'+esc2(dl.name)+'</option>'; }); html+='<div class="bff-fc"><label>Dealership</label><select data-f="__deal">'+dop+'</select></div>'; } html+=ctlSelect('Competition','comp',[{v:'both',t:'Beats Both'},{v:'carmax',t:'Beats CarMax'},{v:'carvana',t:'Beats Carvana'},{v:'neither',t:'Beats Neither'}]); var reps=distinct(function(r){return r.rep;}).map(function(x){return {v:x,t:x};}); reps.unshift({v:'__none__',t:'Unassigned'}); html+=ctlSelect('Assigned Rep','rep',reps); html+=ctlSelect('Milestone Stage','mstage',MACRO.map(function(m){return {v:m.label,t:m.label};})); var stgs=distinct(function(r){return r.status;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Stage','stage',stgs); var sts=distinct(function(r){return r.offerStatus;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Offer Status','ostatus',sts); html+=ctlRange('Opportunity Score','score'); html+=ctlRange('Days in Stage','days'); html+=ctlRange('Offer vs Price ($)','ovp'); html+=ctlRange('Drive Time (min)','drive'); var vh=''; vh+=ctlRange('Mileage','mile'); vh+=ctlRange('Year','year'); var vehSel=function(lbl,key,field){ var opts=distinct(function(r){ return bfVehField(r,field); }).map(function(x){return {v:x,t:x};}); vh+=ctlSelect(lbl,key,opts,'All '+lbl); }; vehSel('Make','make','make'); vehSel('Model','model','model'); vehSel('Trim','trim','trim'); vehSel('Body Style','bodyStyle','bodyStyle'); vehSel('Drivetrain','drivetrain','drivetrain'); vehSel('Engine','engine','engine'); vehSel('Fuel Type','fuelType','fuelType'); vehSel('Transmission','transmission','transmission'); vehSel('Cab Type','cabType','cabType'); fp.innerHTML='<div class="bff-fgrid">'+html+'</div><div class="bff-vehhdr">Vehicle</div><div class="bff-fgrid bff-vehgrid">'+vh+'<button class="bff-fclear" data-r="fclear">Clear all</button></div>'; [].forEach.call(fp.querySelectorAll('[data-f]'),function(el){ var ev=(el.tagName==='SELECT')?'change':'input'; el.addEventListener(ev,function(){ var k=el.getAttribute('data-f'); if(k==='__deal'){ load(el.value===''?null:(+el.value)); return; } st.f[k]=el.value; refresh(); }); }); var cl=q('fclear'); if(cl) cl.addEventListener('click',function(){ st.f={}; buildFilter(); refresh(); }); }
+    function buildFilter(){ var fp=q('fpanel'); if(!fp) return; var html=''; if(st.data&&st.data.canFilter){ var dop='<option value="">All dealerships</option>'; (st.data.dealerships||[]).forEach(function(dl){ dop+='<option value="'+dl.id+'"'+(st.data.selectedDealershipId===dl.id?' selected':'')+'>'+esc2(dl.name)+'</option>'; }); html+='<div class="bff-fc"><label>Dealership</label><select data-f="__deal">'+dop+'</select></div>'; } html+=ctlSelect('Competition','comp',[{v:'both',t:'Beats Both'},{v:'carmax',t:'Beats CarMax'},{v:'carvana',t:'Beats Carvana'},{v:'neither',t:'Beats Neither'}]); var reps=unionReps(distinct(function(r){return r.rep;})).map(function(x){return {v:x,t:x};}); reps.unshift({v:'__none__',t:'Unassigned'}); html+=ctlSelect('Assigned Rep','rep',reps); html+=ctlSelect('Milestone Stage','mstage',MACRO.map(function(m){return {v:m.label,t:m.label};})); var stgs=distinct(function(r){return r.status;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Stage','stage',stgs); var sts=distinct(function(r){return r.offerStatus;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Offer Status','ostatus',sts); html+=ctlRange('Opportunity Score','score'); html+=ctlRange('Days in Stage','days'); html+=ctlRange('Offer vs Price ($)','ovp'); html+=ctlRange('Drive Time (min)','drive'); var vh=''; vh+=ctlRange('Mileage','mile'); vh+=ctlRange('Year','year'); var vehSel=function(lbl,key,field){ var opts=distinct(function(r){ return bfVehField(r,field); }).map(function(x){return {v:x,t:x};}); vh+=ctlSelect(lbl,key,opts,'All '+lbl); }; vehSel('Make','make','make'); vehSel('Model','model','model'); vehSel('Trim','trim','trim'); vehSel('Body Style','bodyStyle','bodyStyle'); vehSel('Drivetrain','drivetrain','drivetrain'); vehSel('Engine','engine','engine'); vehSel('Fuel Type','fuelType','fuelType'); vehSel('Transmission','transmission','transmission'); vehSel('Cab Type','cabType','cabType'); fp.innerHTML='<div class="bff-fgrid">'+html+'</div><div class="bff-vehhdr">Vehicle</div><div class="bff-fgrid bff-vehgrid">'+vh+'<button class="bff-fclear" data-r="fclear">Clear all</button></div>'; [].forEach.call(fp.querySelectorAll('[data-f]'),function(el){ var ev=(el.tagName==='SELECT')?'change':'input'; el.addEventListener(ev,function(){ var k=el.getAttribute('data-f'); if(k==='__deal'){ load(el.value===''?null:(+el.value)); return; } st.f[k]=el.value; refresh(); }); }); var cl=q('fclear'); if(cl) cl.addEventListener('click',function(){ st.f={}; buildFilter(); refresh(); }); }
     function updateScope(d){ var sc=q('scope'); if(!sc) return; if(d&&d.needsAuth){ sc.style.display=''; sc.textContent='(open a record once so your access loads, then refresh)'; return; } if(!(d&&d.allAccess)){ sc.style.display='none'; sc.textContent=''; return; } sc.style.display=''; var base='All dealerships'; if(d.selectedDealershipId!=null&&d.dealerships){ d.dealerships.forEach(function(dl){ if(dl.id===d.selectedDealershipId) base=dl.name; }); } sc.innerHTML=esc2(base)+' \u00b7 <span class="bff-scope-n">'+((d&&d.total)||0)+'</span> deals'; }
     function waitToken(){ if(st._tw) return; var n=0; var sc=q('scope'); if(sc) sc.textContent='Loading your access…'; st._tw=setInterval(function(){ var t=''; try{t=bfGetApiToken();}catch(e){} if(t){ clearInterval(st._tw); st._tw=null; load(st.dealId); } else if(++n>25){ clearInterval(st._tw); st._tw=null; if(sc) sc.textContent='(open any record once so your access loads, then come back)'; } },700); }
     function load(dealId){ st.dealId=(dealId!=null?dealId:null); var __ck='bf.cc.cache.'+(st.dealId==null?'all':st.dealId); try{ var __cj=localStorage.getItem(__ck); if(__cj){ var __co=JSON.parse(__cj); if(__co&&__co.d&&__co.d.stages){ st.data=__co.d; decorate(st.data); updateScope(__co.d); buildFilter(); refresh(); } } }catch(e){} var tk=''; try{ tk=bfGetApiToken(); }catch(e){} if(!tk){ waitToken(); return; } var bo=st.dealId!=null?{dealershipId:st.dealId}:{}; fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','X-BF-Token':tk},body:JSON.stringify(bo)}).then(function(r){return r.json();}).then(function(d){ st.data=d||{stages:[]}; if(d&&d.needsAuth){ var s2=q('scope'); if(s2) s2.textContent='(access not recognized — open any record once to refresh)'; return; } try{ if(d&&d.stages) localStorage.setItem(__ck, JSON.stringify({t:Date.now(), d:d})); }catch(e){} decorate(st.data); updateScope(d); buildFilter(); refresh(); }).catch(function(){ if(!(st.data&&st.data.stages)) q('funnel').innerHTML='<div class="bff-empty">Could not load the pipeline. Refresh to retry.</div>'; }); }
