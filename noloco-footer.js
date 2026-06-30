@@ -2156,12 +2156,13 @@
     if(typeof BF_CUSTOM_MILESTONES==='undefined' || !BF_CUSTOM_MILESTONES) return;
     var root=host.querySelector('.bf-ms'); if(!root) return;
     // ---- accordion: header toggles its body open/closed (only one concern; no data fetch) ----
-    root.querySelectorAll('[data-mstoggle]').forEach(function(hd){
-      if(hd.__bfTog) return; hd.__bfTog=1;  // guard: never attach the toggle twice (double-attach made clicks cancel out)
-      function tog(){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); if(open){ body.hidden=false; } else { body.hidden=true; } }
-      hd.addEventListener('click', function(e){ if(e.target.closest&&e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; tog(); });
-      hd.addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(); } });
-    });
+    // robust accordion: ONE document-level delegated handler (attached once), so it can't be
+    // double-attached or lost on re-render. Toggles any .bf-mshead's body.
+    if(!window.__bfMsDeleg){ window.__bfMsDeleg=1;
+      function bfMsTog(hd){ var sec=hd.closest('.bf-msec'); if(!sec) return; var body=sec.querySelector('.bf-msbody'); if(!body) return; var open=sec.classList.toggle('bf-msopen'); body.hidden=!open; }
+      document.addEventListener('click', function(e){ var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; if(e.target.closest('a,button,input,select,textarea,[data-bfc],[data-bfaction]')) return; bfMsTog(hd); }, false);
+      document.addEventListener('keydown', function(e){ if(e.key!=='Enter'&&e.key!==' ') return; var hd=e.target&&e.target.closest&&e.target.closest('.bf-mshead'); if(!hd) return; e.preventDefault(); bfMsTog(hd); }, false);
+    }
     // ---- stage-transition buttons (reuse bfButton's data-bfto) -> bfPost({uuid,status}) directly ----
     // plus the low-risk milestone actions that map onto EXISTING hooks.
     root.querySelectorAll('.bf-btn[data-bfaction]').forEach(function(b){
