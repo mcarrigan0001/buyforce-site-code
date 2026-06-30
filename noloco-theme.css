@@ -4091,7 +4091,8 @@ html[data-bfv2="1"] .bf-pill.rset{ background:#341515 !important; color:#f87171 
   box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important;
 }
 .bf-v2cockpit .bfc-input.mono,
-.bf-v2cockpit .bfc-vin .bfc-vinval{
+.bf-v2cockpit .bfc-vin .bfc-vinval,
+.bf-v2cockpit .bfc-vinitem .bfc-vinval{
   font-family:'Geist Mono','SFMono-Regular',ui-monospace,monospace !important;
 }
 /* VIN-decode result block recesses deeper */
@@ -4541,3 +4542,65 @@ html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; 
 .bf-v2cockpit .bfc-accddo.on{ color:#92df02; font-weight:600; }
 .bf-v2cockpit .bfc-accddo.on i{ color:#92df02; }
 /* end batch 100 */
+
+/* ============================================================================
+   batch 101 — cockpit header reorg + wider offer-sheet + editable competitor values
+   ----------------------------------------------------------------------------
+   1) Header identity column restructured into Row A (VIN/miles/color),
+      Row B (location/listed), Row C (stage/accident/beats pills). The VIN is now
+      an inline .bfc-fi item (.bfc-vinitem) carrying its own copy-on-click; the
+      "Copy" text label was removed (icon only). The old standalone .bfc-vin row
+      and old .bfc-pills row markup are gone.
+   2) Offer Sheet tile ~2x wider, bottom text clamped to <=2 lines (ellipsis).
+   3) CarMax / Carvana competitor values inline-editable (.bfc-barvaledit).
+   ============================================================================ */
+
+/* ---- Row A inline VIN item (copy-on-click, icon only) ---- */
+.bf-v2cockpit .bfc-vinitem{ cursor:pointer; gap:6px; }
+.bf-v2cockpit .bfc-vinitem:hover{ opacity:0.9; }
+.bf-v2cockpit .bfc-vinitem .bfc-vinlbl{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:#6b6e74; font-weight:600; }
+.bf-v2cockpit .bfc-vinitem .bfc-vinval{ font-family:'Geist Mono',monospace; font-size:13px; color:#d4d4d8; letter-spacing:0.02em; }
+.bf-v2cockpit .bfc-vinitem .bfc-vincopy{ display:inline-flex; align-items:center; color:#a3e635; }
+.bf-v2cockpit .bfc-vinitem .bfc-vincopy i{ font-size:13px; color:#a3e635; }
+.bf-v2cockpit .bfc-vinitem.copied .bfc-vincopy i{ color:#a3e635; }
+.bf-v2cockpit .bfc-vinitem.copied .bfc-vinval{ color:#a3e635; }
+
+/* Row C pills row: a touch more breathing room above the title-rows */
+.bf-v2cockpit .bfc-pills{ margin-top:11px; }
+
+/* ---- Offer Sheet: ~2x wider, bottom text <=2 lines ---- */
+.bf-v2cockpit .bfc-right .bfc-sheet{ flex:0 0 190px; }
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheettxt{ width:100%; min-width:0; }
+.bf-v2cockpit .bfc-sheettitle{
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:normal;
+}
+.bf-v2cockpit .bfc-sheetsub{
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:1;
+  overflow:hidden; text-overflow:ellipsis;
+}
+.bf-v2cockpit .bfc-right .bfc-sheet .bfc-sheetsub{ flex-wrap:nowrap; max-width:100%; }
+/* combined title+sub never exceeds ~2 lines; keep tiles from overflowing at ~1048px */
+.bf-v2cockpit .bfc-right{ flex-wrap:wrap; }
+.bf-v2cockpit .bfc-right .bfc-tiles{ flex:1 1 auto; min-width:200px; }
+
+/* ---- Editable CarMax / Carvana competitor values ---- */
+.bf-v2cockpit .bfc-barval.bfc-barvaledit{
+  display:inline-flex; align-items:center; gap:1px; cursor:text;
+  border-radius:6px; padding:1px 4px; margin:-1px -2px;
+  transition:background .12s;
+}
+.bf-v2cockpit .bfc-barval.bfc-barvaledit:hover{ background:rgba(255,255,255,0.05); }
+.bf-v2cockpit .bfc-barvaldollar{ color:#d4d4d8; font-weight:600; font-size:14px; }
+.bf-v2cockpit .bfc-barvalinput{
+  width:7ch; min-width:5ch; max-width:9ch;
+  background:transparent; border:none; outline:none; padding:0;
+  font-family:inherit; font-variant-numeric:tabular-nums;
+  font-size:14px; font-weight:600; color:#d4d4d8; text-align:left;
+}
+.bf-v2cockpit .bfc-barvalinput::placeholder{ color:#6b6e74; }
+.bf-v2cockpit .bfc-barvalinput:focus{ color:#f4f4f5; }
+.bf-v2cockpit .bfc-barvaledit:focus-within{ background:#0a0b0d; box-shadow:inset 0 0 0 1px rgba(163,230,53,0.4); }
+.bf-v2cockpit .bfc-barvalpen{ font-size:11px; color:#6b6e74; opacity:0; transition:opacity .12s; }
+.bf-v2cockpit .bfc-barvaledit:hover .bfc-barvalpen{ opacity:0.8; }
+/* end batch 101 */

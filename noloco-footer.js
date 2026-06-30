@@ -1379,7 +1379,8 @@
     // ---- competitive bars (proportional) ----
     var prices=[]; if(!isNaN(offN))prices.push(offN); if(!isNaN(cmN))prices.push(cmN); if(!isNaN(cvN))prices.push(cvN);
     var maxP=prices.length?Math.max.apply(null,prices):0;
-    function barRow(name,val,isBf){
+    var bigInputFmt=function(n){ if(isNaN(n)) return ''; var fd=(Math.abs(n)%1)?2:0; return n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); };
+    function barRow(name,val,isBf,compKey){
       var n=(val!=null&&val!=='')?Number((''+val).replace(/[^0-9.\-]/g,'')):NaN;
       var pct=(maxP>0&&!isNaN(n))?Math.max(8,Math.round(n/maxP*100)):(isBf?100:60);
       var inset=100-pct;
@@ -1387,11 +1388,19 @@
       var right=isBf
         ? '<span class="bfc-bartag'+compCls+'">'+E(compClr==='g'?'WINNING':(winLabel||'WINNING'))+'</span>'
         : (delta!=null?'<span class="bfc-bardelta">−$'+Math.abs(Math.round(delta)).toLocaleString('en-US')+'</span>':'<span class="bfc-bardelta"></span>');
+      // value cell: BuyForce + non-editable rows show plain text; CarMax/Carvana (compKey) get an inline-editable input
+      var valCell;
+      if(compKey){
+        valCell='<span class="bfc-barval bfc-barvaledit" style="right:'+inset+'%;"><span class="bfc-barvaldollar">$</span><input type="text" class="bfc-barvalinput" data-bfcomp="'+compKey+'" data-bfuuid="'+E(uuid)+'" inputmode="decimal" value="'+E(bigInputFmt(n))+'" placeholder="—"><i class="ti ti-pencil bfc-barvalpen" aria-hidden="true"></i></span>';
+      } else {
+        valCell='<span class="bfc-barval'+(isBf?' bf':'')+'" style="right:'+inset+'%;">'+(isNaN(n)?'—':M(n))+'</span>';
+      }
       return '<div class="bfc-barrow"><span class="bfc-barname'+(isBf?' bf':'')+'">'+E(name)+'</span>'
         +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?(' bf'+(compClr==='r'?' r':(compClr==='y'?' y':''))):'')+'" style="right:'+inset+'%;"></div>'
-        +'<span class="bfc-barval'+(isBf?' bf':'')+'" style="right:'+inset+'%;">'+(isNaN(n)?'—':M(n))+'</span></div>'+right+'</div>';
+        +valCell+'</div>'+right+'</div>';
     }
-    var bars=barRow('BuyForce',offer,true)+barRow('CarMax',carmax,false)+barRow('Carvana',carvana,false);
+    var bfBarName=R.dealershipName||(R.dealership&&(R.dealership.name||R.dealership.dealershipName))||'BuyForce';
+    var bars=barRow(bfBarName,offer,true)+barRow('CarMax',carmax,false,'carMaxOffer')+barRow('Carvana',carvana,false,'carvanaOffer');
     var compHead=(winning&&lead!=null&&lead>0)?('Leading by $'+Math.abs(Math.round(lead)).toLocaleString('en-US')):(winLabel||'Live market');
     // ---- description ----
     var descRaw=(R.description||R.listingDescription||'');
@@ -1407,21 +1416,26 @@
 
     // ===== HEADER =====
     var photo=R.photo?('<img src="'+E(R.photo)+'" alt="">'):'<i class="ti ti-car" aria-hidden="true"></i>';
-    var pills='';
-    if(winning) pills+='<span class="bfc-pill win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>';
-    else if(winLabel) pills+='<span class="bfc-pill comp"><i class="ti ti-swords" aria-hidden="true"></i>'+E(winLabel)+'</span>';
-    if(stagePretty) pills+='<span class="bfc-pill stage"><span class="bfc-dotlime"></span>'+E(stagePretty)+'</span>';
-    if(accBad) pills+='<span class="bfc-pill bad"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Accident(s)</span>';
-    else if(accClean) pills+='<span class="bfc-pill clean"><i class="ti ti-shield-check" aria-hidden="true"></i>Clean History</span>';
+    // (old separate pills row removed -- stage/accident/beats pills now live in Row C below the title)
 
-    var vinLine=vin?('<div class="bfc-vin bf-v2vin" data-bfvin="'+E(vin)+'" title="Click to copy VIN">'
+    // VIN element (copy-on-click, icon only -- Copy text label removed). Lives inline in Row A.
+    var vinItem=vin?('<span class="bfc-fi bfc-vinitem bf-v2vin" data-bfvin="'+E(vin)+'" title="Click to copy VIN">'
       +'<span class="bfc-vinlbl">VIN</span><span class="bfc-vinval">'+E(vin)+'</span>'
-      +'<span class="bfc-vincopy"><i class="ti ti-copy" aria-hidden="true"></i><span class="bfc-vincopylbl">Copy</span></span></div>'):'';
+      +'<span class="bfc-vincopy"><i class="ti ti-copy" aria-hidden="true"></i></span></span>'):'';
 
-    var f1=[];
     var mileNum=(mileage!=null&&mileage!=='')?Number((''+mileage).replace(/[^0-9.]/g,'')||0):NaN;
-    f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
-    f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw"></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
+    var mileItem='<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>';
+    var colorItem='<span class="bfc-fi bfc-fedit" data-bffedit="color" data-bfuuid="'+E(uuid)+'" title="Click to edit color"><span class="bfc-sw"></span><span class="bfc-fival" data-bffval contenteditable="false">'+(color?E(color):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>';
+    // Row A: VIN (copy) · mileage (editable) · color (editable)
+    var rowA=[]; if(vinItem) rowA.push(vinItem); rowA.push(mileItem); rowA.push(colorItem);
+    var fact1='<div class="bfc-facts">'+rowA.join('<span class="bfc-fsep">·</span>')+'</div>';
+    // Row B: listing location (editable) · listed-ago
+    var f2=[];
+    f2.push('<span class="bfc-fi bfc-fedit" data-bffedit="listingLocation" data-bfuuid="'+E(uuid)+'" title="Click to edit listing location"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(loc?E(loc):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
+    if(listed) f2.push('<span class="bfc-fi"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>Listed '+E(listed)+'</span>');
+    var fact2=f2.length?('<div class="bfc-facts">'+f2.join('<span class="bfc-fsep">·</span>')+'</div>'):'';
+    // Row C (pills): stage pill · accident-history pill (dropdown) · beats-competition pill
+    var stagePill=stagePretty?('<span class="bfc-pill stage"><span class="bfc-dotlime"></span>'+E(stagePretty)+'</span>'):'';
     // editable Accident-Status pill (dropdown -> accidentHistory). state: clean | bad | neutral.
     var accState=accBad?'bad':(accClean?'clean':'neutral');
     var accIcon=accBad?'ti-alert-triangle':(accClean?'ti-shield-check':'ti-help-circle');
@@ -1429,18 +1443,18 @@
     var ACC_OPTS=[['Clean History','clean','ti-shield-check'],['Accident(s) Reported','bad','ti-alert-triangle'],['Unknown / Not Checked','neutral','ti-help-circle']];
     var accCur=(R.accident||'');
     var accMenu=ACC_OPTS.map(function(o){ var on=((accCur||'').toLowerCase()===o[0].toLowerCase())?' on':''; return '<div class="bfc-accddo'+on+'" data-bfaccv="'+E(o[0])+'" data-bfaccstate="'+o[1]+'"><i class="ti '+o[2]+'" aria-hidden="true"></i>'+E(o[0])+'</div>'; }).join('');
-    f1.push('<span class="bfc-fi bfc-accfi"><button type="button" class="bfc-pill bfc-accpill '+accState+'" data-bfaccpill data-bfuuid="'+E(uuid)+'" title="Click to set accident status"><i class="ti '+accIcon+' bfc-acci" aria-hidden="true"></i><span class="bfc-acclbl">'+E(accLabel)+'</span><i class="ti ti-chevron-down bfc-acccar" aria-hidden="true"></i></button><div class="bfc-accddm" data-bfaccmenu>'+accMenu+'</div></span>');
-    var fact1=f1.length?('<div class="bfc-facts">'+f1.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
-    var f2=[];
-    f2.push('<span class="bfc-fi bfc-fedit" data-bffedit="listingLocation" data-bfuuid="'+E(uuid)+'" title="Click to edit listing location"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(loc?E(loc):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
-    if(listed) f2.push('<span class="bfc-fi"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+E(listed)+'</span>');
-    var fact2=f2.length?('<div class="bfc-facts">'+f2.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
+    var accPill='<span class="bfc-fi bfc-accfi"><button type="button" class="bfc-pill bfc-accpill '+accState+'" data-bfaccpill data-bfuuid="'+E(uuid)+'" title="Click to set accident status"><i class="ti '+accIcon+' bfc-acci" aria-hidden="true"></i><span class="bfc-acclbl">'+E(accLabel)+'</span><i class="ti ti-chevron-down bfc-acccar" aria-hidden="true"></i></button><div class="bfc-accddm" data-bfaccmenu>'+accMenu+'</div></span>';
+    // beats-competition pill (WINNING / Beats X) -- reuses compInfo-driven label/color
+    var beatsPill=winning
+      ? '<span class="bfc-pill win"><i class="ti ti-trophy" aria-hidden="true"></i>WINNING</span>'
+      : (winLabel?('<span class="bfc-pill comp"><i class="ti ti-swords" aria-hidden="true"></i>'+E(winLabel)+'</span>'):'');
+    var rowC=[]; if(stagePill) rowC.push(stagePill); rowC.push(accPill); if(beatsPill) rowC.push(beatsPill);
+    var pillsRow='<div class="bfc-pills">'+rowC.join('')+'</div>';
     var viewBtn=link?('<a class="bfc-viewbtn" href="'+E(link)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>View listing</a>'):'';
 
     var center='<div class="bfc-center">'
       +'<div class="bfc-titlerow"><div class="bfc-titlewrap"><h1 class="bfc-title">'+title+'</h1>'+(trim?'<span class="bfc-trim">'+trim+'</span>':'')+'</div>'+viewBtn+'</div>'
-      +(pills?'<div class="bfc-pills">'+pills+'</div>':'')
-      +vinLine+fact1+fact2+'</div>';
+      +fact1+fact2+pillsRow+'</div>';
 
     // metric tiles
     function tile(icon,val,lbl,variant,attr){
@@ -1681,7 +1695,12 @@
         var pct=(maxP>0&&!isNaN(n))?Math.max(8,Math.round(n/maxP*100)):(isBf?100:60);
         var inset=100-pct;
         if(fill) fill.style.right=inset+'%';
-        if(barval){ barval.style.right=inset+'%'; barval.textContent=isNaN(n)?'—':bfV2Money(n); }
+        if(barval){
+          barval.style.right=inset+'%';
+          var binp=barval.querySelector('.bfc-barvalinput');
+          if(binp){ if(document.activeElement!==binp){ var fd=(Math.abs(n)%1)?2:0; binp.value=isNaN(n)?'':n.toLocaleString('en-US',{minimumFractionDigits:fd,maximumFractionDigits:2}); } }
+          else { barval.textContent=isNaN(n)?'—':bfV2Money(n); }
+        }
         if(!isBf){
           var delta=(!isNaN(n)&&!isNaN(o))?(o-n):null;
           var dl=row.querySelector('.bfc-bardelta');
@@ -1751,6 +1770,30 @@
           bfRecomputeSpread();
         }
         try{ bfPost(payload); }catch(_e){}
+      });
+    });
+    // editable CarMax / Carvana competitor values (cents-aware) -> save + recompute bars
+    host.querySelectorAll('.bfc-barvalinput[data-bfcomp]').forEach(function(inp){
+      var ckey=inp.getAttribute('data-bfcomp'); // 'carMaxOffer' | 'carvanaOffer'
+      inp.addEventListener('click',function(e){ e.stopPropagation(); });
+      inp.addEventListener('input',function(){
+        var raw=inp.value, clean=bfMSan(raw);
+        if(clean!==raw){ var pos=(inp.selectionStart||clean.length)-(raw.length-clean.length); if(pos<0)pos=0; inp.value=clean; try{ inp.setSelectionRange(pos,pos); }catch(_e){} }
+        var n=(clean===''||clean==='.')?NaN:(parseFloat(clean)||0);
+        // mirror to R so bfRecomputeCompetitive (which reads R.carmax/R.carvana) reflects the live value
+        if(ckey==='carMaxOffer') R.carmax=isNaN(n)?'':n; else R.carvana=isNaN(n)?'':n;
+        bfRecomputeCompetitive();
+      });
+      inp.addEventListener('change',function(){
+        var clean=bfMSan(inp.value); var empty=(clean===''||clean==='.');
+        var n=empty?NaN:Math.round(parseFloat(clean)*100)/100;
+        if(!empty && !isNaN(n)) inp.value=bfMFmt(n); else inp.value='';
+        var out=empty?null:n;
+        if(ckey==='carMaxOffer') R.carmax=(out==null?'':out); else R.carvana=(out==null?'':out);
+        var payload={uuid:uuid}; payload[ckey]=out;
+        try{ bfPost(payload); }catch(_e){}
+        try{ sessionStorage.setItem('bfrec:'+uuid, JSON.stringify(R)); }catch(_s){}
+        bfRecomputeCompetitive();
       });
     });
     // editable payoff -> live equity recompute (Offer - Payoff)
