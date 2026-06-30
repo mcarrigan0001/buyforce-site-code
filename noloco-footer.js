@@ -14,7 +14,7 @@
   /* Phase 1: render the six milestone stage cards from cached record data (instant, like the cockpit)
      instead of the slow embedded iframe. SAFETY: when false, everything falls back to today's iframe
      behavior exactly — the iframe/embed code, native milestone sections and workspace are untouched. */
-  var BF_CUSTOM_MILESTONES=false;  // Phase 1 custom milestones — OFF until verified live; iframe fallback active
+  var BF_CUSTOM_MILESTONES=(function(){try{return localStorage.getItem('bfCustomMs')==='1';}catch(e){return false;}})();  // opt-in per session for verification; default off
   /* Default pipeline columns: keep only the active stages open, collapse EVERY other stage (incl. null/"No value" and any future stage), once per browser. Reps can open any column; Noloco persists their choice. Collapsed columns don't render their cards -> faster board. */
   var bfFirstDefault=false, bfDefaultAt=0;
   var BF_KEEPOPEN={FRESH_LEADS:1, APPRAISAL_COMPLETE_ENTER_OFFER_SHEET_VALUES:1, OFFER_SHEET_GENERATED:1, OFFER_SENT_0_2_DAYS:1};
