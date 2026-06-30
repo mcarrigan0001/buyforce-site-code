@@ -2347,11 +2347,66 @@
       box.hidden=false;
     }
     function hideYmmt(){ var box=vt.querySelector('[data-bfymmt]'); if(box) box.hidden=true; bfYmmt=null; }
+    // ---- Photo scan -> working drop-zone (paste / drag-drop / click-to-upload -> OCR),
+    // re-implemented locally so the milestone camera buttons act on THIS milestone's VIN/plate
+    // inputs (vt scope). Mirrors bfV2Wire's bfScan: same .bfc-dropzone markup, hint text, ✕ close,
+    // same VIN regex / plate parse, same bfPostOcr. One drop-zone open at a time; closes on read.
+    function msScanClose(){ vt.querySelectorAll('.bfc-dropzone').forEach(function(z){ z.parentNode&&z.parentNode.removeChild(z); }); }
+    function msScanProcess(hint,dataUrl){
+      var h2=vt.querySelector('[data-bfdzhint="'+hint+'"]'); if(h2) h2.textContent='Reading photo…';
+      bfToast('Reading photo…');
+      bfPostOcr(dataUrl).then(function(d){
+        if(!vt.isConnected) return;
+        var txt=(d&&(d.text||d.transcript||d.vin||d.plate))||''; txt=(''+txt).toUpperCase();
+        var ok=false;
+        if(hint==='vin'){
+          var m=txt.replace(/[^A-HJ-NPR-Z0-9]/g,'').match(/[A-HJ-NPR-Z0-9]{17}/);
+          var vi=vt.querySelector('[data-bfvinin]');
+          if(m && vi){ vi.value=m[0]; ok=true; bfToast('VIN read — tap Decode'); }
+          else bfToast('No VIN found in photo');
+        } else {
+          var pm=(txt.match(/[A-Z0-9]{5,8}/)||[])[0]||'';
+          var pl=vt.querySelector('[data-bfplate]');
+          if(pm && pl){ pl.value=pm; ok=true; bfToast('Plate read — tap Decode'); }
+          else bfToast('No plate found in photo');
+        }
+        if(ok){ msScanClose(); }
+        else { var h3=vt.querySelector('[data-bfdzhint="'+hint+'"]'); if(h3) h3.textContent=(hint==='vin'?'No VIN found — try another photo':'No plate found — try another photo'); }
+      });
+    }
+    function msScanReadFile(hint,file){ if(!file) return; var rd=new FileReader(); rd.onload=function(){ msScanProcess(hint,rd.result); }; rd.readAsDataURL(file); }
+    function msScan(hint){
+      var existing=vt.querySelector('.bfc-dropzone[data-bfdz="'+hint+'"]');
+      msScanClose();
+      if(existing) return; // toggle off if the same one was open
+      var btn=vt.querySelector('[data-bfc="'+(hint==='vin'?'scanvin':'scanplate')+'"]');
+      var row=btn?btn.closest('.bfc-inrow'):null;
+      var hintTxt='Paste, drop, or click to upload a photo of the '+(hint==='vin'?'VIN':'plate');
+      var zone=document.createElement('div');
+      zone.className='bfc-dropzone'; zone.setAttribute('data-bfdz',hint); zone.setAttribute('tabindex','0');
+      zone.innerHTML=''
+        +'<button type="button" class="bfc-dzx" data-bfdzclose title="Close">✕</button>'
+        +'<i class="ti ti-photo-up bfc-dzic" aria-hidden="true"></i>'
+        +'<div class="bfc-dzhint" data-bfdzhint="'+hint+'">'+hintTxt+'</div>'
+        +'<input type="file" class="bfc-dzfile" accept="image/*" hidden>';
+      if(row&&row.parentNode){ row.parentNode.insertBefore(zone,row.nextSibling); }
+      else { vt.appendChild(zone); }
+      var fileInp=zone.querySelector('.bfc-dzfile');
+      zone.addEventListener('click',function(e){ if(e.target.closest('[data-bfdzclose]')) return; if(e.target===fileInp) return; fileInp.click(); });
+      fileInp.addEventListener('change',function(){ var f=fileInp.files&&fileInp.files[0]; if(f) msScanReadFile(hint,f); });
+      var xb=zone.querySelector('[data-bfdzclose]'); if(xb) xb.addEventListener('click',function(e){ e.stopPropagation(); msScanClose(); });
+      zone.addEventListener('dragover',function(e){ e.preventDefault(); e.stopPropagation(); zone.classList.add('bfc-dzover'); });
+      zone.addEventListener('dragleave',function(e){ e.preventDefault(); zone.classList.remove('bfc-dzover'); });
+      zone.addEventListener('drop',function(e){ e.preventDefault(); e.stopPropagation(); zone.classList.remove('bfc-dzover'); var dt=e.dataTransfer; var f=dt&&dt.files&&dt.files[0]; if(f&&/^image\//.test(f.type||'')) msScanReadFile(hint,f); else bfToast('Drop an image file'); });
+      zone.addEventListener('paste',function(e){ var items=(e.clipboardData&&e.clipboardData.items)||[]; for(var k=0;k<items.length;k++){ var it=items[k]; if(it.kind==='file'&&/^image\//.test(it.type||'')){ var f=it.getAsFile(); if(f){ e.preventDefault(); msScanReadFile(hint,f); return; } } } });
+      try{ zone.focus(); }catch(_e){}
+    }
     vt.querySelectorAll('[data-bfc]').forEach(function(b){
       b.addEventListener('click', function(e){
         e.preventDefault(); e.stopPropagation();
         var a=b.getAttribute('data-bfc');
-        if(a==='scanvin'||a==='scanplate'){ bfToast('Photo scan runs from the full record — open it to snip a VIN/plate.'); return; }
+        if(a==='scanvin'){ msScan('vin'); return; }
+        if(a==='scanplate'){ msScan('plate'); return; }
         if(a==='platedecode'){
           var pl=vt.querySelector('[data-bfplate]'); var st=vt.querySelector('[data-bfstate]');
           var plate=pl?pl.value.trim().toUpperCase():''; if(!plate){ bfToast('Enter a plate first'); return; }
@@ -2412,6 +2467,24 @@
     function ord(){ try{ return JSON.parse(sessionStorage.getItem('bf.pipeorder')||'[]'); }catch(e){ return []; } }
     function go(u){ if(u) location.href='/opportunities/view/'+u+'/summary'; }
     function back(){ location.href='/command'; }
+    function recSt(u){ try{ var r=JSON.parse(sessionStorage.getItem('bfrec:'+u)||localStorage.getItem('bfrec:'+u)||'{}'); return r&&r.status?r.status:''; }catch(e){ return ''; } }
+    // Stage-aware full-page arrow: double-chevron + "Next/Prev stage: <name>" label when the
+    // adjacent record crosses a stage boundary; single chevron + no label within the same stage.
+    function stageArrow(btn, dir, adjU, curU){
+      if(!btn) return;
+      var ic=btn.querySelector('i.ti'); var lbl=btn.querySelector('.bf-v2navlbl');
+      if(ic) ic.className='ti ti-chevron-'+(dir==='prev'?'left':'right');
+      btn.classList.remove('bf-v2navbtn-stage');
+      if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
+      if(!adjU){ return; }
+      var cs=recSt(curU), as=recSt(adjU);
+      if(!cs||!as||cs===as){ return; }
+      if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
+      btn.classList.add('bf-v2navbtn-stage');
+      if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-v2navlbl'; btn.appendChild(lbl); }
+      lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+(((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[as])||as||'').replace(/_/g,' '));
+      lbl.style.display='';
+    }
     var nav=document.getElementById('bf-v2nav');
     if(!nav){
       nav=document.createElement('div'); nav.id='bf-v2nav';
@@ -2425,7 +2498,7 @@
     nav.setAttribute('data-uuid', uuid);
     var o=ord(), idx=o.indexOf(uuid);
     var pos=nav.querySelector('.bf-v2pos'), pv=nav.querySelector('.bf-v2prev'), nx=nav.querySelector('.bf-v2next');
-    if(idx>-1 && o.length>1){ pos.textContent=(idx+1)+' / '+o.length; pos.style.display=''; pv.style.display=''; nx.style.display=''; pv.style.visibility=idx>0?'visible':'hidden'; nx.style.visibility=idx<o.length-1?'visible':'hidden'; }
+    if(idx>-1 && o.length>1){ pos.textContent=(idx+1)+' / '+o.length; pos.style.display=''; pv.style.display=''; nx.style.display=''; pv.style.visibility=idx>0?'visible':'hidden'; nx.style.visibility=idx<o.length-1?'visible':'hidden'; stageArrow(pv,'prev',idx>0?o[idx-1]:'',uuid); stageArrow(nx,'next',idx<o.length-1?o[idx+1]:'',uuid); }
     else { pos.style.display='none'; pv.style.display='none'; nx.style.display='none'; }
   }
   function bfV2(){
@@ -3548,6 +3621,26 @@
         return head+' <span class="bf-modal-possep">·</span> '+actPos+' of '+actCount+' active';
       }catch(e){ return ''; }
     }
+    // Adjacent-record stage awareness for the modal nav arrows.
+    function bfModalStageName(st){ return ((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[st])||st||'').replace(/_/g,' '); }
+    function bfModalStageArrow(btn, dir, adjUuid, curUuid){
+      if(!btn) return;
+      var ic=btn.querySelector('i.ti');
+      var lbl=btn.querySelector('.bf-modal-stagelbl');
+      // default back to single chevron + no label every render
+      if(ic) ic.className='ti ti-chevron-'+(dir==='prev'?'left':'right');
+      btn.classList.remove('bf-modal-arrow-stage');
+      if(lbl){ lbl.textContent=''; lbl.style.display='none'; }
+      if(!adjUuid){ return; }
+      var curSt=bfModalRecStatus(curUuid), adjSt=bfModalRecStatus(adjUuid);
+      if(!curSt||!adjSt||curSt===adjSt){ return; }
+      // crossing a stage boundary -> double chevron + label
+      if(ic) ic.className='ti ti-chevrons-'+(dir==='prev'?'left':'right');
+      btn.classList.add('bf-modal-arrow-stage');
+      if(!lbl){ lbl=document.createElement('span'); lbl.className='bf-modal-stagelbl'; btn.appendChild(lbl); }
+      lbl.textContent=(dir==='prev'?'Prev stage: ':'Next stage: ')+bfModalStageName(adjSt);
+      lbl.style.display='';
+    }
     function bfModalRender(){
       var uuid=bfModalList[bfModalIdx]; if(!uuid) return;
       var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
@@ -3566,6 +3659,11 @@
       var pv=m.querySelector('.bf-modal-prev'), nx=m.querySelector('.bf-modal-next');
       if(pv) pv.style.visibility=bfModalIdx>0?'visible':'hidden';
       if(nx) nx.style.visibility=bfModalIdx<bfModalList.length-1?'visible':'hidden';
+      // Stage-aware arrows: when the ADJACENT record (the one a click would go to) is in a
+      // DIFFERENT stage than the current record, show a double-chevron + a "Next/Prev stage: <name>"
+      // label; same stage -> single chevron, no label. Recomputed on every flip.
+      bfModalStageArrow(pv, 'prev', bfModalIdx>0?bfModalList[bfModalIdx-1]:'', uuid);
+      bfModalStageArrow(nx, 'next', bfModalIdx<bfModalList.length-1?bfModalList[bfModalIdx+1]:'', uuid);
       var ps=m.querySelector('.bf-modal-pos'); if(ps){ ps.innerHTML=bfModalPosLabel(uuid)||((bfModalIdx+1)+' of '+bfModalList.length); }
       var full=m.querySelector('.bf-modal-full'); if(full) full.href='/command/preview/'+uuid+'/overview';
       var mview=m.querySelector('.bf-modal-view'); if(mview){ var _vl=(R.listingLink||''); if(_vl){ mview.href=_vl; mview.style.display=''; } else { mview.removeAttribute('href'); mview.style.display='none'; } }

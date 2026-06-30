@@ -4401,3 +4401,81 @@ html[data-bfv2="1"] .bf-rsicon{ color:#a3e635 !important; }
 #bf-modal .bf-modal-view i{ font-size:14px; }
 #bf-modal .bf-v2cockpit .bfc-viewbtn{ display:none; }
 /* end batch 97 */
+
+/* ===================================================================
+   batch 98 — milestone fields dark theme + stage-aware nav arrows
+   (1) Dark-recess every input/textarea/select inside the custom
+       milestone cards (.bf-ms) AND the embedded scheduler (.bf-ws-*)
+       so the CarMax/Carvana offer inputs, Condition Notes textarea,
+       the scheduler date/time/pickup read-back inputs, the inline-
+       field value boxes (.bf-f / .bf-fi / .bf-fta-wrap) and the
+       location card match the cockpit's dark inputs.
+   (2) Stage-aware prev/next arrows: a small label sits under the
+       double-chevron when the adjacent record crosses a stage.
+   Scoped to html[data-bfv2="1"] / .bf-ms / #bf-modal / #bf-v2nav.
+   =================================================================== */
+
+/* --- (1) milestone field dark theme --------------------------------- */
+/* base inputs/textareas/selects rendered inside the milestone cards */
+html[data-bfv2="1"] .bf-ms input,
+html[data-bfv2="1"] .bf-ms textarea,
+html[data-bfv2="1"] .bf-ms select,
+html[data-bfv2="1"] .bf-ms .bf-fedit,
+html[data-bfv2="1"] .bf-ms .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-ms .bf-ws-timeinput,
+html[data-bfv2="1"] .bf-ms .bf-ws-pickupinput{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+  color:#e4e4e7 !important;
+  border-radius:9px;
+  outline:none;
+}
+html[data-bfv2="1"] .bf-ms input::placeholder,
+html[data-bfv2="1"] .bf-ms textarea::placeholder,
+html[data-bfv2="1"] .bf-ms .bf-fedit::placeholder,
+html[data-bfv2="1"] .bf-ms .bf-ws-pickupinput::placeholder{ color:#6b6e74 !important; opacity:1; }
+html[data-bfv2="1"] .bf-ms input:focus,
+html[data-bfv2="1"] .bf-ms textarea:focus,
+html[data-bfv2="1"] .bf-ms select:focus,
+html[data-bfv2="1"] .bf-ms .bf-fedit:focus,
+html[data-bfv2="1"] .bf-ms .bf-ws-dateinput:focus,
+html[data-bfv2="1"] .bf-ms .bf-ws-timeinput:focus,
+html[data-bfv2="1"] .bf-ms .bf-ws-pickupinput:focus{ border-color:#a3e635 !important; }
+/* native date/time picker glyph visible on dark */
+html[data-bfv2="1"] .bf-ms .bf-ws-dateinput::-webkit-calendar-picker-indicator,
+html[data-bfv2="1"] .bf-ms .bf-ws-timeinput::-webkit-calendar-picker-indicator{ filter:invert(1) brightness(0.85); }
+
+/* inline-field display boxes (bfInlineField -> .bf-f / .bf-fi / .bf-fta-wrap) */
+html[data-bfv2="1"] .bf-ms .bf-fi,
+html[data-bfv2="1"] .bf-ms .bf-fta-wrap,
+html[data-bfv2="1"] .bf-ms .bf-fta{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+  color:#e4e4e7 !important;
+}
+html[data-bfv2="1"] .bf-ms .bf-fi .bf-fval,
+html[data-bfv2="1"] .bf-ms .bf-fta-wrap .bf-fta{ color:#e4e4e7 !important; }
+html[data-bfv2="1"] .bf-ms .bf-fi .bf-ph,
+html[data-bfv2="1"] .bf-ms .bf-fta .bf-ph{ color:#6b6e74 !important; }
+html[data-bfv2="1"] .bf-ms .bf-fi:hover,
+html[data-bfv2="1"] .bf-ms .bf-fta-wrap:hover{ border-color:rgba(255,255,255,0.18) !important; }
+
+/* scheduler location card -> recessed dark panel (keep the lime map-pin) */
+html[data-bfv2="1"] .bf-ms .bf-ws-loc,
+html[data-bfv2="1"] .bf-ms .bf-ws-loc-pick{
+  background:#0a0b0d !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+  border-radius:10px;
+}
+html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locname{ color:#e4e4e7 !important; }
+html[data-bfv2="1"] .bf-ms .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; }
+/* green selected chips (.bf-ws-type.sel) keep their look — explicitly NOT overridden here */
+
+/* --- (2) stage-aware nav arrows ------------------------------------- */
+/* modal arrows: when crossing a stage, stack the chevron + label vertically */
+#bf-modal .bf-modal-arrow.bf-modal-arrow-stage{ flex-direction:column; height:auto; min-height:76px; padding:9px 8px; gap:3px; }
+#bf-modal .bf-modal-stagelbl{ font-size:9px; font-weight:700; letter-spacing:.2px; line-height:1.1; text-align:center; color:#aef24a; max-width:78px; white-space:normal; text-transform:uppercase; }
+/* full-page arrows (#bf-v2nav): pill out from the round button to hold the label */
+#bf-v2nav .bf-v2navbtn.bf-v2navbtn-stage{ width:auto; min-width:44px; height:auto; min-height:44px; border-radius:22px; flex-direction:column; padding:7px 12px; gap:2px; }
+#bf-v2nav .bf-v2navlbl{ font-size:9px; font-weight:700; letter-spacing:.2px; line-height:1.1; text-align:center; color:#8fe04a; max-width:96px; white-space:normal; text-transform:uppercase; }
+/* end batch 98 */
