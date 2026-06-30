@@ -1339,7 +1339,7 @@
     var sc=bfRecScore(F); var score=sc?sc.score:null;
     var hot=(score!=null&&score>=40);
     // ---- competition ----
-    var ci=compInfo(R.competition||''); var winning=ci&&ci.color==='g'; var winLabel=ci?ci.label:'';
+    var ci=compInfo(R.competition||''); var winning=ci&&ci.color==='g'; var winLabel=ci?ci.label:''; var compClr=ci?ci.color:''; var compCls=(compClr==='y'?' y':(compClr==='r'?' r':''));
     var carmax=R.carmax, carvana=R.carvana;
     var cmN=(carmax!=null&&carmax!=='')?Number((''+carmax).replace(/[^0-9.\-]/g,'')):NaN;
     var cvN=(carvana!=null&&carvana!=='')?Number((''+carvana).replace(/[^0-9.\-]/g,'')):NaN;
@@ -1380,10 +1380,10 @@
       var inset=100-pct;
       var delta=(!isBf&&!isNaN(n)&&!isNaN(offN))?(offN-n):null;
       var right=isBf
-        ? '<span class="bfc-bartag">WINNING</span>'
+        ? '<span class="bfc-bartag'+compCls+'">'+E(compClr==='g'?'WINNING':(winLabel||'WINNING'))+'</span>'
         : (delta!=null?'<span class="bfc-bardelta">−$'+Math.abs(Math.round(delta)).toLocaleString('en-US')+'</span>':'<span class="bfc-bardelta"></span>');
       return '<div class="bfc-barrow"><span class="bfc-barname'+(isBf?' bf':'')+'">'+E(name)+'</span>'
-        +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?' bf':'')+'" style="right:'+inset+'%;"></div>'
+        +'<div class="bfc-bartrack"><div class="bfc-barfill'+(isBf?(' bf'+(compClr==='r'?' r':'')):'')+'" style="right:'+inset+'%;"></div>'
         +'<span class="bfc-barval'+(isBf?' bf':'')+'" style="right:'+inset+'%;">'+(isNaN(n)?'—':M(n))+'</span></div>'+right+'</div>';
     }
     var bars=barRow('BuyForce',offer,true)+barRow('CarMax',carmax,false)+barRow('Carvana',carvana,false);
@@ -1414,11 +1414,12 @@
       +'<span class="bfc-vincopy"><i class="ti ti-copy" aria-hidden="true"></i><span class="bfc-vincopylbl">Copy</span></span></div>'):'';
 
     var f1=[];
-    if(mileage!=null&&mileage!=='') f1.push('<span class="bfc-fi"><i class="ti ti-gauge" aria-hidden="true"></i>'+Number((''+mileage).replace(/[^0-9.]/g,'')||0).toLocaleString('en-US')+' miles</span>');
+    var mileNum=(mileage!=null&&mileage!=='')?Number((''+mileage).replace(/[^0-9.]/g,'')||0):NaN;
+    f1.push('<span class="bfc-fi bfc-fedit" data-bffedit="mileage" data-bfuuid="'+E(uuid)+'"'+(isNaN(mileNum)?' data-bfempty':'')+' title="Click to edit mileage"><i class="ti ti-gauge" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(isNaN(mileNum)?'\u2014':mileNum.toLocaleString('en-US'))+'</span><span class="bfc-fisuffix"> miles</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
     if(color) f1.push('<span class="bfc-fi"><span class="bfc-sw"></span>'+E(color)+'</span>');
     var fact1=f1.length?('<div class="bfc-facts">'+f1.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
     var f2=[];
-    if(loc) f2.push('<span class="bfc-fi"><i class="ti ti-map-pin" aria-hidden="true"></i>'+E(loc)+'</span>');
+    f2.push('<span class="bfc-fi bfc-fedit" data-bffedit="listingLocation" data-bfuuid="'+E(uuid)+'" title="Click to edit listing location"><i class="ti ti-map-pin" aria-hidden="true"></i><span class="bfc-fival" data-bffval contenteditable="false">'+(loc?E(loc):'\u2014')+'</span><i class="ti ti-pencil bfc-fpen" aria-hidden="true"></i></span>');
     if(listed) f2.push('<span class="bfc-fi"><i class="ti ti-clock-hour-4" aria-hidden="true"></i>'+E(listed)+'</span>');
     var fact2=f2.length?('<div class="bfc-facts">'+f2.join('<span class="bfc-fsep">•</span>')+'</div>'):'';
     var viewBtn=link?('<a class="bfc-viewbtn" href="'+E(link)+'" target="_blank" rel="noopener"><i class="ti ti-external-link" aria-hidden="true"></i>View listing</a>'):'';
@@ -1481,11 +1482,11 @@
     var prog='<div class="bfc-card bfc-progcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Deal Progress</span><span class="bfc-stepno">Step '+(stepNo||1)+' of '+ML.length+'</span></div><div class="bfc-stepper">'+steps+'</div></div>';
 
     // ===== COMPETITIVE + DESCRIPTION =====
-    var compCard='<div class="bfc-card bfc-compcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Competitive Landscape</span><span class="bfc-complead'+(winning?' win':'')+'"><i class="ti ti-trophy" aria-hidden="true"></i>'+E(compHead)+'</span></div>'+bars+'</div>';
+    var compCard='<div class="bfc-card bfc-compcard"><div class="bfc-sechead"><span class="bfc-eyebrow">Competitive Landscape</span><span class="bfc-complead'+(winning?' win':compCls)+'"><i class="ti ti-'+(winning?'trophy':(compClr==='r'?'alert-triangle':'swords'))+'" aria-hidden="true"></i>'+E(compHead)+'</span></div>'+bars+'</div>';
     var descCard='<div class="bfc-card bfc-desccard"><div class="bfc-eyebrow" style="margin-bottom:10px;">Listing Description</div>'
       +(descHtml
-        ? '<p class="bfc-desc" data-bfdesc>'+descHtml+'</p><button class="bfc-descbtn" data-bfdesctoggle type="button">Show more</button>'
-        : '<p class="bfc-desc nodesc">No listing description on file.</p>')
+        ? '<p class="bfc-desc" data-bfdesc data-bfdescedit data-bfuuid="'+E(uuid)+'" title="Click to edit description">'+descHtml+'</p><button class="bfc-descbtn" data-bfdesctoggle type="button">Show more</button><button class="bfc-descedit" data-bfdesceditbtn type="button"><i class="ti ti-pencil" aria-hidden="true"></i>Edit</button>'
+        : '<p class="bfc-desc nodesc" data-bfdesc data-bfdescedit data-bfuuid="'+E(uuid)+'" data-bfdescempty title="Click to add description">No listing description on file.</p><button class="bfc-descedit" data-bfdesceditbtn type="button"><i class="ti ti-pencil" aria-hidden="true"></i>Add</button>')
       +'</div>';
     var compdesc='<div class="bfc-cdrow">'+compCard+descCard+'</div>';
 
@@ -1661,6 +1662,79 @@
         dbtn.textContent=open?'Show less':'Show more';
       });
     }
+    // editable Listing Description (click pencil/text -> textarea, save on blur)
+    (function(){
+      var dpe=host.querySelector('[data-bfdescedit]'); if(!dpe) return;
+      var ebtn=host.querySelector('[data-bfdesceditbtn]');
+      var tg=host.querySelector('[data-bfdesctoggle]');
+      var editing=false, ta=null;
+      var rawText=(R.description||R.listingDescription||'');
+      function enter(){
+        if(editing) return; editing=true;
+        ta=document.createElement('textarea');
+        ta.className='bfc-descta'; ta.value=rawText;
+        dpe.style.display='none'; if(tg) tg.style.display='none'; if(ebtn) ebtn.style.display='none';
+        dpe.parentNode.insertBefore(ta, dpe);
+        ta.focus(); try{ ta.setSelectionRange(ta.value.length, ta.value.length); }catch(_e){}
+        ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,360)+'px';
+        ta.addEventListener('input',function(){ ta.style.height='auto'; ta.style.height=Math.min(ta.scrollHeight,360)+'px'; });
+        ta.addEventListener('keydown',function(e){ if(e.key==='Escape'){ e.preventDefault(); cancel(); } });
+        ta.addEventListener('blur', save);
+      }
+      function teardown(){
+        if(ta&&ta.parentNode){ ta.parentNode.removeChild(ta); } ta=null; editing=false;
+        dpe.style.display=''; if(ebtn) ebtn.style.display='';
+      }
+      function cancel(){ teardown(); refresh(); }
+      function save(){
+        if(!editing) return; var val=ta.value.trim();
+        if(val===rawText.trim()){ teardown(); refresh(); return; }
+        rawText=val; R.description=val; R.listingDescription=val;
+        try{ bfPost({uuid:uuid, listingDescription:(val===''?null:val)}); }catch(_e){}
+        try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+        teardown(); refresh();
+      }
+      function refresh(){
+        if(rawText){ dpe.classList.remove('nodesc'); dpe.removeAttribute('data-bfdescempty'); dpe.textContent=rawText; if(tg){ tg.style.display=''; tg.textContent='Show more'; dpe.classList.remove('open'); requestAnimationFrame(function(){ if(dpe.scrollHeight<=dpe.clientHeight+2){ tg.style.display='none'; } }); } if(ebtn){ ebtn.innerHTML='<i class="ti ti-pencil" aria-hidden="true"></i>Edit'; } }
+        else { dpe.classList.add('nodesc'); dpe.setAttribute('data-bfdescempty',''); dpe.textContent='No listing description on file.'; if(tg) tg.style.display='none'; if(ebtn){ ebtn.innerHTML='<i class="ti ti-pencil" aria-hidden="true"></i>Add'; } }
+      }
+      if(ebtn) ebtn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); enter(); });
+      dpe.addEventListener('click', function(e){ if(dpe.classList.contains('nodesc')){ e.preventDefault(); enter(); } });
+    })();
+    // editable header facts: Mileage (numeric, commas) + Listing Location (free text). Click -> contenteditable, save on blur.
+    host.querySelectorAll('[data-bffedit]').forEach(function(fe){
+      var key=fe.getAttribute('data-bffedit');
+      var val=fe.querySelector('[data-bffval]'); if(!val) return;
+      var numeric=(key==='mileage');
+      function curRaw(){ var t=(val.textContent||'').replace(/—/g,'').trim(); return numeric?t.replace(/[^0-9.]/g,''):t; }
+      var startRaw=curRaw();
+      function enter(){
+        if(val.getAttribute('contenteditable')==='true') return;
+        startRaw=curRaw();
+        if((val.textContent||'').indexOf('—')>=0) val.textContent='';
+        else if(numeric) val.textContent=startRaw;
+        val.setAttribute('contenteditable','true'); fe.classList.add('bfc-fediting');
+        val.focus();
+        try{ var rng=document.createRange(); rng.selectNodeContents(val); rng.collapse(false); var sel=getSelection(); sel.removeAllRanges(); sel.addRange(rng); }catch(_e){}
+      }
+      function commit(){
+        if(val.getAttribute('contenteditable')!=='true') return;
+        val.removeAttribute('contenteditable'); fe.classList.remove('bfc-fediting');
+        var txt=(val.textContent||'').trim();
+        if(numeric){
+          var clean=txt.replace(/[^0-9.]/g,''); var n=(clean===''?NaN:Math.round(parseFloat(clean)));
+          if(isNaN(n)){ val.textContent='—'; fe.setAttribute('data-bfempty',''); if((''+startRaw)!==''){ try{ bfPost({uuid:uuid, mileage:null}); R.mileage=''; }catch(_e){} } }
+          else { val.textContent=n.toLocaleString('en-US'); fe.removeAttribute('data-bfempty'); if(String(n)!==String(startRaw).replace(/[^0-9.]/g,'')){ try{ bfPost({uuid:uuid, mileage:n}); R.mileage=n; }catch(_e){} } }
+        } else {
+          if(txt===''){ val.textContent='—'; if(startRaw!==''){ try{ bfPost({uuid:uuid, listingLocation:null}); R.location=''; }catch(_e){} } }
+          else { val.textContent=txt; if(txt!==startRaw){ try{ bfPost({uuid:uuid, listingLocation:txt}); R.location=txt; }catch(_e){} } }
+        }
+        try{ var _j=JSON.stringify(R); sessionStorage.setItem('bfrec:'+uuid,_j); }catch(_s){}
+      }
+      fe.addEventListener('click', function(e){ if(e.target.closest&&e.target.closest('a')) return; e.preventDefault(); enter(); });
+      val.addEventListener('blur', commit);
+      val.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); val.blur(); } else if(e.key==='Escape'){ e.preventDefault(); val.textContent=(numeric?(startRaw===''?'—':Number(startRaw).toLocaleString('en-US')):(startRaw===''?'—':startRaw)); val.removeAttribute('contenteditable'); fe.classList.remove('bfc-fediting'); } });
+    });
     // ---- VIN Tools helpers: NHTSA decode, plate lookup, OCR scan, YMMT preview ----
     var PLATE_VIN_HOOK='https://buyforce.app.n8n.cloud/webhook/plate-vin-lookup';
     var bfYmmt=null; // pending decoded {vin,year,make,model,trim} awaiting Apply
@@ -1880,6 +1954,21 @@
       if(secwrap && c.querySelector){ var _ds=c.querySelector('[data-testid="details-section"]'); var _h2=_ds&&_ds.querySelector('h2'); if(_ds && _h2 && /vin|competing offers|make the offer|send offer|schedule|payoff/i.test(_h2.textContent||'')){ if(c.parentNode!==secwrap){ secwrap.appendChild(c); } c.style.removeProperty('display'); return; } }
       if(c.style.display!=='none') c.style.setProperty('display','none','important');
     });
+    // Item 6: in embed mode, hide the 4 leftover NATIVE field displays (Equity / CarMax / Carvana /
+    // Beats-xx / Competition) that ride along at the bottom of the moved milestone sections. Match by
+    // label text only, so workspace cards + milestone steps are untouched.
+    try{
+      if(document.documentElement.getAttribute('data-bfembed')==='1' && secwrap){
+        var BFKILL=/^\s*(est(?:\.|imated)?\s*)?equity(\s*(position|display|status))?\s*$|^\s*carmax(\s*(offer|value))?\s*$|^\s*carvana(\s*(offer|value))?\s*$|^\s*(competition|beats(\s+(carmax|carvana|both|neither|xx))?)\s*$/i;
+        secwrap.querySelectorAll('[data-testid="record-field"],[class*="record-field"],[class*="field-container"],[data-testid="field"]').forEach(function(fld){
+          if(fld.getAttribute('data-bfkilled')) return;
+          var lbEl=fld.querySelector('label,[class*="field-label"],[data-testid="field-label"]');
+          var lb=lbEl?(lbEl.textContent||''):'';
+          if(!lb){ return; }
+          if(BFKILL.test(lb.replace(/\s+/g,' ').trim())){ fld.setAttribute('data-bfkilled','1'); fld.style.setProperty('display','none','important'); }
+        });
+      }
+    }catch(_k6){}
   }
   function bfColDefaultSweep(){
     if(!bfFirstDefault || (Date.now()-bfDefaultAt>8000)) return;
@@ -2890,7 +2979,7 @@
       document.body.appendChild(m);
       m.addEventListener('click',function(e){ var t=e.target&&e.target.closest&&e.target.closest('[data-m]'); if(!t) return; var k=t.getAttribute('data-m'); if(k==='close'){ bfCloseModal(); } else if(k==='prev'){ bfModalGo(-1); } else if(k==='next'){ bfModalGo(1); } });
       document.addEventListener('keydown',function(e){ if(!bfModalEl||bfModalEl.style.display==='none') return; if(e.key==='Escape'){ bfCloseModal(); } else if(e.key==='ArrowLeft'){ bfModalGo(-1); } else if(e.key==='ArrowRight'){ bfModalGo(1); } });
-      window.addEventListener('message',function(ev){ try{ var d=ev.data; if(!d||!bfModalEl) return; if(d.__bfwheel){ var card=bfModalEl.querySelector('.bf-modal-card'); if(card){ card.scrollTop+=d.dy; } return; } if(!d.__bfws) return; var rec=bfWsPool[d.uuid]; if(rec&&rec.ifr){ rec.ifr.style.height=Math.min(Math.max(d.h,110),4600)+'px'; rec.ready=true; if(rec.wrap){ var ld=rec.wrap.querySelector('.bf-modal-wsload'); if(ld) ld.style.display='none'; } try{ bfWsMaybePrefetch(); }catch(_p){} } }catch(e){} });
+      window.addEventListener('message',function(ev){ try{ var d=ev.data; if(!d||!bfModalEl) return; if(!d.__bfws) return; var rec=bfWsPool[d.uuid]; if(rec&&rec.ifr){ rec.ifr.style.height=Math.min(Math.max(d.h,110),4600)+'px'; rec.ready=true; if(rec.wrap){ var ld=rec.wrap.querySelector('.bf-modal-wsload'); if(ld) ld.style.display='none'; } try{ bfWsMaybePrefetch(); }catch(_p){} } }catch(e){} });
       bfModalEl=m; return m;
     }
     var bfWsPool={}, bfWsPfT=null, bfWsPfIdx=-1;
@@ -2903,6 +2992,17 @@
       var ifr=wrap.querySelector('iframe');
       var rec={ifr:ifr,wrap:wrap,ready:false};
       bfWsPool[uuid]=rec;
+      // Smoother no-scroll: iframe is pointer-inert by default so wheel/scroll always reaches
+      // the modal card (native scroll). Re-enable interaction only after a brief hover, so the
+      // user can click workspace tabs/buttons and type notes; disable again on leave.
+      try{
+        ifr.style.pointerEvents='none';
+        var _hov=null;
+        wrap.addEventListener('mouseenter',function(){ clearTimeout(_hov); _hov=setTimeout(function(){ ifr.style.pointerEvents='auto'; },260); });
+        wrap.addEventListener('mouseleave',function(){ clearTimeout(_hov); ifr.style.pointerEvents='none'; });
+        // a deliberate click should engage immediately
+        wrap.addEventListener('mousedown',function(){ clearTimeout(_hov); ifr.style.pointerEvents='auto'; });
+      }catch(_pe){}
       try{ ifr.src='/command/preview/'+uuid+'/overview#bfembed'; }catch(e){}
       return rec;
     }
@@ -2921,6 +3021,25 @@
     function bfWsMaybePrefetch(){ var u=bfModalList[bfModalIdx]; var rec=bfWsPool[u]; if(rec&&rec.ready&&bfWsPfIdx!==bfModalIdx){ bfWsPfIdx=bfModalIdx; setTimeout(function(){ if(bfWsPfIdx===bfModalIdx){ try{bfWsPrefetch();}catch(e){} } }, 350); } }
     function bfCloseModal(){ if(bfModalEl){ bfModalEl.style.display='none'; } document.documentElement.removeAttribute('data-bfmodal'); try{ clearInterval(bfWsPfT); }catch(e){} try{ var p=bfModalEl&&bfModalEl.querySelector('.bf-modal-wspool'); if(p) p.innerHTML=''; }catch(e){} bfWsPool={}; bfWsPfIdx=-1; }
     function bfModalGo(d){ var ni=bfModalIdx+d; if(ni<0||ni>=bfModalList.length) return; bfModalIdx=ni; bfModalRender(); }
+    function bfModalRecStatus(u){ try{ var r=JSON.parse(sessionStorage.getItem('bfrec:'+u)||localStorage.getItem('bfrec:'+u)||'{}'); return r&&r.status?r.status:''; }catch(e){ return ''; } }
+    function bfModalPosLabel(uuid){
+      try{
+        var list=bfModalList||[]; if(!list.length) return '';
+        var myStatus=bfModalRecStatus(uuid); if(!myStatus) return '';
+        var DEAD={ACQUIRED:1,NO_DEAL:1};
+        var stagePos=0, stageCount=0, actPos=0, actCount=0, sawStageSelf=false, sawActSelf=false;
+        for(var i=0;i<list.length;i++){
+          var u=list[i]; var st=bfModalRecStatus(u); if(!st) continue;
+          if(st===myStatus){ stageCount++; if(u===uuid){ sawStageSelf=true; stagePos=stageCount; } }
+          if(!DEAD[st]){ actCount++; if(u===uuid){ sawActSelf=true; actPos=actCount; } }
+        }
+        if(!sawStageSelf||!stageCount) return '';
+        var name=((typeof PIPE_STATUSNAME!=='undefined'&&PIPE_STATUSNAME[myStatus])||myStatus||'').replace(/_/g,' ');
+        var head=stagePos+' of '+stageCount+' of '+esc(name);
+        if(DEAD[myStatus]||!sawActSelf||!actCount) return head;
+        return head+' <span class="bf-modal-possep">·</span> '+actPos+' of '+actCount+' active';
+      }catch(e){ return ''; }
+    }
     function bfModalRender(){
       var uuid=bfModalList[bfModalIdx]; if(!uuid) return;
       var R={}; try{ R=JSON.parse(sessionStorage.getItem('bfrec:'+uuid)||localStorage.getItem('bfrec:'+uuid)||'{}'); }catch(e){}
@@ -2934,7 +3053,7 @@
       var pv=m.querySelector('.bf-modal-prev'), nx=m.querySelector('.bf-modal-next');
       if(pv) pv.style.visibility=bfModalIdx>0?'visible':'hidden';
       if(nx) nx.style.visibility=bfModalIdx<bfModalList.length-1?'visible':'hidden';
-      var ps=m.querySelector('.bf-modal-pos'); if(ps) ps.textContent=(bfModalIdx+1)+' of '+bfModalList.length;
+      var ps=m.querySelector('.bf-modal-pos'); if(ps){ ps.innerHTML=bfModalPosLabel(uuid)||((bfModalIdx+1)+' of '+bfModalList.length); }
       var full=m.querySelector('.bf-modal-full'); if(full) full.href='/command/preview/'+uuid+'/overview';
     }
     function bfOpenModal(uuid){
@@ -3076,8 +3195,17 @@
   }
   function bfPipelinePage(){ try{ if(!window.__bfPipeLog){ window.__bfPipeLog=1; try{ console.log('BF_PIPE active'); }catch(e){} } bfPipeTitle(); if(/^\/command(\/|$)/.test(location.pathname)){ if(/\/(preview|view)\//.test(location.pathname)){ var _phr=document.getElementById('bf-pipe-host'); if(_phr) _phr.style.setProperty('display','none','important'); return; } var vc=document.querySelector('[data-testid="view-collection"]'); var _phd=document.getElementById('bf-pipe-host'); if(_phd) _phd.style.setProperty('display','flex','important'); if(vc){ var ph=document.getElementById('bf-pipe-host'); if(!ph){ ph=document.createElement('div'); ph.id='bf-pipe-host'; ph.setAttribute('data-bfpipe','1'); ph.style.cssText='display:flex;flex-direction:column;flex:1 1 auto;min-height:0;align-self:stretch;width:auto;min-width:0;max-width:100%;'; vc.insertBefore(ph, vc.firstChild); bfPipeCSS(); bfPipeRender(ph); try{ console.log('BF_PIPE collection host rendered'); }catch(e){} } else if(ph.parentElement!==vc){ vc.insertBefore(ph, vc.firstChild); } try{ if(ph){ var _bfSz=function(){ var _s=document.querySelector('[data-testid="navigation-sidebar"]'); var _sw=_s?_s.getBoundingClientRect().width:64; var _av=window.innerWidth-_sw; if(_av<200) return; var _w=Math.round(_av*0.85); ph.style.setProperty('width',_w+'px','important'); ph.style.setProperty('max-width','none','important'); ph.style.setProperty('margin-left','0','important'); ph.style.setProperty('margin-right','0','important'); ph.style.setProperty('transform','none','important'); var _hl=ph.getBoundingClientRect().left; var _tl=_sw+Math.round((_av-_w)/2); ph.style.setProperty('transform','translateX('+Math.round(_tl-_hl)+'px)','important'); ph.__bfW=_w; }; var _s0=document.querySelector('[data-testid="navigation-sidebar"]'); var _sw0=_s0?_s0.getBoundingClientRect().width:64; var _wt=Math.round((window.innerWidth-_sw0)*0.85); if(ph.__bfW!==_wt){ _bfSz(); } if(!window.__bfPipeResize){ window.__bfPipeResize=1; var _rt; window.addEventListener('resize',function(){ clearTimeout(_rt); _rt=setTimeout(function(){ try{ var p2=document.getElementById('bf-pipe-host'); if(!p2) return; var s2=document.querySelector('[data-testid="navigation-sidebar"]'); var sw2=s2?s2.getBoundingClientRect().width:64; var av2=window.innerWidth-sw2; if(av2<200) return; var w2=Math.round(av2*0.85); p2.style.setProperty('width',w2+'px','important'); p2.style.setProperty('transform','none','important'); var hl2=p2.getBoundingClientRect().left; var tl2=sw2+Math.round((av2-w2)/2); p2.style.setProperty('transform','translateX('+Math.round(tl2-hl2)+'px)','important'); p2.__bfW=w2; }catch(e){} },140); },{passive:true}); } } }catch(_w){} var coll=vc.querySelector('.collection-view'); if(coll) coll.style.setProperty('display','none','important'); [].forEach.call(vc.children,function(c){ if(c===ph) return; if(c.classList&&c.classList.contains('collection-view')) return; if(c.querySelector&&c.querySelector('[data-testid="record-view"]')) return; if(c.getAttribute&&c.getAttribute('data-testid')==='record-view') return; c.style.setProperty('display','none','important'); }); if((location.pathname==='/command') && window.__bfPipeDrawerOpenedAt){ var _oa=window.__bfPipeDrawerOpenedAt; window.__bfPipeDrawerOpenedAt=0; var _w=0; try{ _w=+(localStorage.getItem('bf.lastWriteAt')||0); }catch(e){} if(_w>_oa && ph.__bfReload){ ph.__bfReload(); } } } return; } var host=null; var els=document.querySelectorAll('p,span,div,h1,h2,h3,h4,td,li,strong,em,b'); for(var i=0;i<els.length;i++){ var e=els[i]; if(e.children.length>0) continue; if((e.textContent||'').trim()==='BF_PIPELINE_FUNNEL'){ host=e; break; } } if(!host) return; if(host.getAttribute('data-bfpipe')==='1') return; host.setAttribute('data-bfpipe','1'); try{ console.log('BF_PIPE rendering funnel'); }catch(e){} bfPipeCSS(); bfPipeRender(host); }catch(e){} }
   var bfEmbedRT=null;
-  function bfEmbedReportHeight(){ try{ var u=(location.pathname.match(/rec[0-9a-z]+/)||[''])[0]; var h=0; var ns=document.querySelectorAll('#bf-v2 .bf-v2wsslot, #bf-v2 .bf-v2secs'); [].forEach.call(ns,function(n){ h+=n.getBoundingClientRect().height; }); if(h<40) h=Math.max(document.body.scrollHeight,260); parent.postMessage({__bfws:1,h:Math.ceil(h)+4,uuid:u},'*'); }catch(e){} }
-  function bfEmbedStartReport(){ if(bfEmbedRT) return; bfEmbedReportHeight(); bfEmbedRT=setInterval(bfEmbedReportHeight,1200); try{ window.addEventListener('load',bfEmbedReportHeight); }catch(e){} try{ window.addEventListener('wheel',function(e){ try{ parent.postMessage({__bfwheel:1,dy:e.deltaY},'*'); }catch(_w){} },{passive:true}); }catch(e){} }
+  function bfEmbedReportHeight(){ try{ var u=(location.pathname.match(/rec[0-9a-z]+/)||[''])[0];
+    // Clamp the reported height to the actual content BOTTOM so no black band appears below the
+    // workspace/milestones. Measure the lowest visible bottom edge of our embed content rather than
+    // summing rects (which over-counts collapsing margins).
+    var ns=document.querySelectorAll('#bf-v2 .bf-v2wsslot, #bf-v2 .bf-v2secs');
+    var top=Infinity, bottom=0;
+    [].forEach.call(ns,function(n){ if(n.offsetParent===null && n.getClientRects().length===0) return; var r=n.getBoundingClientRect(); if(r.height<=0) return; if(r.top<top) top=r.top; if(r.bottom>bottom) bottom=r.bottom; });
+    var h=(bottom>0 && isFinite(top))?(bottom-top):0;
+    if(h<40) h=Math.max(document.body.scrollHeight,260);
+    parent.postMessage({__bfws:1,h:Math.ceil(h)+2,uuid:u},'*'); }catch(e){} }
+  function bfEmbedStartReport(){ if(bfEmbedRT) return; bfEmbedReportHeight(); bfEmbedRT=setInterval(bfEmbedReportHeight,1200); try{ window.addEventListener('load',bfEmbedReportHeight); }catch(e){} }
   var _bfNavLocked=false;
   function bfEmbedLockNav(){ if(_bfNavLocked) return; _bfNavLocked=true; try{ document.addEventListener('click',function(e){ var a=e.target&&e.target.closest&&e.target.closest('a[href]'); if(!a) return; var href=a.getAttribute('href')||''; if(/^(https?:|mailto:|tel:|#)/.test(href)) return; if(a.getAttribute('target')==='_blank') return; var base=location.pathname.replace(/\/overview.*$/,''); if(href.indexOf(base)===-1){ e.preventDefault(); e.stopPropagation(); } }, true); }catch(_e){} }
   function bfIframeIsolate(){
