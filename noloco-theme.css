@@ -3995,3 +3995,230 @@ html[data-bfv2="1"] .bf-pill.rset{ background:#341515 !important; color:#f87171 
 .bf-v2cockpit .bfc-paidoff{ display:flex; align-items:center; justify-content:flex-end; gap:5px; margin-top:5px; font-size:10px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:#7b7e84; cursor:pointer; user-select:none; }
 .bf-v2cockpit .bfc-paidoff input{ width:13px; height:13px; accent-color:#84cc16; cursor:pointer; margin:0; }
 .bf-v2cockpit .bfc-paybox.nopay .bfc-payinput{ text-align:right; letter-spacing:.04em; }
+
+/* ============================================================
+   batch 93 — Command Center glossy skin (vignette, glass cards,
+   current-step glow, solid gradient buttons, recessed inputs).
+   CSS-FIRST, purely additive — no markup/JS structure change.
+   Scope:
+     • Shell/background → #bf-modal .bf-modal-card + #bf-v2
+     • Cockpit glass cards → .bf-v2cockpit .bfc-* (modal + full page)
+     • Milestone stage cards → html[data-bfv2="1"] [data-testid="details-section"]
+       (set on BOTH the full record page and the embed iframe — NOT .bf-v2secs)
+   Tokens (Command Center README):
+     glossy header card  linear-gradient(180deg,#1a1e23,#13161a)
+     glossy stage card   linear-gradient(180deg,#1b1f24,#121519)
+     current-step glow   rgba(163,230,53,0.45) + 0 0 36px -6px rgba(163,230,53,0.45)
+     recessed input      #0e1115 / #090b0d + inset 0 1px 2px rgba(0,0,0,0.4-0.5)
+     primary lime btn    linear-gradient(180deg,#a6e236,#86c41a) text #0a0a0a
+   ============================================================ */
+
+/* ---- 1 · SHELL / VIGNETTE -------------------------------------------------
+   Command Center deep top-lit / bottom-glow vignette + glossy gradient shell,
+   rounded 22, drop shadow. Applied to the modal card and the full-page host. */
+#bf-modal .bf-modal-card{
+  background:
+    radial-gradient(900px 520px at 50% -8%, #232830 0%, rgba(12,14,17,0) 52%),
+    radial-gradient(1500px 1000px at 50% 118%, #161a20 0%, rgba(9,10,12,0) 60%),
+    linear-gradient(180deg,#15181c 0%,#0d0f12 100%) !important;
+  border:1px solid rgba(255,255,255,0.1) !important;
+  border-radius:22px !important;
+  box-shadow:0 40px 120px -30px rgba(0,0,0,0.8) !important;
+}
+@media (max-width:760px){
+  #bf-modal .bf-modal-card{ border-radius:16px !important; }
+}
+/* sticky top bar blends into the glossy shell */
+#bf-modal .bf-modal-top{
+  background:linear-gradient(180deg, rgba(21,24,28,0.96), rgba(13,15,18,0.72)) !important;
+  border-bottom:1px solid rgba(255,255,255,0.05) !important;
+}
+/* full record page host gets the same top-lit / bottom-glow vignette */
+#bf-v2{
+  background:
+    radial-gradient(900px 520px at 50% -8%, #232830 0%, rgba(12,14,17,0) 52%),
+    radial-gradient(1500px 1000px at 50% 118%, #161a20 0%, rgba(9,10,12,0) 60%),
+    #090a0c !important;
+  font-family:'Geist',system-ui,-apple-system,'Segoe UI',sans-serif !important;
+}
+
+/* ---- 2 · GLOSSY COCKPIT CARDS --------------------------------------------
+   .bfc-card (progress, competitive, description, VIN tools) → glossy charcoal
+   glass: header-card gradient, faint white border, inner sheen, drop shadow. */
+.bf-v2cockpit .bfc-card{
+  background:linear-gradient(180deg,#1a1e23,#13161a) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+/* offer-economics strip = glossy header card (was flat #0f1113) */
+.bf-v2cockpit .bfc-offstrip{
+  background:linear-gradient(180deg,#1a1e23,#13161a) !important;
+  border:1px solid rgba(255,255,255,0.07) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+/* equity card keeps its sign-driven bg/border from JS, but gains the sheen+drop */
+.bf-v2cockpit .bfc-equity{
+  box-shadow:0 1px 0 rgba(255,255,255,0.05) inset, 0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+/* AIForce next-best-action: lime-tinted glow glass card */
+.bf-v2cockpit .bfc-nba{
+  background:linear-gradient(150deg,rgba(132,204,22,0.07),rgba(15,17,19,0.55)) !important;
+  border:1px solid rgba(163,230,53,0.22) !important;
+  box-shadow:0 0 0 1px rgba(163,230,53,0.06) inset, 0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+
+/* ---- 3 · RECESSED FIELD TILES (metric grid, offer-sheet, VIN result) ------ */
+.bf-v2cockpit .bfc-tile,
+.bf-v2cockpit .bfc-sheet,
+.bf-v2cockpit .bfc-vinres{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+/* seller-score "Hot" tile keeps its orange ring */
+.bf-v2cockpit .bfc-tile.hot{
+  background:#0f1113 !important;
+  border:1px solid rgba(249,115,22,0.22) !important;
+  box-shadow:none !important;
+}
+.bf-v2cockpit .bfc-tilelbl{ letter-spacing:0.05em !important; }
+.bf-v2cockpit .bfc-tileval{ font-variant-numeric:tabular-nums !important; letter-spacing:-0.02em !important; }
+
+/* ---- 4 · RECESSED INPUTS -------------------------------------------------- */
+.bf-v2cockpit .bfc-input,
+.bf-v2cockpit .bfc-select,
+.bf-v2cockpit .bfc-paybox,
+.bf-v2cockpit .bfc-bigedit,
+.bf-v2cockpit .bfc-descta{
+  background:#090b0d !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+.bf-v2cockpit .bfc-input.mono,
+.bf-v2cockpit .bfc-vin .bfc-vinval{
+  font-family:'Geist Mono','SFMono-Regular',ui-monospace,monospace !important;
+}
+/* VIN-decode result block recesses deeper */
+.bf-v2cockpit .bfc-vinres{
+  background:#090b0d !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+
+/* ---- 5 · SOLID GRADIENT BUTTON SYSTEM (cockpit) --------------------------- */
+/* primary / lime → gradient + glow + dark text */
+.bf-v2cockpit .bfc-btn.lime{
+  background:linear-gradient(180deg,#a6e236,#86c41a) !important;
+  border:none !important;
+  box-shadow:0 4px 16px -6px rgba(132,204,22,0.7) !important;
+  color:#0a0a0a !important;
+  font-weight:700 !important;
+}
+.bf-v2cockpit .bfc-btn.lime:hover{
+  background:linear-gradient(180deg,#b2ee48,#92d322) !important;
+}
+/* neutral → solid #191b1f */
+.bf-v2cockpit .bfc-btn.neutral{
+  background:#191b1f !important;
+  border:1px solid rgba(255,255,255,0.14) !important;
+  color:#e4e4e7 !important;
+}
+.bf-v2cockpit .bfc-btn.neutral:hover{ background:#202327 !important; }
+
+/* ---- 6 · CURRENT-STEP GLOW (deal-progress current node) ------------------- */
+.bf-v2cockpit .bfc-step.bfc-cur .bfc-dot{
+  box-shadow:0 0 0 1px rgba(163,230,53,0.12), 0 0 18px -2px rgba(163,230,53,0.5) !important;
+}
+
+/* ---- 7 · TYPOGRAPHY ------------------------------------------------------- */
+.bf-v2cockpit .bfc-eyebrow,
+.bf-v2cockpit .bfc-offlbl,
+.bf-v2cockpit .bfc-eqlbl,
+.bf-v2cockpit .bfc-nbaeyebrow,
+.bf-v2cockpit .bfc-wtdlbl{ letter-spacing:0.06em !important; }
+.bf-v2cockpit .bfc-offval,
+.bf-v2cockpit .bfc-eqval,
+.bf-v2cockpit .bfc-biginput{
+  font-variant-numeric:tabular-nums !important; letter-spacing:-0.02em !important;
+}
+
+/* ============================================================
+   8 · MILESTONE STAGE CARDS — Command Center glass
+   Scope: html[data-bfv2="1"] [data-testid="details-section"] …
+   (set on full record page AND embed iframe; NOT .bf-v2secs).
+   Extends batch 91; upgrades flat fills to glossy gradients +
+   sheen + drop shadow, and re-asserts the lime current-step glow.
+   ============================================================ */
+/* glossy stage-card fill (was flat #0c0d0f) */
+html[data-bfv2="1"] [data-testid="details-section"]{
+  background:linear-gradient(180deg,#1b1f24 0%,#121519 100%) !important;
+  border:1px solid rgba(255,255,255,0.08) !important;
+  border-left:1px solid rgba(255,255,255,0.08) !important;
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+/* current step → neon-lime glow ring (stronger gradient fill + glow border) */
+html[data-bfv2="1"] [data-testid="details-section"].bf-rsec-current{
+  background:linear-gradient(180deg,#1d2228 0%,#121519 100%) !important;
+  border-color:rgba(163,230,53,0.45) !important;
+  border-left-color:rgba(163,230,53,0.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(163,230,53,0.12),
+    0 0 36px -6px rgba(163,230,53,0.45),
+    0 20px 44px -26px rgba(0,0,0,0.85) !important;
+}
+/* inner field tiles → recessed glass */
+html[data-bfv2="1"] [data-testid="details-section"] form > div,
+html[data-bfv2="1"] .bf-f{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.055) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+html[data-bfv2="1"] [data-testid="details-section"] form > div:has(textarea){
+  box-shadow:none !important;
+}
+/* inputs / textareas / selects → deep recessed */
+html[data-bfv2="1"] [data-testid="details-section"] input,
+html[data-bfv2="1"] [data-testid="details-section"] textarea,
+html[data-bfv2="1"] [data-testid="details-section"] select,
+html[data-bfv2="1"] .bf-fta,
+html[data-bfv2="1"] .bf-ws-pickupinput{
+  background:#090b0d !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+/* script cards → recessed glass with lime accent (keep batch-91 left rail) */
+html[data-bfv2="1"] .bf-wt{
+  background:#0e1115 !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+/* ---- milestone SOLID gradient buttons (upgrade batch-91 flat fills) ---- */
+/* primary / lime → gradient + glow */
+html[data-bfv2="1"] .bf-btn-p,
+html[data-bfv2="1"] button.bf-btn-p{
+  background:linear-gradient(180deg,#a6e236,#86c41a) !important;
+  box-shadow:0 4px 16px -6px rgba(132,204,22,0.7) !important;
+}
+html[data-bfv2="1"] .bf-btn-p:hover{
+  background:linear-gradient(180deg,#b2ee48,#92d322) !important;
+}
+/* get-value (CarMax / Carvana) buttons → same lime gradient + glow */
+html[data-bfv2="1"] .bf-getval-wrap .bf-btn{
+  background:linear-gradient(180deg,#a6e236,#86c41a) !important;
+  box-shadow:0 4px 16px -6px rgba(132,204,22,0.7) !important;
+}
+html[data-bfv2="1"] .bf-getval-wrap .bf-btn:hover{
+  background:linear-gradient(180deg,#b2ee48,#92d322) !important;
+}
+/* Schedule → Book appointment full-width lime gradient + glow */
+html[data-bfv2="1"] .bf-recsched .bf-ws-btn.primary{
+  background:linear-gradient(180deg,#a6e236,#86c41a) !important;
+  box-shadow:0 6px 20px -8px rgba(132,204,22,0.7) !important;
+}
+html[data-bfv2="1"] .bf-recsched .bf-ws-btn.primary:hover{
+  background:linear-gradient(180deg,#b2ee48,#92d322) !important;
+}
+/* schedule chips + read-back inputs → recessed glass */
+html[data-bfv2="1"] .bf-recsched .bf-ws-type{ background:#0e1115 !important; box-shadow:inset 0 1px 2px rgba(0,0,0,0.35) !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-type.sel{ box-shadow:none !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-dateinput,
+html[data-bfv2="1"] .bf-recsched .bf-ws-timeinput{ background:#090b0d !important; box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important; }
+html[data-bfv2="1"] .bf-recsched .bf-ws-loc,
+html[data-bfv2="1"] .bf-recsched .bf-ws-loc-deal{ background:#0e1115 !important; box-shadow:inset 0 1px 2px rgba(0,0,0,0.4) !important; }
+/* end batch 93 */
