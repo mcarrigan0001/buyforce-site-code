@@ -4761,3 +4761,53 @@ html[data-bfv2="1"] .bf-ms .bf-msinfo.bf-msinfo-vinhint{
   margin-bottom:12px;
 }
 /* end batch 102 */
+
+/* ===================================================================== */
+/* Batch 103 — FIX: dark scheduler + appraisal fields were anchored on    */
+/* html[data-bfv2="1"], but that attr is absent in the command-center     */
+/* cockpit view, so every dark rule silently failed and the base light    */
+/* styles won (white fields). Re-scope onto .bf-v2cockpit, which always    */
+/* wraps the cockpit + milestone stages in every surface (modal, full      */
+/* page, command center). Adds color-scheme:dark so native date/time      */
+/* controls render dark too. .bf-v2cockpit never wraps the light          */
+/* workspace iframe panel, so no bleed.                                    */
+/* ===================================================================== */
+.bf-v2cockpit .bf-ws-dateinput,
+.bf-v2cockpit .bf-ws-timeinput,
+.bf-v2cockpit .bf-ws-pickupinput{
+  background:#090b0d !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+  color:#e4e4e7 !important;
+  color-scheme:dark !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5) !important;
+}
+.bf-v2cockpit .bf-ws-pickupinput::placeholder{ color:#6b6e74 !important; opacity:1; }
+.bf-v2cockpit .bf-ws-dateinput:focus,
+.bf-v2cockpit .bf-ws-timeinput:focus,
+.bf-v2cockpit .bf-ws-pickupinput:focus{ border-color:#a3e635 !important; }
+.bf-v2cockpit .bf-ws-dateinput::-webkit-calendar-picker-indicator,
+.bf-v2cockpit .bf-ws-timeinput::-webkit-calendar-picker-indicator{ filter:invert(1) brightness(0.85) !important; }
+.bf-v2cockpit .bf-ws-loc,
+.bf-v2cockpit .bf-ws-loc-deal,
+.bf-v2cockpit .bf-ws-loc-pick{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+}
+.bf-v2cockpit .bf-ws-loc .bf-ws-locname{ color:#e4e4e7 !important; }
+.bf-v2cockpit .bf-ws-loc .bf-ws-locaddr{ color:#9aa0a6 !important; }
+.bf-v2cockpit .bf-ws-loc i{ color:#a3e635 !important; }
+/* "Competing Offers & Notes for Appraisal" inline fields — same re-scope */
+.bf-v2cockpit .bf-fi,
+.bf-v2cockpit .bf-fta,
+.bf-v2cockpit .bf-fta-wrap,
+.bf-v2cockpit .bf-mscol input,
+.bf-v2cockpit .bf-mscol textarea{
+  background:#0e1115 !important;
+  border:1px solid rgba(255,255,255,0.10) !important;
+  color:#e4e4e7 !important;
+  color-scheme:dark !important;
+}
+.bf-v2cockpit .bf-fi::placeholder,
+.bf-v2cockpit .bf-fta::placeholder,
+.bf-v2cockpit .bf-mscol input::placeholder,
+.bf-v2cockpit .bf-mscol textarea::placeholder{ color:#6b6e74 !important; opacity:1; }
