@@ -4811,3 +4811,16 @@ html[data-bfv2="1"] .bf-ms .bf-msinfo.bf-msinfo-vinhint{
 .bf-v2cockpit .bf-fta::placeholder,
 .bf-v2cockpit .bf-mscol input::placeholder,
 .bf-v2cockpit .bf-mscol textarea::placeholder{ color:#6b6e74 !important; opacity:1; }
+
+/* ===================================================================== */
+/* Batch 104 — FIX: Make-the-Offer sheet widget. The batch-102 reshape    */
+/* rules were anchored on html[data-bfv2="1"] (absent in command-center), */
+/* so they never applied, and the older .bf-v2cockpit width:100% override */
+/* stretched the card into a wide horizontal bar. The milestone card      */
+/* already carries the .bfc-sheet class, so once we stop forcing full      */
+/* width it renders identically to the header Offer Sheet widget. Re-scope */
+/* onto .bf-v2cockpit so it actually applies. ~190px to match the header.  */
+/* ===================================================================== */
+.bf-v2cockpit .bf-ms .bf-msofferrow{ grid-template-columns:190px 1fr !important; gap:12px !important; align-items:start !important; }
+@media(max-width:760px){ .bf-v2cockpit .bf-ms .bf-msofferrow{ grid-template-columns:1fr !important; } }
+.bf-v2cockpit .bf-ms .bf-mssheet{ width:190px !important; max-width:190px !important; align-self:start !important; }
