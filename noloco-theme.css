@@ -3591,3 +3591,12 @@ html[data-bfembed="1"] [data-testid="record-actions-bar"] { display: none !impor
 .bf-v2cockpit .bfc-ymmtgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px 16px; }
 .bf-v2cockpit .bfc-ymmtbtns{ display:flex; gap:9px; margin-top:13px; }
 .bf-v2cockpit .bfc-ymmtbtns .bfc-btn{ flex:1; }
+
+/* batch 89 — VIN scan drop-zone: scan buttons reveal an inline paste/drag/upload drop area (replacing the direct file picker). Dashed-border, dark+lime tokens, ✕ to close. Scoped under .bf-v2cockpit. */
+.bf-v2cockpit .bfc-dropzone{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; margin-top:10px; padding:18px 16px; min-height:96px; background:rgba(132,204,22,0.04); border:1.5px dashed rgba(163,230,53,0.45); border-radius:11px; color:#cbd5c0; cursor:pointer; outline:none; transition:border-color .12s, background .12s; }
+.bf-v2cockpit .bfc-dropzone:hover{ border-color:rgba(163,230,53,0.7); background:rgba(132,204,22,0.07); }
+.bf-v2cockpit .bfc-dropzone:focus,.bf-v2cockpit .bfc-dropzone.bfc-dzover{ border-color:#a3e635; background:rgba(132,204,22,0.12); }
+.bf-v2cockpit .bfc-dropzone .bfc-dzic{ font-size:26px; color:#a3e635; }
+.bf-v2cockpit .bfc-dropzone .bfc-dzhint{ font-size:12px; font-weight:600; color:#b6c0aa; text-align:center; line-height:1.35; max-width:240px; }
+.bf-v2cockpit .bfc-dropzone .bfc-dzx{ position:absolute; top:7px; right:9px; width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:6px; color:#cbd5c0; font-size:12px; line-height:1; cursor:pointer; padding:0; }
+.bf-v2cockpit .bfc-dropzone .bfc-dzx:hover{ background:rgba(255,255,255,0.1); color:#fff; }

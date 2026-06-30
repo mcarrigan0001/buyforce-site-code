@@ -1508,8 +1508,6 @@
         +'<button class="bfc-scan" data-bfc="scanvin" type="button" title="Scan photo for VIN"><i class="ti ti-camera" aria-hidden="true"></i></button>'
         +'<button class="bfc-btn neutral" data-bfc="vindecode" data-bfuuid="'+E(uuid)+'" type="button">Decode</button>'
       +'</div>'
-      +'<input type="file" class="bfc-scaninput" data-bfscanvin accept="image/*" capture="environment" hidden>'
-      +'<input type="file" class="bfc-scaninput" data-bfscanplate accept="image/*" capture="environment" hidden>'
       +'<div class="bfc-vinres" data-bfvinres hidden>'
         +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Year / Make</div><div class="bfc-vrval">'+(E((dYear+' '+dMake).trim())||'\u2014')+'</div></div>'
         +'<div class="bfc-vrcell"><div class="bfc-vrlbl">Model / Trim</div><div class="bfc-vrval">'+(E((dModel+' '+dTrim).trim())||'\u2014')+'</div></div>'
@@ -1689,32 +1687,66 @@
       box.hidden=false;
     }
     function bfHideYmmt(){ var box=host.querySelector('[data-bfymmt]'); if(box) box.hidden=true; bfYmmt=null; }
-    // Run a file-picker OCR scan; hint='vin'|'plate'; on success populate target input.
+    // Process one image dataURL through OCR for a given scanner hint; populate target input.
+    function bfScanProcess(hint,dataUrl,zone){
+      var hint2=host.querySelector('[data-bfdzhint="'+hint+'"]');
+      if(hint2) hint2.textContent='Reading photo…';
+      bfToast('Reading photo…');
+      bfPostOcr(dataUrl).then(function(d){
+        if(!host.isConnected) return;
+        var txt=(d&&(d.text||d.transcript||d.vin||d.plate))||''; txt=(''+txt).toUpperCase();
+        var ok=false;
+        if(hint==='vin'){
+          var m=txt.replace(/[^A-HJ-NPR-Z0-9]/g,'').match(/[A-HJ-NPR-Z0-9]{17}/);
+          var vi=host.querySelector('[data-bfvinin]');
+          if(m && vi){ vi.value=m[0]; ok=true; bfToast('VIN read — tap Decode'); }
+          else bfToast('No VIN found in photo');
+        } else {
+          var pm=(txt.match(/[A-Z0-9]{5,8}/)||[])[0]||'';
+          var pl=host.querySelector('[data-bfplate]');
+          if(pm && pl){ pl.value=pm; ok=true; bfToast('Plate read — tap Decode'); }
+          else bfToast('No plate found in photo');
+        }
+        if(ok){ bfScanClose(); }
+        else { var h3=host.querySelector('[data-bfdzhint="'+hint+'"]'); if(h3) h3.textContent=(hint==='vin'?'No VIN found — try another photo':'No plate found — try another photo'); }
+      });
+    }
+    function bfScanReadFile(hint,file,zone){ if(!file) return; var rd=new FileReader(); rd.onload=function(){ bfScanProcess(hint,rd.result,zone); }; rd.readAsDataURL(file); }
+    // Close any open scan drop-zone.
+    function bfScanClose(){ host.querySelectorAll('.bfc-dropzone').forEach(function(z){ z.parentNode&&z.parentNode.removeChild(z); }); }
+    // Reveal an inline paste/drag/upload drop-zone for hint='vin'|'plate'; on image, OCR + populate.
     function bfScan(hint){
-      var inp=host.querySelector(hint==='vin'?'[data-bfscanvin]':'[data-bfscanplate]'); if(!inp) return;
-      inp.value='';
-      inp.onchange=function(){
-        var f=inp.files&&inp.files[0]; if(!f) return;
-        bfToast('Reading photo\u2026');
-        var rd=new FileReader();
-        rd.onload=function(){ bfPostOcr(rd.result).then(function(d){
-          inp.value='';
-          var txt=(d&&(d.text||d.transcript||d.vin||d.plate))||''; txt=(''+txt).toUpperCase();
-          if(hint==='vin'){
-            var m=txt.replace(/[^A-HJ-NPR-Z0-9]/g,'').match(/[A-HJ-NPR-Z0-9]{17}/);
-            var vi=host.querySelector('[data-bfvinin]');
-            if(m && vi){ vi.value=m[0]; bfToast('VIN read \u2014 tap Decode'); }
-            else bfToast('No VIN found in photo');
-          } else {
-            var pm=(txt.match(/[A-Z0-9]{5,8}/)||[])[0]||'';
-            var pl=host.querySelector('[data-bfplate]');
-            if(pm && pl){ pl.value=pm; bfToast('Plate read \u2014 tap Decode'); }
-            else bfToast('No plate found in photo');
-          }
-        }); };
-        rd.readAsDataURL(f);
-      };
-      inp.click();
+      // Only one open at a time. Toggle if same one is already open.
+      var existing=host.querySelector('.bfc-dropzone[data-bfdz="'+hint+'"]');
+      bfScanClose();
+      if(existing) return;
+      var btn=host.querySelector('[data-bfc="'+(hint==='vin'?'scanvin':'scanplate')+'"]');
+      var row=btn?btn.closest('.bfc-inrow'):null;
+      var vt=host.querySelector('.bfc-vintools'); if(!vt) return;
+      var hintTxt=hint==='vin'
+        ? 'Paste, drop, or click to upload a photo of the VIN'
+        : 'Paste, drop, or click to upload a photo of the plate';
+      var zone=document.createElement('div');
+      zone.className='bfc-dropzone'; zone.setAttribute('data-bfdz',hint); zone.setAttribute('tabindex','0');
+      zone.innerHTML=''
+        +'<button type="button" class="bfc-dzx" data-bfdzclose title="Close">✕</button>'
+        +'<i class="ti ti-photo-up bfc-dzic" aria-hidden="true"></i>'
+        +'<div class="bfc-dzhint" data-bfdzhint="'+hint+'">'+hintTxt+'</div>'
+        +'<input type="file" class="bfc-dzfile" accept="image/*" hidden>';
+      if(row&&row.parentNode){ row.parentNode.insertBefore(zone,row.nextSibling); }
+      else { vt.appendChild(zone); }
+      var fileInp=zone.querySelector('.bfc-dzfile');
+      // click to upload (but not when clicking the close button)
+      zone.addEventListener('click',function(e){ if(e.target.closest('[data-bfdzclose]')) return; if(e.target===fileInp) return; fileInp.click(); });
+      fileInp.addEventListener('change',function(){ var f=fileInp.files&&fileInp.files[0]; if(f) bfScanReadFile(hint,f,zone); });
+      var xb=zone.querySelector('[data-bfdzclose]'); if(xb) xb.addEventListener('click',function(e){ e.stopPropagation(); bfScanClose(); });
+      // drag + drop
+      zone.addEventListener('dragover',function(e){ e.preventDefault(); e.stopPropagation(); zone.classList.add('bfc-dzover'); });
+      zone.addEventListener('dragleave',function(e){ e.preventDefault(); zone.classList.remove('bfc-dzover'); });
+      zone.addEventListener('drop',function(e){ e.preventDefault(); e.stopPropagation(); zone.classList.remove('bfc-dzover'); var dt=e.dataTransfer; var f=dt&&dt.files&&dt.files[0]; if(f&&/^image\//.test(f.type||'')) bfScanReadFile(hint,f,zone); else bfToast('Drop an image file'); });
+      // paste an image
+      zone.addEventListener('paste',function(e){ var items=(e.clipboardData&&e.clipboardData.items)||[]; for(var k=0;k<items.length;k++){ var it=items[k]; if(it.kind==='file'&&/^image\//.test(it.type||'')){ var f=it.getAsFile(); if(f){ e.preventDefault(); bfScanReadFile(hint,f,zone); return; } } } });
+      try{ zone.focus(); }catch(_e){}
     }
     // cockpit action buttons
     host.querySelectorAll('[data-bfc]').forEach(function(b){
@@ -2829,10 +2861,11 @@
     function calcScore(r){ var acv=Number(r.acv), ask=Number(r.asking); if(!(acv>0)||isNaN(ask)) return null; var cs=compCs(r.competition); var prem=ask-acv; var ds=prem<=2000?30:(prem<=3000?25:(prem<=4000?15:(prem<=5000?7.5:0))); var pct=prem/acv; var ps=pct<=0?20:(pct>=0.20?0:20*(1-pct/0.20)); var eqp=Number(r.eq); var es=isNaN(eqp)?0:(eqp>=2000?10:(eqp<=0?0:10*(eqp/2000))); return Math.round(cs+ds+ps+es); }
     function calcOvp(r){ if(r.asking==null||r.asking===''||r.offer==null||r.offer==='') return null; var ask=Number(r.asking), off=Number(r.offer); if(isNaN(ask)||isNaN(off)) return null; return ask-off; }
     function decorate(d){ var ap=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ r._score=calcScore(r); r._ovp=calcOvp(r); if(!r.location) r.location='Tampa, FL 33607'; if(!r.listingLink) r.listingLink='https://www.facebook.com/marketplace/item/100200300'; try{ var _j=JSON.stringify(r); sessionStorage.setItem('bfrec:'+r.uuid,_j); localStorage.setItem('bfrec:'+r.uuid,_j); }catch(e){} }); }); }; if(d){ ap(d.stages); ap(d.other); } }
+    function bfVehField(r,which){ if(!r) return ''; var direct=function(){ switch(which){ case 'bodyStyle': return r.bodyStyle||r['Body Style']||''; case 'drivetrain': return r.drivetrain||''; case 'engine': return r.engine||''; case 'fuelType': return r.fuelType||r['Fuel Type']||''; case 'transmission': return r.transmission||''; case 'cabType': return r.cabType||r['Cab Type']||''; default: return ''; } }; if(which==='year'){ if(r.year!=null&&r.year!==''){ var yn=parseInt(r.year,10); if(!isNaN(yn)) return yn; } var ym=String(r.title||'').match(/(19|20)\d{2}/); return ym?parseInt(ym[0],10):null; } var title=String(r.title||''); var tm=title.match(/(19|20)\d{2}\s*(.*)$/); var rest=tm?tm[2].trim():title.trim(); var toks=rest.split(/\s+/).filter(Boolean); if(which==='make'){ if(r.make) return String(r.make).trim(); return toks[0]||''; } if(which==='model'){ if(r.model) return String(r.model).trim(); return toks.slice(1).join(' ').trim(); } if(which==='trim'){ if(r.trim) return String(r.trim).trim(); var sub=String(r.subtitle||'').trim(); return sub?sub.split(/[•|,]/)[0].trim():''; } return String(direct()).trim(); }
     function distinct(getter){ var set={},out=[]; var add=function(arr){ (arr||[]).forEach(function(s){ (s.records||[]).forEach(function(r){ var v=getter(r); if(v&&!set[v]){ set[v]=1; out.push(v); } }); }); }; add(st.data&&st.data.stages); add(st.data&&st.data.other); out.sort(); return out; }
     function nIn(v,mn,mx){ if(mn!==''&&mn!=null){ if(v==null||v<Number(mn)) return false; } if(mx!==''&&mx!=null){ if(v==null||v>Number(mx)) return false; } return true; }
     function macroLabelOf(s){ for(var i=0;i<MACRO.length;i++){ if(MACRO[i].statuses.indexOf(s)>-1) return MACRO[i].label; } return ''; }
-    function fOpp(r){ var f=st.f; if(f.mstage){ if(macroLabelOf(r.status)!==f.mstage) return false; } if(f.stage){ if((r.status||'')!==f.stage) return false; } if(f.comp){ if((r.competition||'').toLowerCase().indexOf(f.comp)<0) return false; } if(f.rep){ if(f.rep==='__none__'){ if(r.rep) return false; } else if(r.rep!==f.rep) return false; } if(f.ostatus){ if((r.offerStatus||'')!==f.ostatus) return false; } if(!nIn(r.daysInStage,f.daysMin,f.daysMax)) return false; if(!nIn(r.mileage,f.mileMin,f.mileMax)) return false; if(!nIn(r._score,f.scoreMin,f.scoreMax)) return false; if(!nIn(r._ovp,f.ovpMin,f.ovpMax)) return false; if((f.driveMin!==''&&f.driveMin!=null)||(f.driveMax!==''&&f.driveMax!=null)){ var dm=dMin(r.driveTime); if(dm<0) return false; if(!nIn(dm,f.driveMin,f.driveMax)) return false; } return true; }
+    function fOpp(r){ var f=st.f; if(f.mstage){ if(macroLabelOf(r.status)!==f.mstage) return false; } if(f.stage){ if((r.status||'')!==f.stage) return false; } if(f.comp){ if((r.competition||'').toLowerCase().indexOf(f.comp)<0) return false; } if(f.rep){ if(f.rep==='__none__'){ if(r.rep) return false; } else if(r.rep!==f.rep) return false; } if(f.ostatus){ if((r.offerStatus||'')!==f.ostatus) return false; } if(!nIn(r.daysInStage,f.daysMin,f.daysMax)) return false; if(!nIn(r.mileage,f.mileMin,f.mileMax)) return false; if(!nIn(r._score,f.scoreMin,f.scoreMax)) return false; if(!nIn(r._ovp,f.ovpMin,f.ovpMax)) return false; if((f.driveMin!==''&&f.driveMin!=null)||(f.driveMax!==''&&f.driveMax!=null)){ var dm=dMin(r.driveTime); if(dm<0) return false; if(!nIn(dm,f.driveMin,f.driveMax)) return false; } if(!nIn(bfVehField(r,'year'),f.yearMin,f.yearMax)) return false; var vsel=[['make','make'],['model','model'],['trim','trim'],['bodyStyle','bodyStyle'],['drivetrain','drivetrain'],['engine','engine'],['fuelType','fuelType'],['transmission','transmission'],['cabType','cabType']]; for(var _vi=0;_vi<vsel.length;_vi++){ var _fk=vsel[_vi][0]; if(f[_fk]){ if(String(bfVehField(r,vsel[_vi][1])||'')!==f[_fk]) return false; } } return true; }
     function sortVal(r,c){ var v=r[c.k]; if(c.drive) return dMin(v); if(c.num){ return (v==null||v==='')?-Infinity:Number(v); } return (v==null?'':String(v)).toLowerCase(); }
     function fmtDur2(d){ if(d==null||isNaN(d)) return '—'; var mins=d*1440; if(mins<60) return Math.round(mins)+' mins'; if(mins<1440){ var h=Math.floor(mins/60), m=Math.round(mins-h*60); return h+' hr'+(h===1?'':'s')+(m?' '+m+' mins':''); } return (Math.round(d*10)/10)+' days'; }
     function cellHtml(r,c){ var v=r[c.k]; if(c.k==='title') return '<span class="veh">'+(esc2(v)||'(untitled)')+'</span>'; if(c.k==='_score') return v==null?'—':('<span class="bff-score" style="background:'+scoreTier(v).bg+';color:'+scoreTier(v).fg+';"><i class="ti ti-flame" style="font-size:11px;" aria-hidden="true"></i>'+v+'</span>'); if(c.k==='daysInStage') return v==null?'—':('<span style="color:'+daysColor(v)+';font-weight:600;">'+fmtDur2(v)+'</span>'); if(c.k==='_ovp') return v==null?'—':('<span style="color:'+ovpColor(v)+';">'+usd(v)+'</span>'); if(c.money) return usd(v); if(c.k==='mileage') return num(v); if(c.k==='competition') return v?('<span style="color:'+compColor(v)+';">'+esc2(v)+'</span>'):'—'; if(c.k==='offerStatus') return v?esc2(String(v).replace(/_/g,' ').toLowerCase()):'—'; if(c.k==='driveTime') return v?esc2(v):'—'; if(c.k==='listingLink') return v?('<button class="bff-tbtn" data-link="'+esc2(v)+'"><i class="ti ti-external-link" aria-hidden="true"></i>Listing</button>'):'—'; if(c.k==='offerSheetUrl') return v?('<button class="bff-tbtn bff-tbtn-g" data-sheet="'+esc2(v)+'"><i class="ti ti-photo" aria-hidden="true"></i>Sheet</button>'):'—'; return esc2(v)||'—'; }
@@ -3030,8 +3063,8 @@
     }
     function refresh(){ render(); renderList(); updateCaret(); try{bfPipeKPI();}catch(_k){} }
     function ctlRange(lbl,key){ return '<div class="bff-fc"><label>'+lbl+'</label><div class="bff-frange"><input type="number" data-f="'+key+'Min" placeholder="min" value="'+esc2(st.f[key+'Min']||'')+'"><span>–</span><input type="number" data-f="'+key+'Max" placeholder="max" value="'+esc2(st.f[key+'Max']||'')+'"></div></div>'; }
-    function ctlSelect(lbl,key,opts){ var o='<option value="">All</option>'; opts.forEach(function(op){ o+='<option value="'+esc2(op.v)+'"'+(st.f[key]===op.v?' selected':'')+'>'+esc2(op.t)+'</option>'; }); return '<div class="bff-fc"><label>'+lbl+'</label><select data-f="'+key+'">'+o+'</select></div>'; }
-    function buildFilter(){ var fp=q('fpanel'); if(!fp) return; var html=''; if(st.data&&st.data.canFilter){ var dop='<option value="">All dealerships</option>'; (st.data.dealerships||[]).forEach(function(dl){ dop+='<option value="'+dl.id+'"'+(st.data.selectedDealershipId===dl.id?' selected':'')+'>'+esc2(dl.name)+'</option>'; }); html+='<div class="bff-fc"><label>Dealership</label><select data-f="__deal">'+dop+'</select></div>'; } html+=ctlSelect('Competition','comp',[{v:'both',t:'Beats Both'},{v:'carmax',t:'Beats CarMax'},{v:'carvana',t:'Beats Carvana'},{v:'neither',t:'Beats Neither'}]); var reps=distinct(function(r){return r.rep;}).map(function(x){return {v:x,t:x};}); reps.unshift({v:'__none__',t:'Unassigned'}); html+=ctlSelect('Assigned Rep','rep',reps); html+=ctlSelect('Milestone Stage','mstage',MACRO.map(function(m){return {v:m.label,t:m.label};})); var stgs=distinct(function(r){return r.status;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Stage','stage',stgs); var sts=distinct(function(r){return r.offerStatus;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Offer Status','ostatus',sts); html+=ctlRange('Opportunity Score','score'); html+=ctlRange('Days in Stage','days'); html+=ctlRange('Offer vs Price ($)','ovp'); html+=ctlRange('Mileage','mile'); html+=ctlRange('Drive Time (min)','drive'); fp.innerHTML='<div class="bff-fgrid">'+html+'<button class="bff-fclear" data-r="fclear">Clear all</button></div>'; [].forEach.call(fp.querySelectorAll('[data-f]'),function(el){ var ev=(el.tagName==='SELECT')?'change':'input'; el.addEventListener(ev,function(){ var k=el.getAttribute('data-f'); if(k==='__deal'){ load(el.value===''?null:(+el.value)); return; } st.f[k]=el.value; refresh(); }); }); var cl=q('fclear'); if(cl) cl.addEventListener('click',function(){ st.f={}; buildFilter(); refresh(); }); }
+    function ctlSelect(lbl,key,opts,allLbl){ var o='<option value="">'+esc2(allLbl||'All')+'</option>'; opts.forEach(function(op){ o+='<option value="'+esc2(op.v)+'"'+(st.f[key]===op.v?' selected':'')+'>'+esc2(op.t)+'</option>'; }); return '<div class="bff-fc"><label>'+lbl+'</label><select data-f="'+key+'">'+o+'</select></div>'; }
+    function buildFilter(){ var fp=q('fpanel'); if(!fp) return; var html=''; if(st.data&&st.data.canFilter){ var dop='<option value="">All dealerships</option>'; (st.data.dealerships||[]).forEach(function(dl){ dop+='<option value="'+dl.id+'"'+(st.data.selectedDealershipId===dl.id?' selected':'')+'>'+esc2(dl.name)+'</option>'; }); html+='<div class="bff-fc"><label>Dealership</label><select data-f="__deal">'+dop+'</select></div>'; } html+=ctlSelect('Competition','comp',[{v:'both',t:'Beats Both'},{v:'carmax',t:'Beats CarMax'},{v:'carvana',t:'Beats Carvana'},{v:'neither',t:'Beats Neither'}]); var reps=distinct(function(r){return r.rep;}).map(function(x){return {v:x,t:x};}); reps.unshift({v:'__none__',t:'Unassigned'}); html+=ctlSelect('Assigned Rep','rep',reps); html+=ctlSelect('Milestone Stage','mstage',MACRO.map(function(m){return {v:m.label,t:m.label};})); var stgs=distinct(function(r){return r.status;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Stage','stage',stgs); var sts=distinct(function(r){return r.offerStatus;}).map(function(x){return {v:x,t:String(x).replace(/_/g,' ').toLowerCase()};}); html+=ctlSelect('Offer Status','ostatus',sts); html+=ctlRange('Opportunity Score','score'); html+=ctlRange('Days in Stage','days'); html+=ctlRange('Offer vs Price ($)','ovp'); html+=ctlRange('Mileage','mile'); html+=ctlRange('Drive Time (min)','drive'); html+=ctlRange('Year','year'); var vehSel=function(lbl,key,field){ var opts=distinct(function(r){ return bfVehField(r,field); }).map(function(x){return {v:x,t:x};}); html+=ctlSelect(lbl,key,opts,'All '+lbl); }; vehSel('Make','make','make'); vehSel('Model','model','model'); vehSel('Trim','trim','trim'); vehSel('Body Style','bodyStyle','bodyStyle'); vehSel('Drivetrain','drivetrain','drivetrain'); vehSel('Engine','engine','engine'); vehSel('Fuel Type','fuelType','fuelType'); vehSel('Transmission','transmission','transmission'); vehSel('Cab Type','cabType','cabType'); fp.innerHTML='<div class="bff-fgrid">'+html+'<button class="bff-fclear" data-r="fclear">Clear all</button></div>'; [].forEach.call(fp.querySelectorAll('[data-f]'),function(el){ var ev=(el.tagName==='SELECT')?'change':'input'; el.addEventListener(ev,function(){ var k=el.getAttribute('data-f'); if(k==='__deal'){ load(el.value===''?null:(+el.value)); return; } st.f[k]=el.value; refresh(); }); }); var cl=q('fclear'); if(cl) cl.addEventListener('click',function(){ st.f={}; buildFilter(); refresh(); }); }
     function updateScope(d){ var sc=q('scope'); if(!sc) return; if(d&&d.needsAuth){ sc.style.display=''; sc.textContent='(open a record once so your access loads, then refresh)'; return; } if(!(d&&d.allAccess)){ sc.style.display='none'; sc.textContent=''; return; } sc.style.display=''; var base='All dealerships'; if(d.selectedDealershipId!=null&&d.dealerships){ d.dealerships.forEach(function(dl){ if(dl.id===d.selectedDealershipId) base=dl.name; }); } sc.innerHTML=esc2(base)+' \u00b7 <span class="bff-scope-n">'+((d&&d.total)||0)+'</span> deals'; }
     function waitToken(){ if(st._tw) return; var n=0; var sc=q('scope'); if(sc) sc.textContent='Loading your access…'; st._tw=setInterval(function(){ var t=''; try{t=bfGetApiToken();}catch(e){} if(t){ clearInterval(st._tw); st._tw=null; load(st.dealId); } else if(++n>25){ clearInterval(st._tw); st._tw=null; if(sc) sc.textContent='(open any record once so your access loads, then come back)'; } },700); }
     function load(dealId){ st.dealId=(dealId!=null?dealId:null); var __ck='bf.cc.cache.'+(st.dealId==null?'all':st.dealId); try{ var __cj=localStorage.getItem(__ck); if(__cj){ var __co=JSON.parse(__cj); if(__co&&__co.d&&__co.d.stages){ st.data=__co.d; decorate(st.data); updateScope(__co.d); buildFilter(); refresh(); } } }catch(e){} var tk=''; try{ tk=bfGetApiToken(); }catch(e){} if(!tk){ waitToken(); return; } var bo=st.dealId!=null?{dealershipId:st.dealId}:{}; fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','X-BF-Token':tk},body:JSON.stringify(bo)}).then(function(r){return r.json();}).then(function(d){ st.data=d||{stages:[]}; if(d&&d.needsAuth){ var s2=q('scope'); if(s2) s2.textContent='(access not recognized — open any record once to refresh)'; return; } try{ if(d&&d.stages) localStorage.setItem(__ck, JSON.stringify({t:Date.now(), d:d})); }catch(e){} decorate(st.data); updateScope(d); buildFilter(); refresh(); }).catch(function(){ if(!(st.data&&st.data.stages)) q('funnel').innerHTML='<div class="bff-empty">Could not load the pipeline. Refresh to retry.</div>'; }); }
