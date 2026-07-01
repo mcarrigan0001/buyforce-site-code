@@ -1,0 +1,67 @@
+/* BuyForce Window-Sticker overlay — CarMax / Carvana sell-my-car pages.
+ * Assist-only: highlights which on-page options the sticker confirms. Mirrors the
+ * .bfc-* charcoal/green look from capture.css. Prefixed .bfw-* to avoid clashes
+ * with the host site and with the FB sidebar styles. */
+
+/* Floating panel */
+#bfw-panel {
+  position: fixed; top: 84px; right: 18px; width: 300px; z-index: 2147483000;
+  background: #12151c; color: #eef; border: 1px solid #2a2f3a; border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0,0,0,.45); font: 13px/1.45 -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow: hidden;
+}
+#bfw-panel * { box-sizing: border-box; }
+.bfw-head { display: flex; align-items: flex-start; gap: 8px; padding: 11px 12px 9px; background: #0f1218; border-bottom: 1px solid #232833; }
+.bfw-logo { flex: 0 0 auto; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: #57c822; box-shadow: 0 0 8px #57c82288; }
+.bfw-title { flex: 1 1 auto; min-width: 0; font-size: 13px; font-weight: 700; color: #eafbe3; }
+.bfw-sub { font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: #7fae5e; margin-top: 2px; }
+.bfw-x { flex: 0 0 auto; background: transparent; color: #8a8f98; border: none; font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.bfw-x:hover { color: #e8e8ea; }
+
+.bfw-body { padding: 10px 12px 12px; max-height: 60vh; overflow-y: auto; }
+.bfw-status { font-size: 11.5px; color: #9aa0a6; margin-bottom: 9px; line-height: 1.5; }
+.bfw-status b { color: #cfe9c0; font-weight: 700; }
+.bfw-status.bfw-miss { color: #f1c152; }
+.bfw-status.bfw-err { color: #f08a7a; }
+
+.bfw-sec-h { font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: #7a7c84; margin: 10px 0 5px; }
+.bfw-opts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.bfw-opts li { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #d7dade; padding: 2px 0; }
+.bfw-opts li .bfw-price { color: #8a8f98; flex: 0 0 auto; }
+.bfw-empty { font-size: 11.5px; color: #6d717a; }
+
+.bfw-vin { margin-top: 10px; }
+.bfw-vin label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: #7a7c84; margin-bottom: 4px; }
+.bfw-vin-row { display: flex; gap: 6px; }
+.bfw-vin input { flex: 1 1 auto; min-width: 0; background: #0d1016; border: 1px solid #2a2f3a; color: #eef; border-radius: 7px; padding: 7px 8px; font-size: 12.5px; letter-spacing: .5px; outline: none; text-transform: uppercase; }
+.bfw-vin input:focus { border-color: #57c822; }
+.bfw-btn { flex: 0 0 auto; background: #57c822; color: #06210a; border: none; border-radius: 7px; padding: 7px 13px; font-weight: 700; font-size: 12px; cursor: pointer; }
+.bfw-btn:hover { background: #62d62b; }
+.bfw-btn:disabled { opacity: .55; cursor: default; }
+
+.bfw-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; }
+.bfw-rescan { background: #161922; color: #9fd86a; border: 1px solid #2f5d1a; border-radius: 7px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.bfw-rescan:hover { border-color: #57c822; background: #1b2230; }
+.bfw-count { font-size: 11px; color: #8a8f98; }
+
+/* Re-open tab when panel is dismissed */
+#bfw-tab {
+  position: fixed; top: 84px; right: 0; z-index: 2147483000; cursor: pointer;
+  background: #12151c; color: #9fd86a; border: 1px solid #2f5d1a; border-right: none;
+  border-radius: 9px 0 0 9px; padding: 8px 9px; font: 700 11px/1 -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: .5px; box-shadow: -2px 3px 12px rgba(0,0,0,.35);
+}
+#bfw-tab:hover { background: #1b2230; border-color: #57c822; }
+
+/* ---- On-page highlighting (injected next to the host's controls) ---- */
+.bfw-ring-yes { outline: 2px solid #57c822 !important; outline-offset: 2px !important; border-radius: 8px; box-shadow: 0 0 0 3px rgba(87,200,34,.18) !important; }
+.bfw-ring-no  { outline: 1px dashed #6b7280 !important; outline-offset: 2px !important; }
+
+.bfw-badge {
+  display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; margin-left: 6px;
+  background: #123018; color: #9fd86a; border: 1px solid #2f5d1a; border-radius: 999px;
+  padding: 1px 8px; font: 700 10.5px/1.6 -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  white-space: nowrap; letter-spacing: .2px; z-index: 2147482000; position: relative;
+}
+.bfw-badge.bfw-badge-no { background: #191b20; color: #8a8f98; border-color: #2a2f3a; font-weight: 600; }
+.bfw-badge .bfw-check { font-size: 11px; line-height: 1; }

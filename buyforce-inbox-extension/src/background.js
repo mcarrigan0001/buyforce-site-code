@@ -64,6 +64,37 @@ async function bfDecodeVin(vinRaw) {
   } catch (e) { return { ok: false, reason: 'Could not reach NHTSA.' }; }
 }
 
+// Window-sticker pull. One network fetch per VIN; cached forever in
+// chrome.storage.local under bfSticker.<VIN> (stickers are immutable per VIN).
+async function bfWindowSticker(vinRaw) {
+  const vin = String(vinRaw || '').toUpperCase().replace(/[^A-HJ-NPR-Z0-9]/g, '');
+  if (vin.length !== 17) return { ok: false, reason: 'bad_vin' };
+  const cacheKey = 'bfSticker.' + vin;
+  const cached = (await chrome.storage.local.get(cacheKey))[cacheKey];
+  // Reuse any prior result. Hits are permanent; definitive misses
+  // (not_released / no_free_source / bad_vin) are also cached so we don't re-hit
+  // n8n. Transient failures (auth / network / bad_response) are NOT cached.
+  if (cached && (cached.ok === true || cached.reason === 'not_released' || cached.reason === 'no_free_source' || cached.reason === 'bad_vin')) {
+    return cached;
+  }
+  const token = await bfGetToken();
+  if (!token) return { ok: false, reason: 'auth' };
+  try {
+    const res = await fetch('https://buyforce.app.n8n.cloud/webhook/window-sticker', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-bf-token': token },
+      body: JSON.stringify({ vin: vin })
+    });
+    if (res.status === 401 || res.status === 403) return { ok: false, reason: 'auth' };
+    const data = await res.json().catch(function () { return { ok: false, reason: 'bad_response' }; });
+    if (data && (data.ok === true || data.reason === 'not_released' || data.reason === 'no_free_source' || data.reason === 'bad_vin')) {
+      const store = {}; store[cacheKey] = data; chrome.storage.local.set(store);
+    }
+    return data;
+  } catch (e) {
+    return { ok: false, reason: 'network' };
+  }
+}
 
 let bfOffscreenReady = null;
 async function bfEnsureOffscreen() {
@@ -114,6 +145,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg && msg.type === 'BF_VIN_DECODE' && msg.vin) {
     (async () => { sendResponse(await bfDecodeVin(msg.vin)); })();
+    return true;
+  }
+  if (msg && msg.type === 'BF_WINDOW_STICKER' && msg.vin) {
+    (async () => { sendResponse(await bfWindowSticker(msg.vin)); })();
     return true;
   }
   if (msg && msg.type === 'BF_PLATE_TO_VIN' && msg.plate && msg.state) {

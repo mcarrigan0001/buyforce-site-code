@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BuyForce Inbox Overlay",
   "version": "0.2.0",
-  "description": "BuyForce sidebar for Facebook Marketplace: capture listings as leads, badge inbox conversations, and surface each deal's pipeline data (stage, time-in-stage, next action). Assist-only.",
+  "description": "BuyForce sidebar for Facebook Marketplace: capture listings as leads, badge inbox conversations, and surface each deal's pipeline data (stage, time-in-stage, next action). Also a CarMax/Carvana window-sticker helper that highlights which options a vehicle has. Assist-only.",
   "permissions": [
     "storage",
     "offscreen"
@@ -12,7 +12,9 @@
     "https://vpic.nhtsa.dot.gov/*",
     "https://www.facebook.com/*",
     "https://web.facebook.com/*",
-    "https://buyforce.noloco.co/*"
+    "https://buyforce.noloco.co/*",
+    "https://*.carvana.com/*",
+    "https://*.carmax.com/*"
   ],
   "background": {
     "service_worker": "src/background.js"
@@ -34,6 +36,20 @@
         "src/badges.css",
         "src/capture.css",
         "src/sidebar.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.carvana.com/*",
+        "https://*.carmax.com/*"
+      ],
+      "js": [
+        "src/sticker-match.js",
+        "src/sticker.js"
+      ],
+      "css": [
+        "src/sticker.css"
       ],
       "run_at": "document_idle"
     },
