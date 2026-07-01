@@ -3482,7 +3482,7 @@
   }
   /* ===== Workspace: tabbed object replacing the comments box ===== */
   var BF_WH='https://buyforce.app.n8n.cloud/webhook';
-  var BF_TESTMODE=(Date.now()<Date.parse('2026-07-01T00:00:00'));  // conserve n8n executions during UI build; auto-expires 7/1/26
+  var BF_TESTMODE=false;  // n8n execution-conservation lifted per user (usage healthy); re-enable by setting true if needed
   function bfPostEvent(p){ try{ if(p&&p.uuid) delete bfEvCache[p.uuid]; }catch(_c){} try{ fetch(BF_WH+'/add-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}); }catch(e){} }
   var bfEvCache={}, bfTaskCache={}, BF_WSTTL=300000;
   function bfGetEvents(uuid){ if(BF_TESTMODE) return Promise.resolve({events:[]}); var c=bfEvCache[uuid]; if(c && (Date.now()-c.at)<BF_WSTTL) return Promise.resolve(c.data); return fetch(BF_WH+'/get-events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({uuid:uuid})}).then(function(r){return r.json();}).then(function(d){ d=d||{events:[]}; bfEvCache[uuid]={at:Date.now(),data:d}; return d; }).catch(function(){return {events:[]};}); }
